@@ -215,6 +215,13 @@ function detectShapeOrLetter(points: Point[]) {
 const redrawCanvas = (canvas: HTMLCanvasElement, strokesList: Stroke[]) => {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
+
+  // Safeguard: Ensure canvas coordinates space matches styling scale
+  if (canvas.width !== 3000 || canvas.height !== 2500) {
+    canvas.width = 3000;
+    canvas.height = 2500;
+  }
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   for (const stroke of strokesList) {
@@ -807,27 +814,17 @@ export default function WhiteboardPage() {
     });
   };
 
-  // Effect to redraw canvas when strokes change
+  // Effect to handle initial size setup and redrawing on updates
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (canvas) redrawCanvas(canvas, strokes);
-  }, [strokes]);
-
-  // Effect to handle window resize
-  useEffect(() => {
-    const handleResize = () => {
-      const canvas = canvasRef.current;
-      if (canvas) {
-        // Just keep the size large enough
+    if (canvas) {
+      if (canvas.width !== 3000 || canvas.height !== 2500) {
         canvas.width = 3000;
         canvas.height = 2500;
-        redrawCanvas(canvas, strokes);
       }
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+      redrawCanvas(canvas, strokes);
+    }
+  }, [strokes, joined]);
 
   const stickyColors = {
     yellow: "bg-amber-200/80 text-amber-900 border-amber-300",
