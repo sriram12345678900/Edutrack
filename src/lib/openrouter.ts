@@ -13,7 +13,7 @@ export async function generateContent(prompt: string, useCase: "summary" | "note
       headers: {
         "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://edutrack.app", // Optional, for OpenRouter rankings
+        "HTTP-Referer": "https://edutrack-delta-drab.vercel.app", // Optional, for OpenRouter rankings
         "X-Title": "EduTrack", // Optional, for OpenRouter rankings
       },
       body: JSON.stringify({

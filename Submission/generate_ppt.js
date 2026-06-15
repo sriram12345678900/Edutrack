@@ -71,7 +71,7 @@ const details = [
   { label: "Project Name", val: "EduTrack" },
   { label: "Team Leader Name", val: "Suwrat Korgaonkar" },
   { label: "School Name", val: "Bal Bharati Public School, Navi Mumbai" },
-  { label: "Application Link", val: "https://edutrack.app", link: "https://edutrack.app" }
+  { label: "Application Link", val: "https://edutrack-delta-drab.vercel.app", link: "https://edutrack-delta-drab.vercel.app" }
 ];
 
 details.forEach((item, index) => {
@@ -411,11 +411,11 @@ slide7.addText("Interactive Walkthrough Highlights:\nDashboard Navigation • Dy
   fontFace: 'Arial', align: 'center', lineSpacing: 14
 });
 
-slide7.addText("Access Live Application: https://edutrack.app", {
+slide7.addText("Access Live Application: https://edutrack-delta-drab.vercel.app", {
   x: 2.5, y: 6.0, w: 8.33, h: 0.35,
   fontSize: 14, color: COLORS.accentEmerald, bold: true,
   fontFace: 'Arial', align: 'center',
-  hyperlink: { url: 'https://edutrack.app' },
+  hyperlink: { url: 'https://edutrack-delta-drab.vercel.app' },
   underline: true
 });
 
@@ -513,11 +513,11 @@ slide9.addText("Live Deployed Platform", {
   fontFace: 'Arial'
 });
 
-slide9.addText("https://edutrack.app", {
+slide9.addText("https://edutrack-delta-drab.vercel.app", {
   x: 0.8, y: 2.3, w: 5.4, h: 0.5,
   fontSize: 20, bold: true, color: COLORS.accentIndigo,
   fontFace: 'Arial',
-  hyperlink: { url: "https://edutrack.app" },
+  hyperlink: { url: "https://edutrack-delta-drab.vercel.app" },
   underline: true
 });
 
