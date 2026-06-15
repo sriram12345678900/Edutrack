@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { 
   Home, BookOpen, MessageSquare, Target, Settings, LogOut, Menu, X, 
-  GraduationCap, Moon, Sun, Calendar, Sparkles, Users, Award, Palette, Timer, Brain
+  GraduationCap, Moon, Sun, Calendar, Sparkles, Users, Award, Palette, Timer, Brain, Camera
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -24,6 +24,7 @@ const categories = [
     title: "AI Study Lab",
     items: [
       { href: "/tutor", label: "AI Tutor", icon: MessageSquare },
+      { href: "/lens", label: "Doubt-Solver Lens", icon: Camera },
       { href: "/plan", label: "Study Planner", icon: Calendar },
       { href: "/flashcards", label: "AI Flashcards", icon: Sparkles },
       { href: "/whiteboard", label: "Whiteboard", icon: Palette },

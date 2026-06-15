@@ -305,7 +305,7 @@ export default function Dashboard() {
           
           {/* QUICK PREMIUM UTILITY ROW */}
           <motion.section variants={item} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/tutor')} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/50 dark:border-white/10 p-5 rounded-[1.75rem] flex flex-col items-center justify-center text-center cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-emerald-500/15 hover:border-emerald-500/40 transition-all group">
+            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/lens')} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/50 dark:border-white/10 p-5 rounded-[1.75rem] flex flex-col items-center justify-center text-center cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-emerald-500/15 hover:border-emerald-500/40 transition-all group">
               <Camera className="w-8 h-8 text-emerald-500 mb-3 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(16,185,129,0.35)]" />
               <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">AI Lens</span>
             </motion.div>

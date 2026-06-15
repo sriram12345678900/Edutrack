@@ -285,6 +285,10 @@ export default function WhiteboardPage() {
   const boardRef = useRef<HTMLDivElement>(null);
   const snapshotRef = useRef<ImageData | null>(null);
 
+  const isDrawingRef = useRef(false);
+  const lastPointRef = useRef<Point | null>(null);
+  const strokePointsRef = useRef<Point[]>([]);
+
 
   const paletteColors = [
     "#000000", "#ef4444", "#f97316", "#f59e0b", 
@@ -572,6 +576,7 @@ export default function WhiteboardPage() {
   const startDrawing = (e: React.MouseEvent | React.TouchEvent | any) => {
     if (tool === "hand") {
       setIsDrawing(true);
+      isDrawingRef.current = true;
       const coords = getCoordinates(e);
       setStartScrollLeft(containerRef.current?.scrollLeft || 0);
       setStartScrollTop(containerRef.current?.scrollTop || 0);
@@ -583,8 +588,11 @@ export default function WhiteboardPage() {
     if (tool === "text" || tool === "sticky") return;
     
     setIsDrawing(true);
+    isDrawingRef.current = true;
     const coords = getCoordinates(e);
-    setCurrentStrokePoints([coords]);
+    
+    lastPointRef.current = coords;
+    strokePointsRef.current = [coords];
     
     if (smartPenTimerRef.current) {
       clearTimeout(smartPenTimerRef.current);
@@ -593,7 +601,7 @@ export default function WhiteboardPage() {
   };
 
   const draw = (e: React.MouseEvent | React.TouchEvent | any) => {
-    if (!isDrawing) return;
+    if (!isDrawingRef.current) return;
     
     if (tool === "hand") {
       const coords = getCoordinates(e);
@@ -607,7 +615,7 @@ export default function WhiteboardPage() {
     }
 
     const coords = getCoordinates(e);
-    setCurrentStrokePoints(prev => [...prev, coords]);
+    strokePointsRef.current.push(coords);
     
     // Fast local redraw
     const canvas = canvasRef.current;
@@ -615,84 +623,102 @@ export default function WhiteboardPage() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     
-    ctx.lineWidth = brushSize;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.strokeStyle = color;
-    
-    if (tool === "eraser" || tool === "stroke_eraser") {
-      ctx.globalCompositeOperation = "destination-out";
-      ctx.strokeStyle = "rgba(0,0,0,1)";
-    } else {
+    if (tool === "line" || tool === "rect" || tool === "circle") {
+      redrawCanvas(canvas, strokes);
+      
+      ctx.lineWidth = brushSize;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 1.0;
       ctx.globalCompositeOperation = "source-over";
-      if (tool === "highlighter") {
-        ctx.strokeStyle = color + "60"; // add alpha
+      
+      const start = strokePointsRef.current[0];
+      if (tool === "line") {
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(coords.x, coords.y);
+        ctx.stroke();
+      } else if (tool === "rect") {
+        ctx.beginPath();
+        ctx.rect(start.x, start.y, coords.x - start.x, coords.y - start.y);
+        if (fillShapes) ctx.fill();
+        else ctx.stroke();
+      } else if (tool === "circle") {
+        const radius = Math.sqrt(Math.pow(coords.x - start.x, 2) + Math.pow(coords.y - start.y, 2));
+        ctx.beginPath();
+        ctx.arc(start.x, start.y, radius, 0, 2 * Math.PI);
+        if (fillShapes) ctx.fill();
+        else ctx.stroke();
+      }
+    } else {
+      ctx.lineWidth = brushSize;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = color;
+      
+      if (tool === "eraser" || tool === "stroke_eraser") {
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.strokeStyle = "rgba(0,0,0,1)";
+        ctx.globalAlpha = 1.0;
+      } else {
+        ctx.globalCompositeOperation = "source-over";
+        if (tool === "highlighter") {
+          ctx.strokeStyle = color;
+          ctx.globalAlpha = 0.35;
+        } else {
+          ctx.globalAlpha = 1.0;
+        }
+      }
+      
+      const lastPoint = lastPointRef.current;
+      if (lastPoint) {
+        ctx.beginPath();
+        ctx.moveTo(lastPoint.x, lastPoint.y);
+        ctx.lineTo(coords.x, coords.y);
+        ctx.stroke();
       }
     }
     
-    const lastPoint = currentStrokePoints[currentStrokePoints.length - 1];
-    if (lastPoint) {
-      ctx.beginPath();
-      ctx.moveTo(lastPoint.x, lastPoint.y);
-      ctx.lineTo(coords.x, coords.y);
-      ctx.stroke();
-    }
+    lastPointRef.current = coords;
   };
 
   const stopDrawing = () => {
-    if (!isDrawing) return;
+    if (!isDrawingRef.current) return;
     setIsDrawing(false);
+    isDrawingRef.current = false;
     
     if (tool === "hand") return;
 
-    if (currentStrokePoints.length === 0) return;
+    const points = strokePointsRef.current;
+    if (points.length === 0) return;
 
     const newStroke: Stroke = {
       id: Date.now().toString(),
       tool,
       color,
       brushSize,
-      points: currentStrokePoints,
+      points: points,
       fill: fillShapes
     };
     
     if (tool === "stroke_eraser") {
-      // erase strokes that intersect
-      setStrokes(prev => prev.filter(s => !doStrokesIntersect(s, newStroke)));
+      setStrokes(prev => {
+        const next = prev.filter(s => !doStrokesIntersect(s, newStroke));
+        const canvas = canvasRef.current;
+        if (canvas) redrawCanvas(canvas, next);
+        return next;
+      });
     } else if (tool === "smart_pen") {
       setAccumulatedSmartStrokes(prev => [...prev, newStroke]);
       smartPenTimerRef.current = setTimeout(processSmartPen, 600);
     } else {
-      // Optional heuristic auto-detect for normal pen
-      if (tool === "pen") {
-        const detected = detectShapeOrLetter(currentStrokePoints) as any;
-        if (detected) {
-          if (detected.type === "circle") {
-             newStroke.tool = "circle";
-             newStroke.points = [
-               { x: detected.cx, y: detected.cy },
-               { x: detected.cx + detected.r, y: detected.cy }
-             ];
-             showToast("Detected Circle");
-          } else if (detected.type === "rectangle") {
-             newStroke.tool = "rect";
-             newStroke.points = [
-               { x: detected.x, y: detected.y },
-               { x: detected.x + detected.w, y: detected.y + detected.h }
-             ];
-             showToast("Detected Rectangle");
-          } else if (detected.type === "letter") {
-             newStroke.tool = "text";
-             newStroke.text = detected.value;
-             newStroke.points = [{ x: detected.x - 10, y: detected.y + 10 }];
-             showToast("Detected Letter " + detected.value);
-          }
-        }
-      }
       setStrokes(prev => [...prev, newStroke]);
     }
     
-    setCurrentStrokePoints([]);
+    strokePointsRef.current = [];
+    lastPointRef.current = null;
     
     // Push history and sync
     setTimeout(() => {
