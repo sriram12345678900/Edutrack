@@ -14,25 +14,137 @@ type QuizPhase = "category" | "list" | "mcq-setup" | "mcq-quiz" | "mcq-results" 
 
 const SECONDS_PER_QUESTION = 45;
 
+function cleanMathText(text: string): string {
+  if (!text) return "";
+  return text
+    .replace(/\$\$/g, "")
+    .replace(/\$/g, "")
+    .replace(/\\rightarrow/g, " → ")
+    .replace(/\\leftarrow/g, " ← ")
+    .replace(/\\leftrightarrow/g, " ↔ ")
+    .replace(/\\text\{([^}]+)\}/g, "$1")
+    .replace(/\\text\b/g, "")
+    .replace(/_\{([^}]+)\}/g, "$1")
+    .replace(/_([a-zA-Z0-9])/g, "$1")
+    .replace(/\^([a-zA-Z0-9+-])/g, "$1")
+    .replace(/\\times/g, " × ")
+    .replace(/\\Delta/g, "Δ")
+    .replace(/\\,/g, " ")
+    .replace(/\\;/g, " ")
+    .replace(/\\quad/g, "   ")
+    .replace(/\\cdot/g, "·")
+    .trim();
+}
+
 // Parse MCQ question text into stem + options
 function parseQuestion(raw: string): { stem: string; options: { label: string; text: string }[] } {
-  const optionRegex = /\(([a-dA-D])\)\s*([\s\S]*?)(?=\s*\([a-dA-D]\)|$)/g;
+  const text = raw.trim();
+  
+  // 1. Detect if it's an Assertion-Reason question
+  const isAssertionReason = /assertion\s*\(a\)/i.test(text) || /reason\s*\(r\)/i.test(text);
+  
+  if (isAssertionReason) {
+    const stdOptions = [
+      { label: "A", text: "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)." },
+      { label: "B", text: "Both Assertion (A) and Reason (R) are true, but Reason (R) is not the correct explanation of Assertion (A)." },
+      { label: "C", text: "Assertion (A) is true, but Reason (R) is false." },
+      { label: "D", text: "Assertion (A) is false, but Reason (R) is true." }
+    ];
+    
+    // Strip standard options if they are written at the end of the text
+    const optionStartIndex = text.search(/\((a|A)\)\s*both\s*assertion/i);
+    let stem = text;
+    if (optionStartIndex > 0) {
+      stem = text.slice(0, optionStartIndex).trim();
+    } else {
+      const lastOptionIndex = text.search(/\((a|A)\)[^(]*\((b|B)\)[^(]*\((c|C)\)[^(]*\((d|D)\)/);
+      if (lastOptionIndex > 0) {
+        stem = text.slice(0, lastOptionIndex).trim();
+      }
+    }
+    return { stem, options: stdOptions };
+  }
+  
+  // 2. Regular MCQ parsing with multiple formats
+  const patterns = [
+    {
+      regex: /\(((?:[a-d]|[A-D]))\)\s*([\s\S]*?)(?=\s*\((?:[a-d]|[A-D])\)|$)/g,
+      test: /\((?:a|A)\)[\s\S]*?\((?:b|B)\)[\s\S]*?\((?:c|C)\)[\s\S]*?\((?:d|D)\)/
+    },
+    {
+      regex: /(?:^|\s)((?:[a-d]|[A-D]))\)\s*([\s\S]*?)(?=\s*(?:[a-d]|[A-D])\)|$)/g,
+      test: /(?:a|A)\)[\s\S]*?(?:b|B)\)[\s\S]*?(?:c|C)\)[\s\S]*?(?:d|D)\)/
+    },
+    {
+      regex: /(?:^|\s)((?:[a-d]|[A-D]))\.\s*([\s\S]*?)(?=\s*(?:[a-d]|[A-D])\.|$)/g,
+      test: /(?:a|A)\.[\s\S]*?(?:b|B)\.[\s\S]*?(?:c|C)\.[\s\S]*?(?:d|D)\./
+    }
+  ];
+  
+  for (const pat of patterns) {
+    if (pat.test.test(text)) {
+      const firstOptMatch = text.match(pat.test);
+      if (firstOptMatch) {
+        const optionStartIndex = text.indexOf(firstOptMatch[0]);
+        const stem = text.slice(0, optionStartIndex).trim();
+        const optionsText = text.slice(optionStartIndex);
+        
+        const options: { label: string; text: string }[] = [];
+        let match;
+        pat.regex.lastIndex = 0;
+        while ((match = pat.regex.exec(optionsText)) !== null) {
+          options.push({ label: match[1].toUpperCase(), text: match[2].trim() });
+        }
+        
+        if (options.length === 4) {
+          return { stem, options };
+        }
+      }
+    }
+  }
+  
+  // Basic backup option regex
+  const optionRegex = /\(((?:[a-d]|[A-D]))\)\s*([\s\S]*?)(?=\s*\((?:[a-d]|[A-D])\)|$)/g;
   const options: { label: string; text: string }[] = [];
   let match;
-  while ((match = optionRegex.exec(raw)) !== null) {
+  optionRegex.lastIndex = 0;
+  while ((match = optionRegex.exec(text)) !== null) {
     options.push({ label: match[1].toUpperCase(), text: match[2].trim() });
   }
-  // stem is everything before the first option
-  const firstOption = raw.search(/\([a-dA-D]\)/);
-  const stem = firstOption > 0 ? raw.slice(0, firstOption).trim() : raw;
-  return { stem, options };
+  
+  if (options.length === 4) {
+    const firstOptionIndex = text.search(/\(((?:a|A))\)/);
+    const stem = firstOptionIndex > 0 ? text.slice(0, firstOptionIndex).trim() : text;
+    return { stem, options };
+  }
+  
+  return { stem: text, options: [] };
 }
 
 // Extract the correct letter from officialAnswer
 function getCorrectLetter(officialAnswer?: string): string {
   if (!officialAnswer) return "";
-  const m = officialAnswer.match(/^\(([a-dA-D])\)/i);
-  return m ? m[1].toUpperCase() : "";
+  
+  // Match standard option letters
+  const m = officialAnswer.trim().match(/^\(?([a-d])\)?/i);
+  if (m) return m[1].toUpperCase();
+  
+  // Handle full Assertion-Reason text matches
+  const text = officialAnswer.toLowerCase();
+  if (text.includes("both assertion") && text.includes("correct explanation")) {
+    return "A";
+  }
+  if (text.includes("both assertion") && text.includes("not the correct explanation")) {
+    return "B";
+  }
+  if (text.includes("assertion is true") || text.includes("assertion (a) is true")) {
+    return "C";
+  }
+  if (text.includes("assertion is false") || text.includes("assertion (a) is false") || text.includes("assertion is wrong") || text.includes("assertion (a) is wrong")) {
+    return "D";
+  }
+  
+  return "";
 }
 
 export default function PYQTestPage({ params }: { params: { subject: string, chapter: string } }) {
@@ -410,7 +522,7 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
 
           {/* Question */}
           <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow border border-slate-200 dark:border-slate-800">
-            <p className="text-base md:text-lg font-semibold text-slate-800 dark:text-slate-200 leading-relaxed">{stem}</p>
+            <p className="text-base md:text-lg font-semibold text-slate-800 dark:text-slate-200 leading-relaxed">{cleanMathText(stem)}</p>
           </div>
 
           {/* Options */}
@@ -435,7 +547,7 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
                     revealed && isSelected && !isCorrect ? 'bg-red-400 border-red-400 text-white' :
                     'border-current'
                   }`}>{opt.label}</span>
-                  <span className="flex-1 leading-snug">{opt.text}</span>
+                  <span className="flex-1 leading-snug">{cleanMathText(opt.text)}</span>
                   {revealed && isCorrect && <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />}
                   {revealed && isSelected && !isCorrect && <X className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />}
                 </button>
@@ -463,7 +575,7 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
                 <CheckCircle2 className="w-5 h-5 text-emerald-500" />
                 <h4 className="font-bold text-emerald-700 dark:text-emerald-400">Correct Answer: ({correctLetter})</h4>
               </div>
-              <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">{q.officialAnswer}</p>
+              <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">{cleanMathText(q.officialAnswer || "")}</p>
               <button onClick={handleNextMCQ}
                 className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-colors mt-2">
                 {quizIndex + 1 < questions.length ? "Next Question →" : "See Results 🏆"}

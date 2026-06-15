@@ -277,26 +277,32 @@ export default function SignupWizard() {
                 <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2">
                   <Globe className="w-5 h-5 text-indigo-500" /> Choose Your Default Study Language
                 </h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-[280px] overflow-y-auto pr-2 scrollbar-thin">
                   {[
                     { code: "English", label: "English", flag: "🇬🇧" },
-                    { code: "Hinglish", label: "Hinglish", flag: "🇮🇳" },
+                    { code: "Hinglish", label: "Hinglish (Hindi+Eng)", flag: "🇮🇳" },
+                    { code: "Telgish", label: "Telgish (Telugu+Eng)", flag: "🇮🇳" },
+                    { code: "Tanglish", label: "Tanglish (Tamil+Eng)", flag: "🇮🇳" },
+                    { code: "Marathish", label: "Marathish (Marathi+Eng)", flag: "🇮🇳" },
+                    { code: "Benglish", label: "Benglish (Bengali+Eng)", flag: "🇮🇳" },
                     { code: "Hindi", label: "Hindi (हिंदी)", flag: "🇮🇳" },
-                    { code: "Tamil", label: "Tamil (தமிழ்)", flag: "🇮🇳" },
                     { code: "Telugu", label: "Telugu (తెలుగు)", flag: "🇮🇳" },
-                    { code: "Marathi", label: "Marathi (मराठी)", flag: "🇮🇳" }
+                    { code: "Tamil", label: "Tamil (தமிழ்)", flag: "🇮🇳" },
+                    { code: "Marathi", label: "Marathi (मराठी)", flag: "🇮🇳" },
+                    { code: "Bengali", label: "Bengali (বাংলা)", flag: "🇮🇳" },
+                    { code: "Kannada", label: "Kannada (ಕನ್ನಡ)", flag: "🇮🇳" }
                   ].map((lang) => (
                     <button
                       key={lang.code}
                       onClick={() => setLanguage(lang.code)}
-                      className={`p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
+                      className={`p-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-1.5 ${
                         language === lang.code 
                           ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 scale-[1.02]' 
                           : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:shadow-md'
                       }`}
                     >
-                      <span className="text-3xl">{lang.flag}</span>
-                      <span className="text-sm font-bold">{lang.label}</span>
+                      <span className="text-2xl">{lang.flag}</span>
+                      <span className="text-xs font-bold text-center leading-tight">{lang.label}</span>
                     </button>
                   ))}
                 </div>
