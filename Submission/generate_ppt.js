@@ -70,11 +70,12 @@ const details = [
   { label: "Class", val: "10" },
   { label: "Project Name", val: "EduTrack" },
   { label: "Team Leader Name", val: "Suwrat Korgaonkar" },
-  { label: "School Name", val: "Bal Bharati Public School, Navi Mumbai" }
+  { label: "School Name", val: "Bal Bharati Public School, Navi Mumbai" },
+  { label: "Application Link", val: "https://edutrack.app", link: "https://edutrack.app" }
 ];
 
 details.forEach((item, index) => {
-  const yOffset = 3.8 + (index * 0.45);
+  const yOffset = 3.7 + (index * 0.45);
   // Label
   slide1.addText(item.label + " : ", {
     x: 0.8, y: yOffset, w: 3.2, h: 0.4,
@@ -82,11 +83,16 @@ details.forEach((item, index) => {
     fontFace: 'Arial'
   });
   // Value
-  slide1.addText(item.val, {
+  const valOptions = {
     x: 4.0, y: yOffset, w: 8.0, h: 0.4,
-    fontSize: 16, bold: true, color: COLORS.textTitle,
+    fontSize: 16, bold: true, color: item.link ? COLORS.accentIndigo : COLORS.textTitle,
     fontFace: 'Arial'
-  });
+  };
+  if (item.link) {
+    valOptions.hyperlink = { url: item.link };
+    valOptions.underline = true;
+  }
+  slide1.addText(item.val, valOptions);
 });
 
 
@@ -400,9 +406,17 @@ slide7.addShape(pptx.shapes.RIGHT_TRIANGLE, {
 });
 
 slide7.addText("Interactive Walkthrough Highlights:\nDashboard Navigation • Dynamic AI Textbook Hinglish Explanations • Leitner Box Recalls • Peer Chat", {
-  x: 2.5, y: 5.6, w: 8.33, h: 0.5,
-  fontSize: 12, color: COLORS.textBody,
-  fontFace: 'Arial', align: 'center', lineSpacing: 16
+  x: 2.5, y: 5.5, w: 8.33, h: 0.5,
+  fontSize: 11, color: COLORS.textBody,
+  fontFace: 'Arial', align: 'center', lineSpacing: 14
+});
+
+slide7.addText("Access Live Application: https://edutrack.app", {
+  x: 2.5, y: 6.0, w: 8.33, h: 0.35,
+  fontSize: 14, color: COLORS.accentEmerald, bold: true,
+  fontFace: 'Arial', align: 'center',
+  hyperlink: { url: 'https://edutrack.app' },
+  underline: true
 });
 
 
@@ -474,6 +488,80 @@ slide8.addText(
   {
     x: 8.2, y: 2.2, w: 4.4, h: 4.0,
     fontSize: 11.5, color: COLORS.textTitle,
+    fontFace: 'Arial', lineSpacing: 18
+  }
+);
+
+
+// ----------------------------------------------------
+// SLIDE 9: Project Access & Codebase
+// ----------------------------------------------------
+const slide9 = pptx.addSlide();
+slide9.background = { color: COLORS.bg };
+addHeader(slide9, "Project Access & Codebase");
+
+// Left Card: Live Deployment
+slide9.addShape(pptx.shapes.ROUNDED_RECTANGLE, {
+  x: 0.5, y: 1.5, w: 6.0, h: 5.2,
+  fill: { color: COLORS.cardBg },
+  line: { color: COLORS.border, width: 1.5 }
+});
+
+slide9.addText("Live Deployed Platform", {
+  x: 0.8, y: 1.8, w: 5.4, h: 0.4,
+  fontSize: 22, bold: true, color: COLORS.accentEmerald,
+  fontFace: 'Arial'
+});
+
+slide9.addText("https://edutrack.app", {
+  x: 0.8, y: 2.3, w: 5.4, h: 0.5,
+  fontSize: 20, bold: true, color: COLORS.accentIndigo,
+  fontFace: 'Arial',
+  hyperlink: { url: "https://edutrack.app" },
+  underline: true
+});
+
+slide9.addText(
+  "• Production URL: Deployed to cloud infrastructure for low-latency delivery.\n\n" +
+  "• Fully Responsive: Optimized for desktops, tablets, and smart boards in classrooms.\n\n" +
+  "• Firebase Integration: Handles secure real-time authentication and synchronized peer sessions seamlessly.\n\n" +
+  "• Ready to Test: Create a free account or login to explore AI tutors, homework lens scanner, Leitner cards, and collaborative whiteboard.",
+  {
+    x: 0.8, y: 3.0, w: 5.4, h: 3.2,
+    fontSize: 12.5, color: COLORS.textTitle,
+    fontFace: 'Arial', lineSpacing: 18
+  }
+);
+
+// Right Card: Codebase Repository
+slide9.addShape(pptx.shapes.ROUNDED_RECTANGLE, {
+  x: 6.8, y: 1.5, w: 6.0, h: 5.2,
+  fill: { color: COLORS.cardBg },
+  line: { color: COLORS.border, width: 1.5 }
+});
+
+slide9.addText("GitHub Repository", {
+  x: 7.1, y: 1.8, w: 5.4, h: 0.4,
+  fontSize: 22, bold: true, color: COLORS.accentAmber,
+  fontFace: 'Arial'
+});
+
+slide9.addText("GitHub Codebase Link", {
+  x: 7.1, y: 2.3, w: 5.4, h: 0.5,
+  fontSize: 20, bold: true, color: COLORS.accentIndigo,
+  fontFace: 'Arial',
+  hyperlink: { url: "https://github.com/sriram12345678900/Edutrack.git" },
+  underline: true
+});
+
+slide9.addText(
+  "• Version Control: Hosted on GitHub with comprehensive commit logs.\n\n" +
+  "• Technology Highlights: Next.js 14 App Router, TypeScript, Tailwind CSS, and custom AI prompt pipelines.\n\n" +
+  "• Setup Guide: Comprehensive README.md file detailing local compilation commands and environment variables setup.\n\n" +
+  "• Modular Design: Clean file structures split by concerns (components, state context hooks, local engines, database adapters).",
+  {
+    x: 7.1, y: 3.0, w: 5.4, h: 3.2,
+    fontSize: 12.5, color: COLORS.textTitle,
     fontFace: 'Arial', lineSpacing: 18
   }
 );
