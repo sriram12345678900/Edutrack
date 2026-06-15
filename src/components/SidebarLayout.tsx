@@ -208,13 +208,13 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <main className={cn(
-        "flex-1 h-screen relative bg-slate-50/20 dark:bg-[#03050c]/25 flex flex-col min-h-0",
+        "flex-1 relative bg-slate-50/20 dark:bg-[#03050c]/25 flex flex-col min-h-0",
         (pathname === "/groups" || pathname.startsWith("/groups/") || pathname === "/whiteboard" || pathname.startsWith("/whiteboard/"))
           ? "overflow-hidden"
           : "overflow-y-auto"
       )}>
+
         {/* Mobile Header */}
         <header className="md:hidden flex items-center justify-between p-4 border-b border-slate-200/30 dark:border-white/5 bg-white/90 dark:bg-[#040612]/90 backdrop-blur sticky top-0 z-30 shrink-0">
           <button onClick={() => setIsMobileOpen(true)} className="p-1 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl">

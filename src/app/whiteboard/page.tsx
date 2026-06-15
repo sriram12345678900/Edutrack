@@ -364,7 +364,7 @@ export default function WhiteboardPage() {
   const syncCanvas = async (notes = stickyNotes) => {
     const canvas = canvasRef.current;
     if (!canvas || !db || !joined) return;
-    if (user?.uid.startsWith("mock-")) return; // Bypass Firestore sync for mock sessions
+    if (user?.uid?.startsWith("mock-")) return; // Bypass Firestore sync for mock sessions
     const dataUrl = canvas.toDataURL("image/png");
     try {
       await setDoc(doc(db, "edutrack_messages", `wb_${roomId}`), {
@@ -382,7 +382,7 @@ export default function WhiteboardPage() {
   // Real-time updates subscription
   useEffect(() => {
     if (!db || !joined || !roomId) return;
-    if (user?.uid.startsWith("mock-")) return; // Bypass Firestore sync for mock sessions
+    if (user?.uid?.startsWith("mock-")) return; // Bypass Firestore sync for mock sessions
 
     const unsub = onSnapshot(doc(db, "edutrack_messages", `wb_${roomId}`), (docSnap: any) => {
       if (docSnap.exists()) {
@@ -529,13 +529,14 @@ export default function WhiteboardPage() {
       
       const data = await res.json();
       
-      if (data && data.success && data.type !== "unknown") {
+      if (data && data.type && data.type !== "unknown") {
          showToast(`Recognized ${data.type}: ${data.value || ""}`);
          const box = getBoundingBox(accumulatedSmartStrokes.flatMap(s => s.points));
          const cx = (box.minX + box.maxX) / 2;
          const cy = (box.minY + box.maxY) / 2;
          const w = box.maxX - box.minX;
          const h = box.maxY - box.minY;
+         const r = Math.max(w, h) / 2;
          
          const newStroke: Stroke = {
             id: Date.now().toString(),
@@ -543,7 +544,10 @@ export default function WhiteboardPage() {
             color,
             brushSize,
             fill: fillShapes,
-            points: [
+            points: data.type === "circle" ? [
+              { x: cx, y: cy },
+              { x: cx + r, y: cy }
+            ] : [
               { x: box.minX, y: box.minY },
               { x: box.maxX, y: box.maxY }
             ],
@@ -666,8 +670,8 @@ export default function WhiteboardPage() {
           if (detected.type === "circle") {
              newStroke.tool = "circle";
              newStroke.points = [
-               { x: detected.cx - detected.r, y: detected.cy - detected.r },
-               { x: detected.cx + detected.r, y: detected.cy + detected.r }
+               { x: detected.cx, y: detected.cy },
+               { x: detected.cx + detected.r, y: detected.cy }
              ];
              showToast("Detected Circle");
           } else if (detected.type === "rectangle") {
@@ -808,7 +812,7 @@ export default function WhiteboardPage() {
 
 
   return (
-    <div className="w-full h-full relative font-sans flex flex-col items-center justify-center min-h-[600px] absolute inset-0 z-50 bg-white dark:bg-slate-900" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
+    <div className="w-full h-full relative font-sans flex flex-col items-center justify-center min-h-[600px] bg-white dark:bg-slate-900">
       <style>{`
         .no-scrollbar::-webkit-scrollbar {
           display: none;

@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json" } });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash", generationConfig: { responseMimeType: "application/json" } });
 
     const prompt = `You are an expert AI Study Planner for Indian students. 
 Create a ${days}-day study plan for a Class ${classLevel || '10'} student preparing for ${examName || 'their exam'} in ${subject}.
