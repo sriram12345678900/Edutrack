@@ -153,7 +153,7 @@ export default function SignupWizard() {
                 animate="center"
                 exit="exit"
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="absolute w-full space-y-6"
+                className="w-full space-y-6"
               >
                 <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-indigo-500" /> Choose your Study Nickname
@@ -200,7 +200,7 @@ export default function SignupWizard() {
                 animate="center"
                 exit="exit"
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="absolute w-full"
+                className="w-full"
               >
                 <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2">
                   <GraduationCap className="w-5 h-5 text-indigo-500" /> Which class are you in?
@@ -234,7 +234,7 @@ export default function SignupWizard() {
                 animate="center"
                 exit="exit"
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="absolute w-full space-y-8"
+                className="w-full space-y-8"
               >
                 <div>
                   <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
@@ -300,7 +300,7 @@ export default function SignupWizard() {
                 animate="center"
                 exit="exit"
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="absolute w-full"
+                className="w-full"
               >
                 <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2">
                   <Globe className="w-5 h-5 text-indigo-500" /> Choose Your Default Study Language
@@ -347,7 +347,7 @@ export default function SignupWizard() {
                 animate="center"
                 exit="exit"
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="absolute w-full"
+                className="w-full"
               >
                 <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2">
                   <Monitor className="w-5 h-5 text-indigo-500" /> Choose Your Theme

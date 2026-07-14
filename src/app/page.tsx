@@ -63,28 +63,30 @@ export default function Home() {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="fixed top-0 left-0 right-0 z-50 w-full border-b border-white/5 bg-[#02040a]/50 backdrop-blur-2xl"
       >
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center max-w-7xl">
-          <div className="flex items-center gap-3">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center max-w-7xl">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Preferred Logo */}
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-500 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)] border border-white/10 relative overflow-hidden group">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-500 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)] border border-white/10 relative overflow-hidden group">
               <div className="absolute inset-0 bg-white/20 group-hover:translate-x-full transition-transform duration-500 -skew-x-12 -translate-x-full" />
-              <Brain className="w-5.5 h-5.5 text-white relative z-10" />
+              <Brain className="w-4 h-4 sm:w-5.5 sm:h-5.5 text-white relative z-10" />
             </div>
-            <span className="text-2xl font-black tracking-tighter text-white">
+            <span className="text-lg sm:text-2xl font-black tracking-tighter text-white">
               EduTrack
             </span>
           </div>
-          <div className="flex gap-5 items-center">
-            <Link href="/login" className="text-sm font-bold text-slate-300 hover:text-white transition-colors">
+          <div className="flex gap-3 sm:gap-5 items-center shrink-0">
+            <Link href="/login" className="text-xs sm:text-sm font-bold text-slate-300 hover:text-white transition-colors">
               Log In
             </Link>
             <Link 
               href="/signup" 
-              className="relative group px-6 py-2.5 overflow-hidden rounded-full bg-white/5 border border-white/10 hover:border-indigo-500/50 transition-all"
+              className="relative group px-4 py-2 sm:px-6 sm:py-2.5 overflow-hidden rounded-full bg-white/5 border border-white/10 hover:border-indigo-500/50 transition-all"
             >
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <span className="relative z-10 text-sm font-black text-white flex items-center gap-2">
-                Get Started <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <span className="relative z-10 text-xs sm:text-sm font-black text-white flex items-center gap-1 sm:gap-2">
+                <span className="hidden sm:inline">Get Started</span>
+                <span className="inline sm:hidden">Start</span>
+                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
               </span>
             </Link>
           </div>
@@ -214,7 +216,7 @@ export default function Home() {
                 </div>
 
                 {/* Stat Cards */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {[
                     { c1: 'bg-emerald-500/20', c2: 'bg-emerald-400' },
                     { c1: 'bg-purple-500/20', c2: 'bg-purple-400' },
