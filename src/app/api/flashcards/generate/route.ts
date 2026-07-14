@@ -14,6 +14,8 @@ export async function POST(req: Request) {
 
     const prompt = `You are an expert AI tutor for Indian students. Create exactly ${count} highly effective flashcards for a Class ${classLevel || '10'} student studying ${subject || 'Science'}, focusing on the topic: "${topic}".
     
+You MUST generate the flashcards strictly in English, regardless of the language of the topic provided or the user's selected language. The "front" and "back" MUST be in English.
+    
 You MUST return a JSON object with a single key "flashcards" containing an array of card objects.
 Each card object must have exactly two keys: "front" (the question/term) and "back" (the answer/definition).
 

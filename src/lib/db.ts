@@ -6,6 +6,10 @@ export interface UserProfile {
   email: string | null;
   displayName: string | null;
   className: string;
+  nickname?: string;
+  friendCode?: string;
+  language?: string;
+  theme?: string;
   weakSubjects: string[];
   createdAt: number;
 }

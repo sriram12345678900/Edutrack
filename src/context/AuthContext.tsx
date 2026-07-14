@@ -80,11 +80,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const cred = await signInWithEmailAndPassword(auth, email, password);
       // Remove any leftover mock sessions
       localStorage.removeItem("edutrack_mock_user");
       localStorage.removeItem("edutrack_mock_password");
       
+      try {
+        const { getUserProfile } = await import("@/lib/db");
+        const profile = await getUserProfile(cred.user.uid);
+        if (profile) {
+          if (profile.className) localStorage.setItem("edutrack_class", profile.className);
+          if (profile.nickname) localStorage.setItem("edutrack_nickname", profile.nickname);
+          if (profile.friendCode) localStorage.setItem("edutrack_friend_code", profile.friendCode);
+          if (profile.language) localStorage.setItem("edutrack_language", profile.language);
+          if (profile.theme) localStorage.setItem("edutrack_theme", profile.theme);
+        }
+      } catch (dbErr) {
+        console.warn("Failed to load database profile:", dbErr);
+      }
+
       if (!localStorage.getItem("edutrack_class")) {
         router.push("/setup");
       } else {
@@ -165,12 +179,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const provider = new GoogleAuthProvider();
       const cred = await signInWithPopup(auth, provider);
       
-      // Create database profile if it doesn't exist
+      // Create database profile if it doesn't exist, otherwise load preferences
       try {
-        const { createUserProfile } = await import("@/lib/db");
-        await createUserProfile(cred.user.uid, cred.user.email, cred.user.displayName);
+        const { createUserProfile, getUserProfile } = await import("@/lib/db");
+        const profile = await getUserProfile(cred.user.uid);
+        if (!profile) {
+          await createUserProfile(cred.user.uid, cred.user.email, cred.user.displayName);
+        } else {
+          if (profile.className) localStorage.setItem("edutrack_class", profile.className);
+          if (profile.nickname) localStorage.setItem("edutrack_nickname", profile.nickname);
+          if (profile.friendCode) localStorage.setItem("edutrack_friend_code", profile.friendCode);
+          if (profile.language) localStorage.setItem("edutrack_language", profile.language);
+          if (profile.theme) localStorage.setItem("edutrack_theme", profile.theme);
+        }
       } catch (dbErr) {
-        console.warn("Failed to create database profile:", dbErr);
+        console.warn("Failed to handle database profile:", dbErr);
       }
       
       // Remove mock sessions

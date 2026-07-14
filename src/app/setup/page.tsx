@@ -5,8 +5,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { BookOpen, Moon, Sun, Monitor, ArrowRight, ArrowLeft, CheckCircle2, Sparkles, GraduationCap, Globe } from "lucide-react";
 
+import { useAuth } from "@/context/AuthContext";
+
 export default function SignupWizard() {
   const router = useRouter();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   
   // State
@@ -60,13 +63,16 @@ export default function SignupWizard() {
     }
   };
 
-  const finishSetup = () => {
+  const finishSetup = async () => {
     localStorage.setItem("edutrack_class", selectedClass?.toString() || "10");
     localStorage.setItem("edutrack_theme", theme);
     localStorage.setItem("edutrack_language", language);
+    
+    let finalFriendCode = "";
     if (nickname) {
+      finalFriendCode = generatedCode || `${nickname.toUpperCase()}#${Math.floor(1000 + Math.random() * 9000)}`;
       localStorage.setItem("edutrack_nickname", nickname);
-      localStorage.setItem("edutrack_friend_code", generatedCode || `${nickname.toUpperCase()}#${Math.floor(1000 + Math.random() * 9000)}`);
+      localStorage.setItem("edutrack_friend_code", finalFriendCode);
     }
     if (englishCurr) localStorage.setItem("edutrack_english_curr", englishCurr);
     if (sanskritCurr) localStorage.setItem("edutrack_sanskrit_curr", sanskritCurr);
@@ -75,6 +81,21 @@ export default function SignupWizard() {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
+    }
+
+    if (user) {
+      try {
+        const { updateUserProfile } = await import("@/lib/db");
+        await updateUserProfile(user.uid, {
+          className: selectedClass?.toString() || "10",
+          theme: theme,
+          language: language,
+          nickname: nickname || undefined,
+          friendCode: finalFriendCode || undefined,
+        });
+      } catch (e) {
+        console.error("Failed to save profile to database", e);
+      }
     }
 
     router.push("/dashboard");
