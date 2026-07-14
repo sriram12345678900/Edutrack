@@ -47,10 +47,30 @@
   --ring: 250 89% 65%;
 }
 
+html {
+  /* Fluid scaling: scales font-size between 10px at 320px screen up to 16px at 1280px screen and above */
+  font-size: clamp(10px, 0.625vw + 8px, 16px);
+}
+
+/* On very small screens, prevent it from getting too tiny */
+@media (max-width: 320px) {
+  html {
+    font-size: 10px;
+  }
+}
+
+/* Max out the font size at 16px for larger screens */
+@media (min-width: 1280px) {
+  html {
+    font-size: 16px;
+  }
+}
+
 html, body {
   height: 100vh;
   max-height: 100vh;
   overflow: hidden;
+  touch-action: pan-y;
 }
 
 body {

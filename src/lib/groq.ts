@@ -34,7 +34,7 @@ Use simple analogies, examples, and step-by-step explanations. Be encouraging an
     try {
       const genAI = new GoogleGenerativeAI(geminiKey);
       const model = genAI.getGenerativeModel({ 
-        model: "gemini-2.0-flash",
+        model: "gemini-1.5-flash",
         systemInstruction: systemContent
       });
       

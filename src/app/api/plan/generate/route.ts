@@ -9,8 +9,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Subject and days are required" }, { status: 400 });
     }
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash", generationConfig: { responseMimeType: "application/json" } });
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY_PLAN || process.env.GEMINI_API_KEY || "");
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" } });
 
     const prompt = `You are an expert AI Study Planner for Indian students. 
 Create a ${days}-day study plan for a Class ${classLevel || '10'} student preparing for ${examName || 'their exam'} in ${subject}.

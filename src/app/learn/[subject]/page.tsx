@@ -70,10 +70,16 @@ export default function SubjectPage({ params }: { params: { subject: string } })
   const [generatingChapterId, setGeneratingChapterId] = useState<string | null>(null);
   const [userClass, setUserClass] = useState<number>(10);
 
+  const [userLanguage, setUserLanguage] = useState<string>("Hinglish");
+
   useEffect(() => {
     const stored = localStorage.getItem("edutrack_class");
     if (stored) {
       setUserClass(parseInt(stored, 10));
+    }
+    const storedLang = localStorage.getItem("edutrack_language");
+    if (storedLang) {
+      setUserLanguage(storedLang);
     }
   }, []);
 
@@ -337,7 +343,7 @@ export default function SubjectPage({ params }: { params: { subject: string } })
       const res = await fetch("/api/learn/notes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject: subjectName, chapter: chapterTitle, language: "Hinglish" })
+        body: JSON.stringify({ subject: subjectName, chapter: chapterTitle, language: userLanguage })
       });
       
       if (!res.ok) throw new Error("API error");

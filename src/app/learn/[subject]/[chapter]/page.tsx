@@ -176,10 +176,16 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
   const [showLineByLineModal, setShowLineByLineModal] = useState<boolean>(false);
   const [lineByLineLoading, setLineByLineLoading] = useState<boolean>(false);
 
+  const [userLanguage, setUserLanguage] = useState<string>("Hinglish");
+
   useEffect(() => {
     const stored = localStorage.getItem("edutrack_class");
     if (stored) {
       setUserClass(parseInt(stored, 10));
+    }
+    const storedLang = localStorage.getItem("edutrack_language");
+    if (storedLang) {
+      setUserLanguage(storedLang);
     }
   }, []);
 
@@ -236,7 +242,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ subject: subjectName, chapter: chapterName, language: "Hinglish" })
+        body: JSON.stringify({ subject: subjectName, chapter: chapterName, language: userLanguage })
       });
       const data = await res.json();
       if (data.theory) {
@@ -287,7 +293,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
       const res = await fetch("/api/learn/summarize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject: subjectName, chapter: chapterName, language: "Hinglish" })
+        body: JSON.stringify({ subject: subjectName, chapter: chapterName, language: userLanguage })
       });
       const data = await res.json();
       if (data.keyTerms || data.equations || data.mnemonics) {
@@ -311,7 +317,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
       const res = await fetch("/api/learn/line-by-line", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject: subjectName, chapter: chapterName, language: "Hinglish" })
+        body: JSON.stringify({ subject: subjectName, chapter: chapterName, language: userLanguage })
       });
       const data = await res.json();
       if (data.lines) {
@@ -442,7 +448,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
     try {
       const res = await fetch("/api/learn/notes", {
         method: "POST",
-        body: JSON.stringify({ subject: subjectName, chapter: chapterName, language: "Hinglish" })
+        body: JSON.stringify({ subject: subjectName, chapter: chapterName, language: userLanguage })
       });
       const data = await res.json();
       const topics = data.topics || [];
@@ -491,7 +497,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
     try {
       const res = await fetch("/api/learn/quiz", {
         method: "POST",
-        body: JSON.stringify({ subject: subjectName, chapter: chapterName, language: "Hinglish" })
+        body: JSON.stringify({ subject: subjectName, chapter: chapterName, language: userLanguage })
       });
       const data = await res.json();
       setQuiz(data);

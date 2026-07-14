@@ -28,6 +28,14 @@ export default function LensPage() {
   const [isListening, setIsListening] = useState(false);
   const [activeSpeakingMsg, setActiveSpeakingMsg] = useState<string | null>(null); // formatted as "lens-index"
   const [generatingSummary, setGeneratingSummary] = useState(false);
+  const [userLanguage, setUserLanguage] = useState<string>("Hinglish");
+
+  useEffect(() => {
+    const storedLang = localStorage.getItem("edutrack_language");
+    if (storedLang) {
+      setUserLanguage(storedLang);
+    }
+  }, []);
 
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -131,7 +139,7 @@ export default function LensPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: apiMessages,
-          language: "Hinglish",
+          language: userLanguage,
           bookInfo: ""
         })
       });
@@ -206,7 +214,7 @@ export default function LensPage() {
               ]
             }
           ],
-          language: "Hinglish",
+          language: userLanguage,
           bookInfo: ""
         })
       });
@@ -256,7 +264,7 @@ export default function LensPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: apiMessages,
-          language: "Hinglish",
+          language: userLanguage,
           bookInfo: ""
         })
       });
@@ -287,7 +295,7 @@ export default function LensPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: [{ role: "user", content: query }],
-          language: "Hinglish",
+          language: userLanguage,
           bookInfo: ""
         })
       });

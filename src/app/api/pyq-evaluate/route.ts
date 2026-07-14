@@ -9,7 +9,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY_EVALUATE || process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return NextResponse.json({ error: "Missing Gemini API Key" }, { status: 500 });
     }
@@ -62,7 +62,7 @@ Ensure the response is ONLY valid JSON, without any markdown formatting like \`\
     }
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-1.5-flash',
       contents: contents,
       config: {
         temperature: 0.2, // Low temperature for consistent grading

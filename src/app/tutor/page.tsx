@@ -31,6 +31,7 @@ export default function TutorPage() {
   const [isListening, setIsListening] = useState(false);
   const [activeSpeakingMsg, setActiveSpeakingMsg] = useState<string | null>(null); // formatted as "chat-index"
   const [generatingSummary, setGeneratingSummary] = useState(false);
+  const [userLanguage, setUserLanguage] = useState<string>("Hinglish");
 
   // Refs
   const chatFileInputRef = useRef<HTMLInputElement>(null);
@@ -50,6 +51,9 @@ export default function TutorPage() {
         } catch (e) {
           console.error("Error loading sessions:", e);
         }
+      const storedLang = localStorage.getItem("edutrack_language");
+      if (storedLang) {
+        setUserLanguage(storedLang);
       }
     }
   }, []);
@@ -217,7 +221,7 @@ export default function TutorPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: apiMessages,
-          language: "Hinglish",
+          language: userLanguage,
           bookInfo: ""
         })
       });
@@ -278,7 +282,7 @@ export default function TutorPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: apiMessages,
-          language: "Hinglish",
+          language: userLanguage,
           bookInfo: ""
         })
       });

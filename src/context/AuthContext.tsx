@@ -109,26 +109,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       }
       
-      // Fallback: Create a mock session on the fly if Firebase rejects (e.g. rate limit, config, or offline)
-      // Fallback: Create a mock session on the fly if Firebase rejects
-      {
-        const mockUser = {
-          uid: `mock-user-${Math.random().toString(36).substr(2, 9)}`,
-          email: email,
-          displayName: email.split("@")[0],
-          emailVerified: true
-        };
-        localStorage.setItem("edutrack_mock_user", JSON.stringify(mockUser));
-        localStorage.setItem("edutrack_mock_password", password);
-        setUser(mockUser as any);
-        if (!localStorage.getItem("edutrack_class")) {
-          router.push("/setup");
-        } else {
-          router.push("/dashboard");
-        }
-        return;
-      }
-      throw err;
+      // If mock login also fails, throw an invalid credential error
+      throw { code: "auth/invalid-credential", message: "Invalid email or password." };
     }
   };
 

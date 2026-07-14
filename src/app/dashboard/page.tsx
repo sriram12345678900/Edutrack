@@ -107,6 +107,7 @@ export default function Dashboard() {
   const router = useRouter();
 
   const [userClass, setUserClass] = useState<number | null>(null);
+  const [userLanguage, setUserLanguage] = useState<string>("Hinglish");
   
   // Gamification States
   const [xp, setXp] = useState<number>(0);
@@ -132,6 +133,11 @@ export default function Dashboard() {
       router.push("/setup");
     } else {
       setUserClass(parseInt(stored, 10));
+    }
+
+    const storedLang = localStorage.getItem("edutrack_language");
+    if (storedLang) {
+      setUserLanguage(storedLang);
     }
 
     // Load Gamification stats from localStorage
@@ -280,7 +286,7 @@ export default function Dashboard() {
             <span className="shrink-0 drop-shadow-sm select-none">👋</span>
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-2.5 font-bold text-xs">
-            {profile?.className || (userClass ? `Class ${userClass}` : "Class 10")} | Language Preference: Hinglish
+            {profile?.className || (userClass ? `Class ${userClass}` : "Class 10")} | Language Preference: {userLanguage}
           </p>
         </div>
         <div className="flex items-center gap-3 shrink-0">
@@ -575,7 +581,7 @@ export default function Dashboard() {
 
             {/* Interactive SVG Canvas */}
             <div className="relative w-full bg-slate-950/40 dark:bg-black/35 rounded-2xl border border-slate-200/20 dark:border-white/5 p-4 overflow-x-auto scrollbar-none min-h-[220px]">
-              <svg className="w-[800px] h-[160px] mx-auto relative z-10" viewBox="0 0 800 160">
+              <svg className="w-full max-w-[800px] h-auto mx-auto relative z-10" viewBox="0 0 800 160">
                 {/* Connecting Paths with dynamic flows */}
                 <path d="M 96 80 Q 176 40 256 40" fill="none" className="stroke-emerald-500/50 animate-laser-flow" strokeWidth="3.5" />
                 <path d="M 256 40 Q 336 80 416 120" fill="none" className="stroke-indigo-500/40 animate-laser-flow" strokeWidth="3" />

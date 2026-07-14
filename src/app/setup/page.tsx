@@ -12,6 +12,7 @@ export default function SignupWizard() {
   // State
   const [nickname, setNickname] = useState<string>("");
   const [generatedCode, setGeneratedCode] = useState<string>("");
+  const [suffix] = useState<number>(() => Math.floor(1000 + Math.random() * 9000));
   const [selectedClass, setSelectedClass] = useState<number | null>(null);
   const [englishCurr, setEnglishCurr] = useState<string>("");
   const [sanskritCurr, setSanskritCurr] = useState<string>("");
@@ -21,11 +22,9 @@ export default function SignupWizard() {
   const isClass9or10 = selectedClass === 9 || selectedClass === 10;
 
   const handleNicknameChange = (val: string) => {
-    const cleaned = val.trim().replace(/[^a-zA-Z0-9]/g, "");
-    setNickname(cleaned);
-    if (cleaned) {
-      const suffix = Math.floor(1000 + Math.random() * 9000);
-      setGeneratedCode(`${cleaned.toUpperCase()}#${suffix}`);
+    setNickname(val);
+    if (val.trim()) {
+      setGeneratedCode(`${val.trim().replace(/\s+/g, '').toUpperCase()}#${suffix}`);
     } else {
       setGeneratedCode("");
     }
@@ -99,12 +98,12 @@ export default function SignupWizard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-6 overflow-hidden relative transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-6 relative transition-colors duration-300 overflow-y-auto">
       {/* Background blobs */}
       <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      <div className="w-full max-w-2xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden relative z-10 p-8 md:p-12">
+      <div className="w-full max-w-2xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl relative z-10 p-8 md:p-12 my-8">
         
         {/* Header */}
         <div className="text-center mb-10">
@@ -139,14 +138,22 @@ export default function SignupWizard() {
                   <Sparkles className="w-5 h-5 text-indigo-500" /> Choose your Study Nickname
                 </h2>
                 <div className="space-y-4">
-                  <input
-                    type="text"
-                    value={nickname}
-                    onChange={(e) => handleNicknameChange(e.target.value)}
-                    placeholder="Enter a unique nickname..."
-                    maxLength={12}
-                    className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 font-bold text-lg text-slate-850 dark:text-white transition-all placeholder:font-normal"
-                  />
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    if (nickname.trim()) {
+                      nextStep();
+                    }
+                  }}>
+                    <input
+                      type="text"
+                      value={nickname}
+                      onChange={(e) => handleNicknameChange(e.target.value)}
+                      placeholder="Enter a unique nickname..."
+                      maxLength={15}
+                      enterKeyHint="go"
+                      className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 font-bold text-lg text-slate-850 dark:text-white transition-all placeholder:font-normal"
+                    />
+                  </form>
                   {generatedCode && (
                     <motion.div 
                       initial={{ opacity: 0, y: 10 }}
