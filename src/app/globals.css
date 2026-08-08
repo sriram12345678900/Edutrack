@@ -67,10 +67,7 @@ html {
 }
 
 html, body {
-  height: 100vh;
-  max-height: 100vh;
-  overflow: hidden;
-  touch-action: pan-y;
+  /* Removed height and overflow constraints to allow natural responsive scrolling */
 }
 
 body {

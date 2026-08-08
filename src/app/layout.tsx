@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Outfit, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 
@@ -7,11 +7,26 @@ const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-outfit",
   weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+});
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-plus-jakarta",
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "EduTrack - AI Powered Learning",
-  description: "Personalized AI learning platform for Indian students",
+  title: "EduTrack - Next-Gen AI Learning OS",
+  description: "Personalized AI learning platform for Indian CBSE Class 6-10 students",
   manifest: "/manifest.json",
 };
 
@@ -28,13 +43,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${outfit.variable}`}>
-      <body className={`${outfit.className} antialiased min-h-screen`}>
+    <html lang="en" className={`${outfit.variable} ${plusJakarta.variable} ${jetbrainsMono.variable}`}>
+      <body className={`${outfit.className} antialiased min-h-screen bg-[#02040a] text-slate-100 selection:bg-indigo-500/30 selection:text-indigo-200`}>
         <script
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                let theme = localStorage.getItem('edutrack_theme') || 'system';
+                let theme = localStorage.getItem('edutrack_theme') || 'dark';
                 if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                   document.documentElement.classList.add('dark');
                 } else {
@@ -51,4 +66,3 @@ export default function RootLayout({
     </html>
   );
 }
-

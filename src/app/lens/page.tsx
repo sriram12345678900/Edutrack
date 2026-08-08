@@ -4,12 +4,41 @@ import React, { useState, useEffect, useRef } from "react";
 import { 
   Home, Camera, Upload, Sparkles, MessageSquare, ArrowRight, 
   Zap, Bot, User, Check, Loader2, Mic, Volume2, 
-  VolumeX, FileText, Copy, X
+  VolumeX, FileText, Copy, X, Eye, HelpCircle, BookOpen, Compass
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
+
+interface SampleDoubt {
+  id: string;
+  title: string;
+  subject: "Physics" | "Mathematics" | "Chemistry";
+  query: string;
+  imageSvgData?: string;
+}
+
+const SAMPLE_NCERT_DOUBTS: SampleDoubt[] = [
+  {
+    id: "d1",
+    title: "Light Refraction Prism Angle",
+    subject: "Physics",
+    query: "Explain angle of deviation (D) when a white light ray passes through a glass prism for CBSE Class 10?",
+  },
+  {
+    id: "d2",
+    title: "Quadratic Equation Word Problem",
+    subject: "Mathematics",
+    query: "A motor boat whose speed is 18 km/h in still water takes 1 hour more to go 24 km upstream than to return downstream to the same spot. Find the speed of the stream.",
+  },
+  {
+    id: "d3",
+    title: "Esterification vs Saponification",
+    subject: "Chemistry",
+    query: "Write chemical equations for esterification of ethanoic acid with ethanol and saponification of ethyl ethanoate with sodium hydroxide.",
+  }
+];
 
 export default function LensPage() {
   const { user, loading: authLoading } = useAuth();
@@ -26,7 +55,7 @@ export default function LensPage() {
   // Common UI States
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [activeSpeakingMsg, setActiveSpeakingMsg] = useState<string | null>(null); // formatted as "lens-index"
+  const [activeSpeakingMsg, setActiveSpeakingMsg] = useState<string | null>(null);
   const [generatingSummary, setGeneratingSummary] = useState(false);
   const [userLanguage, setUserLanguage] = useState<string>("Hinglish");
 
@@ -37,23 +66,19 @@ export default function LensPage() {
     }
   }, []);
 
-  // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
   const lensChatEndRef = useRef<HTMLDivElement>(null);
 
-  // Route protection
   useEffect(() => {
     if (!authLoading && !user) {
       router.push("/login");
     }
   }, [user, authLoading, router]);
 
-  // Scroll to bottom on new messages
   useEffect(() => {
     lensChatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [lensMessages, isScanning]);
 
-  // Convert uploaded image file to Base64 data URL
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -74,7 +99,7 @@ export default function LensPage() {
       const rec = new SpeechRecognition();
       rec.continuous = false;
       rec.interimResults = false;
-      rec.lang = "en-IN"; // English (India) is excellent for hybrid/Hinglish dictation
+      rec.lang = userLanguage === "Hindi" ? "hi-IN" : "en-IN";
 
       rec.onstart = () => setIsListening(true);
       rec.onend = () => setIsListening(false);
@@ -101,7 +126,6 @@ export default function LensPage() {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       
-      // Attempt to find natural sounding English voice
       const voices = window.speechSynthesis.getVoices();
       const voice = voices.find(v => v.lang.includes("en-IN") || v.lang.includes("en-US"));
       if (voice) utterance.voice = voice;
@@ -242,7 +266,37 @@ export default function LensPage() {
     }
   };
 
-  // ── GENERATE CONCLUSION ──
+  // Trigger Preset Sample Doubt
+  const handleSampleDoubtClick = async (sample: SampleDoubt) => {
+    setLensChatStarted(true);
+    setLensConclusion(null);
+    setLensMessages([{ role: "user", content: sample.query }]);
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [{ role: "user", content: `[NCERT Doubt Analysis] ${sample.query}` }],
+          language: userLanguage,
+          bookInfo: ""
+        })
+      });
+
+      const data = await res.json();
+      setLensMessages([
+        { role: "user", content: sample.query },
+        { role: "ai", content: data.reply || "Error solving doubt." }
+      ]);
+    } catch (e) {
+      console.error(e);
+      setLensMessages(prev => [...prev, { role: "ai", content: "Failed to connect to the doubt solver." }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const generateSessionConclusion = async () => {
     if (generatingSummary || lensMessages.length === 0) return;
 
@@ -279,43 +333,6 @@ export default function LensPage() {
       setGeneratingSummary(false);
     }
   };
-
-  // Quick chips handler
-  const handleChipClick = async (query: string) => {
-    setLensChatStarted(true);
-    setLensConclusion(null);
-    setLensMessages([
-      { role: "user", content: query }
-    ]);
-    setLoading(true);
-
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [{ role: "user", content: query }],
-          language: userLanguage,
-          bookInfo: ""
-        })
-      });
-
-      const data = await res.json();
-      setLensMessages(prev => [...prev, { role: "ai", content: data.reply || "Error generating response." }]);
-    } catch (e) {
-      console.error(e);
-      setLensMessages(prev => [...prev, { role: "ai", content: "Failed to connect to the tutor." }]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const quickChips = [
-    { label: "Refraction of Light (Hindi)", query: "Can you explain refraction of light in a glass slab in easy Hinglish?" },
-    { label: "Quadratic Equations", query: "Explain how to solve the quadratic equation 2x² - 5x + 3 = 0 step-by-step?" },
-    { label: "Mnemonic for Reactivity", query: "What is a simple mnemonic to remember the metal reactivity series for CBSE Class 10?" },
-    { label: "Photosynthesis Process", query: "Explain the light and dark reactions of photosynthesis in simple terms." }
-  ];
 
   // ── LATEX / MATH SANITIZATION ──
   const cleanMathLaTeX = (mathStr: string): string => {
@@ -362,7 +379,7 @@ export default function LensPage() {
         return (
           <div 
             key={idx} 
-            className="flex justify-center my-4 p-4 bg-indigo-950/20 border border-indigo-500/10 rounded-2xl font-serif italic text-base text-indigo-300 tracking-widest font-bold select-all"
+            className="flex justify-center my-4 p-4 bg-emerald-950/20 border border-emerald-500/20 rounded-2xl font-serif italic text-base text-emerald-300 tracking-widest font-bold select-all"
             dangerouslySetInnerHTML={{ __html: cleanMathLaTeX(mathText) }}
           />
         );
@@ -371,7 +388,7 @@ export default function LensPage() {
       const formatMathInline = (mathText: string, keyIdx: number) => (
         <span 
           key={`math-${keyIdx}`}
-          className="font-serif italic text-indigo-350 dark:text-indigo-400 font-bold text-sm tracking-wide bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/15 inline-block mx-0.5 select-all"
+          className="font-serif italic text-emerald-300 font-bold text-sm tracking-wide bg-emerald-500/15 px-1.5 py-0.5 rounded border border-emerald-500/20 inline-block mx-0.5 select-all"
           dangerouslySetInnerHTML={{ __html: cleanMathLaTeX(mathText) }}
         />
       );
@@ -401,13 +418,13 @@ export default function LensPage() {
 
         if (level === 1) {
           return (
-            <h1 key={idx} className="text-xl font-black text-white mt-4 mb-2 tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+            <h1 key={idx} className="text-xl font-black text-white mt-4 mb-2 tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
               {headingContent}
             </h1>
           );
         } else if (level === 2) {
           return (
-            <h2 key={idx} className="text-base font-extrabold text-white mt-5 mb-2 tracking-tight bg-gradient-to-r from-indigo-400 via-purple-350 to-teal-400 bg-clip-text text-transparent flex items-center gap-2">
+            <h2 key={idx} className="text-base font-extrabold text-white mt-5 mb-2 tracking-tight bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-300 bg-clip-text text-transparent flex items-center gap-2">
               {headingContent}
             </h2>
           );
@@ -422,8 +439,8 @@ export default function LensPage() {
       if (isBullet) {
         return (
           <div key={idx} className="flex items-start gap-2.5 ml-2.5 my-1.5 select-text">
-            <span className="text-indigo-400 mt-1.5 text-xs">•</span>
-            <span className="text-slate-300 dark:text-slate-200 text-sm font-medium leading-relaxed">{parseMix(line.trim().substring(2))}</span>
+            <span className="text-emerald-400 mt-1.5 text-xs">•</span>
+            <span className="text-slate-300 text-sm font-medium leading-relaxed">{parseMix(line.trim().substring(2))}</span>
           </div>
         );
       }
@@ -433,8 +450,8 @@ export default function LensPage() {
         if (numMatch) {
           return (
             <div key={idx} className="flex items-start gap-2.5 ml-2.5 my-1.5 select-text">
-              <span className="text-indigo-400 font-bold mt-0.5 text-sm">{numMatch[1]}</span>
-              <span className="text-slate-300 dark:text-slate-200 text-sm font-medium leading-relaxed">{parseMix(numMatch[2])}</span>
+              <span className="text-emerald-400 font-bold mt-0.5 text-sm">{numMatch[1]}</span>
+              <span className="text-slate-300 text-sm font-medium leading-relaxed">{parseMix(numMatch[2])}</span>
             </div>
           );
         }
@@ -443,7 +460,7 @@ export default function LensPage() {
       if (!line.trim()) return <div key={idx} className="h-2.5" />;
 
       return (
-        <p key={idx} className="text-slate-300 dark:text-slate-200 text-sm font-medium mb-2.5 last:mb-0 leading-relaxed select-text">
+        <p key={idx} className="text-slate-300 text-sm font-medium mb-2.5 last:mb-0 leading-relaxed select-text">
           {parseMix(line)}
         </p>
       );
@@ -454,85 +471,98 @@ export default function LensPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#05060f]">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-12 h-12 text-indigo-500 animate-spin" />
-          <p className="text-slate-400 text-sm font-semibold">Checking authentication...</p>
+          <Loader2 className="w-12 h-12 text-emerald-500 animate-spin" />
+          <p className="text-slate-400 text-sm font-semibold">Loading doubt solver lens...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full min-h-screen flex flex-col bg-[#05060f] text-slate-100 font-sans relative overflow-hidden">
+    <div className="w-full h-full min-h-screen flex flex-col bg-[#03050d] text-slate-100 font-sans relative overflow-hidden selection:bg-emerald-500/30">
+      
       {/* Background Gradients */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
 
       {/* ── TOP HEADER ── */}
-      <div className="p-6 border-b border-slate-900 bg-slate-950/40 backdrop-blur-md flex flex-row items-center justify-between gap-4 z-10 shrink-0">
+      <header className="p-4 sm:p-6 border-b border-white/10 bg-[#050816]/90 backdrop-blur-2xl flex flex-row items-center justify-between gap-4 z-10 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl flex items-center justify-center text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+          <div className="w-11 h-11 bg-gradient-to-br from-emerald-500 to-teal-600 border border-white/10 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/25">
             <Camera className="w-5.5 h-5.5" />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-indigo-400 tracking-tight flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 tracking-tight flex items-center gap-2">
               AI Doubt-Solver Lens 🔍
             </h1>
-            <p className="text-slate-500 text-xs font-semibold mt-0.5">
-              Snap a photo of your homework to get step-by-step explanations instantly.
+            <p className="text-slate-400 text-xs font-semibold mt-0.5">
+              Instant Optical Character Recognition & Step-by-Step Solutions
             </p>
           </div>
         </div>
 
         <Link href="/dashboard">
-          <button className="px-5.5 py-3 rounded-2xl border border-slate-800 hover:border-slate-700 bg-slate-950/50 hover:bg-slate-900/60 text-slate-350 hover:text-white text-xs font-bold transition-all flex items-center gap-2 shadow-sm">
+          <button className="px-4.5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-extrabold transition-all flex items-center gap-2 shadow-sm">
             <Home className="w-4 h-4" />
             Back to Dashboard
           </button>
         </Link>
-      </div>
+      </header>
 
       {/* ── DOUBLE-COLUMN SCANNER WORKSPACE ── */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 overflow-hidden min-h-0 relative z-10">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 p-4 sm:p-6 overflow-hidden min-h-0 relative z-10">
         
-        {/* Left Column: Drag & Drop upload scanner workspace */}
+        {/* Left Column: Holographic Laser Scanner Canvas & Sample Presets */}
         <div className="flex flex-col gap-6 overflow-y-auto no-scrollbar pb-10">
+          
+          {/* Holographic HUD Viewport */}
           <div 
-            className={`relative bg-slate-900/40 backdrop-blur-3xl border-2 border-dashed ${
-              lensImage ? "border-emerald-500/40" : "border-slate-800 hover:border-emerald-500/50"
-            } rounded-[2.5rem] p-3 aspect-[4/3] flex flex-col items-center justify-center overflow-hidden transition-all group shrink-0`}
+            className={`relative bg-[#060a1c]/90 backdrop-blur-3xl border-2 border-dashed ${
+              lensImage ? "border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)]" : "border-white/15 hover:border-emerald-500/50"
+            } rounded-3xl p-3 aspect-[4/3] flex flex-col items-center justify-center overflow-hidden transition-all group shrink-0 relative`}
             onDrop={handleLensDrop}
             onDragOver={(e) => e.preventDefault()}
           >
+            {/* Holographic Frame Corner Accents */}
+            <div className="absolute top-3 left-3 w-6 h-6 border-t-2 border-l-2 border-emerald-400/80 z-20 pointer-events-none" />
+            <div className="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 border-emerald-400/80 z-20 pointer-events-none" />
+            <div className="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 border-emerald-400/80 z-20 pointer-events-none" />
+            <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 border-emerald-400/80 z-20 pointer-events-none" />
+
             {lensImage ? (
-              <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-inner">
+              <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
                 <img src={lensImage} alt="Uploaded homework" className="w-full h-full object-cover" />
+                
                 {isScanning && (
                   <>
                     <div className="absolute inset-0 bg-emerald-500/10" />
-                    <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-450 to-teal-450 shadow-[0_0_20px_#10b981] animate-scan" />
+                    {/* Animated Cyan/Emerald Laser Line */}
+                    <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-cyan-400 via-emerald-400 to-teal-300 shadow-[0_0_20px_#10b981] animate-scan" />
                   </>
                 )}
+
                 {!isScanning && !lensChatStarted && (
                   <button 
                     onClick={triggerLensScan}
-                    className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-750 text-white px-7 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-2xl hover:scale-105 active:scale-98 transition-all duration-300 border border-emerald-400/25"
+                    className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white px-7 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-2xl hover:scale-105 active:scale-95 transition-all border border-white/20"
                   >
-                    <Zap className="w-4.5 h-4.5 fill-current" /> Analyze homework doubt
+                    <Zap className="w-4.5 h-4.5 fill-current" /> Trigger OCR Scan & Solve
                   </button>
                 )}
               </div>
             ) : (
-              <div className="text-center p-8 select-none">
-                <div className="w-20 h-20 bg-slate-850/40 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-800/80 group-hover:scale-110 transition-transform duration-300">
-                  <Camera className="w-8 h-8 text-emerald-400" />
+              <div className="text-center p-8 select-none relative z-10 w-full h-full flex flex-col items-center justify-center rounded-2xl overflow-hidden">
+                <div className="absolute inset-0 opacity-15 bg-cover bg-center pointer-events-none mix-blend-screen" style={{ backgroundImage: "url('/ai_lens_scanner.jpg')" }} />
+                <div className="w-20 h-20 bg-emerald-500/10 border border-emerald-500/30 rounded-3xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-[0_0_25px_rgba(16,185,129,0.25)] relative z-10 backdrop-blur-md">
+                  <Camera className="w-9 h-9 text-emerald-400" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Drag & Drop Image</h3>
-                <p className="text-slate-500 text-xs font-semibold mb-6">or click the button below to browse</p>
+                <h3 className="text-xl font-black text-white mb-1.5 relative z-10 tracking-tight">Drag & Drop Homework Photo</h3>
+                <p className="text-slate-400 text-xs font-semibold mb-6 relative z-10 max-w-xs">Scan math equations, physics diagrams, or chemistry formulas instantly</p>
                 <button 
                   onClick={() => fileInputRef.current?.click()}
-                  className="bg-slate-800/60 hover:bg-slate-700/60 text-white px-6 py-3 rounded-2xl font-bold text-xs flex items-center gap-2 transition-colors border border-slate-750 mx-auto active:scale-95"
+                  className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white px-7 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center gap-2.5 transition-all border border-white/20 mx-auto active:scale-95 shadow-xl shadow-emerald-500/25 relative z-10"
                 >
-                  <Upload className="w-4 h-4" /> Select File
+                  <Upload className="w-4.5 h-4.5" /> Browse Homework Image
                 </button>
                 <input 
                   type="file" 
@@ -545,92 +575,95 @@ export default function LensPage() {
             )}
           </div>
 
-          <div className="bg-slate-900/40 backdrop-blur-3xl border border-slate-800/60 rounded-[2.5rem] p-6 shadow-xl shrink-0">
-            <h3 className="text-xs font-extrabold text-slate-350 uppercase tracking-widest mb-4 flex items-center gap-2">
-              <Sparkles className="w-4.5 h-4.5 text-emerald-400" /> How It Works
-            </h3>
-            <ul className="space-y-3.5">
-              {[
-                "Take a clear photo of one doubt or question at a time.",
-                "Our AI extracts text and analyzes complex diagrams instantly."
-              ].map((step, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <div className="bg-emerald-500/10 border border-emerald-500/20 w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+          {/* Sample NCERT Doubt Presets Deck */}
+          <div className="bg-[#070918]/90 border border-white/10 rounded-3xl p-6 shadow-2xl backdrop-blur-xl shrink-0">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xs font-black text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-emerald-400" /> Test Sample NCERT Doubts
+              </h3>
+              <span className="text-[10px] font-extrabold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                1-Click Demo
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {SAMPLE_NCERT_DOUBTS.map((sd) => (
+                <button
+                  key={sd.id}
+                  onClick={() => handleSampleDoubtClick(sd)}
+                  className="w-full p-4 rounded-2xl border border-white/10 bg-white/5 hover:bg-emerald-500/10 hover:border-emerald-500/30 text-left transition-all group flex items-start justify-between gap-3 shadow-md"
+                >
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase">
+                        {sd.subject}
+                      </span>
+                      <span className="text-xs font-bold text-white group-hover:text-emerald-300 transition-colors">
+                        {sd.title}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 line-clamp-1 font-semibold">{sd.query}</p>
                   </div>
-                  <span className="text-sm text-slate-400 font-semibold leading-relaxed">{step}</span>
-                </li>
+                  <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 shrink-0 mt-2 transition-transform group-hover:translate-x-1" />
+                </button>
               ))}
-            </ul>
+            </div>
           </div>
         </div>
 
-        {/* Right Column: Split Screen Chat Canvas */}
-        <div className="bg-slate-900/40 backdrop-blur-3xl border border-slate-800/60 rounded-[2.5rem] overflow-hidden flex flex-col h-full shadow-2xl relative min-h-0">
+        {/* Right Column: Split Screen Interactive AI Canvas */}
+        <div className="bg-[#060817]/90 border border-white/10 rounded-3xl overflow-hidden flex flex-col h-full shadow-2xl relative min-h-0 backdrop-blur-xl">
           {!lensChatStarted ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-8 relative z-10 select-none">
-              <div className="relative mb-4">
-                <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-xl animate-pulse" />
-                <MessageSquare className="w-16 h-16 text-slate-700 animate-bounce relative z-10" />
+              <div className="relative mb-5 flex items-center justify-center">
+                <div className="absolute w-28 h-28 bg-emerald-500/15 rounded-full blur-2xl animate-pulse" />
+                <div className="w-18 h-18 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl flex items-center justify-center text-white relative z-10 shadow-2xl border border-white/20">
+                  <Bot className="w-9 h-9" />
+                </div>
               </div>
-              <h2 className="text-xl font-bold text-slate-350 mb-2">Interactive AI Canvas</h2>
-              <p className="text-slate-500 text-xs font-semibold mb-6 max-w-sm">
-                Upload an image and click analyze, or click a quick-chip below to start instantly.
+
+              <h2 className="text-2xl font-black text-white mb-2 tracking-tight">
+                AI Solution Canvas Ready
+              </h2>
+              <p className="text-slate-400 text-xs font-semibold mb-6 max-w-sm leading-relaxed">
+                Upload a homework image or click a sample NCERT doubt to generate step-by-step explanations.
               </p>
 
               {isScanning && (
                 <div className="mt-4 flex flex-col items-center gap-3">
-                  <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
-                  <span className="text-emerald-400 font-extrabold text-xs tracking-widest uppercase animate-pulse">Running Optical Character Recognition...</span>
-                </div>
-              )}
-
-              {/* Quickchips Grid */}
-              {!isScanning && (
-                <div className="w-full max-w-md mt-6 space-y-3.5">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-550 text-center block">Frequently Asked Doubts</span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {quickChips.map((chip, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => handleChipClick(chip.query)}
-                        className="px-4 py-3.5 bg-slate-950/45 hover:bg-emerald-500/10 text-slate-300 hover:text-emerald-400 border border-slate-900 hover:border-emerald-500/30 rounded-2xl text-xs font-semibold transition-all text-left flex items-start gap-2 hover:scale-[1.01] active:scale-[0.99] shadow-sm"
-                      >
-                        <Sparkles className="w-3.5 h-3.5 shrink-0 text-emerald-400 mt-0.5" />
-                        <span>{chip.label}</span>
-                      </button>
-                    ))}
-                  </div>
+                  <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
+                  <span className="text-emerald-400 font-extrabold text-xs tracking-widest uppercase animate-pulse">Running OCR & Analyzing Equations...</span>
                 </div>
               )}
             </div>
           ) : (
             <>
               {/* Chat Header */}
-              <div className="bg-slate-850/80 p-4 flex items-center justify-between border-b border-slate-800 backdrop-blur-md shrink-0">
+              <div className="bg-[#080b1e]/90 p-4 flex items-center justify-between border-b border-white/10 backdrop-blur-md shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="bg-emerald-500/25 p-2 rounded-xl">
-                    <Bot className="w-5 h-5 text-emerald-400" />
+                  <div className="w-9 h-9 bg-emerald-500/20 border border-emerald-500/30 rounded-xl flex items-center justify-center text-emerald-400 shadow-md">
+                    <Bot className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white text-sm">Professor AI</h3>
-                    <p className="text-[10px] text-emerald-455 uppercase tracking-widest font-bold">Online</p>
+                    <h3 className="font-extrabold text-white text-sm">Professor Doubt Solver</h3>
+                    <p className="text-[10px] text-emerald-400 uppercase tracking-widest font-black">Active Session</p>
                   </div>
                 </div>
+
                 {lensMessages.length > 0 && !lensConclusion && (
                   <button
                     onClick={generateSessionConclusion}
                     disabled={generatingSummary}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-xl text-xs font-bold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-extrabold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 shadow-md"
                   >
                     {generatingSummary ? (
                       <>
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        <span>Summarizing...</span>
+                        <span>Compiling...</span>
                       </>
                     ) : (
                       <>
-                        <FileText className="w-3.5 h-3.5" />
+                        <FileText className="w-3.5 h-3.5 text-emerald-400" />
                         <span>Generate Conclusion</span>
                       </>
                     )}
@@ -639,32 +672,32 @@ export default function LensPage() {
               </div>
 
               {/* Chat Messages */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
                 {lensMessages.map((msg, i) => {
                   const identifier = `lens-${i}`;
                   const isAi = msg.role === "ai";
                   return (
                     <div key={i} className={`flex gap-4 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-md ${
-                        isAi ? "bg-emerald-900/50 text-emerald-400" : "bg-purple-900/50 text-purple-400"
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-md border ${
+                        isAi ? "bg-emerald-950/60 text-emerald-400 border-emerald-500/20" : "bg-purple-950/60 text-purple-400 border-purple-500/20"
                       }`}>
                         {isAi ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
                       </div>
+
                       <div className="relative group max-w-[85%]">
-                        {/* Image preview in bubble */}
                         {msg.imagePreview && (
-                          <div className="mb-2.5 rounded-2xl overflow-hidden max-w-[200px] border border-white/10 shadow-md">
-                            <img src={msg.imagePreview} alt="Homework Attachment" className="w-full h-auto object-cover" />
+                          <div className="mb-2.5 rounded-2xl overflow-hidden max-w-[220px] border border-white/10 shadow-lg">
+                            <img src={msg.imagePreview} alt="Scanned Attachment" className="w-full h-auto object-cover" />
                           </div>
                         )}
                         
-                        <div className={`p-4.5 rounded-2xl shadow-md border leading-relaxed ${
+                        <div className={`p-4 sm:p-5 rounded-3xl shadow-2xl border leading-relaxed ${
                           msg.role === "user" 
-                            ? "bg-gradient-to-br from-emerald-500 to-emerald-650 text-white rounded-tr-none border-emerald-400/20" 
-                            : "bg-[#0b0c16]/75 backdrop-blur-md text-slate-300 rounded-tl-none border-slate-800/80"
+                            ? "bg-gradient-to-br from-emerald-600 to-teal-600 text-white rounded-tr-none border-emerald-400/20 font-bold text-sm" 
+                            : "bg-[#080a18]/90 backdrop-blur-md text-slate-200 rounded-tl-none border-white/10 font-medium text-sm"
                         }`}>
                           {msg.role === "user" ? (
-                            <p className="text-sm font-semibold select-text">{msg.content}</p>
+                            <p className="select-text whitespace-pre-wrap">{msg.content}</p>
                           ) : (
                             <div className="space-y-1">
                               {formatMessageContent(msg.content)}
@@ -675,7 +708,7 @@ export default function LensPage() {
                         {isAi && (
                           <button
                             onClick={() => speakText(msg.content, identifier)}
-                            className="absolute -right-10 top-2.5 p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
+                            className="absolute -right-10 top-3 p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-400 hover:text-white border border-white/10 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
                             title="Read aloud"
                           >
                             {activeSpeakingMsg === identifier ? (
@@ -692,12 +725,11 @@ export default function LensPage() {
 
                 {/* Lens Conclusion Card */}
                 {lensConclusion && (
-                  <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/5 border border-emerald-500/30 rounded-3xl p-5 shadow-lg relative overflow-hidden my-6 border-l-4 border-l-emerald-500">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
+                  <div className="bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent border border-emerald-500/30 rounded-3xl p-5 shadow-2xl relative overflow-hidden my-6 border-l-4 border-l-emerald-500">
                     <div className="flex items-center justify-between border-b border-emerald-500/20 pb-3 mb-4">
                       <div className="flex items-center gap-2">
                         <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
-                        <h4 className="font-extrabold text-sm text-emerald-300 uppercase tracking-widest">Study Session Summary</h4>
+                        <h4 className="font-extrabold text-xs text-emerald-300 uppercase tracking-widest">Study Session Summary</h4>
                       </div>
                       <button
                         type="button"
@@ -705,9 +737,9 @@ export default function LensPage() {
                           navigator.clipboard.writeText(lensConclusion || "");
                           alert("Summary copied to clipboard!");
                         }}
-                        className="flex items-center gap-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all active:scale-95"
+                        className="flex items-center gap-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all active:scale-95"
                       >
-                        <Copy className="w-3 h-3" />
+                        <Copy className="w-3.5 h-3.5" />
                         <span>Copy Summary</span>
                       </button>
                     </div>
@@ -717,16 +749,15 @@ export default function LensPage() {
                   </div>
                 )}
 
-                {/* Loading Typing Indicator */}
                 {loading && (
                   <div className="flex gap-4">
-                    <div className="w-8 h-8 rounded-full bg-emerald-900/50 text-emerald-400 flex items-center justify-center shrink-0">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-950/60 text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0">
                       <Bot className="w-4 h-4" />
                     </div>
-                    <div className="bg-[#0b0c16]/75 backdrop-blur-md rounded-2xl rounded-tl-none border border-slate-800/80 px-5 py-4 flex items-center gap-1.5 shadow-md">
-                      <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <span className="w-2.5 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                      <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                    <div className="bg-[#080a18]/90 backdrop-blur-md rounded-2xl rounded-tl-none border border-white/10 px-5 py-4 flex items-center gap-2 shadow-md">
+                      <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                      <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                      <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                     </div>
                   </div>
                 )}
@@ -735,16 +766,16 @@ export default function LensPage() {
               </div>
 
               {/* Chat Input */}
-              <div className="p-4 bg-slate-950/45 border-t border-slate-850/60 backdrop-blur-md shrink-0">
+              <div className="p-4 bg-[#050816]/90 border-t border-white/10 backdrop-blur-md shrink-0">
                 <form onSubmit={handleLensSend} className="relative flex items-center">
                   <input 
                     type="text" 
                     value={lensInputValue}
                     onChange={(e) => setLensInputValue(e.target.value)}
                     placeholder={isListening ? "Listening closely..." : "Ask a follow-up question about this scanned doubt..."}
-                    className={`w-full bg-[#03040c]/80 border ${
-                      isListening ? "border-red-500/50 focus:ring-red-500" : "border-slate-800 focus:border-emerald-500/60 focus:ring-emerald-500/40"
-                    } rounded-full pl-5 pr-26 py-4 text-sm focus:outline-none focus:ring-1 text-slate-250 placeholder:text-slate-500 transition-all font-semibold`}
+                    className={`w-full bg-[#03040c]/90 border ${
+                      isListening ? "border-red-500/50 focus:ring-red-500" : "border-white/10 focus:border-emerald-500/50 focus:ring-emerald-500/30"
+                    } rounded-full pl-5 pr-26 py-4 text-sm focus:outline-none focus:ring-1 text-slate-100 placeholder:text-slate-500 transition-all font-semibold`}
                   />
                   <div className="absolute right-2 flex gap-1.5 items-center">
                     <button 
@@ -752,8 +783,8 @@ export default function LensPage() {
                       onClick={startSpeechToText}
                       className={`w-9.5 h-9.5 rounded-full flex items-center justify-center border transition-all ${
                         isListening 
-                          ? "bg-red-650 border-red-500 text-white animate-pulse" 
-                          : "bg-slate-900 border-slate-800 text-slate-400 hover:text-white"
+                          ? "bg-red-600 border-red-500 text-white animate-pulse" 
+                          : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
                       }`}
                       title="Speak doubt"
                     >
@@ -762,7 +793,7 @@ export default function LensPage() {
                     <button 
                       type="submit"
                       disabled={!lensInputValue.trim() || loading}
-                      className="w-9.5 h-9.5 bg-gradient-to-r from-emerald-500 to-emerald-650 text-white rounded-full flex items-center justify-center hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 transition-colors shadow-md shadow-emerald-500/10 active:scale-95"
+                      className="w-9.5 h-9.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-full flex items-center justify-center hover:from-emerald-600 hover:to-teal-700 disabled:opacity-40 transition-all shadow-md shadow-emerald-500/20 active:scale-95"
                     >
                       {loading ? (
                         <Loader2 className="w-4 h-4 animate-spin" />

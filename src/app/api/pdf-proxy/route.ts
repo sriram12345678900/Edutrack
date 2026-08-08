@@ -131,14 +131,15 @@ export async function GET(request: Request) {
 
     // Override the internal PDF metadata title so Chrome's viewer shows the correct name
     // instead of the original author's filename (e.g. "CHAP 2.pmd")
+    // Only attempt on unencrypted PDFs; encrypted PDFs (like NCERT books) should be served untouched.
     try {
-      const pdfDoc = await PDFDocument.load(pdfBuffer, { ignoreEncryption: true });
+      const pdfDoc = await PDFDocument.load(pdfBuffer);
       pdfDoc.setTitle(filename.replace(/\.pdf$/i, ''));
       const modifiedBytes = await pdfDoc.save();
       pdfBuffer = Buffer.from(modifiedBytes);
     } catch (metaErr) {
-      console.warn('[PDF Proxy] Failed to modify PDF metadata:', metaErr);
-      // Proceed with the original buffer if parsing fails
+      console.warn('[PDF Proxy] Skipping PDF metadata modification (file encrypted or custom structure):', metaErr);
+      // Proceed with the original buffer if parsing fails or PDF is encrypted
     }
 
     // Write to disk cache for future requests

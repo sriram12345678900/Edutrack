@@ -69,7 +69,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-6 relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col md:flex-row items-center justify-center p-6 relative overflow-x-hidden transition-colors duration-300">
       {/* Immersive Glowing Mesh Gradients */}
       <div className="absolute top-[-10%] right-[-5%] w-[450px] h-[450px] bg-indigo-500/10 dark:bg-indigo-550/5 rounded-full blur-[110px] pointer-events-none -z-10 animate-float-slow" />
       <div className="absolute bottom-[10%] left-[-5%] w-[400px] h-[400px] bg-fuchsia-500/10 dark:bg-fuchsia-550/5 rounded-full blur-[110px] pointer-events-none -z-10 animate-float-delayed" />

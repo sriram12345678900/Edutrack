@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { 
   Sparkles, MessageSquare, ArrowRight, Bot, User, Check, Loader2, 
   Mic, Volume2, VolumeX, FileText, Copy, Plus, Trash2, Paperclip, X,
-  Compass, Zap, GraduationCap, ChevronLeft, Menu
+  Compass, Zap, GraduationCap, ChevronLeft, Menu, Settings2, Lightbulb, ShieldCheck, Globe, Activity
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,20 +18,25 @@ interface ChatSession {
   timestamp: number;
 }
 
+type PersonaMode = "ncert_expert" | "socratic" | "simplifier";
+
 export default function TutorPage() {
   // Conversational Chat States
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [chatInputValue, setChatInputValue] = useState("");
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false); // Mobile/desktop sidebar toggle
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  // Persona & Language States
+  const [personaMode, setPersonaMode] = useState<PersonaMode>("ncert_expert");
+  const [userLanguage, setUserLanguage] = useState<string>("Hinglish");
 
   // Common UI States
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [activeSpeakingMsg, setActiveSpeakingMsg] = useState<string | null>(null); // formatted as "chat-index"
+  const [activeSpeakingMsg, setActiveSpeakingMsg] = useState<string | null>(null);
   const [generatingSummary, setGeneratingSummary] = useState(false);
-  const [userLanguage, setUserLanguage] = useState<string>("Hinglish");
 
   // Refs
   const chatFileInputRef = useRef<HTMLInputElement>(null);
@@ -51,6 +56,7 @@ export default function TutorPage() {
         } catch (e) {
           console.error("Error loading sessions:", e);
         }
+      }
       const storedLang = localStorage.getItem("edutrack_language");
       if (storedLang) {
         setUserLanguage(storedLang);
@@ -58,18 +64,15 @@ export default function TutorPage() {
     }
   }, []);
 
-  // Save sessions to localStorage when updated
   const saveSessions = (updatedSessions: ChatSession[]) => {
     setSessions(updatedSessions);
     localStorage.setItem("edutrack_tutor_sessions", JSON.stringify(updatedSessions));
   };
 
-  // Scroll to bottom on new messages
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [currentSessionId, sessions, loading]);
 
-  // Convert uploaded image file to Base64 data URL
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -90,7 +93,7 @@ export default function TutorPage() {
       const rec = new SpeechRecognition();
       rec.continuous = false;
       rec.interimResults = false;
-      rec.lang = "en-IN"; // Hinglish support
+      rec.lang = userLanguage === "Hindi" ? "hi-IN" : "en-IN";
 
       rec.onstart = () => setIsListening(true);
       rec.onend = () => setIsListening(false);
@@ -165,7 +168,6 @@ export default function TutorPage() {
     const textQuery = chatInputValue.trim();
     setChatInputValue("");
 
-    // Create user message object
     const userMessage = {
       role: "user" as const,
       content: textQuery || "Uploaded an image for analysis.",
@@ -176,7 +178,6 @@ export default function TutorPage() {
     let targetSession = currentSession;
     let updatedSessions = [...sessions];
 
-    // Initialize new session if none is active
     if (!targetSessionId) {
       targetSessionId = Date.now().toString();
       targetSession = {
@@ -198,11 +199,21 @@ export default function TutorPage() {
     saveSessions(updatedSessions);
     setAttachedImage(null);
 
+    // Persona System Instruction Prefix
+    let personaPrompt = "";
+    if (personaMode === "ncert_expert") {
+      personaPrompt = "[SYSTEM: Act as an NCERT CBSE Board Examiner. Provide strict, marking-scheme-friendly solutions with definitions, formulas, and board exam tips.]";
+    } else if (personaMode === "socratic") {
+      personaPrompt = "[SYSTEM: Act as a Socratic Mentor. Don't give answers directly immediately; guide the student with helpful hints, step 1, step 2.]";
+    } else if (personaMode === "simplifier") {
+      personaPrompt = "[SYSTEM: Act as an ELI5 Simplifier. Use fun real-world analogies, simple terms, and zero jargon.]";
+    }
+
     try {
-      const apiMessages = targetSession!.messages.map(m => {
+      const apiMessages = targetSession!.messages.map((m, idx) => {
         const msgObj: any = {
           role: m.role === "user" ? "user" : "assistant",
-          content: m.content
+          content: idx === targetSession!.messages.length - 1 && m.role === "user" ? `${personaPrompt} ${m.content}` : m.content
         };
         if (m.imagePreview) {
           msgObj.attachments = [
@@ -307,10 +318,10 @@ export default function TutorPage() {
   };
 
   const quickChips = [
-    { label: "Refraction slab (Hindi)", query: "Can you explain refraction of light in a glass slab in easy Hinglish?", icon: Compass, color: "text-emerald-450 border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10" },
-    { label: "Solve Quadratic formula", query: "Explain how to solve the quadratic equation 2x² - 5x + 3 = 0 step-by-step?", icon: Zap, color: "text-amber-400 border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10" },
-    { label: "Metal reactivity series", query: "What is a simple mnemonic to remember the metal reactivity series for CBSE Class 10?", icon: GraduationCap, color: "text-indigo-400 border-indigo-500/20 bg-indigo-500/5 hover:bg-indigo-500/10" },
-    { label: "Photosynthesis summary", query: "Explain the light and dark reactions of photosynthesis in simple terms.", icon: Sparkles, color: "text-fuchsia-400 border-fuchsia-500/20 bg-fuchsia-500/5 hover:bg-fuchsia-500/10" }
+    { label: "Refraction in Glass Slab", query: "Explain refraction of light through a rectangular glass slab with ray diagram steps in Hinglish?", icon: Compass, color: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20" },
+    { label: "Solve Quadratic Equation", query: "Explain how to solve 2x² - 5x + 3 = 0 step-by-step using the quadratic formula?", icon: Zap, color: "text-amber-400 border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20" },
+    { label: "Metal Reactivity Mnemonic", query: "What is a simple memory trick to remember the metal reactivity series for CBSE Class 10?", icon: GraduationCap, color: "text-cyan-400 border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20" },
+    { label: "Photosynthesis Reactions", query: "Explain light and dark reactions of photosynthesis in simple terms.", icon: Sparkles, color: "text-fuchsia-400 border-fuchsia-500/30 bg-fuchsia-500/10 hover:bg-fuchsia-500/20" }
   ];
 
   // ── LATEX / MATH SANITIZATION ──
@@ -358,7 +369,7 @@ export default function TutorPage() {
         return (
           <div 
             key={idx} 
-            className="flex justify-center my-4 p-4.5 bg-indigo-950/20 border border-indigo-500/10 rounded-2xl font-serif italic text-base text-indigo-300 tracking-widest font-bold select-all"
+            className="flex justify-center my-4 p-4.5 bg-cyan-950/40 border border-cyan-500/30 rounded-2xl font-serif italic text-base text-cyan-300 tracking-widest font-bold select-all shadow-inner"
             dangerouslySetInnerHTML={{ __html: cleanMathLaTeX(mathText) }}
           />
         );
@@ -367,7 +378,7 @@ export default function TutorPage() {
       const formatMathInline = (mathText: string, keyIdx: number) => (
         <span 
           key={`math-${keyIdx}`}
-          className="font-serif italic text-indigo-300 dark:text-indigo-400 font-bold text-sm tracking-wide bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/15 inline-block mx-0.5 select-all"
+          className="font-serif italic text-cyan-300 font-bold text-sm tracking-wide bg-cyan-500/20 px-2 py-0.5 rounded-lg border border-cyan-500/30 inline-block mx-0.5 select-all"
           dangerouslySetInnerHTML={{ __html: cleanMathLaTeX(mathText) }}
         />
       );
@@ -397,13 +408,13 @@ export default function TutorPage() {
 
         if (level === 1) {
           return (
-            <h1 key={idx} className="text-xl font-black text-white mt-4 mb-2 tracking-tight bg-gradient-to-r from-indigo-400 to-fuchsia-400 bg-clip-text text-transparent">
+            <h1 key={idx} className="text-xl font-black text-white mt-4 mb-2 tracking-tight bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400 bg-clip-text text-transparent">
               {headingContent}
             </h1>
           );
         } else if (level === 2) {
           return (
-            <h2 key={idx} className="text-base font-extrabold text-white mt-5 mb-2 tracking-tight bg-gradient-to-r from-indigo-400 via-purple-350 to-teal-400 bg-clip-text text-transparent flex items-center gap-2">
+            <h2 key={idx} className="text-base font-extrabold text-white mt-5 mb-2 tracking-tight bg-gradient-to-r from-cyan-300 via-teal-300 to-emerald-300 bg-clip-text text-transparent flex items-center gap-2">
               {headingContent}
             </h2>
           );
@@ -418,8 +429,8 @@ export default function TutorPage() {
       if (isBullet) {
         return (
           <div key={idx} className="flex items-start gap-2.5 ml-2.5 my-1.5 select-text">
-            <span className="text-indigo-450 mt-1.5 text-xs">•</span>
-            <span className="text-slate-300 dark:text-slate-200 text-sm font-medium leading-relaxed">{parseMix(line.trim().substring(2))}</span>
+            <span className="text-cyan-400 mt-1 text-xs">•</span>
+            <span className="text-slate-300 text-sm font-medium leading-relaxed">{parseMix(line.trim().substring(2))}</span>
           </div>
         );
       }
@@ -429,8 +440,8 @@ export default function TutorPage() {
         if (numMatch) {
           return (
             <div key={idx} className="flex items-start gap-2.5 ml-2.5 my-1.5 select-text">
-              <span className="text-indigo-455 font-bold mt-0.5 text-sm">{numMatch[1]}</span>
-              <span className="text-slate-300 dark:text-slate-200 text-sm font-medium leading-relaxed">{parseMix(numMatch[2])}</span>
+              <span className="text-cyan-400 font-bold mt-0.5 text-sm">{numMatch[1]}</span>
+              <span className="text-slate-300 text-sm font-medium leading-relaxed">{parseMix(numMatch[2])}</span>
             </div>
           );
         }
@@ -439,7 +450,7 @@ export default function TutorPage() {
       if (!line.trim()) return <div key={idx} className="h-2.5" />;
 
       return (
-        <p key={idx} className="text-slate-300 dark:text-slate-200 text-sm font-medium mb-2.5 last:mb-0 leading-relaxed select-text">
+        <p key={idx} className="text-slate-300 text-sm font-medium mb-2.5 last:mb-0 leading-relaxed select-text">
           {parseMix(line)}
         </p>
       );
@@ -447,11 +458,82 @@ export default function TutorPage() {
   };
 
   return (
-    <div className="w-full h-full min-h-[calc(100vh-80px)] flex flex-col bg-[#030409] text-slate-100 font-sans relative overflow-hidden">
+    <div className="w-full h-full min-h-[calc(100vh-80px)] flex flex-col bg-[#03040b] text-slate-100 font-sans relative overflow-hidden">
       
-      {/* Spectacular Glowing Ambient Spotlights */}
-      <div className="absolute top-[-10%] left-[5vw] w-[40vw] h-[40vw] bg-indigo-600/10 rounded-full blur-[130px] pointer-events-none mix-blend-screen" />
-      <div className="absolute bottom-[-10%] right-[5vw] w-[40vw] h-[40vw] bg-fuchsia-600/5 rounded-full blur-[130px] pointer-events-none mix-blend-screen" />
+      {/* Ambient Background Orbs */}
+      <div className="absolute top-[-10%] left-[10vw] w-[45vw] h-[45vw] bg-cyan-600/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[10vw] w-[45vw] h-[45vw] bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none" />
+
+      {/* Top Controls Header Bar */}
+      <header className="sticky top-0 z-20 bg-[#050714]/90 backdrop-blur-2xl border-b border-white/10 px-4 sm:px-8 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Link href="/dashboard" className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white transition-all shadow-sm">
+            <ChevronLeft className="w-5 h-5" />
+          </Link>
+          <div className="flex items-center gap-3">
+            {/* Animated Cyber Core Icon */}
+            <div className="relative w-10 h-10 rounded-2xl overflow-hidden border border-cyan-400/30 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+              <img src="/ai_tutor_avatar.jpg" alt="AI Core Avatar" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-cyan-500/10 mix-blend-overlay" />
+            </div>
+            <div>
+              <h1 className="text-base font-black text-white leading-tight flex items-center gap-2">
+                Professor AI Tutor <span className="text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-extrabold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" /> Live Core
+                </span>
+              </h1>
+              <p className="text-[11px] text-slate-400 font-semibold">NCERT CBSE Class 10 Interactive Learning Specialist</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Persona Mode & Language Selector */}
+        <div className="flex items-center gap-3 overflow-x-auto w-full sm:w-auto">
+          
+          {/* Persona Pills */}
+          <div className="flex p-1 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md">
+            {[
+              { id: "ncert_expert", label: "NCERT Board Expert", icon: ShieldCheck },
+              { id: "socratic", label: "Socratic Mentor", icon: Lightbulb },
+              { id: "simplifier", label: "ELI5 Simplifier", icon: Zap }
+            ].map((p) => {
+              const Icon = p.icon;
+              const isActive = personaMode === p.id;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setPersonaMode(p.id as PersonaMode)}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                    isActive 
+                      ? "bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-lg shadow-cyan-500/25 border border-white/20 scale-[1.02]" 
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span>{p.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Language Switcher */}
+          <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs">
+            <Globe className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            <select
+              value={userLanguage}
+              onChange={(e) => {
+                setUserLanguage(e.target.value);
+                localStorage.setItem("edutrack_language", e.target.value);
+              }}
+              className="bg-transparent text-white font-extrabold focus:outline-none cursor-pointer text-xs pr-1"
+            >
+              <option value="Hinglish" className="bg-[#080b18] text-white">Hinglish</option>
+              <option value="English" className="bg-[#080b18] text-white">English</option>
+              <option value="Hindi" className="bg-[#080b18] text-white">Hindi</option>
+            </select>
+          </div>
+        </div>
+      </header>
 
       {/* Main Container */}
       <div className="flex-1 flex overflow-hidden min-h-0 relative z-10">
@@ -459,33 +541,31 @@ export default function TutorPage() {
         {/* Toggle History Button (Mobile Only) */}
         <button 
           onClick={() => setIsHistoryOpen(!isHistoryOpen)}
-          className="md:hidden fixed bottom-28 right-6 w-14 h-14 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center shadow-[0_4px_20px_rgba(99,102,241,0.4)] border border-indigo-450 z-40"
-          title="Toggle Chat Logs"
+          className="md:hidden fixed bottom-28 right-6 w-12 h-12 rounded-full bg-gradient-to-tr from-cyan-600 to-indigo-600 text-white flex items-center justify-center shadow-xl border border-cyan-400 z-40"
         >
-          {isHistoryOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {isHistoryOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
 
         {/* ── LEFT COLUMN: SIDEBAR LOGS ── */}
-        <aside className={`absolute md:static top-0 bottom-0 left-0 w-80 border-r border-white/5 bg-[#060814]/95 md:bg-transparent backdrop-blur-2xl md:backdrop-blur-none p-6 flex flex-col gap-6 z-30 transition-transform duration-300 ${
+        <aside className={`absolute md:static top-0 bottom-0 left-0 w-80 border-r border-white/10 bg-[#050714]/95 md:bg-transparent backdrop-blur-2xl md:backdrop-blur-none p-5 flex flex-col gap-5 z-30 transition-transform duration-300 ${
           isHistoryOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}>
-          {/* New Session Button */}
           <button 
             onClick={startNewSession}
-            className="w-full py-4.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-extrabold text-xs uppercase tracking-widest rounded-2xl transition-all shadow-[0_0_20px_rgba(99,102,241,0.25)] hover:shadow-[0_0_30px_rgba(168,85,247,0.45)] hover:scale-[1.01] active:scale-[0.98]"
+            className="w-full py-3.5 bg-gradient-to-r from-cyan-500 via-teal-500 to-indigo-600 text-white font-extrabold text-xs uppercase tracking-widest rounded-2xl transition-all shadow-xl shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] border border-white/20"
           >
             <div className="flex items-center justify-center gap-2">
-              <Plus className="w-4.5 h-4.5 stroke-[2.5]" />
-              <span>New Session</span>
+              <Plus className="w-4 h-4" />
+              <span>New Study Chat</span>
             </div>
           </button>
 
-          <div className="flex-1 overflow-y-auto space-y-2.5 pr-2 scrollbar-none">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-3 block mb-1">Recent Sessions</span>
+          <div className="flex-1 overflow-y-auto space-y-2 pr-1 scrollbar-none">
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2 block mb-1">Recent Sessions</span>
             
             {sessions.length === 0 ? (
-              <div className="text-center py-10 border border-dashed border-white/5 rounded-2xl bg-white/[0.01]">
-                <p className="text-slate-650 text-xs font-bold px-4">No previous chats. Start a new one above!</p>
+              <div className="text-center py-8 border border-dashed border-white/10 rounded-2xl bg-white/[0.01]">
+                <p className="text-slate-400 text-xs font-semibold px-4">No previous chats. Start a new session above!</p>
               </div>
             ) : (
               sessions.map(s => {
@@ -494,25 +574,24 @@ export default function TutorPage() {
                   <div
                     key={s.id}
                     onClick={() => selectSession(s.id)}
-                    className={`group w-full p-4.5 rounded-2xl border text-left flex items-center justify-between cursor-pointer transition-all relative ${
+                    className={`group w-full p-3.5 rounded-2xl border text-left flex items-center justify-between cursor-pointer transition-all relative ${
                       isActive
-                        ? "bg-indigo-500/10 border-indigo-500/25 text-indigo-400 font-extrabold"
-                        : "bg-white/[0.01] border-white/5 text-slate-400 hover:bg-white/[0.03] hover:text-slate-200"
+                        ? "bg-cyan-500/15 border-cyan-500/40 text-cyan-300 font-extrabold shadow-lg"
+                        : "bg-white/[0.02] border-white/5 text-slate-400 hover:bg-white/[0.05] hover:text-slate-200"
                     }`}
                   >
                     {isActive && (
-                      <div className="absolute left-0 top-1/4 bottom-1/4 w-[3px] bg-indigo-500 rounded-full shadow-[0_0_8px_#6366f1]" />
+                      <div className="absolute left-0 top-1/4 bottom-1/4 w-[3.5px] bg-cyan-400 rounded-full shadow-[0_0_10px_#22d3ee]" />
                     )}
-                    <div className="flex items-center gap-3 min-w-0">
-                      <MessageSquare className={`w-4 h-4 shrink-0 ${isActive ? "text-indigo-400" : "text-slate-500"}`} />
-                      <span className="text-xs truncate">{s.title}</span>
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <MessageSquare className={`w-4 h-4 shrink-0 ${isActive ? "text-cyan-400" : "text-slate-500"}`} />
+                      <span className="text-xs truncate font-semibold">{s.title}</span>
                     </div>
                     <button
                       onClick={(e) => deleteSession(e, s.id)}
-                      className="opacity-0 group-hover:opacity-100 hover:text-red-400 p-1 rounded-lg hover:bg-white/5 transition-opacity"
-                      title="Delete chat log"
+                      className="opacity-0 group-hover:opacity-100 hover:text-red-400 p-1 rounded-lg hover:bg-white/10 transition-opacity"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 );
@@ -521,277 +600,273 @@ export default function TutorPage() {
           </div>
         </aside>
 
-        {/* ── RIGHT COLUMN: MAIN CHAT SPACE ── */}
-        <section className="flex-1 flex flex-col min-w-0 bg-[#04050b]/25 relative">
+        {/* ── RIGHT COLUMN: MAIN CHAT SPACE LOCKED IN A FRAMED BOX ── */}
+        <section className="flex-1 flex flex-col min-w-0 bg-[#04050b]/40 relative p-3 sm:p-6 overflow-hidden">
           
-          {/* Messages Feed */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar">
-            {!currentSessionId || currentSession?.messages.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center p-6 max-w-xl mx-auto select-none">
-                
-                {/* Big Glowing Bot Avatar Welcome */}
-                <div className="relative mb-8 flex items-center justify-center">
-                  <div className="absolute w-36 h-36 bg-indigo-500/10 rounded-full blur-2xl animate-pulse" />
+          {/* Locked Chat Box Card Container */}
+          <div className="w-full h-full max-w-5xl mx-auto bg-[#060817]/90 backdrop-blur-3xl border border-cyan-500/20 rounded-3xl sm:rounded-[2.5rem] flex flex-col overflow-hidden shadow-[0_0_50px_rgba(6,182,212,0.1)] relative">
+            
+            {/* Ambient Corner HUD Accents */}
+            <div className="absolute top-4 left-4 w-5 h-5 border-t-2 border-l-2 border-cyan-400/60 pointer-events-none z-20" />
+            <div className="absolute top-4 right-4 w-5 h-5 border-t-2 border-r-2 border-cyan-400/60 pointer-events-none z-20" />
+            <div className="absolute bottom-4 left-4 w-5 h-5 border-b-2 border-l-2 border-cyan-400/60 pointer-events-none z-20" />
+            <div className="absolute bottom-4 right-4 w-5 h-5 border-b-2 border-r-2 border-cyan-400/60 pointer-events-none z-20" />
+
+            {/* Scrollable Messages Feed Inside Box */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+              {!currentSessionId || currentSession?.messages.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-center p-6 max-w-xl mx-auto select-none">
                   
-                  {/* Concentric Halo Rings */}
-                  <div className="absolute w-28 h-28 border border-indigo-500/20 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
-                  <div className="absolute w-24 h-24 border border-purple-500/20 rounded-full animate-ping" style={{ animationDuration: '2s' }} />
-                  
-                  <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 via-purple-650 to-pink-500 rounded-[2rem] flex items-center justify-center text-white relative z-10 shadow-2xl border border-white/10 hover:scale-105 hover:rotate-2 transition-transform duration-300">
-                    <Bot className="w-10 h-10" />
-                  </div>
-                </div>
-
-                <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-300 mb-3 tracking-tight">
-                  Professor AI Tutor
-                </h2>
-                <p className="text-slate-400 text-sm font-semibold mb-10 max-w-sm leading-relaxed">
-                  Your personalized NCERT & CBSE study buddy. Ask textbook equations, attach figures, or dictate notes.
-                </p>
-
-                {/* Quick Chips Suggestion Deck */}
-                <div className="w-full space-y-4 text-left">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 pl-1">Interactive Doubts</span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    {quickChips.map((chip, idx) => {
-                      const ChipIcon = chip.icon;
-                      return (
-                        <button
-                          key={idx}
-                          onClick={() => handleChipClick(chip.query)}
-                          className={`px-5 py-4 border rounded-2xl text-xs font-extrabold transition-all text-left flex items-start gap-3 hover:scale-[1.01] active:scale-[0.99] shadow-sm ${chip.color}`}
-                        >
-                          <ChipIcon className="w-4.5 h-4.5 shrink-0 mt-0.5" />
-                          <span>{chip.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-              </div>
-            ) : (
-              <div className="max-w-4xl mx-auto space-y-6">
-                
-                {/* Generate Summary Banner */}
-                {currentSession && !currentSession.conclusion && (
-                  <div className="flex justify-end mb-2">
-                    <button
-                      onClick={generateSessionConclusion}
-                      disabled={generatingSummary}
-                      className="flex items-center gap-2 px-5 py-3 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/25 rounded-2xl text-xs font-black uppercase tracking-wider transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
-                    >
-                      {generatingSummary ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Summarizing...</span>
-                        </>
-                      ) : (
-                        <>
-                          <FileText className="w-4 h-4" />
-                          <span>Compile Study Conclusion</span>
-                        </>
+                  {/* Futuristic Cyber Avatar HUD Header */}
+                  <div className="relative mb-6 flex items-center justify-center">
+                    <div className="absolute w-36 h-36 bg-cyan-500/20 rounded-full blur-2xl animate-pulse" />
+                    <div className="relative w-24 h-24 rounded-3xl overflow-hidden shadow-2xl border-2 border-cyan-400/40 p-1 bg-[#070a1a] hover:scale-105 transition-transform duration-300">
+                      <img src="/ai_tutor_avatar.jpg" alt="Holographic AI Tutor" className="w-full h-full object-cover rounded-2xl" />
+                      {activeSpeakingMsg && (
+                        <div className="absolute inset-0 bg-cyan-500/20 flex items-center justify-center gap-1 backdrop-blur-xs">
+                          <Activity className="w-6 h-6 text-cyan-300 animate-bounce" />
+                        </div>
                       )}
+                    </div>
+                  </div>
+
+                  <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-teal-300 mb-2 tracking-tight">
+                    How can I help your study today?
+                  </h2>
+                  <p className="text-slate-400 text-xs sm:text-sm font-semibold mb-8 max-w-sm leading-relaxed">
+                    Currently active in <strong className="text-cyan-400 uppercase tracking-wider">{personaMode.replace('_', ' ')}</strong> mode in <strong className="text-cyan-400">{userLanguage}</strong>.
+                  </p>
+
+                  {/* Quick Chips Suggestion Deck */}
+                  <div className="w-full space-y-3 text-left">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Interactive CBSE Doubts</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {quickChips.map((chip, idx) => {
+                        const ChipIcon = chip.icon;
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => handleChipClick(chip.query)}
+                            className={`px-4.5 py-3.5 border rounded-2xl text-xs font-extrabold transition-all text-left flex items-start gap-3 hover:scale-[1.01] active:scale-[0.99] shadow-md ${chip.color}`}
+                          >
+                            <ChipIcon className="w-4 h-4 shrink-0 mt-0.5" />
+                            <span>{chip.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                </div>
+              ) : (
+                <div className="max-w-4xl mx-auto space-y-6">
+                  
+                  {/* Summary Generator Button Banner */}
+                  {currentSession && !currentSession.conclusion && (
+                    <div className="flex justify-end mb-2">
+                      <button
+                        onClick={generateSessionConclusion}
+                        disabled={generatingSummary}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 rounded-2xl text-xs font-black uppercase tracking-wider transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 shadow-md"
+                      >
+                        {generatingSummary ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Compiling Summary...</span>
+                          </>
+                        ) : (
+                          <>
+                            <FileText className="w-4 h-4 text-cyan-400" />
+                            <span>Generate Session Summary</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Messages Feed */}
+                  {currentSession?.messages.map((msg, i) => {
+                    const identifier = `chat-${i}`;
+                    const isAi = msg.role === "ai";
+                    return (
+                      <div key={i} className={`flex gap-4 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
+                        
+                        <div className={`w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 shadow-lg border ${
+                          isAi 
+                            ? "bg-cyan-950/60 text-cyan-400 border-cyan-500/30" 
+                            : "bg-purple-950/60 text-purple-400 border-purple-500/30"
+                        }`}>
+                          {isAi ? <Bot className="w-4.5 h-4.5" /> : <User className="w-4.5 h-4.5" />}
+                        </div>
+
+                        <div className="relative group max-w-[82%]">
+                          
+                          {msg.imagePreview && (
+                            <div className="mb-3 rounded-2xl overflow-hidden max-w-[260px] border border-white/10 shadow-2xl relative">
+                              <img src={msg.imagePreview} alt="Attached homework" className="w-full h-auto object-cover" />
+                            </div>
+                          )}
+
+                          <div className={`p-4.5 sm:p-5 rounded-3xl shadow-2xl border leading-relaxed select-text ${
+                            msg.role === "user"
+                              ? "bg-gradient-to-br from-cyan-600 to-indigo-600 text-white rounded-tr-none border-cyan-400/20 font-bold text-sm"
+                              : "bg-[#080a17]/90 backdrop-blur-2xl text-slate-200 rounded-tl-none border-white/10 border-l-4 border-l-cyan-500 font-medium text-sm"
+                          }`}>
+                            {msg.role === "user" ? (
+                              <p className="whitespace-pre-wrap">{msg.content}</p>
+                            ) : (
+                              <div className="space-y-1">
+                                {formatMessageContent(msg.content)}
+                              </div>
+                            )}
+                          </div>
+
+                          {isAi && (
+                            <button
+                              onClick={() => speakText(msg.content, identifier)}
+                              className="absolute -right-10 top-3 p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-400 hover:text-white border border-white/10 shadow-md transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 active:scale-95"
+                              title="Read text aloud"
+                            >
+                              {activeSpeakingMsg === identifier ? (
+                                <VolumeX className="w-4 h-4 text-red-400" />
+                              ) : (
+                                <Volume2 className="w-4 h-4" />
+                              )}
+                            </button>
+                          )}
+
+                        </div>
+
+                      </div>
+                    );
+                  })}
+
+                  {/* Session Conclusion Card */}
+                  {currentSession?.conclusion && (
+                    <div className="bg-gradient-to-br from-cyan-500/10 via-teal-500/5 to-transparent border border-cyan-500/30 rounded-3xl p-6 shadow-2xl relative overflow-hidden border-l-4 border-l-cyan-500">
+                      <div className="flex items-center justify-between border-b border-cyan-500/20 pb-3 mb-4">
+                        <div className="flex items-center gap-2.5">
+                          <Sparkles className="w-5 h-5 text-cyan-400 animate-pulse" />
+                          <h4 className="font-extrabold text-xs text-cyan-300 uppercase tracking-widest">Study Session Summary</h4>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(currentSession.conclusion || "");
+                            alert("Summary copied to clipboard!");
+                          }}
+                          className="flex items-center gap-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/30 px-3.5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all active:scale-95"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Copy Summary</span>
+                        </button>
+                      </div>
+
+                      <div className="space-y-3">
+                        {formatMessageContent(currentSession.conclusion)}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Loading Typing Indicator */}
+                  {loading && (
+                    <div className="flex gap-4">
+                      <div className="w-9 h-9 rounded-2xl bg-cyan-950/40 text-cyan-400 border border-cyan-500/20 flex items-center justify-center shrink-0">
+                        <Bot className="w-4.5 h-4.5 animate-pulse" />
+                      </div>
+                      <div className="bg-[#080a17]/90 backdrop-blur-md rounded-3xl rounded-tl-none border border-white/10 px-5 py-4 flex items-center gap-2 shadow-xl">
+                        <span className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <span className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <span className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                      </div>
+                    </div>
+                  )}
+
+                  <div ref={chatEndRef} />
+                </div>
+              )}
+            </div>
+
+            {/* Fixed Input Dock Inside Box */}
+            <div className="p-4 sm:p-5 bg-[#050716]/95 border-t border-white/10 backdrop-blur-2xl shrink-0 z-20">
+              <div className="max-w-4xl mx-auto">
+                
+                {attachedImage && (
+                  <div className="mb-3 p-3 bg-slate-900/90 border border-white/10 rounded-2xl flex items-center justify-between w-fit gap-4 shadow-2xl backdrop-blur-md">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/10">
+                        <img src={attachedImage} alt="Homework draft" className="w-full h-full object-cover" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-extrabold text-slate-200">Homework Photo Attached</p>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wide">Ready for analysis</p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => setAttachedImage(null)}
+                      className="p-1 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-full transition-all active:scale-95"
+                    >
+                      <X className="w-4 h-4" />
                     </button>
                   </div>
                 )}
 
-                {/* Messages Feed */}
-                {currentSession?.messages.map((msg, i) => {
-                  const identifier = `chat-${i}`;
-                  const isAi = msg.role === "ai";
-                  return (
-                    <div key={i} className={`flex gap-5 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
-                      
-                      {/* Avatar */}
-                      <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-lg border relative group-hover:scale-105 transition-transform ${
-                        isAi 
-                          ? "bg-indigo-950/45 text-indigo-400 border-indigo-500/15" 
-                          : "bg-purple-950/45 text-purple-400 border-purple-500/15"
-                      }`}>
-                        {isAi ? <Bot className="w-5 h-5" /> : <User className="w-5 h-5" />}
-                      </div>
+                <form onSubmit={handleChatSend} className="relative flex items-center">
+                  <input 
+                    type="text" 
+                    value={chatInputValue}
+                    onChange={(e) => setChatInputValue(e.target.value)}
+                    placeholder={isListening ? "Listening closely to your voice..." : "Ask your doubt (e.g. solve 2x² - 5x + 3 = 0, or write notes)..."}
+                    className={`w-full bg-[#030510]/95 border ${
+                      isListening ? "border-red-500/50 focus:ring-red-500" : "border-white/10 focus:border-cyan-500/50 focus:ring-cyan-500/30"
+                    } rounded-full pl-14 pr-28 py-4 text-sm focus:outline-none focus:ring-1 text-slate-100 placeholder:text-slate-400 transition-all font-semibold shadow-inner`}
+                  />
 
-                      {/* Bubble Wrapper */}
-                      <div className="relative group max-w-[80%]">
-                        
-                        {/* Attached Image Preview */}
-                        {msg.imagePreview && (
-                          <div className="mb-3 rounded-2xl overflow-hidden max-w-[280px] border border-white/10 shadow-2xl relative group">
-                            <img src={msg.imagePreview} alt="Attached doubt illustration" className="w-full h-auto object-cover" />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <span className="text-white text-[10px] font-bold uppercase tracking-wider bg-black/60 px-3 py-1.5 rounded-full border border-white/10">Attached figure</span>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Text bubble */}
-                        <div className={`p-5 rounded-3xl shadow-2xl border leading-relaxed select-text ${
-                          msg.role === "user"
-                            ? "bg-gradient-to-br from-indigo-550 to-indigo-650 text-white rounded-tr-none border-indigo-400/20 font-bold"
-                            : "bg-[#0b0c16]/80 backdrop-blur-2xl text-slate-300 rounded-tl-none border-white/5 border-l-4 border-l-indigo-500 font-semibold"
-                        }`}>
-                          {msg.role === "user" ? (
-                            <p className="text-sm select-text whitespace-pre-wrap">{msg.content}</p>
-                          ) : (
-                            <div className="space-y-1 select-text">
-                              {formatMessageContent(msg.content)}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Speaker Voice Synthesizer Button */}
-                        {isAi && (
-                          <button
-                            onClick={() => speakText(msg.content, identifier)}
-                            className="absolute -right-11 top-3.5 p-2 rounded-xl bg-slate-900/95 hover:bg-slate-800 text-slate-400 hover:text-white border border-white/5 shadow-md transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 active:scale-95"
-                            title="Speak text aloud"
-                          >
-                            {activeSpeakingMsg === identifier ? (
-                              <VolumeX className="w-4 h-4 text-red-400" />
-                            ) : (
-                              <Volume2 className="w-4 h-4" />
-                            )}
-                          </button>
-                        )}
-
-                      </div>
-
-                    </div>
-                  );
-                })}
-
-                {/* Render compiled Study Conclusion Card */}
-                {currentSession?.conclusion && (
-                  <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/5 border border-indigo-500/25 rounded-[2.2rem] p-6 shadow-2xl relative overflow-hidden border-l-4 border-l-indigo-500">
-                    <div className="absolute top-0 right-0 w-36 h-36 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
-                    
-                    <div className="flex items-center justify-between border-b border-indigo-500/20 pb-4 mb-4">
-                      <div className="flex items-center gap-3">
-                        <Sparkles className="w-5.5 h-5.5 text-indigo-400 animate-pulse" />
-                        <h4 className="font-extrabold text-sm text-indigo-300 uppercase tracking-widest leading-none">Saved Study Summary</h4>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          navigator.clipboard.writeText(currentSession.conclusion || "");
-                          alert("Summary copied to clipboard!");
-                        }}
-                        className="flex items-center gap-1.5 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 border border-indigo-500/30 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 animate-shimmer"
-                      >
-                        <Copy className="w-3.5 h-3.5" />
-                        <span>Copy Summary</span>
-                      </button>
-                    </div>
-
-                    <div className="space-y-3">
-                      {formatMessageContent(currentSession.conclusion)}
-                    </div>
-                  </div>
-                )}
-
-                {/* Loading indicator */}
-                {loading && (
-                  <div className="flex gap-4.5">
-                    <div className="w-9 h-9 rounded-2xl bg-indigo-950/30 text-indigo-400 border border-indigo-500/15 flex items-center justify-center shrink-0">
-                      <Bot className="w-4.5 h-4.5 animate-pulse" />
-                    </div>
-                    <div className="bg-[#0b0c16]/80 backdrop-blur-md rounded-3xl rounded-tl-none border border-white/5 px-5.5 py-4.5 flex items-center gap-2 shadow-xl">
-                      <span className="w-2.5 h-2.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <span className="w-2.5 h-2.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                      <span className="w-2.5 h-2.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-                    </div>
-                  </div>
-                )}
-
-                <div ref={chatEndRef} />
-              </div>
-            )}
-          </div>
-
-          {/* Floating Input Dock */}
-          <div className="p-6 bg-gradient-to-t from-[#030409] via-[#030409]/95 to-transparent backdrop-blur-md shrink-0 z-20">
-            <div className="max-w-4xl mx-auto">
-              
-              {/* Image Draft Attach Tooltip */}
-              {attachedImage && (
-                <div className="mb-3.5 p-3.5 bg-slate-900/90 border border-white/5 rounded-2xl flex items-center justify-between w-fit gap-5 shadow-2xl backdrop-blur-md">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl overflow-hidden border border-white/10 shadow-inner">
-                      <img src={attachedImage} alt="Homework draft" className="w-full h-full object-cover" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-extrabold text-slate-200">Homework Photo Attached</p>
-                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide">Ready to solve inline</p>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => setAttachedImage(null)}
-                    className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-full transition-all active:scale-95"
-                    title="Remove attachment"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
-
-              {/* Form Input Bar wrapper */}
-              <form onSubmit={handleChatSend} className="relative flex items-center">
-                <input 
-                  type="text" 
-                  value={chatInputValue}
-                  onChange={(e) => setChatInputValue(e.target.value)}
-                  placeholder={isListening ? "Listening closely to your voice..." : "Ask your doubt (e.g. solve 2x² - 5x + 3 = 0, or write notes)..."}
-                  className={`w-full bg-[#070914]/90 border ${
-                    isListening ? "border-red-500/50 focus:ring-red-500" : "border-white/5 focus:border-indigo-500/50 focus:ring-indigo-500/30"
-                  } rounded-[2rem] pl-16 pr-28 py-5 text-sm focus:outline-none focus:ring-1 text-slate-200 placeholder:text-slate-500 transition-all font-semibold shadow-inner`}
-                />
-
-                {/* Paperclip Button */}
-                <button 
-                  type="button"
-                  onClick={() => chatFileInputRef.current?.click()}
-                  className="absolute left-4.5 w-10 h-10 rounded-full flex items-center justify-center bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 text-slate-450 hover:text-white transition-all active:scale-95"
-                  title="Attach homework photo"
-                >
-                  <Paperclip className="w-4.5 h-4.5 stroke-[2]" />
-                </button>
-                <input 
-                  type="file"
-                  ref={chatFileInputRef}
-                  onChange={handleChatFileUpload}
-                  accept="image/*"
-                  className="hidden"
-                />
-
-                {/* Speech Microphone & Send Button */}
-                <div className="absolute right-3.5 flex gap-2 items-center">
                   <button 
                     type="button"
-                    onClick={startSpeechToText}
-                    className={`w-10 h-10 rounded-full flex items-center justify-center border transition-all ${
-                      isListening 
-                        ? "bg-gradient-to-tr from-red-650 to-red-550 border-red-500 text-white animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.4)]" 
-                        : "bg-white/[0.02] border-white/5 text-slate-400 hover:text-white active:scale-95"
-                    }`}
-                    title="Voice speech-to-text input"
+                    onClick={() => chatFileInputRef.current?.click()}
+                    className="absolute left-3.5 w-9 h-9 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white transition-all active:scale-95"
+                    title="Attach homework photo"
                   >
-                    <Mic className="w-4.5 h-4.5" />
+                    <Paperclip className="w-4 h-4" />
                   </button>
-                  <button 
-                    type="submit"
-                    disabled={(!chatInputValue.trim() && !attachedImage) || loading}
-                    className="w-10 h-10 bg-gradient-to-r from-indigo-550 to-purple-650 text-white rounded-full flex items-center justify-center hover:from-indigo-600 hover:to-purple-700 disabled:opacity-40 transition-all shadow-[0_4px_15px_rgba(99,102,241,0.2)] active:scale-95"
-                  >
-                    {loading ? (
-                      <Loader2 className="w-4.5 h-4.5 animate-spin" />
-                    ) : (
-                      <ArrowRight className="w-4.5 h-4.5 stroke-[2.5]" />
-                    )}
-                  </button>
-                </div>
-              </form>
+                  <input 
+                    type="file"
+                    ref={chatFileInputRef}
+                    onChange={handleChatFileUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+
+                  <div className="absolute right-3 flex gap-2 items-center">
+                    <button 
+                      type="button"
+                      onClick={startSpeechToText}
+                      className={`w-9.5 h-9.5 rounded-full flex items-center justify-center border transition-all ${
+                        isListening 
+                          ? "bg-red-600 border-red-500 text-white animate-pulse shadow-lg shadow-red-500/40" 
+                          : "bg-white/5 border-white/10 text-slate-400 hover:text-white active:scale-95"
+                      }`}
+                      title="Voice speech-to-text input"
+                    >
+                      <Mic className="w-4 h-4" />
+                    </button>
+                    <button 
+                      type="submit"
+                      disabled={(!chatInputValue.trim() && !attachedImage) || loading}
+                      className="w-9.5 h-9.5 bg-gradient-to-r from-cyan-500 to-indigo-600 text-white rounded-full flex items-center justify-center hover:from-cyan-600 hover:to-indigo-700 disabled:opacity-40 transition-all shadow-md shadow-cyan-500/20 active:scale-95"
+                    >
+                      {loading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <ArrowRight className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
+
           </div>
 
         </section>

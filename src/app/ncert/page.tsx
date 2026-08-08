@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import { BookOpen, ExternalLink, Search, GraduationCap, X, FileText, ChevronRight, ArrowLeft, Download, Loader2, Home, Brain, Send, Bot, User, Camera, Crop, Image as ImageIcon, ZoomIn, ZoomOut, ChevronLeft, Moon, Sun, Pen, Eraser, Highlighter, Pencil, Trash2, Sparkles, Trophy, Volume2, Play, Pause, Activity } from "lucide-react";
+import { BookOpen, ExternalLink, Search, GraduationCap, X, FileText, ChevronRight, ArrowLeft, Download, Loader2, Home, Brain, Send, Bot, User, Camera, Crop, Image as ImageIcon, ZoomIn, ZoomOut, ChevronLeft, Moon, Sun, Pen, Eraser, Highlighter, Pencil, Trash2, Sparkles, Trophy, Volume2, Play, Pause, Activity, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { ncertLibrary, subjects, subjectColors, NcertBook } from "@/lib/ncert-books";
 import html2canvas from 'html2canvas';
@@ -269,6 +269,7 @@ export default function NcertViewer() {
   const [openBook, setOpenBook] = useState<BookWithClass | null>(null);
   const [openChapter, setOpenChapter] = useState<{ num: number; pdfUrl: string } | null>(null);
   const [pdfLoading, setPdfLoading] = useState(true);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
 
   const [lineByLineData, setLineByLineData] = useState<any>(null);
   const [showLineByLineModal, setShowLineByLineModal] = useState<boolean>(false);
@@ -961,62 +962,91 @@ export default function NcertViewer() {
             </div>
 
           {/* ── Top Bar (Premium Header) ── */}
-          <div className="relative z-[105] shrink-0 w-full bg-[#0b0f19] shadow-[0_10px_40px_rgba(0,0,0,0.5)] border-b border-white/5">
-            {/* Background with Subject Gradient */}
-            <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-15 mix-blend-screen`} />
-            
-            <div className="relative flex items-center justify-between px-4 sm:px-6 py-3">
-              {/* Back button */}
-              <button
-                onClick={handleCloseViewer}
-                className="group flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white px-4 py-2 rounded-2xl shadow-lg backdrop-blur-md transition-all border border-white/10 hover:border-white/20 hover:scale-105"
-              >
-                <div className="bg-white/10 rounded-full p-1 group-hover:-translate-x-1 transition-transform">
-                  <ArrowLeft className="w-4 h-4" />
-                </div>
-                <span className="font-bold text-sm tracking-wide pr-1">Back</span>
-              </button>
+          {isHeaderVisible ? (
+            <div className="relative z-[105] shrink-0 w-full bg-[#0b0f19] shadow-[0_10px_40px_rgba(0,0,0,0.5)] border-b border-white/5 transition-all duration-300">
+              {/* Background with Subject Gradient */}
+              <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-15 mix-blend-screen`} />
+              
+              <div className="relative flex items-center justify-between px-4 sm:px-6 py-3">
+                {/* Back button */}
+                <button
+                  onClick={handleCloseViewer}
+                  className="group flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white px-4 py-2 rounded-2xl shadow-lg backdrop-blur-md transition-all border border-white/10 hover:border-white/20 hover:scale-105"
+                >
+                  <div className="bg-white/10 rounded-full p-1 group-hover:-translate-x-1 transition-transform">
+                    <ArrowLeft className="w-4 h-4" />
+                  </div>
+                  <span className="font-bold text-sm tracking-wide pr-1">Back</span>
+                </button>
 
-              {/* Book info (Center) */}
-              <div className="hidden sm:flex items-center gap-4 bg-white/5 pr-6 pl-2 py-1.5 rounded-full border border-white/10 backdrop-blur-md shadow-inner">
-                <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg ring-2 ring-white/20`}>
-                  <BookOpen className="w-4 h-4 text-white drop-shadow-md" />
-                </div>
-                <div className="flex flex-col justify-center">
-                  <h2 className="text-white text-sm font-extrabold tracking-wide leading-tight drop-shadow-md">
-                    {openBook.title}
-                  </h2>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${gradient} animate-pulse`} />
-                    <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest">
-                      {openBook.singleFileName || openBook.directUrl ? "Full Book" : "Chapter " + openChapter.num} <span className="opacity-40 mx-1">•</span> Class {openBook.class}
-                    </p>
+                {/* Book info (Center) */}
+                <div className="hidden sm:flex items-center gap-4 bg-white/5 pr-6 pl-2 py-1.5 rounded-full border border-white/10 backdrop-blur-md shadow-inner">
+                  <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg ring-2 ring-white/20`}>
+                    <BookOpen className="w-4 h-4 text-white drop-shadow-md" />
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    <h2 className="text-white text-sm font-extrabold tracking-wide leading-tight drop-shadow-md">
+                      {openBook.title}
+                    </h2>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${gradient} animate-pulse`} />
+                      <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest">
+                        {openBook.singleFileName || openBook.directUrl ? "Full Book" : "Chapter " + openChapter.num} <span className="opacity-40 mx-1">•</span> Class {openBook.class}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Actions */}
-              <div className="flex items-center gap-3">
-                <a
-                  href={getProxyUrl(openChapter.pdfUrl, openBook, openChapter.num)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white/90 hover:text-white px-4 py-2 rounded-2xl backdrop-blur-md transition-all border border-white/10 hover:border-white/20 hover:scale-105"
-                >
-                  <ExternalLink className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                  <span className="hidden sm:inline font-bold text-sm">New Tab</span>
-                </a>
-                <a
-                  href={getProxyUrl(openChapter.pdfUrl, openBook, openChapter.num)}
-                  download
-                  className={`group flex items-center gap-2 bg-gradient-to-r ${gradient} hover:opacity-90 text-white px-5 py-2 rounded-2xl shadow-xl transition-all hover:scale-105 ring-1 ring-white/20`}
-                >
-                  <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform drop-shadow-md" />
-                  <span className="hidden sm:inline font-bold text-sm drop-shadow-md">Download</span>
-                </a>
+                {/* Actions */}
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setIsHeaderVisible(false)}
+                    className="group flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white/90 hover:text-white px-3.5 py-2 rounded-2xl backdrop-blur-md transition-all border border-white/10 hover:border-white/20 hover:scale-105"
+                    title="Hide Header Bar for Full-Screen View"
+                  >
+                    <EyeOff className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform" />
+                    <span className="hidden sm:inline font-bold text-sm">Hide Header</span>
+                  </button>
+                  <a
+                    href={getProxyUrl(openChapter.pdfUrl, openBook, openChapter.num)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white/90 hover:text-white px-4 py-2 rounded-2xl backdrop-blur-md transition-all border border-white/10 hover:border-white/20 hover:scale-105"
+                  >
+                    <ExternalLink className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                    <span className="hidden sm:inline font-bold text-sm">New Tab</span>
+                  </a>
+                  <a
+                    href={getProxyUrl(openChapter.pdfUrl, openBook, openChapter.num)}
+                    download
+                    className={`group flex items-center gap-2 bg-gradient-to-r ${gradient} hover:opacity-90 text-white px-5 py-2 rounded-2xl shadow-xl transition-all hover:scale-105 ring-1 ring-white/20`}
+                  >
+                    <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform drop-shadow-md" />
+                    <span className="hidden sm:inline font-bold text-sm drop-shadow-md">Download</span>
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            /* Restore Floating Bar when Header is Hidden */
+            <div className="absolute top-4 left-4 right-4 z-[115] flex items-center justify-between pointer-events-none">
+              <button
+                onClick={handleCloseViewer}
+                className="pointer-events-auto flex items-center gap-2 bg-slate-900/90 hover:bg-slate-800 text-white px-4 py-2 rounded-2xl shadow-2xl backdrop-blur-md transition-all border border-slate-700/80 hover:scale-105"
+              >
+                <ArrowLeft className="w-4 h-4 text-indigo-400" />
+                <span className="font-bold text-sm">Back</span>
+              </button>
+              <button
+                onClick={() => setIsHeaderVisible(true)}
+                className="pointer-events-auto flex items-center gap-2 bg-slate-900/90 hover:bg-slate-800 text-white px-4 py-2 rounded-2xl shadow-2xl backdrop-blur-md transition-all border border-slate-700/80 hover:scale-105"
+                title="Show Header Bar"
+              >
+                <Eye className="w-4 h-4 text-emerald-400" />
+                <span className="font-bold text-sm">Show Header</span>
+              </button>
+            </div>
+          )}
 
           {/* ── SPLIT VIEWER CONTAINER ── */}
           <div className="flex-1 w-full flex overflow-hidden relative">

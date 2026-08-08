@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: "class", // Forces Tailwind to use the "dark" class on HTML instead of OS preferences
+  darkMode: "class",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -10,6 +10,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-outfit)", "var(--font-plus-jakarta)", "system-ui", "sans-serif"],
+        heading: ["var(--font-outfit)", "sans-serif"],
+        mono: ["var(--font-jetbrains-mono)", "Consolas", "Courier New", "monospace"],
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
@@ -47,16 +52,16 @@ const config: Config = {
         "fuchsia-505": "#d946ef",
       },
       spacing: {
-        "4.5": "1.125rem", // 18px
-        "5.5": "1.375rem", // 22px
-        "6.5": "1.625rem", // 26px
-        "9.5": "2.375rem", // 38px
-        "13": "3.25rem",   // 52px
-        "22": "5.5rem",    // 88px
-        "66": "16.5rem",   // 264px
+        "4.5": "1.125rem",
+        "5.5": "1.375rem",
+        "6.5": "1.625rem",
+        "9.5": "2.375rem",
+        "13": "3.25rem",
+        "22": "5.5rem",
+        "66": "16.5rem",
       },
       fontSize: {
-        "2.5xl": ["1.625rem", { lineHeight: "2.125rem" }], // 26px
+        "2.5xl": ["1.625rem", { lineHeight: "2.125rem" }],
       },
       animation: {
         'float-slow': 'float 8s ease-in-out infinite',
