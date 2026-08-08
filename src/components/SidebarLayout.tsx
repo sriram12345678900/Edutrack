@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { 
   Home, BookOpen, MessageSquare, Target, Settings, LogOut, Menu, X, 
-  GraduationCap, Moon, Sun, Calendar, Sparkles, Users, Award, Palette, Timer, Brain, Camera, Zap, Trophy, Shield
+  GraduationCap, Moon, Sun, Calendar, Sparkles, Users, Award, Palette, Timer, Brain, Camera, Zap, Trophy, Shield, Compass
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,7 @@ const categories = [
       { href: "/dashboard", label: "Dashboard", icon: Home, badge: "Main" },
       { href: "/learn", label: "Subjects Hub", icon: BookOpen },
       { href: "/ncert", label: "NCERT Books", icon: GraduationCap },
+      { href: "/formulas", label: "Formulas Hub", icon: Compass, badge: "Master" },
     ]
   },
   {

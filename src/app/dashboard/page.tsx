@@ -310,21 +310,25 @@ export default function Dashboard() {
         <div className="lg:col-span-2 space-y-8">
           
           {/* QUICK PREMIUM UTILITY ROW */}
-          <motion.section variants={item} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/lens')} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/50 dark:border-white/10 p-5 rounded-[1.75rem] flex flex-col items-center justify-center text-center cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-emerald-500/15 hover:border-emerald-500/40 transition-all group">
-              <Camera className="w-8 h-8 text-emerald-500 mb-3 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(16,185,129,0.35)]" />
+          <motion.section variants={item} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5">
+            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/lens')} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/50 dark:border-white/10 p-4 sm:p-5 rounded-[1.75rem] flex flex-col items-center justify-center text-center cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-emerald-500/15 hover:border-emerald-500/40 transition-all group">
+              <Camera className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-500 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(16,185,129,0.35)]" />
               <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">AI Lens</span>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/sandbox')} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/50 dark:border-white/10 p-5 rounded-[1.75rem] flex flex-col items-center justify-center text-center cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-orange-500/15 hover:border-orange-500/40 transition-all group">
-              <Zap className="w-8 h-8 text-orange-500 mb-3 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(249,115,22,0.35)]" />
+            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/formulas')} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/50 dark:border-white/10 p-4 sm:p-5 rounded-[1.75rem] flex flex-col items-center justify-center text-center cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-cyan-500/15 hover:border-cyan-500/40 transition-all group">
+              <Compass className="w-7 h-7 sm:w-8 sm:h-8 text-cyan-400 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(34,211,238,0.35)]" />
+              <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Formulas</span>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/sandbox')} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/50 dark:border-white/10 p-4 sm:p-5 rounded-[1.75rem] flex flex-col items-center justify-center text-center cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-orange-500/15 hover:border-orange-500/40 transition-all group">
+              <Zap className="w-7 h-7 sm:w-8 sm:h-8 text-orange-500 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(249,115,22,0.35)]" />
               <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Sandbox</span>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/trophies')} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/50 dark:border-white/10 p-5 rounded-[1.75rem] flex flex-col items-center justify-center text-center cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-yellow-500/15 hover:border-yellow-500/40 transition-all group">
-              <Trophy className="w-8 h-8 text-yellow-500 mb-3 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(234,179,8,0.35)]" />
+            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/trophies')} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/50 dark:border-white/10 p-4 sm:p-5 rounded-[1.75rem] flex flex-col items-center justify-center text-center cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-yellow-500/15 hover:border-yellow-500/40 transition-all group">
+              <Trophy className="w-7 h-7 sm:w-8 sm:h-8 text-yellow-500 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(234,179,8,0.35)]" />
               <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Trophies</span>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/analytics')} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/50 dark:border-white/10 p-5 rounded-[1.75rem] flex flex-col items-center justify-center text-center cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-indigo-500/15 hover:border-indigo-500/40 transition-all group">
-              <Activity className="w-8 h-8 text-indigo-500 mb-3 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(99,102,241,0.35)]" />
+            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/analytics')} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/50 dark:border-white/10 p-4 sm:p-5 rounded-[1.75rem] flex flex-col items-center justify-center text-center cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-indigo-500/15 hover:border-indigo-500/40 transition-all group">
+              <Activity className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-500 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(99,102,241,0.35)]" />
               <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Analytics</span>
             </motion.div>
           </motion.section>
