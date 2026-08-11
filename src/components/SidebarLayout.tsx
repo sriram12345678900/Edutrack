@@ -47,6 +47,8 @@ const categories = [
 export default function SidebarLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "";
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
   const [userXp, setUserXp] = useState<number>(0);
   const [userLevel, setUserLevel] = useState<number>(1);
   const { user, loading, logout } = useAuth();
@@ -68,10 +70,18 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     if (typeof window !== "undefined") {
       const xpVal = localStorage.getItem("edutrack_xp");
       const lvlVal = localStorage.getItem("edutrack_level");
+      const pinnedState = localStorage.getItem("edutrack_sidebar_pinned");
       if (xpVal) setUserXp(parseInt(xpVal, 10));
       if (lvlVal) setUserLevel(parseInt(lvlVal, 10));
+      if (pinnedState) setIsPinned(pinnedState === "true");
     }
   }, []);
+
+  const togglePin = () => {
+    const nextState = !isPinned;
+    setIsPinned(nextState);
+    localStorage.setItem("edutrack_sidebar_pinned", String(nextState));
+  };
 
   // Prefetch all sidebar routes on mount for ultra-fast navigation
   useEffect(() => {
@@ -88,16 +98,26 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       <div className="min-h-screen flex items-center justify-center bg-[#03050c] text-white">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(99,102,241,0.5)]" />
-          <p className="text-slate-400 text-xs font-bold uppercase tracking-widest animate-pulse">Initializing Neural Space...</p>
+          <p className="text-slate-400 text-xs font-bold uppercase tracking-widest animate-pulse">Initializing Neural Workspace...</p>
         </div>
       </div>
     );
   }
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#03050c] text-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(99,102,241,0.5)]" />
+          <p className="text-slate-400 text-xs font-bold uppercase tracking-widest animate-pulse">Initializing Neural Workspace...</p>
+        </div>
+      </div>
+    );
+  }
 
   const firstName = user.displayName?.split(" ")[0] || user.email?.split("@")[0] || "Student";
   const initials = (user.displayName || user.email || "S").charAt(0).toUpperCase();
+  const isExpanded = isPinned || isHovered;
 
   return (
     <div className="h-screen max-h-screen bg-slate-50 dark:bg-[#03050c] text-slate-900 dark:text-slate-100 flex overflow-hidden grid-bg-overlay selection:bg-indigo-500/30 selection:text-indigo-200">
@@ -109,77 +129,112 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         />
       )}
 
-      {/* Sidebar */}
-      <aside className={cn(
-        "fixed md:sticky top-0 h-screen w-68 border-r border-slate-200/50 dark:border-white/5 bg-white/80 dark:bg-[#040612]/80 backdrop-blur-2xl flex flex-col z-50 transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none",
-        isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-      )}>
-        {/* Ambient Top Glow */}
+      {/* Interactive Unveiling Sidebar */}
+      <aside 
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className={cn(
+          "fixed md:sticky top-0 h-screen border-r border-slate-200/50 dark:border-white/10 bg-white/95 dark:bg-[#040614]/95 backdrop-blur-3xl flex flex-col z-50 transition-all duration-300 ease-out shadow-2xl",
+          isExpanded ? "w-68 shadow-[0_0_40px_rgba(99,102,241,0.2)]" : "w-20 shadow-none",
+          isMobileOpen ? "translate-x-0 w-68" : "-translate-x-full md:translate-x-0"
+        )}
+      >
+        {/* Ambient Top Beam Glow */}
         <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
 
+        {/* Unveil Indicator Edge Light */}
+        {!isExpanded && (
+          <div className="absolute right-0 top-0 bottom-0 w-[2px] bg-indigo-500/40 animate-pulse pointer-events-none" />
+        )}
+
         {/* Logo / Header */}
-        <div className="p-6 border-b border-slate-200/40 dark:border-white/5 flex justify-between items-center shrink-0">
-          <Link href="/dashboard" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-500 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)] border border-white/10 group-hover:scale-105 transition-transform">
+        <div className="p-4 border-b border-slate-200/40 dark:border-white/5 flex justify-between items-center shrink-0">
+          <Link href="/dashboard" className="flex items-center gap-3 group overflow-hidden">
+            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-500 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)] border border-white/10 group-hover:scale-105 transition-transform shrink-0">
               <Brain className="w-5.5 h-5.5 text-white" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-1">
+            <div className={cn(
+              "flex flex-col transition-all duration-300",
+              isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 pointer-events-none"
+            )}>
+              <span className="text-xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-1 whitespace-nowrap">
                 EduTrack
                 <span className="w-2 h-2 rounded-full bg-indigo-500 animate-ping" />
               </span>
-              <span className="text-[9px] font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400">Next-Gen OS</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400 whitespace-nowrap">Next-Gen OS</span>
             </div>
           </Link>
+
+          {isExpanded && (
+            <button 
+              onClick={togglePin}
+              title={isPinned ? "Unpin sidebar (Auto-unveil on hover)" : "Pin sidebar"}
+              className="hidden md:flex p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-indigo-400 transition-all text-[10px] font-bold uppercase tracking-wider"
+            >
+              {isPinned ? "Pinned" : "Hover"}
+            </button>
+          )}
+
           <button className="md:hidden p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl text-slate-400" onClick={() => setIsMobileOpen(false)}>
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* User Profile Card & Quick Theme Toggle */}
-        <div className="p-4 mx-4 mt-5 bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent border border-indigo-500/20 dark:border-white/10 rounded-2xl flex items-center gap-3 shrink-0 relative overflow-hidden group shadow-sm">
-          <div className="relative">
+        {/* User Profile Card & Theme Toggle */}
+        <div className={cn(
+          "p-2.5 mx-2.5 mt-3 bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent border border-indigo-500/20 dark:border-white/10 rounded-2xl flex items-center gap-2.5 shrink-0 relative overflow-hidden transition-all duration-300",
+          !isExpanded && "justify-center"
+        )}>
+          <div className="relative shrink-0">
             {user.photoURL ? (
-              <img src={user.photoURL} alt={firstName} className="w-10 h-10 rounded-full object-cover border-2 border-indigo-500/40 shadow-sm" />
+              <img src={user.photoURL} alt={firstName} className="w-9 h-9 rounded-full object-cover border-2 border-indigo-500/40 shadow-sm" />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white font-black text-sm flex-shrink-0 shadow-lg shadow-indigo-500/20 border border-white/20">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white font-black text-xs flex-shrink-0 shadow-lg shadow-indigo-500/20 border border-white/20">
                 {initials}
               </div>
             )}
-            <div className="absolute -bottom-1 -right-1 bg-indigo-600 text-white text-[8px] font-black px-1 rounded-full border border-black" title={`Level ${userLevel}`}>
+            <div className="absolute -bottom-1 -right-1 bg-indigo-600 text-white text-[7px] font-black px-1 rounded-full border border-black" title={`Level ${userLevel}`}>
               L{userLevel}
             </div>
           </div>
 
-          <div className="overflow-hidden flex-1">
+          <div className={cn(
+            "overflow-hidden transition-all duration-300 flex-1",
+            isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden"
+          )}>
             <p className="font-black text-xs text-slate-900 dark:text-white truncate">{user.displayName || firstName}</p>
-            <p className="text-[9px] text-slate-500 dark:text-slate-400 font-bold truncate leading-none mt-1 uppercase tracking-wider">{user.email?.split("@")[0]}</p>
+            <p className="text-[8px] text-slate-500 dark:text-slate-400 font-bold truncate leading-none mt-0.5 uppercase tracking-wider">{user.email?.split("@")[0]}</p>
           </div>
           
-          <button 
-            onClick={() => {
-              const isDark = document.documentElement.classList.contains('dark');
-              if (isDark) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('edutrack_theme', 'light');
-              } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('edutrack_theme', 'dark');
-              }
-            }}
-            className="p-2 rounded-xl bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-indigo-500 dark:hover:text-indigo-400 hover:scale-105 active:scale-95 transition-all shrink-0 shadow-sm"
-            title="Toggle Light/Dark Theme"
-          >
-            <Moon className="w-4 h-4 hidden dark:block text-indigo-400" />
-            <Sun className="w-4 h-4 block dark:hidden text-amber-500" />
-          </button>
+          {isExpanded && (
+            <button 
+              onClick={() => {
+                const isDark = document.documentElement.classList.contains('dark');
+                if (isDark) {
+                  document.documentElement.classList.remove('dark');
+                  localStorage.setItem('edutrack_theme', 'light');
+                } else {
+                  document.documentElement.classList.add('dark');
+                  localStorage.setItem('edutrack_theme', 'dark');
+                }
+              }}
+              className="p-1.5 rounded-xl bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-indigo-500 dark:hover:text-indigo-400 hover:scale-105 active:scale-95 transition-all shrink-0 shadow-sm"
+              title="Toggle Light/Dark Theme"
+            >
+              <Moon className="w-3.5 h-3.5 hidden dark:block text-indigo-400" />
+              <Sun className="w-3.5 h-3.5 block dark:hidden text-amber-500" />
+            </button>
+          )}
         </div>
 
         {/* Scrollable Navigation Groups */}
-        <nav className="flex-1 overflow-y-auto px-4 py-5 space-y-6 scrollbar-none">
+        <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-4 custom-scrollbar overflow-x-hidden">
           {categories.map((category, catIdx) => (
-            <div key={catIdx} className="space-y-1.5">
-              <span className="text-[9px] font-black uppercase tracking-widest text-slate-450 dark:text-slate-500 px-3 block mb-1">
+            <div key={catIdx} className="space-y-1">
+              <span className={cn(
+                "text-[9px] font-black uppercase tracking-widest text-slate-450 dark:text-slate-500 px-3 block transition-all duration-300",
+                isExpanded ? "opacity-100" : "opacity-0 hidden"
+              )}>
                 {category.title}
               </span>
               <div className="space-y-1">
@@ -192,11 +247,12 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                       href={link.href}
                       prefetch={true}
                       onClick={() => setIsMobileOpen(false)}
+                      title={!isExpanded ? link.label : undefined}
                       className={cn(
-                        "flex items-center justify-between px-3.5 py-2.5 rounded-xl font-extrabold text-xs transition-all relative group",
+                        "flex items-center justify-between px-3 py-2.5 rounded-xl font-extrabold text-xs transition-all relative group",
                         isActive
-                          ? "bg-indigo-500/10 text-indigo-650 dark:bg-indigo-500/15 dark:text-indigo-400 border border-indigo-500/25 shadow-sm"
-                          : "hover:bg-slate-100/70 dark:hover:bg-white/[0.03] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                          ? "bg-indigo-500/15 text-indigo-650 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-500/30 shadow-sm"
+                          : "hover:bg-slate-100/70 dark:hover:bg-white/[0.05] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                       )}
                     >
                       {isActive && (
@@ -207,10 +263,15 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                           "w-4.5 h-4.5 shrink-0 transition-transform group-hover:scale-110",
                           isActive ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-500 group-hover:text-indigo-500"
                         )} /> 
-                        <span>{link.label}</span>
+                        <span className={cn(
+                          "transition-all duration-300 whitespace-nowrap",
+                          isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden"
+                        )}>
+                          {link.label}
+                        </span>
                       </div>
 
-                      {link.badge && (
+                      {link.badge && isExpanded && (
                         <span className={cn(
                           "text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full border",
                           isActive ? "bg-indigo-500/20 text-indigo-400 border-indigo-500/30" : "bg-white/5 text-slate-400 border-white/10"
@@ -227,33 +288,37 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         </nav>
 
         {/* Settings & Logout Footer */}
-        <div className="p-4 border-t border-slate-200/40 dark:border-white/5 shrink-0 space-y-1">
+        <div className="p-3 border-t border-slate-200/40 dark:border-white/5 shrink-0 space-y-1">
           <Link 
             href="/setup" 
             prefetch={true}
             onClick={() => setIsMobileOpen(false)}
-            className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-100 dark:hover:bg-white/[0.03] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-all"
+            title={!isExpanded ? "Account Setup" : undefined}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-100 dark:hover:bg-white/[0.03] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-all"
           >
-            <Settings className="w-4.5 h-4.5 text-slate-400" /> 
-            <span>Account Setup</span>
+            <Settings className="w-4.5 h-4.5 text-slate-400 shrink-0" /> 
+            <span className={cn(
+              "transition-all duration-300 whitespace-nowrap",
+              isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden"
+            )}>
+              Account Setup
+            </span>
           </Link>
           <button
             onClick={logout}
-            className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs hover:bg-red-500/10 hover:text-red-500 dark:hover:bg-red-500/10 dark:hover:text-red-400 text-slate-500 dark:text-slate-400 transition-all w-full text-left"
+            title={!isExpanded ? "Log Out" : undefined}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs hover:bg-red-500/10 hover:text-red-500 dark:hover:bg-red-500/10 dark:hover:text-red-400 text-slate-500 dark:text-slate-400 transition-all w-full text-left"
           >
-            <LogOut className="w-4.5 h-4.5 text-red-400/80" /> 
-            <span>Log Out</span>
+            <LogOut className="w-4.5 h-4.5 text-red-400/80 shrink-0" /> 
+            <span className={cn(
+              "transition-all duration-300 whitespace-nowrap",
+              isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden"
+            )}>
+              Log Out
+            </span>
           </button>
         </div>
       </aside>
-
-      {/* Main Display Viewport */}
-      <main className={cn(
-        "flex-1 relative bg-slate-50/40 dark:bg-[#03050c]/40 flex flex-col min-h-0",
-        (pathname === "/groups" || pathname.startsWith("/groups/") || pathname === "/whiteboard" || pathname.startsWith("/whiteboard/"))
-          ? "overflow-hidden"
-          : "overflow-y-auto"
-      )}>
 
         {/* Mobile Navbar Header */}
         <header className="md:hidden flex items-center justify-between p-4 border-b border-slate-200/40 dark:border-white/5 bg-white/90 dark:bg-[#040612]/90 backdrop-blur-xl sticky top-0 z-30 shrink-0">
@@ -269,14 +334,28 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           </div>
         </header>
 
-        <div className={cn(
-          (pathname === "/groups" || pathname.startsWith("/groups/") || pathname === "/whiteboard" || pathname.startsWith("/whiteboard/"))
-            ? "w-full flex-1 min-h-0 overflow-hidden relative flex flex-col"
-            : "p-6 md:p-10 max-w-7xl mx-auto w-full"
-        )}>
-          {children}
-        </div>
-      </main>
+        {(() => {
+          const isFullHeightPage = 
+            pathname === "/groups" || pathname.startsWith("/groups/") ||
+            pathname === "/whiteboard" || pathname.startsWith("/whiteboard/") ||
+            pathname === "/tutor" || pathname.startsWith("/tutor/") ||
+            pathname === "/lens" || pathname.startsWith("/lens/");
+
+          return (
+            <main className={cn(
+              "flex-1 relative bg-slate-50/40 dark:bg-[#03050c]/40 flex flex-col min-h-0",
+              isFullHeightPage ? "overflow-hidden" : "overflow-y-auto"
+            )}>
+              <div className={cn(
+                isFullHeightPage
+                  ? "w-full flex-1 min-h-0 overflow-hidden relative flex flex-col"
+                  : "p-6 md:p-10 max-w-7xl mx-auto w-full"
+              )}>
+                {children}
+              </div>
+            </main>
+          );
+        })()}
     </div>
   );
 }

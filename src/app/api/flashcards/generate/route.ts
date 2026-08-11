@@ -3,6 +3,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from "fs";
 import path from "path";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   try {
     const { topic, classLevel = "10", subject = "Science", count = 10 } = await req.json();

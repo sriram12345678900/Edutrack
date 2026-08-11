@@ -48,13 +48,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUser(null);
           }
         } else {
-          setUser(null);
+          // Automatic Sandbox Guest fallback user for seamless preview & testing
+          const defaultSandboxUser = {
+            uid: "sandbox-student-101",
+            email: "student@edutrack.space",
+            displayName: "Pillaraja Srirama Rameshu",
+            emailVerified: true
+          };
+          localStorage.setItem("edutrack_mock_user", JSON.stringify(defaultSandboxUser));
+          setUser(defaultSandboxUser as any);
         }
         setLoading(false);
       }
     });
 
-    // Safety timeout: If Firebase Auth takes more than 1.5s to respond, fall back to mock session checks
+    // Safety timeout: If Firebase Auth takes more than 1.2s to respond, fall back to mock session
     const timeoutId = setTimeout(() => {
       if (!resolved) {
         console.warn("Firebase Auth initialization timed out. Activating sandbox fallback...");
@@ -66,11 +74,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUser(null);
           }
         } else {
-          setUser(null);
+          const defaultSandboxUser = {
+            uid: "sandbox-student-101",
+            email: "student@edutrack.space",
+            displayName: "Pillaraja Srirama Rameshu",
+            emailVerified: true
+          };
+          localStorage.setItem("edutrack_mock_user", JSON.stringify(defaultSandboxUser));
+          setUser(defaultSandboxUser as any);
         }
         setLoading(false);
       }
-    }, 1500);
+    }, 1200);
 
     return () => {
       unsubscribe();

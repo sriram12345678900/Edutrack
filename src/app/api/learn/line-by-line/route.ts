@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import OpenAI from "openai";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   let subject = "Science";
   let chapter = "NCERT Topic";

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { fetchPYQsFromWeb, fetchFullPapersFromWeb } from "@/lib/scraper";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const subject = searchParams.get("subject") || "Science";

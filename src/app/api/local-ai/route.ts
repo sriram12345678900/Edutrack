@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
+export const dynamic = "force-dynamic";
+
 // Self-Hosted Local AI Engine (100% Offline & Private, 0 External APIs)
 // Built specifically for EduTrack CBSE Class 6-10 Curriculum
 

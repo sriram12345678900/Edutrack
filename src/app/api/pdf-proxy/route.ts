@@ -5,6 +5,8 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 
+export const dynamic = "force-dynamic";
+
 // Allowed domains – keep the list short to avoid abuse
 const ALLOWED_HOSTS = [
   'ncert.nic.in',
