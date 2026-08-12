@@ -827,15 +827,15 @@ export default function WhiteboardPage() {
   }, [strokes, joined]);
 
   const stickyColors = {
-    yellow: "bg-amber-200/80 text-amber-900 border-amber-300",
-    pink: "bg-pink-200/80 text-pink-900 border-pink-300",
-    blue: "bg-blue-200/80 text-blue-900 border-blue-300",
-    green: "bg-emerald-200/80 text-emerald-900 border-emerald-300"
+    yellow: "premium-glass-panel !bg-amber-500/20 text-amber-100 !border-amber-500/30",
+    pink: "premium-glass-panel !bg-pink-500/20 text-pink-100 !border-pink-500/30",
+    blue: "premium-glass-panel !bg-blue-500/20 text-blue-100 !border-blue-500/30",
+    green: "premium-glass-panel !bg-emerald-500/20 text-emerald-100 !border-emerald-500/30"
   };
 
 
   return (
-    <div className="w-full h-full relative font-sans flex flex-col items-center justify-center min-h-[600px] bg-white dark:bg-slate-900">
+    <div className="w-full h-full relative font-sans flex flex-col items-center justify-center min-h-[600px] premium-mesh-bg">
       <style>{`
         .no-scrollbar::-webkit-scrollbar {
           display: none;
@@ -857,13 +857,13 @@ export default function WhiteboardPage() {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 p-8 rounded-[2rem] shadow-2xl w-full text-center relative overflow-hidden"
+            className="premium-glass-panel premium-glow-border p-8 w-full text-center relative overflow-hidden shadow-2xl"
           >
             <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
             <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-650 rounded-[1.5rem] flex items-center justify-center text-white mx-auto shadow-lg shadow-indigo-500/30 mb-6 border border-white/20 rotate-3 hover:rotate-6 transition-transform">
               <Palette className="w-10 h-10" />
             </div>
-            <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">Studio Whiteboard</h2>
+            <h2 className="text-3xl font-black premium-text-gradient mb-3 tracking-tight">Studio Whiteboard</h2>
             <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed mb-8 px-4">
               Enter a custom room ID to join classmates, or continue with the generated code.
             </p>
@@ -874,11 +874,11 @@ export default function WhiteboardPage() {
                 value={roomInput}
                 onChange={(e) => setRoomInput(e.target.value.toUpperCase())}
                 placeholder="ROOM-1234"
-                className="w-full px-6 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 font-black text-lg focus:outline-none focus:ring-4 focus:ring-indigo-500/20 text-center uppercase tracking-[0.2em] shadow-inner transition-all placeholder:font-medium placeholder:tracking-normal"
+                className="w-full px-6 py-4 rounded-2xl border border-white/10 bg-black/40 font-black text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-white text-center uppercase tracking-[0.2em] shadow-inner transition-all placeholder:font-medium placeholder:tracking-normal placeholder:text-slate-400"
               />
               <button 
                 onClick={joinRoom}
-                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm uppercase tracking-widest rounded-2xl transition-all shadow-xl shadow-indigo-500/20 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full py-4 bg-[#0d1127] text-white font-extrabold text-sm uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-2 micro-hover-lift premium-glow-border shadow-[0_0_20px_rgba(99,102,241,0.2)]"
               >
                 <span>Enter Studio</span>
                 <ChevronRight className="w-5 h-5" />
@@ -887,15 +887,15 @@ export default function WhiteboardPage() {
           </motion.div>
         </div>
       ) : (
-        <div className="absolute inset-0 bg-[#f8fafc] dark:bg-[#0B0D17] overflow-hidden rounded-none shadow-2xl flex flex-col">
+        <div className="absolute inset-0 bg-[#02040a] overflow-hidden rounded-none shadow-2xl flex flex-col">
           
           {/* FLOATING TOP BAR (Left: Status, Right: Actions) */}
           <div className="absolute top-6 left-6 right-6 z-40 flex justify-between items-start pointer-events-none">
             
             {/* Properties Panel (Left) */}
-            <div className="pointer-events-auto bg-white/85 dark:bg-slate-900/85 backdrop-blur-2xl border border-slate-200 dark:border-white/10 p-5 rounded-3xl shadow-xl w-[280px] flex flex-col gap-6 transition-all hover:shadow-2xl">
+            <div className="pointer-events-auto premium-glass-panel p-5 w-[280px] flex flex-col gap-6 transition-all hover:shadow-2xl">
               
-              <div className="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800 relative">
+              <div className="flex items-center gap-3 pb-4 border-b border-white/10 relative">
                 <button 
                   onClick={() => setJoined(false)}
                   className="absolute right-0 top-0 p-1.5 text-slate-400 hover:text-slate-800 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -998,11 +998,11 @@ export default function WhiteboardPage() {
 
             {/* Top Right Actions */}
             <div className="pointer-events-auto flex flex-col gap-3">
-              <div className="bg-white/85 dark:bg-slate-900/85 backdrop-blur-2xl border border-slate-200 dark:border-white/10 p-2 rounded-2xl shadow-xl flex items-center gap-1 hover:shadow-2xl transition-shadow">
+              <div className="premium-glass-panel p-2 flex items-center gap-1 hover:shadow-2xl transition-shadow">
                 <button 
                   onClick={handleUndo}
                   disabled={historyStep <= 0}
-                  className="w-10 h-10 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+                  className="w-10 h-10 rounded-xl text-slate-300 hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent flex items-center justify-center transition-all micro-hover-lift"
                   title="Undo"
                 >
                   <Undo2 className="w-5 h-5" />
@@ -1010,15 +1010,15 @@ export default function WhiteboardPage() {
                 <button 
                   onClick={handleRedo}
                   disabled={historyStep >= history.length - 1}
-                  className="w-10 h-10 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+                  className="w-10 h-10 rounded-xl text-slate-300 hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent flex items-center justify-center transition-all micro-hover-lift"
                   title="Redo"
                 >
                   <Redo2 className="w-5 h-5" />
                 </button>
-                <div className="w-[1px] h-6 bg-slate-200 dark:bg-slate-800 mx-1"></div>
+                <div className="w-[1px] h-6 bg-white/10 mx-1"></div>
                 <button 
                   onClick={clearCanvas}
-                  className="w-10 h-10 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+                  className="w-10 h-10 rounded-xl text-rose-400 hover:bg-rose-500/20 flex items-center justify-center transition-all micro-hover-lift"
                   title="Clear Canvas"
                 >
                   <Trash2 className="w-5 h-5" />
@@ -1035,7 +1035,7 @@ export default function WhiteboardPage() {
               <div className="flex justify-end">
                 <button 
                   onClick={copyRoomCode}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-500/20 font-bold text-xs tracking-wide flex items-center gap-2 transition-all hover:scale-105 active:scale-95"
+                  className="premium-glow-border px-4 py-2.5 rounded-xl shadow-lg font-bold text-xs tracking-wide flex items-center gap-2 transition-all micro-hover-lift bg-[#0d1127]"
                 >
                   {copied ? <CheckCheck className="w-4 h-4" /> : <Users className="w-4 h-4" />}
                   <span>{copied ? "Link Copied" : "Invite"}</span>
@@ -1064,11 +1064,11 @@ export default function WhiteboardPage() {
               {/* Background Grid Pattern Rendering */}
               <div className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${
                 pattern === "dots" 
-                  ? "bg-[radial-gradient(#cbd5e1_1.5px,transparent_1.5px)] dark:bg-[radial-gradient(#334155_1.5px,transparent_1.5px)] [background-size:32px_32px] opacity-70"
+                  ? "bg-[radial-gradient(#334155_1.5px,transparent_1.5px)] [background-size:32px_32px] opacity-70"
                   : pattern === "grid"
-                  ? "bg-[linear-gradient(to_right,#cbd5e1_1px,transparent_1px),linear-gradient(to_bottom,#cbd5e1_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] [background-size:32px_32px] opacity-40"
+                  ? "bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] [background-size:32px_32px] opacity-40"
                   : pattern === "ruled"
-                  ? "bg-[linear-gradient(to_bottom,#e2e8f0_1.5px,transparent_1.5px)] dark:bg-[linear-gradient(to_bottom,#334155_1.5px,transparent_1.5px)] [background-size:100%_32px] opacity-60"
+                  ? "bg-[linear-gradient(to_bottom,#334155_1.5px,transparent_1.5px)] [background-size:100%_32px] opacity-60"
                   : "opacity-0"
               }`} />
 
@@ -1166,23 +1166,23 @@ export default function WhiteboardPage() {
 
           {/* FLOATING BOTTOM TOOLBAR */}
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
-            <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl border border-slate-200/80 dark:border-white/10 p-2.5 rounded-[1.5rem] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.6)] flex items-center gap-1.5 pointer-events-auto">
+            <div className="premium-glass-panel premium-glow-border p-2.5 flex items-center gap-1.5 pointer-events-auto shadow-[0_20px_50px_-10px_rgba(0,0,0,0.6)]">
               
               <ToolButton active={tool === "hand"} onClick={() => setTool("hand")} icon={Hand} label="Pan" />
-              <div className="w-[1px] h-8 bg-slate-200 dark:bg-slate-700/50 mx-1"></div>
+              <div className="w-[1px] h-8 bg-white/10 mx-1"></div>
               
               <ToolButton active={tool === "pen"} onClick={() => setTool("pen")} icon={PenTool} label="Pen" />
               <button 
                 onClick={() => setTool("smart_pen")}
                 className={`group relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
                   tool === "smart_pen"
-                    ? "bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] scale-105"
-                    : "text-slate-500 dark:text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-500/20 dark:hover:text-indigo-300"
+                    ? "bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] scale-105"
+                    : "text-slate-400 hover:bg-indigo-500/20 hover:text-indigo-300"
                 }`}
                 title="Smart Pen (AI shapes & text)"
               >
                 {tool === "smart_pen" && (
-                   <motion.div layoutId="activeTool" className="absolute inset-0 bg-indigo-500 rounded-xl" style={{ zIndex: -1 }} />
+                   <motion.div layoutId="activeTool" className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl shadow-[0_0_15px_rgba(99,102,241,0.5)]" style={{ zIndex: -1 }} />
                 )}
                 <Sparkles className={`w-5 h-5 relative z-10 ${isRecognizing ? 'animate-spin text-white' : ''}`} />
                 {isRecognizing && <div className="absolute inset-0 border-2 border-white/50 rounded-xl animate-pulse"></div>}
@@ -1198,13 +1198,13 @@ export default function WhiteboardPage() {
               <ToolButton active={tool === "eraser"} onClick={() => setTool("eraser")} icon={Eraser} label="Eraser" />
               <ToolButton active={tool === "stroke_eraser"} onClick={() => setTool("stroke_eraser")} icon={Eraser} label="Stroke Eraser" extraClass="text-rose-500 dark:text-rose-400" />
               
-              <div className="w-[1px] h-8 bg-slate-200 dark:bg-slate-700/50 mx-1"></div>
+              <div className="w-[1px] h-8 bg-white/10 mx-1"></div>
               
               <ToolButton active={tool === "line"} onClick={() => setTool("line")} icon={() => <div className="w-5 h-5 border-t-2 border-current rotate-45 transform origin-center" />} label="Line" />
               <ToolButton active={tool === "rect"} onClick={() => setTool("rect")} icon={Square} label="Rectangle" />
               <ToolButton active={tool === "circle"} onClick={() => setTool("circle")} icon={Circle} label="Circle" />
               
-              <div className="w-[1px] h-8 bg-slate-200 dark:bg-slate-700/50 mx-1"></div>
+              <div className="w-[1px] h-8 bg-white/10 mx-1"></div>
               
               <ToolButton active={tool === "text"} onClick={() => setTool("text")} icon={Type} label="Text" />
               <ToolButton active={tool === "sticky"} onClick={() => setTool("sticky")} icon={FileText} label="Sticky Note" />
@@ -1242,12 +1242,12 @@ function ToolButton({ active, onClick, icon: Icon, label, extraClass = "" }: any
       title={label}
       className={`group relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
         active
-          ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg scale-105"
-          : `text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 ${extraClass}`
+          ? "bg-white text-slate-900 shadow-[0_0_20px_rgba(255,255,255,0.4)] scale-105"
+          : `text-slate-400 hover:bg-white/10 ${extraClass}`
       }`}
     >
       {active && (
-         <motion.div layoutId="activeTool" className="absolute inset-0 bg-slate-900 dark:bg-white rounded-xl" style={{ zIndex: -1 }} />
+         <motion.div layoutId="activeTool" className="absolute inset-0 bg-white rounded-xl shadow-[0_0_15px_rgba(255,255,255,0.3)]" style={{ zIndex: -1 }} />
       )}
       <Icon className="w-5 h-5 relative z-10" />
       {/* Tooltip */}

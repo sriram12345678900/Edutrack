@@ -199,33 +199,36 @@ export default function TutorPage() {
     saveSessions(updatedSessions);
     setAttachedImage(null);
 
-    // Persona System Instruction Prefix
-    let personaPrompt = "";
+    // Persona System Instruction
+    let personaInstruction = "";
     if (personaMode === "ncert_expert") {
-      personaPrompt = "[SYSTEM: Act as an NCERT CBSE Board Examiner. Provide strict, marking-scheme-friendly solutions with definitions, formulas, and board exam tips.]";
+      personaInstruction = "Act as an NCERT CBSE Board Examiner. Provide strict, marking-scheme-friendly solutions with definitions, formulas, and board exam tips.";
     } else if (personaMode === "socratic") {
-      personaPrompt = "[SYSTEM: Act as a Socratic Mentor. Don't give answers directly immediately; guide the student with helpful hints, step 1, step 2.]";
+      personaInstruction = "Act as a Socratic Mentor. Don't give answers directly immediately; guide the student with helpful hints, step by step.";
     } else if (personaMode === "simplifier") {
-      personaPrompt = "[SYSTEM: Act as an ELI5 Simplifier. Use fun real-world analogies, simple terms, and zero jargon.]";
+      personaInstruction = "Act as an ELI5 Simplifier. Use fun real-world analogies, simple terms, and zero jargon.";
     }
 
     try {
-      const apiMessages = targetSession!.messages.map((m, idx) => {
-        const msgObj: any = {
-          role: m.role === "user" ? "user" : "assistant",
-          content: idx === targetSession!.messages.length - 1 && m.role === "user" ? `${personaPrompt} ${m.content}` : m.content
-        };
-        if (m.imagePreview) {
-          msgObj.attachments = [
-            {
-              type: "image/jpeg",
-              data: m.imagePreview,
-              name: "homework.jpg"
-            }
-          ];
-        }
-        return msgObj;
-      });
+      const apiMessages = [
+        { role: "system", content: personaInstruction },
+        ...targetSession!.messages.map((m) => {
+          const msgObj: any = {
+            role: m.role === "user" ? "user" : "assistant",
+            content: m.content
+          };
+          if (m.imagePreview) {
+            msgObj.attachments = [
+              {
+                type: "image/jpeg",
+                data: m.imagePreview,
+                name: "homework.jpg"
+              }
+            ];
+          }
+          return msgObj;
+        })
+      ];
 
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -357,43 +360,57 @@ export default function TutorPage() {
     return s;
   };
 
-  // Check if line is a math equation
+  // Check if a line is a standalone mathematical equation
   const isEquationLine = (lineStr: string): boolean => {
     const trimmed = lineStr.trim();
-    if (trimmed.startsWith("$$") || trimmed.startsWith("$")) return true;
-    // Common mathematical patterns: "x =", "y =", "x = (", "±", "√", "²", "³", "/ 2a", "sin(", "cos(", "tan("
-    const mathSymbolsRegex = /^([a-zA-Z0-9\s,\\(\\)]+)\s*=\s*(.*)|[±√²³≠≤≥≈÷×∞θπ]|\\(frac|sqrt|pm|theta|pi)|([0-9a-zA-Z\)\/]\s*[\+\-\*\/=]\s*[0-9a-zA-Z\(])/;
-    return mathSymbolsRegex.test(trimmed) && !trimmed.toLowerCase().startsWith("step") && !trimmed.toLowerCase().startsWith("the ") && !trimmed.toLowerCase().startsWith("substitute ") && !trimmed.toLowerCase().startsWith("so, ");
+    if (!trimmed) return false;
+    if (trimmed.startsWith("$$") || (trimmed.startsWith("$") && trimmed.endsWith("$"))) return true;
+    
+    // Prose lines starting with bullets, step numbers, headers or system notes are NOT math equation boxes
+    if (/^(\d+\.|\*|\-|\#|\[SYSTEM|\*Note:)/i.test(trimmed)) return false;
+    if (trimmed.includes("**")) return false; // If line contains markdown bolding, treat as rich text paragraph
+    
+    // Pure mathematical equality or formula expressions
+    const isPureMath = /^([a-zA-Z]\([a-zA-Z0-9,\s]+\)|[a-zA-Z0-9\s\\√±²³\+\-\*\/\^=]+)\s*=\s*(.*)$/i.test(trimmed) ||
+                       /^\\(int|sum|lim|frac|sqrt)/i.test(trimmed);
+                       
+    return isPureMath;
   };
 
-  // ── MARKDOWN FORMATTER WITH MATH TYPOGRAPHY ──
+  // ── MARKDOWN FORMATTER WITH CLEAN TYPOGRAPHY ──
   const formatMessageContent = (text: string) => {
-    if (!text) return "";
-    const lines = text.split("\n");
+    if (!text) return null;
+
+    // Clean stray system instructions or raw tags if any
+    const cleanText = text.replace(/\[SYSTEM:[^\]]*\]/gi, "").trim();
+    const lines = cleanText.split("\n");
     
     return lines.map((line, idx) => {
       const trimmed = line.trim();
+      if (!trimmed) return <div key={idx} className="h-2" />;
+
       const isExplicitBlockMath = trimmed.startsWith("$$") && trimmed.endsWith("$$");
       const isMathEquation = isExplicitBlockMath || isEquationLine(trimmed);
 
+      // Render explicit math formulas as mathematical cards
       if (isExplicitBlockMath) {
         const mathText = trimmed.slice(2, -2);
         return (
           <div 
             key={idx} 
-            className="flex justify-center my-3.5 p-4 bg-[#050c22] border border-cyan-500/40 rounded-2xl font-mono text-base text-cyan-300 tracking-wider font-extrabold select-all shadow-[0_0_25px_rgba(6,182,212,0.18)]"
+            className="flex justify-center my-3 p-3.5 bg-[#050c22] border border-cyan-500/40 rounded-xl font-mono text-sm sm:text-base text-cyan-300 tracking-wider font-extrabold select-all shadow-[0_0_20px_rgba(6,182,212,0.15)]"
             dangerouslySetInnerHTML={{ __html: cleanMathLaTeX(mathText) }}
           />
         );
       }
 
-      if (isMathEquation && trimmed.length > 0 && !trimmed.startsWith("#")) {
+      if (isMathEquation) {
         return (
           <div 
             key={idx} 
-            className="my-2 p-3 bg-[#060e28]/90 border border-cyan-500/35 rounded-xl font-mono text-sm text-cyan-200 tracking-wide font-extrabold select-all shadow-md shadow-cyan-950/50 flex items-center gap-2"
+            className="my-2 p-2.5 px-3.5 bg-[#060e28]/80 border border-cyan-500/30 rounded-xl font-mono text-xs sm:text-sm text-cyan-200 tracking-wide font-bold select-all shadow-sm flex items-center gap-2"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0 shadow-[0_0_8px_#22d3ee]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0 shadow-[0_0_6px_#22d3ee]" />
             <span dangerouslySetInnerHTML={{ __html: cleanMathLaTeX(trimmed) }} />
           </div>
         );
@@ -402,16 +419,24 @@ export default function TutorPage() {
       const formatMathInline = (mathText: string, keyIdx: number) => (
         <span 
           key={`math-${keyIdx}`}
-          className="font-mono text-cyan-300 font-extrabold text-xs tracking-wider bg-cyan-500/20 px-2 py-0.5 rounded-lg border border-cyan-500/35 inline-block mx-0.5 select-all shadow-sm"
+          className="font-mono text-cyan-300 font-bold text-xs tracking-wide bg-cyan-500/20 px-2 py-0.5 rounded-md border border-cyan-500/30 inline-block mx-0.5 select-all"
           dangerouslySetInnerHTML={{ __html: cleanMathLaTeX(mathText) }}
         />
       );
 
-      const formatBoldAndPlain = (plainText: string, keyIdx: number) => {
-        const parts = plainText.split(/\*\*/g);
+      const formatBoldItalicAndPlain = (plainText: string, keyIdx: number) => {
+        const parts = plainText.split(/(\*\*.*?\*\*|\*.*?\*)/g);
         return (
           <React.Fragment key={`plain-${keyIdx}`}>
-            {parts.map((part, i) => i % 2 === 1 ? <strong key={i} className="font-black text-white">{part}</strong> : part)}
+            {parts.map((part, i) => {
+              if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
+                return <strong key={i} className="font-black text-cyan-200 bg-cyan-500/10 px-1 py-0.5 rounded border border-cyan-500/20">{part.slice(2, -2)}</strong>;
+              }
+              if (part.startsWith("*") && part.endsWith("*") && part.length > 2) {
+                return <em key={i} className="italic text-slate-300">{part.slice(1, -1)}</em>;
+              }
+              return part;
+            })}
           </React.Fragment>
         );
       };
@@ -420,7 +445,7 @@ export default function TutorPage() {
         const parts = mixText.split("$");
         return parts.map((part, i) => {
           if (i % 2 === 1) return formatMathInline(part, i);
-          return formatBoldAndPlain(part, i);
+          return formatBoldItalicAndPlain(part, i);
         });
       };
 
@@ -432,18 +457,18 @@ export default function TutorPage() {
 
         if (level === 1) {
           return (
-            <h1 key={idx} className="text-xl font-black text-white mt-4 mb-2 tracking-tight bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400 bg-clip-text text-transparent">
+            <h1 key={idx} className="text-lg font-black text-white mt-4 mb-2 tracking-tight bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400 bg-clip-text text-transparent">
               {headingContent}
             </h1>
           );
         } else if (level === 2) {
           return (
-            <h2 key={idx} className="text-base font-extrabold text-white mt-5 mb-2 tracking-tight bg-gradient-to-r from-cyan-300 via-teal-300 to-emerald-300 bg-clip-text text-transparent flex items-center gap-2">
+            <h2 key={idx} className="text-base font-extrabold text-white mt-4 mb-2 tracking-tight flex items-center gap-2">
               {headingContent}
             </h2>
           );
         } else {
-          return <h3 key={idx} className="text-sm font-extrabold text-white mt-3 mb-1.5 tracking-tight">{headingContent}</h3>;
+          return <h3 key={idx} className="text-sm font-extrabold text-white mt-3 mb-1 tracking-tight">{headingContent}</h3>;
         }
       }
 
@@ -452,7 +477,7 @@ export default function TutorPage() {
 
       if (isBullet) {
         return (
-          <div key={idx} className="flex items-start gap-2.5 ml-2.5 my-1.5 select-text">
+          <div key={idx} className="flex items-start gap-2.5 ml-2 my-1.5 select-text">
             <span className="text-cyan-400 mt-1 text-xs">•</span>
             <span className="text-slate-300 text-sm font-medium leading-relaxed">{parseMix(line.trim().substring(2))}</span>
           </div>
@@ -463,18 +488,16 @@ export default function TutorPage() {
         const numMatch = line.trim().match(/^(\d+\.)\s(.*)/);
         if (numMatch) {
           return (
-            <div key={idx} className="flex items-start gap-2.5 ml-2.5 my-1.5 select-text">
-              <span className="text-cyan-400 font-bold mt-0.5 text-sm">{numMatch[1]}</span>
-              <span className="text-slate-300 text-sm font-medium leading-relaxed">{parseMix(numMatch[2])}</span>
+            <div key={idx} className="flex items-start gap-2.5 ml-1 my-2 select-text">
+              <span className="text-cyan-400 font-extrabold text-xs bg-cyan-500/10 px-2 py-0.5 rounded-lg border border-cyan-500/30 shrink-0">{numMatch[1]}</span>
+              <span className="text-slate-200 text-sm font-semibold leading-relaxed pt-0.5">{parseMix(numMatch[2])}</span>
             </div>
           );
         }
       }
 
-      if (!line.trim()) return <div key={idx} className="h-2.5" />;
-
       return (
-        <p key={idx} className="text-slate-300 text-sm font-medium mb-2.5 last:mb-0 leading-relaxed select-text">
+        <p key={idx} className="text-slate-300 text-sm font-medium mb-2 last:mb-0 leading-relaxed select-text">
           {parseMix(line)}
         </p>
       );

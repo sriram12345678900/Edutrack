@@ -62,7 +62,7 @@ function SwiperCard({ card, index, activeIndex, totalCards, onSwipeLeft, onSwipe
         }
       }}
       className={cn(
-        "absolute inset-0 bg-[#0d1127]/90 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 flex flex-col justify-between shadow-[0_12px_40px_rgba(0,0,0,0.4)] cursor-grab",
+        "absolute inset-0 premium-glass-panel p-6 flex flex-col justify-between cursor-grab",
         !isTop && "pointer-events-none"
       )}
     >
@@ -265,10 +265,13 @@ export default function Dashboard() {
       animate="show"
       className="space-y-10 relative max-w-7xl mx-auto"
     >
-      {/* Premium Dashboard Glowing Ambient Meshes */}
-      <div className="absolute top-[-10%] right-[5%] w-[500px] h-[500px] bg-indigo-500/10 dark:bg-indigo-600/5 rounded-full blur-[120px] pointer-events-none -z-10 animate-float-slow" />
-      <div className="absolute bottom-[10%] left-[-5%] w-[450px] h-[450px] bg-purple-500/10 dark:bg-purple-600/5 rounded-full blur-[120px] pointer-events-none -z-10 animate-float-delayed" />
-      <div className="absolute top-[40%] left-[30%] w-[350px] h-[350px] bg-emerald-500/5 rounded-full blur-[110px] pointer-events-none -z-10 animate-pulse-glow" />
+      {/* Premium Vanilla CSS Backgrounds */}
+      <div className="premium-mesh-bg">
+        <div className="premium-mesh-blob-1"></div>
+        <div className="premium-mesh-blob-2"></div>
+        <div className="premium-mesh-blob-3"></div>
+        <div className="premium-grid-overlay"></div>
+      </div>
 
       {/* ── HEADER SECTION ── */}
       <motion.header 
@@ -279,8 +282,8 @@ export default function Dashboard() {
           <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/15">
             Premium Academic Space
           </span>
-          <h1 className="text-4xl md:text-5xl font-black mt-3.5 tracking-tight flex items-center gap-2.5">
-            <span className="bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 dark:from-white dark:via-indigo-200 dark:to-slate-200 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-black mt-3.5 tracking-tight flex items-center gap-2.5 premium-text-gradient-accent">
+            <span>
               Welcome back, {firstName}!
             </span>
             <span className="shrink-0 drop-shadow-sm select-none">👋</span>
@@ -311,23 +314,23 @@ export default function Dashboard() {
           
           {/* QUICK PREMIUM UTILITY ROW */}
           <motion.section variants={item} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5">
-            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/lens')} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/50 dark:border-white/10 p-4 sm:p-5 rounded-[1.75rem] flex flex-col items-center justify-center text-center cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-emerald-500/15 hover:border-emerald-500/40 transition-all group">
+            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/lens')} className="premium-glass-panel micro-hover-lift p-5 flex flex-col items-center justify-center text-center cursor-pointer group">
               <Camera className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-500 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(16,185,129,0.35)]" />
               <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">AI Lens</span>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/formulas')} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/50 dark:border-white/10 p-4 sm:p-5 rounded-[1.75rem] flex flex-col items-center justify-center text-center cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-cyan-500/15 hover:border-cyan-500/40 transition-all group">
+            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/formulas')} className="premium-glass-panel micro-hover-lift p-5 flex flex-col items-center justify-center text-center cursor-pointer group">
               <Compass className="w-7 h-7 sm:w-8 sm:h-8 text-cyan-400 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(34,211,238,0.35)]" />
               <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Formulas</span>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/sandbox')} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/50 dark:border-white/10 p-4 sm:p-5 rounded-[1.75rem] flex flex-col items-center justify-center text-center cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-orange-500/15 hover:border-orange-500/40 transition-all group">
+            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/sandbox')} className="premium-glass-panel micro-hover-lift p-5 flex flex-col items-center justify-center text-center cursor-pointer group">
               <Zap className="w-7 h-7 sm:w-8 sm:h-8 text-orange-500 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(249,115,22,0.35)]" />
               <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Sandbox</span>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/trophies')} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/50 dark:border-white/10 p-4 sm:p-5 rounded-[1.75rem] flex flex-col items-center justify-center text-center cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-yellow-500/15 hover:border-yellow-500/40 transition-all group">
+            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/trophies')} className="premium-glass-panel micro-hover-lift p-5 flex flex-col items-center justify-center text-center cursor-pointer group">
               <Trophy className="w-7 h-7 sm:w-8 sm:h-8 text-yellow-500 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(234,179,8,0.35)]" />
               <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Trophies</span>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/analytics')} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/50 dark:border-white/10 p-4 sm:p-5 rounded-[1.75rem] flex flex-col items-center justify-center text-center cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-indigo-500/15 hover:border-indigo-500/40 transition-all group">
+            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/analytics')} className="premium-glass-panel micro-hover-lift p-5 flex flex-col items-center justify-center text-center cursor-pointer group">
               <Activity className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-500 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(99,102,241,0.35)]" />
               <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Analytics</span>
             </motion.div>
@@ -336,13 +339,13 @@ export default function Dashboard() {
           {/* STATS & PROGRESS HUD (Glassmorphic Command Deck) */}
           <motion.section 
             variants={item}
-            className="relative bg-gradient-to-br from-indigo-950 via-[#0d1020] to-[#040612] border border-white/5 rounded-3xl p-6.5 shadow-2xl overflow-hidden select-none"
+            className="premium-glass-panel premium-glow-border p-6.5 select-none"
           >
             {/* Ambient Background Glows */}
-            <div className="absolute top-[-50%] left-[-20%] w-[350px] h-[350px] bg-indigo-500/15 rounded-full blur-[90px] pointer-events-none" />
-            <div className="absolute bottom-[-50%] right-[-20%] w-[350px] h-[350px] bg-pink-500/15 rounded-full blur-[90px] pointer-events-none" />
             
-            <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
+            
+            
+            
             
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
               <div className="flex items-center gap-6 w-full md:w-auto">
@@ -429,7 +432,7 @@ export default function Dashboard() {
               
               {/* AI Bot Card */}
               <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/tutor')} className="group cursor-pointer">
-                <div className="bg-white/80 dark:bg-[#0c0f1d]/80 backdrop-blur-2xl border border-slate-200/50 dark:border-white/10 p-5 rounded-[2rem] flex flex-col justify-between h-44 transition-all group-hover:border-indigo-500/50 shadow-[0_10px_30px_rgba(0,0,0,0.02)] dark:shadow-[0_10px_30px_rgba(99,102,241,0.04)]">
+                <div className="premium-glass-panel micro-hover-lift p-5 flex flex-col justify-between h-44 group">
                   <div className="p-3 bg-indigo-500/10 rounded-2xl w-fit text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
                     <Sparkles className="w-5 h-5 drop-shadow-[0_0_8px_rgba(99,102,241,0.4)]" />
                   </div>
@@ -442,7 +445,7 @@ export default function Dashboard() {
 
               {/* Study Hub Card */}
               <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/learn')} className="group cursor-pointer">
-                <div className="bg-white/80 dark:bg-[#0c0f1d]/80 backdrop-blur-2xl border border-slate-200/50 dark:border-white/10 p-5 rounded-[2rem] flex flex-col justify-between h-44 transition-all group-hover:border-emerald-500/50 shadow-[0_10px_30px_rgba(0,0,0,0.02)] dark:shadow-[0_10px_30px_rgba(16,185,129,0.04)]">
+                <div className="premium-glass-panel micro-hover-lift p-5 flex flex-col justify-between h-44 group">
                   <div className="p-3 bg-emerald-500/10 rounded-2xl w-fit text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
                     <Book className="w-5 h-5 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
                   </div>
@@ -455,7 +458,7 @@ export default function Dashboard() {
 
               {/* Whiteboard Card */}
               <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/whiteboard')} className="group cursor-pointer">
-                <div className="bg-white/80 dark:bg-[#0c0f1d]/80 backdrop-blur-2xl border border-slate-200/50 dark:border-white/10 p-5 rounded-[2rem] flex flex-col justify-between h-44 transition-all group-hover:border-pink-500/50 shadow-[0_10px_30px_rgba(0,0,0,0.02)] dark:shadow-[0_10px_30px_rgba(236,72,153,0.04)]">
+                <div className="premium-glass-panel micro-hover-lift p-5 flex flex-col justify-between h-44 group">
                   <div className="p-3 bg-pink-500/10 rounded-2xl w-fit text-pink-600 dark:text-pink-400 group-hover:scale-110 transition-transform">
                     <Palette className="w-5 h-5 drop-shadow-[0_0_8px_rgba(236,72,153,0.4)]" />
                   </div>
@@ -468,7 +471,7 @@ export default function Dashboard() {
 
               {/* Pomodoro Card */}
               <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/pomodoro')} className="group cursor-pointer">
-                <div className="bg-white/80 dark:bg-[#0c0f1d]/80 backdrop-blur-2xl border border-slate-200/50 dark:border-white/10 p-5 rounded-[2rem] flex flex-col justify-between h-44 transition-all group-hover:border-amber-500/50 shadow-[0_10px_30px_rgba(0,0,0,0.02)] dark:shadow-[0_10px_30px_rgba(245,158,11,0.04)]">
+                <div className="premium-glass-panel micro-hover-lift p-5 flex flex-col justify-between h-44 group">
                   <div className="p-3 bg-amber-500/10 rounded-2xl w-fit text-amber-500 dark:text-amber-400 group-hover:scale-110 transition-transform">
                     <Timer className="w-5 h-5 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]" />
                   </div>
@@ -485,7 +488,7 @@ export default function Dashboard() {
           {/* DYNAMIC CORE STUDY PATH */}
           <motion.section 
             variants={item}
-            className="bg-white/65 dark:bg-[#040612]/65 backdrop-blur-xl border border-slate-200/50 dark:border-white/5 p-8 rounded-[2rem] shadow-sm relative overflow-hidden"
+            className="premium-glass-panel p-8 relative"
           >
             <div className="absolute top-[-20px] right-[-20px] w-24 h-24 bg-indigo-500/5 rounded-full blur-xl pointer-events-none" />
 
@@ -514,7 +517,7 @@ export default function Dashboard() {
 
               {/* Task 1: NCERT Textbook */}
               <Link href="/learn" className="group">
-                <div className="bg-slate-50/50 dark:bg-white/[0.01] border border-slate-200/40 dark:border-white/5 hover:border-indigo-500/40 p-6 rounded-2xl transition-all duration-350 hover:-translate-y-1.5 hover:shadow-xl h-48 flex flex-col justify-between">
+                <div className="premium-glass-panel micro-hover-lift p-6 h-48 flex flex-col justify-between">
                   <div className="flex justify-between items-start">
                     <div className="p-2.5 bg-indigo-500/10 rounded-xl text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
                       <Book className="w-5 h-5" />
@@ -530,7 +533,7 @@ export default function Dashboard() {
 
               {/* Task 2: AI Recall Cards */}
               <Link href="/flashcards" className="group">
-                <div className="bg-slate-50/50 dark:bg-white/[0.01] border border-slate-200/40 dark:border-white/5 hover:border-purple-500/40 p-6 rounded-2xl transition-all duration-350 hover:-translate-y-1.5 hover:shadow-xl h-48 flex flex-col justify-between">
+                <div className="premium-glass-panel micro-hover-lift p-6 h-48 flex flex-col justify-between">
                   <div className="flex justify-between items-start">
                     <div className="p-2.5 bg-purple-500/10 rounded-xl text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
                       <Sparkles className="w-5 h-5" />
@@ -546,7 +549,7 @@ export default function Dashboard() {
 
               {/* Task 3: StudyCircles Chat */}
               <Link href="/groups" className="group">
-                <div className="bg-slate-50/50 dark:bg-white/[0.01] border border-slate-200/40 dark:border-white/5 hover:border-emerald-500/40 p-6 rounded-2xl transition-all duration-350 hover:-translate-y-1.5 hover:shadow-xl h-48 flex flex-col justify-between">
+                <div className="premium-glass-panel micro-hover-lift p-6 h-48 flex flex-col justify-between">
                   <div className="flex justify-between items-start">
                     <div className="p-2.5 bg-emerald-500/10 rounded-xl text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
                       <Users className="w-5 h-5" />
@@ -565,7 +568,7 @@ export default function Dashboard() {
           {/* SYLLABUS SKILL TREE / MIND MAP */}
           <motion.section 
             variants={item}
-            className="bg-white/65 dark:bg-[#040612]/65 backdrop-blur-xl border border-slate-200/50 dark:border-white/5 p-8 rounded-[2rem] shadow-sm relative overflow-hidden"
+            className="premium-glass-panel p-8 relative"
           >
             <div className="absolute top-[-20px] right-[-20px] w-24 h-24 bg-indigo-500/5 rounded-full blur-xl pointer-events-none" />
             
@@ -686,7 +689,7 @@ export default function Dashboard() {
           {/* ACTIVE MEMORY STUDY SWIPER */}
           <motion.section 
             variants={item}
-            className="bg-white/65 dark:bg-[#040612]/65 backdrop-blur-xl border border-slate-200/50 dark:border-white/5 p-8 rounded-[2rem] shadow-sm relative overflow-hidden"
+            className="premium-glass-panel p-8 relative"
           >
             <div className="absolute top-[-20px] right-[-20px] w-24 h-24 bg-pink-500/5 rounded-full blur-xl pointer-events-none" />
             
@@ -786,7 +789,7 @@ export default function Dashboard() {
           {/* DAILY QUESTBOARD (MISSIONS) */}
           <motion.section 
             variants={item} 
-            className="bg-white/60 dark:bg-[#040612]/60 backdrop-blur-xl border border-slate-200/50 dark:border-white/5 p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-shadow"
+            className="premium-glass-panel p-8"
           >
             <h3 className="text-xl font-extrabold flex items-center gap-3 mb-6 text-slate-900 dark:text-white">
               <div className="p-2 bg-indigo-500/10 rounded-xl">
@@ -857,7 +860,7 @@ export default function Dashboard() {
           {/* CLASSMATES LEADERBOARD & STUDY BUDDIES */}
           <motion.section 
             variants={item} 
-            className="bg-white/60 dark:bg-[#040612]/60 backdrop-blur-xl border border-slate-200/50 dark:border-white/5 p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-shadow"
+            className="premium-glass-panel p-8"
           >
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-extrabold flex items-center gap-3 text-slate-900 dark:text-white">
@@ -930,7 +933,7 @@ export default function Dashboard() {
           {/* TARGET SUBJECT AREAS (WEAK AREAS) */}
           <motion.section 
             variants={item} 
-            className="bg-white/60 dark:bg-[#040612]/60 backdrop-blur-xl border border-slate-200/50 dark:border-white/5 p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-shadow"
+            className="premium-glass-panel p-8"
           >
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-extrabold flex items-center gap-3 text-slate-900 dark:text-white">
