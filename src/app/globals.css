@@ -298,12 +298,15 @@ body {
 }
 
 /* Fix for emojis rendering as solid box artifacts inside text-gradient elements */
-.emoji,
-[data-emoji] {
-  display: inline-block;
-  -webkit-text-fill-color: initial !important;
-  background: transparent !important;
-  background-clip: border-box !important;
-  -webkit-background-clip: border-box !important;
-  color: initial !important;
+/* 3D Perspective & Flip Utilities */
+.perspective-1000 {
+  perspective: 1000px;
 }
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+

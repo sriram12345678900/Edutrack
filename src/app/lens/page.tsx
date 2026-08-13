@@ -162,6 +162,7 @@ export default function LensPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          image: lensImage || undefined,
           messages: apiMessages,
           language: userLanguage,
           bookInfo: ""
@@ -225,6 +226,7 @@ export default function LensPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          image: lensImage,
           messages: [
             {
               role: "user",

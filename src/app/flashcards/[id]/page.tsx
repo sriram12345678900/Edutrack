@@ -210,7 +210,7 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
               <motion.div
                 className="w-full h-full relative preserve-3d cursor-pointer"
                 onClick={handleFlip}
-                animate={{ rotateX: isFlipped ? 180 : 0 }}
+                animate={{ rotateY: isFlipped ? 180 : 0 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
               >
                 {/* Front */}
@@ -241,7 +241,7 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
                 {/* Back */}
                 <div 
                   className="absolute inset-0 backface-hidden bg-gradient-to-br from-indigo-50 to-fuchsia-50 dark:from-indigo-900/20 dark:to-fuchsia-900/20 rounded-3xl shadow-xl border border-fuchsia-200 dark:border-fuchsia-800 flex flex-col items-center justify-center p-8 text-center"
-                  style={{ transform: "rotateX(180deg)" }}
+                  style={{ transform: "rotateY(180deg)" }}
                 >
                   <span className="absolute top-6 left-6 text-xs font-extrabold uppercase tracking-widest text-fuchsia-500 flex items-center gap-2">
                     Answer

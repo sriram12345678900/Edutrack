@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    const { topic, classLevel = "10", subject = "Science", count = 10 } = await req.json();
+    const { topic, classLevel = "10", subject = "Geography", count = 10 } = await req.json();
 
     if (!topic) {
       return NextResponse.json({ error: "Topic is required" }, { status: 400 });
@@ -63,8 +63,40 @@ Example format:
 function generateLocalFlashcards(topic: string, subject: string, count: number) {
   const cleanTopic = topic.toLowerCase();
   
-  // Dedicated Curated Subject Question Banks for Class 10 NCERT Science & Physics
+  // Dedicated Curated Subject Question Banks for Class 10 NCERT Subjects
   const defaultBank: Record<string, { front: string; back: string }[]> = {
+    // ── GEOGRAPHY CHAPTER 3: WATER RESOURCES ──
+    water: [
+      { front: "What proportion of the Earth's surface is covered with water?", back: "Three-fourths (approx. 71%) of the Earth's surface is covered with water, but only 2.5% is fresh water." },
+      { front: "What are Multi-Purpose River Projects?", back: "Dams built across rivers serving multiple objectives: flood control, irrigation, hydroelectricity, fish breeding, navigation, and soil conservation." },
+      { front: "Why did Jawaharlal Nehru call dams the 'Temples of Modern India'?", back: "Because he believed multi-purpose river projects would integrate agricultural growth with rapid industrialization and urban progress." },
+      { front: "Which is the highest gravity dam in India?", back: "Bhakra Nangal Dam constructed across the Satluj River." },
+      { front: "Which is the longest dam in India?", back: "Hirakud Dam constructed across the Mahanadi River in Odisha." },
+      { front: "What is Rooftop Rainwater Harvesting?", back: "Traditional technique of collecting rainwater from roofs via pipes into underground storage tanks (tanka) popular in semi-arid regions like Rajasthan." },
+      { front: "Which Indian state made rooftop rainwater harvesting compulsory for all houses?", back: "Tamil Nadu (first state in India to mandate rooftop rainwater harvesting for all households)." },
+      { front: "What is Bamboo Drip Irrigation?", back: "A 200-year-old traditional system in Meghalaya where stream water is tapped using bamboo pipes to irrigate betel leaf or black pepper plants." },
+      { front: "What was the main objective of Narmada Bachao Andolan?", back: "An NGO movement led by Medha Patkar mobilizing tribal people and environmentalists against large dams like Sardar Sarovar Dam on Narmada River." },
+      { front: "What is Water Scarcity?", back: "Shortage of water relative to demand, caused by over-exploitation, excessive use, unequal access, pollution, or seasonal drought." }
+    ],
+
+    // ── GEOGRAPHY CHAPTER 1: RESOURCES & DEVELOPMENT ──
+    resource: [
+      { front: "What are Biotic and Abiotic Resources?", back: "Biotic Resources are obtained from biosphere and have life (e.g., flora, fauna, human beings). Abiotic Resources consist of non-living things (e.g., rocks, metals)." },
+      { front: "What are Renewable and Non-Renewable Resources?", back: "Renewable Resources can be renewed or reproduced by physical/chemical/mechanical processes (e.g., solar, wind, water). Non-Renewable Resources take millions of years in formation and get exhausted (e.g., coal, petroleum)." },
+      { front: "What is Rio Earth Summit 1992?", back: "First International Earth Summit held in Rio de Janeiro, Brazil, where 100+ heads of state signed Agenda 21 for global sustainable development." },
+      { front: "What is Agenda 21?", back: "A declaration signed at UNCED 1992 to achieve global sustainable development by combating environmental damage, poverty, and disease through global cooperation." },
+      { front: "Which soil is most widely spread and important in India?", back: "Alluvial Soil (found in Northern Plains, coastal plains, and river deltas of Mahanadi, Godavari, Krishna, and Kaveri)." }
+    ],
+
+    // ── GEOGRAPHY CHAPTER 4: AGRICULTURE ──
+    agriculture: [
+      { front: "What are the three main cropping seasons in India?", back: "1. Kharif (sown June/July, harvested Oct/Nov - Rice, Maize, Cotton).\n2. Rabi (sown Oct/Dec, harvested April/June - Wheat, Barley, Mustard).\n3. Zaid (short summer season - Watermelon, Cucumber)." },
+      { front: "Which is the staple food crop of a majority of people in India?", back: "Rice (India is 2nd largest producer after China; requires high temperature >25°C and annual rainfall >100 cm)." },
+      { front: "What are the ideal growing conditions for Wheat?", back: "Cool growing season, bright sunshine at ripening time, 50-75 cm annual rainfall evenly distributed. Major belts: Ganga-Satluj plains & Black soil region." },
+      { front: "What was the Bhoodan-Gramdan Movement?", back: "Bloodless Revolution initiated by Vinoba Bhave where land donors gifted land to landless farmers (Shri Ram Chandra Reddy donated 80 acres in Pochampally)." }
+    ],
+
+    // ── SCIENCE: LIGHT REFLECTION & REFRACTION ──
     light: [
       { front: "State the Laws of Reflection of Light.", back: "1. Angle of incidence equals angle of reflection (∠i = ∠r).\n2. Incident ray, reflected ray, and normal at point of incidence all lie in the same plane." },
       { front: "State the Mirror Formula.", back: "1/f = 1/v + 1/u (where f = focal length, v = image distance, u = object distance)." },
@@ -77,16 +109,8 @@ function generateLocalFlashcards(topic: string, subject: string, count: number) 
       { front: "What is the nature & size of image formed by Concave Mirror when object is at C?", back: "Real, inverted, and SAME SIZE as the object, formed at Center of Curvature (C)." },
       { front: "Focal length of a Plane Mirror?", back: "Infinity (∞), and magnification is +1." }
     ],
-    reflection: [
-      { front: "State the Laws of Reflection of Light.", back: "1. Angle of incidence equals angle of reflection (∠i = ∠r).\n2. Incident ray, reflected ray, and normal at point of incidence all lie in the same plane." },
-      { front: "State the Mirror Formula.", back: "1/f = 1/v + 1/u (where f = focal length, v = image distance, u = object distance)." },
-      { front: "Formula for Magnification of a Spherical Mirror?", back: "m = -v/u = h_image / h_object." }
-    ],
-    refraction: [
-      { front: "State Snell's Law of Refraction.", back: "sin i / sin r = constant (Refractive Index n₂₁)." },
-      { front: "Define Absolute Refractive Index (n).", back: "n = c / v (Ratio of speed of light in vacuum to speed in medium)." },
-      { front: "State the Lens Formula.", back: "1/f = 1/v - 1/u." }
-    ],
+
+    // ── SCIENCE: ELECTRICITY ──
     electric: [
       { front: "State Ohm's Law.", back: "Electric current (I) flowing through a conductor is directly proportional to potential difference (V) across its ends at constant temperature (V = IR)." },
       { front: "What is the SI unit of Electric Current?", back: "Ampere (A), where 1 Ampere = 1 Coulomb per second (1 A = 1 C/s)." },
@@ -95,22 +119,7 @@ function generateLocalFlashcards(topic: string, subject: string, count: number) 
       { front: "Formula for Resistors connected in Parallel?", back: "1/R_total = 1/R₁ + 1/R₂ + 1/R₃ + ..." },
       { front: "State Joule's Law of Heating.", back: "H = I²Rt (Heat produced is directly proportional to square of current, resistance, and time)." },
       { front: "What are the formulas for Electric Power (P)?", back: "P = VI = I²R = V²/R (SI Unit: Watt)." },
-      { front: "Commercial unit of Electrical Energy?", back: "Kilowatt-hour (kWh). 1 kWh = 3.6 × 10⁶ Joules (1 unit)." },
-      { front: "Factors on which Resistance of a conductor depends?", back: "Length (l), Area of cross-section (A), Material resistivity (ρ), and Temperature (R = ρ l / A)." },
-      { front: "Difference between Ammeter and Voltmeter?", back: "Ammeter measures current and is connected in SERIES (low resistance). Voltmeter measures potential difference and is connected in PARALLEL (high resistance)." }
-    ],
-    photosynthesis: [
-      { front: "What is Photosynthesis?", back: "Process by which green plants manufacture glucose from CO₂ and H₂O using sunlight and chlorophyll." },
-      { front: "Write the chemical equation for Photosynthesis.", back: "6CO₂ + 6H₂O + Sunlight → C₆H₁₂O₆ + 6O₂" },
-      { front: "Where does Photosynthesis occur in plant cells?", back: "Inside Chloroplasts containing Chlorophyll pigment." },
-      { front: "What is the main byproduct of Photosynthesis released into air?", back: "Oxygen gas (O₂)." },
-      { front: "What are Stomata?", back: "Tiny pores present on leaves used for gas exchange (CO₂ in, O₂ out) and transpiration." }
-    ],
-    motion: [
-      { front: "State Newton's First Law of Motion.", back: "An object remains at rest or in uniform motion unless acted upon by an external unbalanced force (Law of Inertia)." },
-      { front: "State Newton's Second Law formula.", back: "F = ma (Force = mass × acceleration)." },
-      { front: "What is SI unit of Force?", back: "Newton (N) or kg·m/s²." },
-      { front: "State Newton's Third Law of Motion.", back: "For every action, there is an equal and opposite reaction." }
+      { front: "Commercial unit of Electrical Energy?", back: "Kilowatt-hour (kWh). 1 kWh = 3.6 × 10⁶ Joules (1 unit)." }
     ]
   };
 
@@ -118,7 +127,7 @@ function generateLocalFlashcards(topic: string, subject: string, count: number) 
 
   // 1. Check default curated subject banks first
   for (const key in defaultBank) {
-    if (cleanTopic.includes(key)) {
+    if (cleanTopic.includes(key) || (key === "water" && cleanTopic.includes("water"))) {
       for (const card of defaultBank[key]) {
         if (matchedCards.length < count) {
           matchedCards.push(card);
@@ -127,7 +136,7 @@ function generateLocalFlashcards(topic: string, subject: string, count: number) 
     }
   }
 
-  // 2. Search PYQs dataset and clean tags if needed
+  // 2. Search PYQs dataset with subject relevance filtering
   if (matchedCards.length < count) {
     const pyqPath = path.join(process.cwd(), "public", "training", "edutrack_gemini_dataset.json");
     if (fs.existsSync(pyqPath)) {
@@ -137,6 +146,12 @@ function generateLocalFlashcards(topic: string, subject: string, count: number) 
         for (const item of dataset) {
           if (matchedCards.length >= count) break;
           const txt = (item.input_text || "").toLowerCase();
+
+          // Exclude chemistry electrolysis when subject is Geography / Social Science
+          if ((subject.toLowerCase().includes("geography") || subject.toLowerCase().includes("social") || cleanTopic.includes("water resource")) && txt.includes("electrolysis")) {
+            continue;
+          }
+
           if (txt.includes(cleanTopic) || cleanTopic.split(/\s+/).some(w => w.length > 3 && txt.includes(w))) {
             let cleanFront = item.input_text.replace(/\[[^\]]+\]\s*/g, "").trim();
             if (cleanFront.length > 110) {
