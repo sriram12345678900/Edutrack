@@ -11,7 +11,7 @@ import {
   PenTool, Highlighter, ChevronDown, FileText, X, Hand, Move, LassoSelect, 
   Triangle, ArrowRight, ZoomIn, ZoomOut, RotateCcw, Keyboard,
   Zap, Sun, Moon, Layers, Crosshair, Calculator, Library, Compass,
-  Maximize2, Minimize2, Sliders
+  Maximize2, Minimize2, Sliders, Image as ImageIcon, Ruler, Mic, Volume2, Plus, ChevronLeft
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -30,7 +30,9 @@ type DrawTool =
   | "stroke_eraser" 
   | "smart_pen" 
   | "lasso" 
-  | "laser";
+  | "laser"
+  | "image"
+  | "ruler";
 
 type BackgroundPattern = "dots" | "grid" | "ruled" | "isometric" | "blank";
 type CanvasTheme = "dark" | "light";
@@ -41,6 +43,7 @@ interface StickyNote {
   y: number;
   text: string;
   color: string;
+  audioUrl?: string;
 }
 
 interface Point {
@@ -55,7 +58,7 @@ interface Stroke {
   brushSize: number;
   tool: DrawTool;
   fill?: boolean;
-  text?: string;
+  text?: string; // Stores text content or base64 image data
 }
 
 interface LaserParticle {
@@ -63,6 +66,25 @@ interface LaserParticle {
   y: number;
   alpha: number;
   color: string;
+}
+
+interface WhiteboardPageData {
+  id: string;
+  title: string;
+  strokes: Stroke[];
+  stickyNotes: StickyNote[];
+}
+
+// Global Image Cache for Canvas Performance
+const imageCache = new Map<string, HTMLImageElement>();
+function getCachedImage(src: string): HTMLImageElement {
+  if (imageCache.has(src)) {
+    return imageCache.get(src)!;
+  }
+  const img = new Image();
+  img.src = src;
+  imageCache.set(src, img);
+  return img;
 }
 
 // Intersect math helpers
@@ -221,8 +243,14 @@ function renderSmoothPath(ctx: CanvasRenderingContext2D, points: Point[]) {
   ctx.stroke();
 }
 
-// Canvas Redraw Engine with Selection Box & Handles
-const redrawCanvas = (canvas: HTMLCanvasElement, strokesList: Stroke[], selectedIds: string[] = []) => {
+// Canvas Redraw Engine with Image & Interactive Ruler Rendering
+const redrawCanvas = (
+  canvas: HTMLCanvasElement, 
+  strokesList: Stroke[], 
+  selectedIds: string[] = [],
+  showRuler: boolean = false,
+  rulerPos: { x: number; y: number; angle: number } = { x: 500, y: 500, angle: 0 }
+) => {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
@@ -245,7 +273,20 @@ const redrawCanvas = (canvas: HTMLCanvasElement, strokesList: Stroke[], selected
 
     if (stroke.points.length === 0) continue;
 
-    if (stroke.tool === "pen" || stroke.tool === "smart_pen" || stroke.tool === "highlighter" || stroke.tool === "eraser") {
+    if (stroke.tool === "image" && stroke.text) {
+      const img = getCachedImage(stroke.text);
+      const start = stroke.points[0];
+      const end = stroke.points[stroke.points.length - 1];
+      const w = end.x - start.x;
+      const h = end.y - start.y;
+      if (img.complete) {
+        ctx.drawImage(img, start.x, start.y, w, h);
+      } else {
+        img.onload = () => {
+          ctx.drawImage(img, start.x, start.y, w, h);
+        };
+      }
+    } else if (stroke.tool === "pen" || stroke.tool === "smart_pen" || stroke.tool === "highlighter" || stroke.tool === "eraser") {
       renderSmoothPath(ctx, stroke.points);
     } else if (stroke.tool === "line") {
       const start = stroke.points[0];
@@ -347,6 +388,53 @@ const redrawCanvas = (canvas: HTMLCanvasElement, strokesList: Stroke[], selected
     }
   }
 
+  // Render Interactive Metric Ruler Overlay
+  if (showRuler) {
+    ctx.save();
+    ctx.translate(rulerPos.x, rulerPos.y);
+    ctx.rotate((rulerPos.angle * Math.PI) / 180);
+
+    const rulerW = 600;
+    const rulerH = 80;
+
+    // Translucent glass body
+    ctx.fillStyle = "rgba(30, 41, 59, 0.85)";
+    ctx.strokeStyle = "#6366f1";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(-rulerW / 2, -rulerH / 2, rulerW, rulerH, 12);
+    ctx.fill();
+    ctx.stroke();
+
+    // Centimeter ticks & numbers
+    ctx.strokeStyle = "#94a3b8";
+    ctx.fillStyle = "#cbd5e1";
+    ctx.font = "10px Outfit, sans-serif";
+    ctx.textAlign = "center";
+
+    const cmPx = 40; // 40px per cm
+    const totalCm = Math.floor(rulerW / cmPx);
+
+    for (let i = 0; i <= totalCm; i++) {
+      const tx = -rulerW / 2 + i * cmPx + 20;
+      // Main cm tick
+      ctx.beginPath();
+      ctx.moveTo(tx, -rulerH / 2);
+      ctx.lineTo(tx, -rulerH / 2 + 18);
+      ctx.stroke();
+      ctx.fillText(`${i} cm`, tx, -rulerH / 2 + 30);
+
+      // Half cm tick
+      if (i < totalCm) {
+        ctx.beginPath();
+        ctx.moveTo(tx + cmPx / 2, -rulerH / 2);
+        ctx.lineTo(tx + cmPx / 2, -rulerH / 2 + 10);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
   ctx.globalAlpha = 1.0;
   ctx.globalCompositeOperation = "source-over";
 };
@@ -362,6 +450,14 @@ export default function WhiteboardPage() {
     width: 3200,
     height: 2400
   });
+
+  // Multi-Page Deck State
+  const [deckPages, setDeckPages] = useState<WhiteboardPageData[]>([
+    { id: "page_1", title: "Page 1", strokes: [], stickyNotes: [] }
+  ]);
+  const [activePageIndex, setActivePageIndex] = useState(0);
+
+  const imageUploadInputRef = useRef<HTMLInputElement>(null);
 
   const isDrawingRef = useRef(false);
   const isMovingSelectionRef = useRef(false);
@@ -397,16 +493,42 @@ export default function WhiteboardPage() {
   const [canvasTheme, setCanvasTheme] = useState<CanvasTheme>("dark");
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedStrokeIds, setSelectedStrokeIds] = useState<string[]>([]);
-  const [stickyNotes, setStickyNotes] = useState<StickyNote[]>([]);
   const [showKeyShortcuts, setShowKeyShortcuts] = useState(false);
+
+  // Ruler State
+  const [showRuler, setShowRuler] = useState(false);
+  const [rulerPos, setRulerPos] = useState<{ x: number; y: number; angle: number }>({ x: 800, y: 600, angle: 0 });
 
   // Modals & Panels
   const [showPresetBank, setShowPresetBank] = useState(false);
   const [solvingAI, setSolvingAI] = useState(false);
   const [aiSolution, setAiSolution] = useState<string | null>(null);
 
-  // Strokes Tracking
-  const [strokes, setStrokes] = useState<Stroke[]>([]);
+  // Active Page Shortcuts
+  const activePage = deckPages[activePageIndex] || deckPages[0];
+  const strokes = activePage.strokes;
+  const stickyNotes = activePage.stickyNotes;
+
+  const setStrokes = (action: Stroke[] | ((prev: Stroke[]) => Stroke[])) => {
+    setDeckPages(prev => prev.map((pg, idx) => {
+      if (idx === activePageIndex) {
+        const nextStrokes = typeof action === "function" ? action(pg.strokes) : action;
+        return { ...pg, strokes: nextStrokes };
+      }
+      return pg;
+    }));
+  };
+
+  const setStickyNotes = (action: StickyNote[] | ((prev: StickyNote[]) => StickyNote[])) => {
+    setDeckPages(prev => prev.map((pg, idx) => {
+      if (idx === activePageIndex) {
+        const nextNotes = typeof action === "function" ? action(pg.stickyNotes) : action;
+        return { ...pg, stickyNotes: nextNotes };
+      }
+      return pg;
+    }));
+  };
+
   const [accumulatedSmartStrokes, setAccumulatedSmartStrokes] = useState<Stroke[]>([]);
   const [isRecognizing, setIsRecognizing] = useState(false);
   const smartPenTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -458,15 +580,66 @@ export default function WhiteboardPage() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
-      redrawCanvas(canvas, strokes, selectedStrokeIds);
+      redrawCanvas(canvas, strokes, selectedStrokeIds, showRuler, rulerPos);
     }
-  }, [canvasSize, strokes, selectedStrokeIds]);
+  }, [canvasSize, strokes, selectedStrokeIds, showRuler, rulerPos, activePageIndex]);
 
   useEffect(() => {
     const randomNum = Math.floor(1000 + Math.random() * 9000);
     setRoomId(`ROOM-${randomNum}`);
     setRoomInput(`ROOM-${randomNum}`);
   }, []);
+
+  // Page Management Functions
+  const addNewPage = () => {
+    const newPgNumber = deckPages.length + 1;
+    const newPg: WhiteboardPageData = {
+      id: `page_${Date.now()}`,
+      title: `Page ${newPgNumber}`,
+      strokes: [],
+      stickyNotes: []
+    };
+    setDeckPages(prev => [...prev, newPg]);
+    setActivePageIndex(deckPages.length);
+    setSelectedStrokeIds([]);
+    showToast(`Created Page ${newPgNumber} 📄`);
+  };
+
+  // Image Upload / Import Handler
+  const handleImageImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target?.result as string;
+        const img = new Image();
+        img.onload = () => {
+          const cx = 1000;
+          const cy = 800;
+          const aspect = img.height / (img.width || 1);
+          const w = Math.min(600, img.width || 400);
+          const h = w * aspect;
+
+          const newStroke: Stroke = {
+            id: Date.now().toString(),
+            tool: "image",
+            color: "#ffffff",
+            brushSize: 1,
+            points: [{ x: cx - w/2, y: cy - h/2 }, { x: cx + w/2, y: cy + h/2 }],
+            text: base64
+          };
+
+          setStrokes(prev => [...prev, newStroke]);
+          setSelectedStrokeIds([newStroke.id]);
+          showToast("Imported Image to Canvas 🖼️");
+          pushToHistory();
+          syncCanvas();
+        };
+        img.src = base64;
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Laser Pointer Animation Loop
   useEffect(() => {
@@ -642,7 +815,7 @@ export default function WhiteboardPage() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const link = document.createElement('a');
-    link.download = `edutrack-whiteboard-${roomId}.png`;
+    link.download = `edutrack-whiteboard-${roomId}-page${activePageIndex + 1}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
     showToast("Downloaded PNG Export 🎨");
@@ -718,7 +891,7 @@ export default function WhiteboardPage() {
     setStrokes(prev => {
       const next = [...prev, ...newStrokes];
       const canvas = canvasRef.current;
-      if (canvas) redrawCanvas(canvas, next, selectedStrokeIds);
+      if (canvas) redrawCanvas(canvas, next, selectedStrokeIds, showRuler, rulerPos);
       return next;
     });
     setShowPresetBank(false);
@@ -749,7 +922,7 @@ export default function WhiteboardPage() {
     setStrokes(prev => {
       const next = prev.map(s => selectedStrokeIds.includes(s.id) ? { ...s, color: newColor } : s);
       const canvas = canvasRef.current;
-      if (canvas) redrawCanvas(canvas, next, selectedStrokeIds);
+      if (canvas) redrawCanvas(canvas, next, selectedStrokeIds, showRuler, rulerPos);
       return next;
     });
     showToast("Recolored selected elements 🎨");
@@ -778,7 +951,7 @@ export default function WhiteboardPage() {
         return s;
       });
       const canvas = canvasRef.current;
-      if (canvas) redrawCanvas(canvas, next, selectedStrokeIds);
+      if (canvas) redrawCanvas(canvas, next, selectedStrokeIds, showRuler, rulerPos);
       return next;
     });
     showToast(`Scaled elements (${scaleFactor > 1 ? "Enlarged" : "Shrunk"}) 🔍`);
@@ -916,7 +1089,7 @@ export default function WhiteboardPage() {
           return s;
         });
         const canvas = canvasRef.current;
-        if (canvas) redrawCanvas(canvas, next, selectedStrokeIds);
+        if (canvas) redrawCanvas(canvas, next, selectedStrokeIds, showRuler, rulerPos);
         return next;
       });
       return;
@@ -953,7 +1126,7 @@ export default function WhiteboardPage() {
     if (tool === "lasso") {
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
-      redrawCanvas(canvas, strokes, selectedStrokeIds);
+      redrawCanvas(canvas, strokes, selectedStrokeIds, showRuler, rulerPos);
       ctx.lineWidth = 2;
       ctx.strokeStyle = "#6366f1";
       ctx.fillStyle = "rgba(99, 102, 241, 0.15)";
@@ -979,7 +1152,7 @@ export default function WhiteboardPage() {
       points: [...strokePointsRef.current]
     };
 
-    redrawCanvas(canvas, [...strokes, liveStroke], selectedStrokeIds);
+    redrawCanvas(canvas, [...strokes, liveStroke], selectedStrokeIds, showRuler, rulerPos);
     lastPointRef.current = coords;
   };
 
@@ -1015,7 +1188,7 @@ export default function WhiteboardPage() {
       setStrokes(prev => {
         const next = prev.filter(s => !doStrokesIntersect(s, newStroke));
         const canvas = canvasRef.current;
-        if (canvas) redrawCanvas(canvas, next, selectedStrokeIds);
+        if (canvas) redrawCanvas(canvas, next, selectedStrokeIds, showRuler, rulerPos);
         return next;
       });
     } else if (tool === "smart_pen") {
@@ -1042,7 +1215,7 @@ export default function WhiteboardPage() {
           setStrokes(prev => {
             const next = [...prev, cleanStroke];
             const canvas = canvasRef.current;
-            if (canvas) redrawCanvas(canvas, next, selectedStrokeIds);
+            if (canvas) redrawCanvas(canvas, next, selectedStrokeIds, showRuler, rulerPos);
             return next;
           });
         } else {
@@ -1061,7 +1234,7 @@ export default function WhiteboardPage() {
         setSelectedStrokeIds([]);
       }
       const canvas = canvasRef.current;
-      if (canvas) redrawCanvas(canvas, strokes, selected);
+      if (canvas) redrawCanvas(canvas, strokes, selected, showRuler, rulerPos);
     } else {
       setStrokes(prev => [...prev, newStroke]);
     }
@@ -1123,7 +1296,7 @@ export default function WhiteboardPage() {
     setStrokes(prev => {
       const next = prev.filter(s => !selectedStrokeIds.includes(s.id));
       const canvas = canvasRef.current;
-      if (canvas) redrawCanvas(canvas, next, []);
+      if (canvas) redrawCanvas(canvas, next, [], showRuler, rulerPos);
       return next;
     });
     setSelectedStrokeIds([]);
@@ -1154,6 +1327,15 @@ export default function WhiteboardPage() {
 
   return (
     <div className={`relative w-full h-screen overflow-hidden select-none ${canvasTheme === "dark" ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"}`}>
+      {/* Hidden File Input for Image Import */}
+      <input
+        ref={imageUploadInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageImport}
+        className="hidden"
+      />
+
       {/* Toast Notification */}
       <AnimatePresence>
         {toastMsg && (
@@ -1250,8 +1432,36 @@ export default function WhiteboardPage() {
               <h1 className="text-xs font-bold tracking-wide bg-gradient-to-r from-indigo-300 via-cyan-200 to-white bg-clip-text text-transparent">
                 EduTrack Pro Whiteboard
               </h1>
-              <p className="text-[10px] text-slate-400 font-medium">Infinite Canvas & AI Assist</p>
+              <p className="text-[10px] text-slate-400 font-medium">Infinite Canvas & Multi-Page Deck</p>
             </div>
+          </div>
+
+          {/* Multi-Page Slide Deck Switcher */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl text-xs font-semibold">
+            <button
+              onClick={() => setActivePageIndex(prev => Math.max(0, prev - 1))}
+              disabled={activePageIndex === 0}
+              className="p-1 hover:bg-slate-800 rounded-lg text-slate-300 disabled:opacity-40"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+            <span className="font-mono text-indigo-300">
+              {activePageIndex + 1} / {deckPages.length}
+            </span>
+            <button
+              onClick={() => setActivePageIndex(prev => Math.min(deckPages.length - 1, prev + 1))}
+              disabled={activePageIndex === deckPages.length - 1}
+              className="p-1 hover:bg-slate-800 rounded-lg text-slate-300 disabled:opacity-40"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={addNewPage}
+              className="p-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all ml-1"
+              title="Add New Slide Page"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
           </div>
 
           {/* Theme Toggle */}
@@ -1266,6 +1476,31 @@ export default function WhiteboardPage() {
 
         {/* Action Controls */}
         <div className="flex items-center gap-2 pointer-events-auto">
+          {/* Import Image */}
+          <button
+            onClick={() => imageUploadInputRef.current?.click()}
+            className="px-3 py-2 bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-slate-200 rounded-2xl text-xs font-semibold backdrop-blur-xl shadow-lg flex items-center gap-1.5 transition-all"
+            title="Import Image to Canvas"
+          >
+            <ImageIcon className="w-4 h-4 text-emerald-400" />
+            <span>Import Image</span>
+          </button>
+
+          {/* Metric Ruler Toggle */}
+          <button
+            onClick={() => {
+              setShowRuler(!showRuler);
+              showToast(showRuler ? "Hidden Metric Ruler" : "Metric Ruler Active 📏");
+            }}
+            className={`px-3 py-2 border rounded-2xl text-xs font-semibold backdrop-blur-xl shadow-lg flex items-center gap-1.5 transition-all ${
+              showRuler ? "bg-indigo-600 border-indigo-500 text-white" : "bg-slate-900/80 hover:bg-slate-800 border-slate-800 text-slate-200"
+            }`}
+            title="Toggle Metric Ruler"
+          >
+            <Ruler className="w-4 h-4 text-amber-400" />
+            <span>Ruler</span>
+          </button>
+
           {/* AI Math Solve */}
           <button
             onClick={solveWhiteboardWithAI}
@@ -1284,34 +1519,6 @@ export default function WhiteboardPage() {
             <Library className="w-4 h-4 text-indigo-400" />
             <span>Diagram Presets</span>
           </button>
-
-          {/* Room Sync */}
-          <div className="flex items-center bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl p-1 shadow-lg">
-            {!joined ? (
-              <div className="flex items-center gap-1">
-                <input
-                  type="text"
-                  value={roomInput}
-                  onChange={(e) => setRoomInput(e.target.value)}
-                  className="w-24 bg-slate-950/60 text-slate-100 text-xs px-2.5 py-1.5 rounded-xl border border-slate-800 focus:outline-none uppercase font-mono font-semibold"
-                />
-                <button
-                  onClick={joinRoom}
-                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition-all"
-                >
-                  Join Sync
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 px-2.5 py-1 text-xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span className="font-mono font-bold text-slate-200">{roomId}</span>
-                <button onClick={copyRoomCode} className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 transition-all">
-                  {copied ? <CheckCheck className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                </button>
-              </div>
-            )}
-          </div>
 
           {/* Export PNG */}
           <button
