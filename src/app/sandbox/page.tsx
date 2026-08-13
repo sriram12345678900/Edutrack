@@ -411,7 +411,7 @@ export default function SandboxPage() {
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-300">
               Interactive Sim Sandbox
             </h1>
-            <p className="text-slate-400 text-xs sm:text-sm font-semibold">NCERT Virtual Physics & Chemistry Simulator</p>
+            <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-semibold">NCERT Virtual Physics & Chemistry Simulator</p>
           </div>
         </div>
 
@@ -421,7 +421,7 @@ export default function SandboxPage() {
             <button
               onClick={() => setActiveTab('chemistry')}
               className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
-                activeTab === 'chemistry' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white'
+                activeTab === 'chemistry' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-500 dark:text-slate-400 hover:text-white'
               }`}
             >
               <Beaker className="w-4 h-4" /> Molecular Chemistry Lab
@@ -429,14 +429,14 @@ export default function SandboxPage() {
             <button
               onClick={() => setActiveTab('optics')}
               className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
-                activeTab === 'optics' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white'
+                activeTab === 'optics' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-500 dark:text-slate-400 hover:text-white'
               }`}
             >
               <Eye className="w-4 h-4" /> Light Optics & Ray Lab
             </button>
           </div>
 
-          <Link href="/dashboard" className="hidden lg:flex items-center gap-2 bg-white/5 hover:bg-white/10 px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all border border-white/10 text-slate-300">
+          <Link href="/dashboard" className="hidden lg:flex items-center gap-2 bg-white/5 hover:bg-white/10 px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all border border-white/10 text-slate-600 dark:text-slate-300">
             <Home className="w-4 h-4" /> Exit Sandbox
           </Link>
         </div>
@@ -455,7 +455,7 @@ export default function SandboxPage() {
               <h2 className="text-sm font-black text-white flex items-center gap-2 uppercase tracking-wider">
                 <Atom className="w-4 h-4 text-indigo-400" /> Reagent & Element Shelf
               </h2>
-              <span className="text-[11px] font-bold text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg border border-white/10">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg border border-white/10">
                 {filteredReagents.length} Available
               </span>
             </div>
@@ -472,7 +472,7 @@ export default function SandboxPage() {
                   key={cat.id}
                   onClick={() => setChemCategory(cat.id as any)}
                   className={`flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
-                    chemCategory === cat.id ? 'bg-indigo-500 text-white font-extrabold shadow' : 'text-slate-400 hover:text-white'
+                    chemCategory === cat.id ? 'bg-indigo-500 text-white font-extrabold shadow' : 'text-slate-500 dark:text-slate-400 hover:text-white'
                   }`}
                 >
                   {cat.label}
@@ -492,7 +492,7 @@ export default function SandboxPage() {
                     {r.symbol}
                   </div>
                   <span className="text-[11px] font-bold text-slate-200 text-center line-clamp-1">{r.name}</span>
-                  <span className="text-[9px] font-mono text-slate-400 uppercase tracking-tighter">
+                  <span className="text-[9px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-tighter">
                     {r.state} • pH {r.pH}
                   </span>
                 </button>
@@ -520,7 +520,7 @@ export default function SandboxPage() {
               </h2>
               <button 
                 onClick={clearWorkspace}
-                className="flex items-center gap-1.5 text-xs font-black uppercase text-slate-400 hover:text-white transition-colors px-3 py-1.5 bg-white/5 rounded-xl border border-white/10"
+                className="flex items-center gap-1.5 text-xs font-black uppercase text-slate-500 dark:text-slate-400 hover:text-white transition-colors px-3 py-1.5 bg-white/5 rounded-xl border border-white/10"
               >
                 <RefreshCw className="w-3.5 h-3.5" /> Clear Beaker
               </button>
@@ -531,7 +531,7 @@ export default function SandboxPage() {
               {/* Added Reagents Pills (5 Cols) */}
               <div className="md:col-span-5 flex flex-col justify-between h-full space-y-4">
                 <div>
-                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Reagents in Beaker:</h3>
+                  <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Reagents in Beaker:</h3>
                   {workspace.length === 0 ? (
                     <div className="p-6 border border-dashed border-white/10 rounded-2xl text-center text-slate-500">
                       <Atom className="w-8 h-8 mx-auto mb-2 opacity-40 text-indigo-400" />
@@ -547,7 +547,7 @@ export default function SandboxPage() {
                             </span>
                             <div>
                               <div className="text-xs font-bold text-white">{r.name}</div>
-                              <div className="text-[10px] text-slate-400">pH {r.pH} • {r.category}</div>
+                              <div className="text-[10px] text-slate-500 dark:text-slate-400">pH {r.pH} • {r.category}</div>
                             </div>
                           </div>
                         </div>
@@ -559,7 +559,7 @@ export default function SandboxPage() {
                 {/* pH Meter Bar */}
                 <div className="p-3.5 bg-black/50 border border-white/10 rounded-2xl space-y-2">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="font-bold text-slate-300">pH Indicator Level:</span>
+                    <span className="font-bold text-slate-600 dark:text-slate-300">pH Indicator Level:</span>
                     <span className={`font-mono font-black text-xs px-2 py-0.5 rounded ${
                       currentPH < 6 ? 'bg-rose-500/20 text-rose-400' : currentPH > 8 ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'
                     }`}>
@@ -655,7 +655,7 @@ export default function SandboxPage() {
                 </div>
 
                 <div className="mt-2 text-center">
-                  <span className="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-widest">
+                  <span className="text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                     {result ? result.name : workspace.length > 0 ? 'Beaker Ready for Reaction' : 'Empty Reaction Flask'}
                   </span>
                 </div>
@@ -667,7 +667,7 @@ export default function SandboxPage() {
             {result && (
               <div className="mt-4 p-4 bg-[#080b1e]/95 backdrop-blur-2xl border border-white/10 rounded-2xl animate-in slide-in-from-bottom-4 duration-300">
                 <div className="flex items-start gap-3">
-                  <div className={`p-2.5 rounded-xl shrink-0 ${result.type.includes('No Reaction') ? 'bg-slate-500/20 text-slate-300' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
+                  <div className={`p-2.5 rounded-xl shrink-0 ${result.type.includes('No Reaction') ? 'bg-slate-500/20 text-slate-600 dark:text-slate-300' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
                     {result.type.includes('No Reaction') ? <Info className="w-5 h-5" /> : <CheckCircle2 className="w-5 h-5" />}
                   </div>
                   <div className="flex-1">
@@ -677,8 +677,8 @@ export default function SandboxPage() {
                         {result.type}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 font-medium leading-relaxed mt-1">{result.desc}</p>
-                    <div className="flex items-center gap-4 mt-2 text-[11px] font-mono font-bold text-slate-400 border-t border-white/5 pt-2">
+                    <p className="text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed mt-1">{result.desc}</p>
+                    <div className="flex items-center gap-4 mt-2 text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 border-t border-white/5 pt-2">
                       <span>Temp Change: <strong className="text-orange-400">{result.tempChange}</strong></span>
                       <span>Final pH: <strong className="text-emerald-400">{result.finalPH.toFixed(1)}</strong></span>
                       <span>Result State: <strong className="text-indigo-300">{result.product}</strong></span>
@@ -706,7 +706,7 @@ export default function SandboxPage() {
               <button
                 onClick={() => setOpticsMode('ray_optics')}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${
-                  opticsMode === 'ray_optics' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'
+                  opticsMode === 'ray_optics' ? 'bg-indigo-600 text-white shadow' : 'text-slate-500 dark:text-slate-400 hover:text-white'
                 }`}
               >
                 🔍 Lenses & Mirrors
@@ -714,7 +714,7 @@ export default function SandboxPage() {
               <button
                 onClick={() => setOpticsMode('snell_refraction')}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${
-                  opticsMode === 'snell_refraction' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'
+                  opticsMode === 'snell_refraction' ? 'bg-indigo-600 text-white shadow' : 'text-slate-500 dark:text-slate-400 hover:text-white'
                 }`}
               >
                 📐 Snell's Refraction
@@ -726,7 +726,7 @@ export default function SandboxPage() {
               <>
                 {/* Optical Element Choice */}
                 <div>
-                  <label className="text-xs font-extrabold text-slate-300 block mb-2">Select Optical Element:</label>
+                  <label className="text-xs font-extrabold text-slate-600 dark:text-slate-300 block mb-2">Select Optical Element:</label>
                   <div className="grid grid-cols-1 gap-1.5">
                     {[
                       { id: 'convex_lens', label: 'Convex Lens (Converging)', desc: 'f > 0' },
@@ -741,7 +741,7 @@ export default function SandboxPage() {
                         className={`p-2.5 rounded-xl border text-left flex justify-between items-center transition-all ${
                           elementType === item.id 
                             ? 'bg-indigo-600/30 border-indigo-500 text-white font-extrabold shadow-md' 
-                            : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10'
+                            : 'bg-white/5 border-white/5 text-slate-500 dark:text-slate-400 hover:bg-white/10'
                         }`}
                       >
                         <span className="text-xs">{item.label}</span>
@@ -755,7 +755,7 @@ export default function SandboxPage() {
                 {elementType !== 'plane_mirror' && (
                   <div>
                     <div className="flex justify-between items-center mb-1">
-                      <label className="text-xs font-bold text-slate-300">Focal Length magnitude (|f|):</label>
+                      <label className="text-xs font-bold text-slate-600 dark:text-slate-300">Focal Length magnitude (|f|):</label>
                       <span className="text-xs font-mono font-black text-indigo-400">{focalLength} cm</span>
                     </div>
                     <input 
@@ -772,7 +772,7 @@ export default function SandboxPage() {
                 {/* Object Distance Slider */}
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <label className="text-xs font-bold text-slate-300">Object Distance (|u|):</label>
+                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300">Object Distance (|u|):</label>
                     <span className="text-xs font-mono font-black text-indigo-400">{objectDistance} cm</span>
                   </div>
                   <input 
@@ -788,7 +788,7 @@ export default function SandboxPage() {
                 {/* Object Height Slider */}
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <label className="text-xs font-bold text-slate-300">Object Height (hₒ):</label>
+                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300">Object Height (hₒ):</label>
                     <span className="text-xs font-mono font-black text-indigo-400">{objectHeight} cm</span>
                   </div>
                   <input 
@@ -819,7 +819,7 @@ export default function SandboxPage() {
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <label className="text-xs font-bold text-slate-300">Angle of Incidence (i):</label>
+                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300">Angle of Incidence (i):</label>
                     <span className="text-xs font-mono font-black text-indigo-400">{incidentAngle}°</span>
                   </div>
                   <input 
@@ -833,7 +833,7 @@ export default function SandboxPage() {
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-300 block mb-2">Select Refractive Medium (n₂):</label>
+                  <label className="text-xs font-bold text-slate-600 dark:text-slate-300 block mb-2">Select Refractive Medium (n₂):</label>
                   <div className="space-y-1.5">
                     {[
                       { name: "Water", n: 1.33 },
@@ -845,7 +845,7 @@ export default function SandboxPage() {
                         key={m.name}
                         onClick={() => { setRefractiveIndex(m.n); setMediumName(m.name); }}
                         className={`w-full p-2.5 rounded-xl border text-left flex justify-between items-center transition-all ${
-                          refractiveIndex === m.n ? 'bg-indigo-600/30 border-indigo-500 text-white font-extrabold' : 'bg-white/5 border-white/5 text-slate-400'
+                          refractiveIndex === m.n ? 'bg-indigo-600/30 border-indigo-500 text-white font-extrabold' : 'bg-white/5 border-white/5 text-slate-500 dark:text-slate-400'
                         }`}
                       >
                         <span className="text-xs">{m.name}</span>
@@ -870,7 +870,7 @@ export default function SandboxPage() {
             
             {/* Top Canvas Header */}
             <div className="flex justify-between items-center border-b border-white/5 pb-3">
-              <span className="text-xs font-black uppercase text-slate-400 tracking-wider">
+              <span className="text-xs font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">
                 {opticsMode === 'ray_optics' ? `Ray Diagram (${elementType.replace('_', ' ').toUpperCase()})` : `Refraction: Air ➔ ${mediumName}`}
               </span>
               {opticsMode === 'ray_optics' && (
@@ -1090,25 +1090,25 @@ export default function SandboxPage() {
             {opticsMode === 'ray_optics' && (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-white/5 pt-3">
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase">Image Distance (v)</div>
+                  <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Image Distance (v)</div>
                   <div className="text-xs font-mono font-black text-white">
                     {opticsRes.v === Infinity ? '∞' : `${opticsRes.v.toFixed(1)} cm`}
                   </div>
                 </div>
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase">Magnification (m)</div>
+                  <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Magnification (m)</div>
                   <div className="text-xs font-mono font-black text-indigo-400">
                     {opticsRes.m === Infinity ? '∞' : `${opticsRes.m.toFixed(2)}x`}
                   </div>
                 </div>
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase">Image Height (hᵢ)</div>
+                  <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Image Height (hᵢ)</div>
                   <div className="text-xs font-mono font-black text-emerald-400">
                     {opticsRes.hi === Infinity ? '∞' : `${opticsRes.hi.toFixed(1)} cm`}
                   </div>
                 </div>
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase">Image Location</div>
+                  <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Image Location</div>
                   <div className="text-[10px] font-bold text-amber-300 line-clamp-1">
                     {opticsRes.positionText}
                   </div>

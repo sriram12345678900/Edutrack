@@ -136,7 +136,7 @@ export default function MockTestPage() {
           <h1 className="text-3xl md:text-4xl font-extrabold text-white mt-3.5 tracking-tight flex items-center gap-3">
             CBSE AI Mock Tests
           </h1>
-          <p className="text-slate-400 font-medium text-xs mt-1.5">Grade short answers against board patterns in real-time.</p>
+          <p className="text-slate-500 dark:text-slate-400 font-medium text-xs mt-1.5">Grade short answers against board patterns in real-time.</p>
         </div>
         <div className="flex items-center gap-3 relative z-10">
           <Link href="/dashboard" className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-2xl transition-colors border border-white/10">
@@ -169,7 +169,7 @@ export default function MockTestPage() {
                   className={`py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
                     subject === sub
                       ? "bg-indigo-600 text-white shadow-md"
-                      : "text-slate-400 hover:text-white bg-transparent"
+                      : "text-slate-500 dark:text-slate-400 hover:text-white bg-transparent"
                   }`}
                 >
                   {sub}
@@ -224,7 +224,7 @@ export default function MockTestPage() {
                     setTestStarted(false);
                   }
                 }}
-                className="px-8 py-4 bg-white/5 hover:bg-white/10 text-slate-300 font-extrabold text-xs uppercase tracking-wider rounded-xl border border-white/10 transition-colors"
+                className="px-8 py-4 bg-white/5 hover:bg-white/10 text-slate-600 dark:text-slate-300 font-extrabold text-xs uppercase tracking-wider rounded-xl border border-white/10 transition-colors"
               >
                 Cancel
               </button>
@@ -257,7 +257,7 @@ export default function MockTestPage() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-black text-white">CBSE Mock Test Scorecard</h2>
-                  <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">AI Evaluator Graded Report Card</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1">AI Evaluator Graded Report Card</p>
                 </div>
                 
                 {/* Total Marks Gauge */}
@@ -299,7 +299,7 @@ export default function MockTestPage() {
                     </div>
                     <div className="bg-emerald-500/[0.02] border border-emerald-500/10 p-4 rounded-xl">
                       <h4 className="text-[9px] font-black uppercase tracking-widest text-emerald-400">CBSE Baseline Reference</h4>
-                      <p className="text-xs text-slate-400 mt-1 leading-relaxed">{activeQuestions[idx].officialAnswer}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{activeQuestions[idx].officialAnswer}</p>
                     </div>
                   </div>
 
@@ -310,7 +310,7 @@ export default function MockTestPage() {
                         <ShieldAlert className="w-4.5 h-4.5 text-red-400 shrink-0 mt-0.5" />
                         <div>
                           <h5 className="font-black text-red-400 uppercase tracking-wider text-[9px] mb-1">Identified Errors & Gap Analyses</h5>
-                          <p className="text-slate-300 font-bold leading-normal">{item.errors}</p>
+                          <p className="text-slate-600 dark:text-slate-300 font-bold leading-normal">{item.errors}</p>
                         </div>
                       </div>
                     )}
@@ -320,7 +320,7 @@ export default function MockTestPage() {
                         <Sparkles className="w-4.5 h-4.5 text-indigo-400 shrink-0 mt-0.5" />
                         <div>
                           <h5 className="font-black text-indigo-400 uppercase tracking-wider text-[9px] mb-1">Board-Pattern Layout Recommendations</h5>
-                          <p className="text-slate-300 font-bold leading-normal">{item.improvements}</p>
+                          <p className="text-slate-600 dark:text-slate-300 font-bold leading-normal">{item.improvements}</p>
                         </div>
                       </div>
                     )}
@@ -329,8 +329,8 @@ export default function MockTestPage() {
                       <div className="flex items-start gap-3 bg-slate-100/50 dark:bg-white/5 p-3.5 rounded-xl border border-slate-200/50 dark:border-white/5 text-xs">
                         <CheckCircle className="w-4.5 h-4.5 text-emerald-400 shrink-0 mt-0.5" />
                         <div>
-                          <h5 className="font-black text-slate-400 uppercase tracking-wider text-[9px] mb-1">AI Evaluator Feedback</h5>
-                          <p className="text-slate-300 font-bold leading-normal">{item.feedback}</p>
+                          <h5 className="font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[9px] mb-1">AI Evaluator Feedback</h5>
+                          <p className="text-slate-600 dark:text-slate-300 font-bold leading-normal">{item.feedback}</p>
                         </div>
                       </div>
                     )}

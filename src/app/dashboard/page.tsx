@@ -92,7 +92,7 @@ function SwiperCard({ card, index, activeIndex, totalCards, onSwipeLeft, onSwipe
       <p className="text-center font-extrabold text-sm text-white px-2 mt-2 leading-relaxed relative z-10">{card.front}</p>
       
       {/* Interactive Swipe Hint */}
-      <div className="mt-3 text-[10px] text-slate-500 font-black tracking-widest uppercase text-center border-t border-white/5 pt-2 flex justify-between items-center relative z-10">
+      <div className="mt-3 text-[10px] text-slate-500 font-black tracking-widest uppercase text-center border-t border-slate-200/60 dark:border-white/5 pt-2 flex justify-between items-center relative z-10">
         <span className="text-red-400/80">← Swipe Left</span>
         <span className="text-slate-600">Active Recall</span>
         <span className="text-emerald-400/80">Swipe Right →</span>
@@ -276,7 +276,7 @@ export default function Dashboard() {
       {/* ── HEADER SECTION ── */}
       <motion.header 
         variants={item} 
-        className="flex flex-col md:flex-row justify-between md:items-center gap-6 border-b border-slate-200/50 dark:border-white/5 pb-8"
+        className="flex flex-col md:flex-row justify-between md:items-center gap-6 border-b border-slate-200/50 dark:border-slate-200/60 dark:border-white/5 pb-8"
       >
         <div>
           <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/15">
@@ -299,7 +299,7 @@ export default function Dashboard() {
             <span>{streak} Day Streak</span>
           </div>
           <Link href="/setup">
-            <button className="text-xs font-extrabold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/5 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.04] px-4.5 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95">
+            <button className="text-xs font-extrabold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-200/60 dark:border-white/5 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.04] px-4.5 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95">
               Settings & Setup
             </button>
           </Link>
@@ -404,7 +404,7 @@ export default function Dashboard() {
               {/* Progress Detail HUD info */}
               <div className="flex flex-col gap-1 w-full md:w-60">
                 <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest text-right hidden md:block">Progression Tracker</span>
-                <div className="w-full bg-[#050710] h-3.5 rounded-full overflow-hidden border border-white/5 shadow-inner relative mt-1">
+                <div className="w-full bg-[#050710] h-3.5 rounded-full overflow-hidden border border-slate-200/60 dark:border-white/5 shadow-inner relative mt-1">
                   <div 
                     className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-400 rounded-full transition-all duration-500 shadow-[0_0_12px_rgba(129,140,248,0.5)]"
                     style={{ width: `${(xp / (level * 200)) * 100}%` }}
@@ -587,7 +587,7 @@ export default function Dashboard() {
             </div>
 
             {/* Interactive SVG Canvas */}
-            <div className="relative w-full bg-slate-950/40 dark:bg-black/35 rounded-2xl border border-slate-200/20 dark:border-white/5 p-4 overflow-x-auto scrollbar-none min-h-[220px]">
+            <div className="relative w-full bg-slate-950/40 dark:bg-black/35 rounded-2xl border border-slate-200/20 dark:border-slate-200/60 dark:border-white/5 p-4 overflow-x-auto scrollbar-none min-h-[220px]">
               <svg className="w-full max-w-[800px] h-auto mx-auto relative z-10" viewBox="0 0 800 160">
                 {/* Connecting Paths with dynamic flows */}
                 <path d="M 96 80 Q 176 40 256 40" fill="none" className="stroke-emerald-500/50 animate-laser-flow" strokeWidth="3.5" />
@@ -707,7 +707,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="relative flex flex-col items-center justify-center min-h-[220px] bg-slate-950/40 dark:bg-black/35 rounded-2xl border border-slate-200/20 dark:border-white/5 p-6 overflow-hidden">
+            <div className="relative flex flex-col items-center justify-center min-h-[220px] bg-slate-950/40 dark:bg-black/35 rounded-2xl border border-slate-200/20 dark:border-slate-200/60 dark:border-white/5 p-6 overflow-hidden">
               {swiperIndex < swiperCards.length ? (
                 <div className="relative w-full max-w-sm h-40 flex items-center justify-center">
                   {swiperCards.map((card, idx) => (
@@ -772,7 +772,7 @@ export default function Dashboard() {
                     </button>
                   </Link>
                   <Link href="/ncert">
-                    <button className="bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-300 font-extrabold text-xs uppercase tracking-wider px-6 py-3 rounded-2xl border border-slate-200 dark:border-white/5 transition-all">
+                    <button className="bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-300 font-extrabold text-xs uppercase tracking-wider px-6 py-3 rounded-2xl border border-slate-200 dark:border-slate-200/60 dark:border-white/5 transition-all">
                       Browse NCERT Books
                     </button>
                   </Link>
@@ -806,7 +806,7 @@ export default function Dashboard() {
                   className={`group cursor-pointer p-4 rounded-2xl border transition-all duration-300 flex items-center gap-3.5 select-none ${
                     mission.completed
                       ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40 shadow-sm shadow-emerald-500/5'
-                      : 'bg-slate-50/50 dark:bg-white/[0.01] border-slate-200/30 dark:border-white/5 hover:border-indigo-500/40 hover:scale-[1.01]'
+                      : 'bg-slate-50/50 dark:bg-white/[0.01] border-slate-200/30 dark:border-slate-200/60 dark:border-white/5 hover:border-indigo-500/40 hover:scale-[1.01]'
                   }`}
                 >
                   {/* Dynamic Spring Checkbox */}
@@ -884,7 +884,7 @@ export default function Dashboard() {
                       "flex items-center justify-between p-3 rounded-2xl border transition-all duration-300",
                       buddy.isSelf
                         ? "bg-indigo-500/10 dark:bg-indigo-500/10 border-indigo-500/45 shadow-[0_0_12px_rgba(99,102,241,0.1)] shimmer-border"
-                        : "bg-slate-50/50 dark:bg-white/[0.01] border-slate-200/30 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.02]"
+                        : "bg-slate-50/50 dark:bg-white/[0.01] border-slate-200/30 dark:border-slate-200/60 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.02]"
                     )}
                   >
                     <div className="flex items-center gap-3 min-w-0">
@@ -918,7 +918,7 @@ export default function Dashboard() {
                     {!buddy.isSelf && (
                       <button
                         onClick={() => router.push("/groups")}
-                        className="p-2 bg-white dark:bg-white/5 hover:bg-indigo-500/10 dark:hover:bg-indigo-500/15 border border-slate-200 dark:border-white/5 hover:border-indigo-500/25 rounded-xl text-slate-500 hover:text-indigo-650 dark:text-slate-400 dark:hover:text-indigo-400 shadow-sm transition-all"
+                        className="p-2 bg-white dark:bg-white/5 hover:bg-indigo-500/10 dark:hover:bg-indigo-500/15 border border-slate-200 dark:border-slate-200/60 dark:border-white/5 hover:border-indigo-500/25 rounded-xl text-slate-500 hover:text-indigo-650 dark:text-slate-400 dark:hover:text-indigo-400 shadow-sm transition-all"
                         title={`Message ${buddy.name}`}
                       >
                         <MessageCircle className="w-3.5 h-3.5" />
@@ -952,7 +952,7 @@ export default function Dashboard() {
             <div className="space-y-3.5">
               {weakSubjects.length > 0 ? (
                 weakSubjects.map((subject, idx) => (
-                  <div key={idx} className="group bg-slate-50/50 dark:bg-white/[0.01] hover:bg-indigo-500/5 dark:hover:bg-indigo-550/5 p-4.5 rounded-2xl flex justify-between items-center transition-all border border-slate-200/30 dark:border-white/5 hover:border-indigo-500/20">
+                  <div key={idx} className="group bg-slate-50/50 dark:bg-white/[0.01] hover:bg-indigo-500/5 dark:hover:bg-indigo-550/5 p-4.5 rounded-2xl flex justify-between items-center transition-all border border-slate-200/30 dark:border-slate-200/60 dark:border-white/5 hover:border-indigo-500/20">
                     <div className="overflow-hidden mr-2">
                       <p className="font-black text-sm text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">{subject}</p>
                       <p className="text-[10px] font-bold text-red-500 mt-1 flex items-center gap-1">
@@ -960,14 +960,14 @@ export default function Dashboard() {
                       </p>
                     </div>
                     <Link href="/tutor" className="shrink-0">
-                      <button className="text-[10px] font-black uppercase tracking-wider bg-white dark:bg-white/5 text-indigo-650 dark:text-indigo-400 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md hover:scale-105 transition-all">
+                      <button className="text-[10px] font-black uppercase tracking-wider bg-white dark:bg-white/5 text-indigo-650 dark:text-indigo-400 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-200/60 dark:border-white/5 shadow-sm hover:shadow-md hover:scale-105 transition-all">
                         Train
                       </button>
                     </Link>
                   </div>
                 ))
               ) : (
-                <div className="text-center p-6 bg-slate-50/30 dark:bg-white/[0.01] rounded-2xl border border-slate-200/30 dark:border-white/5">
+                <div className="text-center p-6 bg-slate-50/30 dark:bg-white/[0.01] rounded-2xl border border-slate-200/30 dark:border-slate-200/60 dark:border-white/5">
                   <p className="text-slate-650 dark:text-slate-350 font-black text-sm mb-1">Looking Great!</p>
                   <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed font-bold">No weak areas identified yet. Practice quizzes to check performance.</p>
                 </div>
@@ -1023,28 +1023,28 @@ export default function Dashboard() {
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               className="bg-[#0c0f1d]/95 backdrop-blur-xl border border-white/10 w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden p-7 text-left text-white"
             >
-              <div className="flex justify-between items-start border-b border-white/5 pb-4 mb-4">
+              <div className="flex justify-between items-start border-b border-slate-200/60 dark:border-white/5 pb-4 mb-4">
                 <div>
                   <span className="text-[9px] font-black uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/25">CBSE Syllabus Node</span>
                   <h3 className="text-2xl font-black mt-2 leading-none">{selectedNode.label}</h3>
                 </div>
                 <button 
                   onClick={() => setSelectedNode(null)} 
-                  className="p-2 bg-white/5 hover:bg-white/10 hover:text-red-400 rounded-xl transition-all font-black text-xs uppercase border border-white/5"
+                  className="p-2 bg-white/5 hover:bg-white/10 hover:text-red-400 rounded-xl transition-all font-black text-xs uppercase border border-slate-200/60 dark:border-white/5"
                 >
                   Close
                 </button>
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center justify-between bg-white/[0.02] px-4 py-2.5 rounded-xl border border-white/5">
+                <div className="flex items-center justify-between bg-white/[0.02] px-4 py-2.5 rounded-xl border border-slate-200/60 dark:border-white/5">
                   <span className="text-xs font-semibold text-slate-400">Mastery Progress</span>
                   <span className="text-xs font-black text-indigo-400">{selectedNode.percent}% Complete</span>
                 </div>
 
                 <p className="text-slate-400 text-sm font-semibold leading-relaxed">{selectedNode.desc}</p>
                 
-                <div className="bg-white/[0.02] border border-white/5 p-4.5 rounded-2xl">
+                <div className="bg-white/[0.02] border border-slate-200/60 dark:border-white/5 p-4.5 rounded-2xl">
                   <h4 className="text-[10px] font-black uppercase tracking-wider text-indigo-400 mb-2">High-Yield Board Highlights</h4>
                   <ul className="space-y-2">
                     {selectedNode.keyPoints.map((point: string, idx: number) => (
@@ -1068,7 +1068,7 @@ export default function Dashboard() {
                   <Link href="/learn">
                     <button 
                       onClick={() => setSelectedNode(null)}
-                      className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-slate-200 font-extrabold text-xs uppercase tracking-wider py-3.5 rounded-xl border border-white/5 transition-all"
+                      className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-slate-200 font-extrabold text-xs uppercase tracking-wider py-3.5 rounded-xl border border-slate-200/60 dark:border-white/5 transition-all"
                     >
                       <Book className="w-4 h-4" /> Read Theory
                     </button>

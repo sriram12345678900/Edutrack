@@ -95,10 +95,10 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#03050c] text-white">
+      <div className="min-h-screen flex items-center justify-center bg-[#f0f4ff] dark:bg-[#03050c]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(99,102,241,0.5)]" />
-          <p className="text-slate-400 text-xs font-bold uppercase tracking-widest animate-pulse">Initializing Neural Workspace...</p>
+          <p className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest animate-pulse">Initializing Neural Workspace...</p>
         </div>
       </div>
     );
@@ -106,10 +106,10 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#03050c] text-white">
+      <div className="min-h-screen flex items-center justify-center bg-[#f0f4ff] dark:bg-[#03050c]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(99,102,241,0.5)]" />
-          <p className="text-slate-400 text-xs font-bold uppercase tracking-widest animate-pulse">Initializing Neural Workspace...</p>
+          <p className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest animate-pulse">Initializing Neural Workspace...</p>
         </div>
       </div>
     );
@@ -343,9 +343,9 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
           return (
             <main className={cn(
-              "flex-1 relative bg-slate-50/40 dark:bg-[#03050c]/40 flex flex-col min-h-0",
+              "flex-1 relative flex flex-col min-h-0 transition-colors duration-300",
               isFullHeightPage ? "overflow-hidden" : "overflow-y-auto"
-            )}>
+            )} style={{ backgroundColor: 'var(--background)' }}>
               <div className={cn(
                 isFullHeightPage
                   ? "w-full flex-1 min-h-0 overflow-hidden relative flex flex-col"

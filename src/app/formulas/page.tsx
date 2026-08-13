@@ -368,28 +368,28 @@ export default function FormulasPage() {
   const calcOutput = computeLiveResult();
 
   return (
-    <div className="min-h-screen bg-[#02040a] text-white selection:bg-indigo-500/30 selection:text-indigo-200 pb-20 font-sans relative">
+    <div className="min-h-screen text-slate-900 dark:text-white selection:bg-indigo-500/30 selection:text-indigo-200 pb-20 font-sans relative" style={{ backgroundColor: "var(--background)" }}>
       {/* Background Mesh Overlays */}
       <div className="fixed inset-0 bg-[linear-gradient(to_right,#4f4f4f15_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f15_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none" />
       <div className="fixed top-0 left-1/4 w-[40vw] h-[40vw] bg-indigo-600/15 rounded-full blur-[140px] pointer-events-none" />
       <div className="fixed bottom-0 right-1/4 w-[40vw] h-[40vw] bg-purple-600/15 rounded-full blur-[140px] pointer-events-none" />
 
       {/* Top Header Navigation */}
-      <header className="sticky top-0 z-40 bg-[#02040a]/85 backdrop-blur-2xl border-b border-white/10 px-4 sm:px-8 py-4">
+      <header className="sticky top-0 z-40 bg-white/85 dark:bg-white dark:bg-[#02040a]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/10 px-4 sm:px-8 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all text-slate-300 hover:text-white">
+            <Link href="/dashboard" className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-white/10 border border-slate-200/70 dark:border-white/10 transition-all text-slate-600 dark:text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white">
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-white/10">
-                <Brain className="w-5.5 h-5.5 text-white" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-slate-200/70 dark:border-white/10">
+                <Brain className="w-5.5 h-5.5 text-slate-900 dark:text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-black tracking-tight text-white flex items-center gap-2">
+                <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
                   EduTrack <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Formulas Hub</span>
                 </h1>
-                <p className="text-xs text-slate-400 font-bold">CBSE Class 6–10 Master Formulas & Live Solver</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">CBSE Class 6–10 Master Formulas & Live Solver</p>
               </div>
             </div>
           </div>
@@ -399,7 +399,7 @@ export default function FormulasPage() {
             className={`flex items-center gap-2 px-4.5 py-2.5 rounded-2xl border text-xs font-black uppercase tracking-wider transition-all ${
               practiceMode 
                 ? "bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.3)]" 
-                : "bg-white/5 text-slate-300 border-white/10 hover:bg-white/10"
+                : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-600 dark:text-slate-300 border-slate-200/70 dark:border-white/10 hover:bg-white/10"
             }`}
           >
             {practiceMode ? <EyeOff className="w-4 h-4 text-amber-400" /> : <Eye className="w-4 h-4 text-indigo-400" />}
@@ -419,14 +419,14 @@ export default function FormulasPage() {
           <h2 className="text-4xl sm:text-5xl font-black tracking-tight mb-4 bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
             Physics, Maths & Chemistry Master Deck
           </h2>
-          <p className="text-slate-300 text-base sm:text-lg font-medium leading-relaxed">
+          <p className="text-slate-600 dark:text-slate-600 dark:text-slate-300 text-base sm:text-lg font-medium leading-relaxed">
             Search formulas, test active recall, or launch the <strong className="text-indigo-400">Live Interactive Calculator</strong> to solve numericals step-by-step!
           </p>
         </div>
 
         {/* Filter Controls Bar */}
         <div className="flex flex-col sm:flex-row gap-4 mb-8 items-center justify-between">
-          <div className="flex p-1.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md w-full sm:w-auto overflow-x-auto">
+          <div className="flex p-1.5 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 backdrop-blur-md w-full sm:w-auto overflow-x-auto">
             {(["All", "Physics", "Mathematics", "Chemistry"] as const).map((subject) => {
               const isActive = selectedSubject === subject;
               return (
@@ -435,8 +435,8 @@ export default function FormulasPage() {
                   onClick={() => setSelectedSubject(subject)}
                   className={`px-5 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm transition-all whitespace-nowrap ${
                     isActive 
-                      ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25 border border-white/10" 
-                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                      ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-slate-900 dark:text-white shadow-lg shadow-indigo-500/25 border border-slate-200/70 dark:border-white/10" 
+                      : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white hover:bg-slate-100 dark:bg-white/5"
                   }`}
                 >
                   {subject === "All" && "⚡ All Subjects"}
@@ -449,13 +449,13 @@ export default function FormulasPage() {
           </div>
 
           <div className="relative w-full sm:w-80">
-            <Search className="w-4.5 h-4.5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+            <Search className="w-4.5 h-4.5 text-slate-500 dark:text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search formula, Ohm, Lens, Quadratic..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50 transition-colors font-semibold shadow-inner"
+              className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 rounded-2xl pl-11 pr-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50 transition-colors font-semibold shadow-inner"
             />
           </div>
         </div>
@@ -479,7 +479,7 @@ export default function FormulasPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3 }}
-                  className="bg-white/[0.03] border border-white/10 hover:border-indigo-500/40 rounded-3xl p-6 backdrop-blur-xl relative group flex flex-col justify-between transition-colors shadow-2xl"
+                  className="bg-slate-100 dark:bg-white/[0.03] border border-slate-200/70 dark:border-white/10 hover:border-indigo-500/40 rounded-3xl p-6 backdrop-blur-xl relative group flex flex-col justify-between transition-colors shadow-2xl"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-4">
@@ -487,19 +487,19 @@ export default function FormulasPage() {
                         <span className={`px-3 py-1 rounded-lg border text-[10px] font-black uppercase tracking-wider ${subjectColor}`}>
                           {item.subject}
                         </span>
-                        <span className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px] font-extrabold text-slate-300">
+                        <span className="px-3 py-1 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 text-[10px] font-extrabold text-slate-600 dark:text-slate-600 dark:text-slate-300">
                           {item.chapter}
                         </span>
                       </div>
-                      <span className="text-xs font-black text-slate-400">{item.classLevel}</span>
+                      <span className="text-xs font-black text-slate-500 dark:text-slate-400">{item.classLevel}</span>
                     </div>
 
-                    <h3 className="text-xl font-black text-white mb-3 group-hover:text-indigo-300 transition-colors">
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white mb-3 group-hover:text-indigo-300 transition-colors">
                       {item.title}
                     </h3>
 
                     {/* Formula Display Box */}
-                    <div className="bg-black/70 border border-white/10 rounded-2xl p-4.5 mb-4 relative overflow-hidden font-mono">
+                    <div className="bg-white/70 dark:bg-black/70 border border-slate-200/70 dark:border-white/10 rounded-2xl p-4.5 mb-4 relative overflow-hidden font-mono">
                       {practiceMode && !isRevealed ? (
                         <div 
                           onClick={() => toggleReveal(item.id)}
@@ -516,7 +516,7 @@ export default function FormulasPage() {
                       {(!practiceMode || isRevealed) && (
                         <button
                           onClick={() => handleCopy(item.id, item.formula)}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 p-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-all text-slate-300 hover:text-white"
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 p-2 rounded-xl bg-white/10 hover:bg-white/20 border border-slate-200/70 dark:border-white/10 transition-all text-slate-600 dark:text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white"
                           title="Copy Formula"
                         >
                           {isCopied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
@@ -525,11 +525,11 @@ export default function FormulasPage() {
                     </div>
 
                     <div className="space-y-2 mb-4 text-xs sm:text-sm">
-                      <p className="text-slate-300 font-semibold">
+                      <p className="text-slate-600 dark:text-slate-600 dark:text-slate-300 font-semibold">
                         <span className="text-slate-500 font-bold">Variables:</span> {item.variables}
                       </p>
                       {item.units && (
-                        <p className="text-slate-300 font-semibold">
+                        <p className="text-slate-600 dark:text-slate-600 dark:text-slate-300 font-semibold">
                           <span className="text-slate-500 font-bold">Units:</span> {item.units}
                         </p>
                       )}
@@ -537,7 +537,7 @@ export default function FormulasPage() {
                   </div>
 
                   {/* Actions Footer: Board Tip & Live Calculator Trigger */}
-                  <div className="space-y-3 pt-4 border-t border-white/5">
+                  <div className="space-y-3 pt-4 border-t border-slate-200/50 dark:border-white/5">
                     <div className="flex items-start gap-2.5 text-xs text-amber-300/90 font-medium bg-amber-500/5 p-3 rounded-xl border border-amber-500/10">
                       <Flame className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                       <span><strong className="text-amber-300 uppercase tracking-wider font-bold">Board Tip:</strong> {item.examTip}</span>
@@ -546,7 +546,7 @@ export default function FormulasPage() {
                     {item.calcType && (
                       <button
                         onClick={() => setActiveCalcFormula(item)}
-                        className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 border border-white/10 shadow-lg shadow-indigo-500/20"
+                        className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-slate-900 dark:text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 border border-slate-200/70 dark:border-white/10 shadow-lg shadow-indigo-500/20"
                       >
                         <Calculator className="w-4 h-4" /> Live Interactive Variable Solver
                       </button>
@@ -569,7 +569,7 @@ export default function FormulasPage() {
           >
             <button
               onClick={() => setActiveCalcFormula(null)}
-              className="absolute right-5 top-5 p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/10"
+              className="absolute right-5 top-5 p-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white border border-slate-200/70 dark:border-white/10"
             >
               <X className="w-5 h-5" />
             </button>
@@ -579,7 +579,7 @@ export default function FormulasPage() {
                 <Calculator className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-white">{activeCalcFormula.title}</h3>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white">{activeCalcFormula.title}</h3>
                 <p className="text-xs text-indigo-400 font-bold">Live Numerical Solver</p>
               </div>
             </div>
@@ -589,36 +589,36 @@ export default function FormulasPage() {
               {activeCalcFormula.calcType === "ohms_law" && (
                 <>
                   <div>
-                    <label className="text-xs font-bold text-slate-400 block mb-1">Current I (Amperes):</label>
-                    <input type="number" value={valA} onChange={(e) => setValA(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white font-mono focus:border-indigo-500 outline-none" />
+                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">Current I (Amperes):</label>
+                    <input type="number" value={valA} onChange={(e) => setValA(e.target.value)} className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white font-mono focus:border-indigo-500 outline-none" />
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-slate-400 block mb-1">Resistance R (Ohms Ω):</label>
-                    <input type="number" value={valB} onChange={(e) => setValB(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white font-mono focus:border-indigo-500 outline-none" />
+                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">Resistance R (Ohms Ω):</label>
+                    <input type="number" value={valB} onChange={(e) => setValB(e.target.value)} className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white font-mono focus:border-indigo-500 outline-none" />
                   </div>
                 </>
               )}
 
               {activeCalcFormula.calcType === "lens_power" && (
                 <div>
-                  <label className="text-xs font-bold text-slate-400 block mb-1">Focal Length f (in centimeters):</label>
-                  <input type="number" value={valA} onChange={(e) => setValA(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white font-mono focus:border-indigo-500 outline-none" />
+                  <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">Focal Length f (in centimeters):</label>
+                  <input type="number" value={valA} onChange={(e) => setValA(e.target.value)} className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white font-mono focus:border-indigo-500 outline-none" />
                 </div>
               )}
 
               {activeCalcFormula.calcType === "quadratic" && (
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="text-xs font-bold text-slate-400 block mb-1">Coeff a:</label>
-                    <input type="number" value={valA} onChange={(e) => setValA(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white font-mono" />
+                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">Coeff a:</label>
+                    <input type="number" value={valA} onChange={(e) => setValA(e.target.value)} className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-white font-mono" />
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-slate-400 block mb-1">Coeff b:</label>
-                    <input type="number" value={valB} onChange={(e) => setValB(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white font-mono" />
+                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">Coeff b:</label>
+                    <input type="number" value={valB} onChange={(e) => setValB(e.target.value)} className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-white font-mono" />
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-slate-400 block mb-1">Coeff c:</label>
-                    <input type="number" value={valC} onChange={(e) => setValC(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white font-mono" />
+                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">Coeff c:</label>
+                    <input type="number" value={valC} onChange={(e) => setValC(e.target.value)} className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-white font-mono" />
                   </div>
                 </div>
               )}
@@ -626,16 +626,16 @@ export default function FormulasPage() {
               {activeCalcFormula.calcType === "joules_heating" && (
                 <>
                   <div>
-                    <label className="text-xs font-bold text-slate-400 block mb-1">Current I (A):</label>
-                    <input type="number" value={valA} onChange={(e) => setValA(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white font-mono" />
+                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">Current I (A):</label>
+                    <input type="number" value={valA} onChange={(e) => setValA(e.target.value)} className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white font-mono" />
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-slate-400 block mb-1">Resistance R (Ω):</label>
-                    <input type="number" value={valB} onChange={(e) => setValB(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white font-mono" />
+                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">Resistance R (Ω):</label>
+                    <input type="number" value={valB} onChange={(e) => setValB(e.target.value)} className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white font-mono" />
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-slate-400 block mb-1">Time t (seconds):</label>
-                    <input type="number" value={valC} onChange={(e) => setValC(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white font-mono" />
+                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">Time t (seconds):</label>
+                    <input type="number" value={valC} onChange={(e) => setValC(e.target.value)} className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white font-mono" />
                   </div>
                 </>
               )}
@@ -645,12 +645,12 @@ export default function FormulasPage() {
             {calcOutput && (
               <div className="bg-indigo-950/40 border border-indigo-500/30 p-5 rounded-2xl space-y-3 font-mono">
                 <div className="text-xs text-indigo-300 font-bold uppercase tracking-wider">Formula Equation:</div>
-                <div className="text-white text-base font-black">{calcOutput.equation}</div>
+                <div className="text-slate-900 dark:text-white text-base font-black">{calcOutput.equation}</div>
                 <div className="text-emerald-400 text-lg font-black pt-2 border-t border-indigo-500/20">
                   Result: {calcOutput.result}
                 </div>
-                <div className="space-y-1 text-xs text-slate-300 font-sans pt-2">
-                  <div className="font-bold text-slate-400">Step-by-Step Breakdown:</div>
+                <div className="space-y-1 text-xs text-slate-600 dark:text-slate-600 dark:text-slate-300 font-sans pt-2">
+                  <div className="font-bold text-slate-500 dark:text-slate-400">Step-by-Step Breakdown:</div>
                   {calcOutput.steps.map((st, i) => (
                     <div key={i}>• {st}</div>
                   ))}

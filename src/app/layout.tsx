@@ -47,7 +47,7 @@ export default function RootLayout({
       <head>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossOrigin="anonymous" />
       </head>
-      <body className={`${outfit.className} antialiased min-h-screen bg-[#02040a] text-slate-100 selection:bg-indigo-500/30 selection:text-indigo-200`}>
+      <body className={`${outfit.className} antialiased min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200`}>
         <script
           dangerouslySetInnerHTML={{
             __html: `

@@ -18,17 +18,17 @@ export default function AnalyticsPage() {
 
   const getIntensityColor = (val: number) => {
     switch(val) {
-      case 0: return 'bg-slate-800';
+      case 0: return 'bg-slate-50 dark:bg-slate-800';
       case 1: return 'bg-indigo-900/40';
       case 2: return 'bg-indigo-700/60';
       case 3: return 'bg-indigo-500';
       case 4: return 'bg-indigo-400 shadow-[0_0_10px_rgba(129,140,248,0.8)]';
-      default: return 'bg-slate-800';
+      default: return 'bg-slate-50 dark:bg-slate-800';
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-slate-200 font-sans p-6 pb-20">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0b0f19] text-slate-700 dark:text-slate-200 font-sans p-6 pb-20">
       <header className="max-w-6xl mx-auto flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
           <div className="bg-indigo-500/20 p-3 rounded-2xl border border-indigo-500/30">
@@ -36,10 +36,10 @@ export default function AnalyticsPage() {
           </div>
           <div>
             <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Mastery Dashboard</h1>
-            <p className="text-slate-400 text-sm font-medium">AI-driven analytics of your learning journey.</p>
+            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">AI-driven analytics of your learning journey.</p>
           </div>
         </div>
-        <Link href="/dashboard" className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-sm font-bold transition-colors border border-slate-700 shadow-lg">
+        <Link href="/dashboard" className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-sm font-bold transition-colors border border-slate-200 dark:border-slate-700 shadow-lg">
           <Home className="w-4 h-4" /> Back
         </Link>
       </header>
@@ -47,9 +47,9 @@ export default function AnalyticsPage() {
       <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Radar Chart (Mastery) */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col items-center">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col items-center">
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
-          <h2 className="text-lg font-bold text-white w-full flex items-center gap-2 mb-8">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white w-full flex items-center gap-2 mb-8">
             <Target className="w-5 h-5 text-indigo-400" /> Subject Mastery
           </h2>
           
@@ -57,11 +57,11 @@ export default function AnalyticsPage() {
             <svg viewBox="-100 -100 200 200" className="w-full h-full overflow-visible">
               {/* Grid circles */}
               {[20, 40, 60, 80, 100].map(r => (
-                <circle key={r} cx="0" cy="0" r={r} fill="none" stroke="#1e293b" strokeWidth="1" strokeDasharray="4 4" />
+                <circle key={r} cx="0" cy="0" r={r} fill="none" stroke="var(--border-grid, #1e293b)" strokeWidth="1" strokeDasharray="4 4" />
               ))}
               {/* Axes */}
-              <line x1="0" y1="-100" x2="0" y2="100" stroke="#1e293b" strokeWidth="1" />
-              <line x1="-100" y1="0" x2="100" y2="0" stroke="#1e293b" strokeWidth="1" />
+              <line x1="0" y1="-100" x2="0" y2="100" stroke="var(--border-grid, #1e293b)" strokeWidth="1" />
+              <line x1="-100" y1="0" x2="100" y2="0" stroke="var(--border-grid, #1e293b)" strokeWidth="1" />
               
               {/* Data Polygon */}
               <motion.polygon
@@ -114,8 +114,8 @@ export default function AnalyticsPage() {
         <div className="lg:col-span-2 grid grid-rows-2 gap-6">
           
           {/* Heatmap */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col justify-center">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col justify-center">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
               <TrendingUp className="w-5 h-5 text-emerald-400" /> 28-Day Study Streak
             </h2>
             <div className="grid grid-cols-7 gap-2 mx-auto sm:mx-0 w-full">
@@ -138,26 +138,26 @@ export default function AnalyticsPage() {
           {/* AI Insights */}
           <div className="bg-gradient-to-br from-indigo-900/40 to-purple-900/40 border border-indigo-500/20 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl" />
-            <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
               <Brain className="w-5 h-5 text-indigo-400" /> AI Recommendations
             </h2>
             <div className="space-y-4 relative z-10">
-              <div className="bg-slate-900/50 p-4 rounded-2xl border border-slate-700/50 flex gap-3">
+              <div className="bg-white dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-200/70 dark:border-slate-700/50 flex gap-3">
                 <div className="bg-amber-500/20 p-2 rounded-xl h-fit">
                   <Zap className="w-4 h-4 text-amber-400" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-200">Focus on Biology</h4>
-                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">Your mastery in Biology is currently at 45%. We recommend reviewing <strong className="text-indigo-300">Chapter 6: Life Processes</strong>.</p>
+                  <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200">Focus on Biology</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Your mastery in Biology is currently at 45%. We recommend reviewing <strong className="text-indigo-300">Chapter 6: Life Processes</strong>.</p>
                 </div>
               </div>
-              <div className="bg-slate-900/50 p-4 rounded-2xl border border-slate-700/50 flex gap-3">
+              <div className="bg-white dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-200/70 dark:border-slate-700/50 flex gap-3">
                 <div className="bg-emerald-500/20 p-2 rounded-xl h-fit">
                   <BookOpen className="w-4 h-4 text-emerald-400" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-200">Maths Streak Achieved!</h4>
-                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">Excellent work maintaining a 92% mastery in Maths. You are ready for the advanced Quiz Duels.</p>
+                  <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200">Maths Streak Achieved!</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Excellent work maintaining a 92% mastery in Maths. You are ready for the advanced Quiz Duels.</p>
                 </div>
               </div>
             </div>

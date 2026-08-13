@@ -70,7 +70,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col md:flex-row items-center justify-center p-6 relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-x-hidden transition-colors duration-300" style={{ backgroundColor: "var(--background)" }}>
       {/* Immersive Glowing Mesh Gradients */}
       <div className="absolute top-[-10%] right-[-5%] w-[450px] h-[450px] bg-indigo-500/10 dark:bg-indigo-550/5 rounded-full blur-[110px] pointer-events-none -z-10 animate-float-slow" />
       <div className="absolute bottom-[10%] left-[-5%] w-[400px] h-[400px] bg-fuchsia-500/10 dark:bg-fuchsia-550/5 rounded-full blur-[110px] pointer-events-none -z-10 animate-float-delayed" />
@@ -93,7 +93,7 @@ export default function Signup() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="bg-white/80 dark:bg-[#0c0f1d]/80 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_20px_50px_rgb(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(99,102,241,0.1)] p-8 sm:p-10 border border-white/40 dark:border-white/10 relative overflow-hidden ring-1 ring-slate-900/5 dark:ring-white/5"
+          className="premium-glass-panel p-8 sm:p-10 relative overflow-hidden"
         >
           {/* Top glowing accent border */}
           <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-indigo-500 via-purple-500 to-fuchsia-400" />
@@ -161,7 +161,7 @@ export default function Signup() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Enter your name"
-                    className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-[#040612]/50 border border-slate-200 dark:border-white/10 rounded-2xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-500/20 transition-all text-xs font-bold text-slate-800 dark:text-white shadow-inner"
+                    className="w-full pl-12 pr-4 py-3.5 bg-white/70 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-500/20 transition-all text-xs font-bold text-slate-800 dark:text-white shadow-inner"
                   />
                 </div>
               </motion.div>
@@ -176,7 +176,7 @@ export default function Signup() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@example.com"
-                    className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-[#040612]/50 border border-slate-200 dark:border-white/10 rounded-2xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-500/20 transition-all text-xs font-bold text-slate-800 dark:text-white shadow-inner"
+                    className="w-full pl-12 pr-4 py-3.5 bg-white/70 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-500/20 transition-all text-xs font-bold text-slate-800 dark:text-white shadow-inner"
                   />
                 </div>
               </motion.div>
@@ -191,7 +191,7 @@ export default function Signup() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Min. 6 characters"
-                    className="w-full pl-12 pr-12 py-3.5 bg-white dark:bg-[#040612]/50 border border-slate-200 dark:border-white/10 rounded-2xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-500/20 transition-all text-xs font-bold text-slate-800 dark:text-white shadow-inner"
+                    className="w-full pl-12 pr-12 py-3.5 bg-white/70 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-500/20 transition-all text-xs font-bold text-slate-800 dark:text-white shadow-inner"
                   />
                   <button
                     type="button"

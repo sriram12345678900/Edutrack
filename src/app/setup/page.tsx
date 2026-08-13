@@ -124,7 +124,7 @@ export default function SignupWizard() {
       <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      <div className="w-full max-w-2xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl relative z-10 p-8 md:p-12 my-8">
+      <div className="w-full max-w-2xl bg-white/70 dark:bg-slate-50 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl relative z-10 p-8 md:p-12 my-8">
         
         {/* Header */}
         <div className="text-center mb-10">
@@ -134,7 +134,7 @@ export default function SignupWizard() {
           <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white mb-3">
             Set Up Your Profile
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-semibold">
+          <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm font-semibold">
             Let's customize EduTrack perfectly for you.
           </p>
         </div>
@@ -172,7 +172,7 @@ export default function SignupWizard() {
                       placeholder="Enter a unique nickname..."
                       maxLength={15}
                       enterKeyHint="go"
-                      className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 font-bold text-lg text-slate-850 dark:text-white transition-all placeholder:font-normal"
+                      className="w-full px-5 py-4 bg-slate-50 dark:bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 font-bold text-lg text-slate-850 dark:text-white transition-all placeholder:font-normal"
                     />
                   </form>
                   {generatedCode && (
@@ -181,7 +181,7 @@ export default function SignupWizard() {
                       animate={{ opacity: 1, y: 0 }}
                       className="bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-150 dark:border-indigo-900/60 p-4 rounded-2xl"
                     >
-                      <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Your Assigned Unique Friend Code:</p>
+                      <p className="text-xs font-semibold text-slate-500 dark:text-slate-500 dark:text-slate-400">Your Assigned Unique Friend Code:</p>
                       <p className="text-lg font-black text-indigo-600 dark:text-indigo-400 font-mono tracking-wider mt-1">{generatedCode}</p>
                       <p className="text-[10px] text-slate-450 mt-1 leading-snug">Classmates can search this code to invite and message you directly!</p>
                     </motion.div>
@@ -213,7 +213,7 @@ export default function SignupWizard() {
                       className={`p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
                         selectedClass === cls 
                           ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 scale-[1.02]' 
-                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:shadow-md'
+                          : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 bg-white dark:bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:shadow-md'
                       }`}
                     >
                       <span className="text-3xl font-black">{cls}</span>
@@ -244,7 +244,7 @@ export default function SignupWizard() {
                     <button
                       onClick={() => setEnglishCurr("Language & Literature")}
                       className={`p-4 rounded-2xl border-2 text-left transition-all duration-200 ${
-                        englishCurr === "Language & Literature" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300'
+                        englishCurr === "Language & Literature" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-indigo-300'
                       }`}
                     >
                       <div className="font-bold text-slate-900 dark:text-white mb-1">Language & Literature</div>
@@ -253,7 +253,7 @@ export default function SignupWizard() {
                     <button
                       onClick={() => setEnglishCurr("Communicative")}
                       className={`p-4 rounded-2xl border-2 text-left transition-all duration-200 ${
-                        englishCurr === "Communicative" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300'
+                        englishCurr === "Communicative" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-indigo-300'
                       }`}
                     >
                       <div className="font-bold text-slate-900 dark:text-white mb-1">Communicative</div>
@@ -270,7 +270,7 @@ export default function SignupWizard() {
                     <button
                       onClick={() => setSanskritCurr("Regular")}
                       className={`p-4 rounded-2xl border-2 text-left transition-all duration-200 ${
-                        sanskritCurr === "Regular" ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-amber-300'
+                        sanskritCurr === "Regular" ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/10' : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-amber-300'
                       }`}
                     >
                       <div className="font-bold text-slate-900 dark:text-white mb-1">Regular (Shemushi)</div>
@@ -279,7 +279,7 @@ export default function SignupWizard() {
                     <button
                       onClick={() => setSanskritCurr("Communicative")}
                       className={`p-4 rounded-2xl border-2 text-left transition-all duration-200 ${
-                        sanskritCurr === "Communicative" ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-amber-300'
+                        sanskritCurr === "Communicative" ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/10' : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-amber-300'
                       }`}
                     >
                       <div className="font-bold text-slate-900 dark:text-white mb-1">Communicative (Manika)</div>
@@ -326,7 +326,7 @@ export default function SignupWizard() {
                       className={`p-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-1.5 ${
                         language === lang.code 
                           ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 scale-[1.02]' 
-                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:shadow-md'
+                          : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 bg-white dark:bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:shadow-md'
                       }`}
                     >
                       <span className="text-2xl">{lang.flag}</span>
@@ -356,7 +356,7 @@ export default function SignupWizard() {
                   <button
                     onClick={() => setTheme("light")}
                     className={`p-6 rounded-2xl border-2 flex flex-col items-center gap-3 transition-all duration-200 ${
-                      theme === "light" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300'
+                      theme === "light" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-indigo-300'
                     }`}
                   >
                     <Sun className="w-8 h-8 text-amber-500" />
@@ -365,7 +365,7 @@ export default function SignupWizard() {
                   <button
                     onClick={() => setTheme("dark")}
                     className={`p-6 rounded-2xl border-2 flex flex-col items-center gap-3 transition-all duration-200 ${
-                      theme === "dark" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300'
+                      theme === "dark" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-indigo-300'
                     }`}
                   >
                     <Moon className="w-8 h-8 text-indigo-400" />
@@ -374,7 +374,7 @@ export default function SignupWizard() {
                   <button
                     onClick={() => setTheme("system")}
                     className={`p-6 rounded-2xl border-2 flex flex-col items-center gap-3 transition-all duration-200 ${
-                      theme === "system" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300'
+                      theme === "system" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-indigo-300'
                     }`}
                   >
                     <Monitor className="w-8 h-8 text-slate-500" />
@@ -393,7 +393,7 @@ export default function SignupWizard() {
             onClick={prevStep}
             disabled={currentStep === 0}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-bold transition-colors ${
-              currentStep === 0 ? 'opacity-0 pointer-events-none' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+              currentStep === 0 ? 'opacity-0 pointer-events-none' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-white dark:bg-slate-800'
             }`}
           >
             <ArrowLeft className="w-5 h-5" /> Back

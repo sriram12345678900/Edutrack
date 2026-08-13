@@ -8,11 +8,11 @@ import {
   Palette, Eraser, Trash2, Download, Users, Share2, 
   Sparkles, Check, ChevronRight, Copy, CheckCheck, 
   Square, Circle, Type, Undo2, Redo2, Grid, Sparkle,
-  PenTool, Highlighter, ChevronDown, FileText, X, Hand, Move
+  PenTool, Highlighter, ChevronDown, FileText, X, Hand, Move, LassoSelect, MousePointerClick, RefreshCw
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-type DrawTool = "pen" | "highlighter" | "eraser" | "line" | "rect" | "circle" | "text" | "sticky" | "hand" | "stroke_eraser" | "smart_pen";
+type DrawTool = "pen" | "highlighter" | "eraser" | "line" | "rect" | "circle" | "text" | "sticky" | "hand" | "stroke_eraser" | "smart_pen" | "lasso";
 type BackgroundPattern = "dots" | "grid" | "ruled" | "blank";
 
 interface StickyNote {
@@ -92,8 +92,58 @@ function doStrokesIntersect(strokeA: Stroke, strokeB: Stroke) {
   return false;
 }
 
+
+// Check if point is inside a polygon (Ray-casting algorithm)
+function isPointInPolygon(p: Point, polygon: Point[]) {
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].x, yi = polygon[i].y;
+    const xj = polygon[j].x, yj = polygon[j].y;
+    const intersect = ((yi > p.y) !== (yj > p.y)) && (p.x < (xj - xi) * (p.y - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+// Check if stroke is enclosed or intersected by lasso polygon
+function isStrokeInLasso(stroke: Stroke, lassoPolygon: Point[]) {
+  if (lassoPolygon.length < 3) return false;
+  const box = getBoundingBox(lassoPolygon);
+  const strokeBox = getBoundingBox(stroke.points);
+  if (!doBoxesOverlap(box, strokeBox)) return false;
+
+  let insideCount = 0;
+  for (const pt of stroke.points) {
+    if (isPointInPolygon(pt, lassoPolygon)) insideCount++;
+  }
+  return (insideCount / stroke.points.length) >= 0.3;
+}
+
+type DetectedShape =
+  | { type: "line"; start: Point; end: Point }
+  | { type: "circle"; cx: number; cy: number; r: number }
+  | { type: "rectangle"; x: number; y: number; w: number; h: number }
+  | { type: "letter"; value: string; x: number; y: number }
+  | null;
+
 // Heuristic recognizer for shapes and basic letters
-function detectShapeOrLetter(points: Point[]) {
+function detectShapeOrLetter(points: Point[]): DetectedShape {
+  if (points.length < 5) return null;
+
+  const startPt = points[0];
+  const endPt = points[points.length - 1];
+  const startEndDist = Math.sqrt(Math.pow(endPt.x - startPt.x, 2) + Math.pow(endPt.y - startPt.y, 2));
+
+  // 0. Straight Line Check
+  let totalLength = 0;
+  for (let i = 0; i < points.length - 1; i++) {
+    totalLength += Math.sqrt(Math.pow(points[i+1].x - points[i].x, 2) + Math.pow(points[i+1].y - points[i].y, 2));
+  }
+  const straightRatio = startEndDist / (totalLength || 1);
+  if (straightRatio > 0.86 && startEndDist > 30) {
+    return { type: "line", start: startPt, end: endPt };
+  }
+
   if (points.length < 10) return null;
 
   const { minX, maxX, minY, maxY } = getBoundingBox(points);
@@ -105,9 +155,7 @@ function detectShapeOrLetter(points: Point[]) {
   const cy = minY + h / 2;
 
   // Closed shape check
-  const startPt = points[0];
-  const endPt = points[points.length - 1];
-  const startEndDist = Math.sqrt(Math.pow(endPt.x - startPt.x, 2) + Math.pow(endPt.y - startPt.y, 2));
+  // (startPt, endPt, and startEndDist already computed above)
 
   // 1. Circle Check: constant distance of points from center of mass, points far from bounding box corners
   const avgX = points.reduce((sum, p) => sum + p.x, 0) / points.length;
@@ -310,6 +358,7 @@ export default function WhiteboardPage() {
   const [brushSize, setBrushSize] = useState(4);
   const [fillShapes, setFillShapes] = useState(false);
   const [pattern, setPattern] = useState<BackgroundPattern>("dots");
+  const [selectedStrokeIds, setSelectedStrokeIds] = useState<string[]>([]);
   const [stickyNotes, setStickyNotes] = useState<StickyNote[]>([]);
   
   // Vector stroke tracking states
@@ -630,6 +679,24 @@ export default function WhiteboardPage() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     
+    if (tool === "lasso") {
+      redrawCanvas(canvas, strokes);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#6366f1";
+      ctx.fillStyle = "rgba(99, 102, 241, 0.15)";
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.moveTo(strokePointsRef.current[0].x, strokePointsRef.current[0].y);
+      for (let i = 1; i < strokePointsRef.current.length; i++) {
+        ctx.lineTo(strokePointsRef.current[i].x, strokePointsRef.current[i].y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+      ctx.fill();
+      ctx.setLineDash([]);
+      return;
+    }
+
     if (tool === "line" || tool === "rect" || tool === "circle") {
       redrawCanvas(canvas, strokes);
       
@@ -718,8 +785,77 @@ export default function WhiteboardPage() {
         return next;
       });
     } else if (tool === "smart_pen") {
-      setAccumulatedSmartStrokes(prev => [...prev, newStroke]);
-      smartPenTimerRef.current = setTimeout(processSmartPen, 600);
+      const detected = detectShapeOrLetter(points);
+      if (detected) {
+        let cleanStroke: Stroke | null = null;
+        if (detected.type === "line") {
+          cleanStroke = {
+            id: Date.now().toString(),
+            tool: "line",
+            color,
+            brushSize,
+            points: [detected.start, detected.end]
+          };
+          showToast("Snapped to Line ✨");
+        } else if (detected.type === "circle") {
+          const { cx, cy, r } = detected;
+          cleanStroke = {
+            id: Date.now().toString(),
+            tool: "circle",
+            color,
+            brushSize,
+            fill: fillShapes,
+            points: [{ x: cx, y: cy }, { x: cx + r, y: cy }]
+          };
+          showToast("Snapped to Circle ✨");
+        } else if (detected.type === "rectangle") {
+          const { x, y, w, h } = detected;
+          cleanStroke = {
+            id: Date.now().toString(),
+            tool: "rect",
+            color,
+            brushSize,
+            fill: fillShapes,
+            points: [{ x, y }, { x: x + w, y: y + h }]
+          };
+          showToast("Snapped to Rectangle ✨");
+        } else if (detected.type === "letter") {
+          const { x, y, value } = detected;
+          cleanStroke = {
+            id: Date.now().toString(),
+            tool: "text",
+            color,
+            brushSize,
+            points: [{ x, y }],
+            text: value
+          };
+          showToast(`Recognized Symbol: ${value} ✨`);
+        }
+
+        if (cleanStroke) {
+          setStrokes(prev => {
+            const next = [...prev, cleanStroke];
+            const canvas = canvasRef.current;
+            if (canvas) redrawCanvas(canvas, next);
+            return next;
+          });
+        } else {
+          setStrokes(prev => [...prev, newStroke]);
+        }
+      } else {
+        setAccumulatedSmartStrokes(prev => [...prev, newStroke]);
+        smartPenTimerRef.current = setTimeout(processSmartPen, 400);
+      }
+    } else if (tool === "lasso") {
+      const selected = strokes.filter(s => isStrokeInLasso(s, points)).map(s => s.id);
+      setSelectedStrokeIds(selected);
+      if (selected.length > 0) {
+        showToast(`Selected ${selected.length} element${selected.length > 1 ? "s" : ""} 🎯`);
+      } else {
+        setSelectedStrokeIds([]);
+      }
+      const canvas = canvasRef.current;
+      if (canvas) redrawCanvas(canvas, strokes);
     } else {
       setStrokes(prev => [...prev, newStroke]);
     }
@@ -775,6 +911,35 @@ export default function WhiteboardPage() {
       }, 50);
     }
     setTextInputPos(null);
+  };
+
+  // Selection Actions
+  const deleteSelectedStrokes = () => {
+    if (selectedStrokeIds.length === 0) return;
+    setStrokes(prev => {
+      const next = prev.filter(s => !selectedStrokeIds.includes(s.id));
+      const canvas = canvasRef.current;
+      if (canvas) redrawCanvas(canvas, next);
+      return next;
+    });
+    setSelectedStrokeIds([]);
+    showToast("Deleted selected elements");
+    pushToHistory();
+    syncCanvas();
+  };
+
+  const recolorSelectedStrokes = (newColor: string) => {
+    if (selectedStrokeIds.length === 0) return;
+    setColor(newColor);
+    setStrokes(prev => {
+      const next = prev.map(s => selectedStrokeIds.includes(s.id) ? { ...s, color: newColor } : s);
+      const canvas = canvasRef.current;
+      if (canvas) redrawCanvas(canvas, next);
+      return next;
+    });
+    showToast("Recolored selected elements");
+    pushToHistory();
+    syncCanvas();
   };
 
   const updateNoteText = (id: string, text: string) => {
@@ -835,7 +1000,13 @@ export default function WhiteboardPage() {
 
 
   return (
-    <div className="w-full h-full relative font-sans flex flex-col items-center justify-center min-h-[600px] premium-mesh-bg">
+    <div className="w-full h-full relative font-sans flex flex-col items-center justify-center min-h-[600px] bg-white dark:bg-slate-900">
+      {/* Premium Vanilla CSS Backgrounds */}
+      <div className="premium-mesh-bg">
+        <div className="premium-mesh-blob-1"></div>
+        <div className="premium-mesh-blob-2"></div>
+        <div className="premium-mesh-blob-3"></div>
+      </div>
       <style>{`
         .no-scrollbar::-webkit-scrollbar {
           display: none;
@@ -1172,6 +1343,7 @@ export default function WhiteboardPage() {
               <div className="w-[1px] h-8 bg-white/10 mx-1"></div>
               
               <ToolButton active={tool === "pen"} onClick={() => setTool("pen")} icon={PenTool} label="Pen" />
+              <ToolButton active={tool === "lasso"} onClick={() => setTool("lasso")} icon={LassoSelect} label="Lasso Select" extraClass="text-indigo-400" />
               <button 
                 onClick={() => setTool("smart_pen")}
                 className={`group relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
@@ -1211,6 +1383,52 @@ export default function WhiteboardPage() {
 
             </div>
           </div>
+
+          {/* FLOATING LASSO SELECTION CONTROL HUD */}
+          <AnimatePresence>
+            {selectedStrokeIds.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                className="absolute top-24 left-1/2 -translate-x-1/2 z-50 premium-glass-panel premium-glow-border px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-4 text-white"
+              >
+                <div className="flex items-center gap-2 border-r border-white/10 pr-3">
+                  <LassoSelect className="w-5 h-5 text-indigo-400" />
+                  <span className="text-xs font-black tracking-wide">{selectedStrokeIds.length} Selected</span>
+                </div>
+
+                {/* Recolor swatches */}
+                <div className="flex items-center gap-1.5 border-r border-white/10 pr-3">
+                  {paletteColors.slice(0, 4).map(c => (
+                    <button
+                      key={c}
+                      onClick={() => recolorSelectedStrokes(c)}
+                      className="w-6 h-6 rounded-full hover:scale-110 transition-transform shadow-sm border border-white/20"
+                      style={{ backgroundColor: c }}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  onClick={deleteSelectedStrokes}
+                  className="p-2 rounded-xl bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 font-bold text-xs flex items-center gap-1.5 transition-all micro-hover-lift"
+                  title="Delete Selection"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>Delete</span>
+                </button>
+
+                <button
+                  onClick={() => setSelectedStrokeIds([])}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                  title="Clear Selection"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* TOAST NOTIFICATION FOR AUTO-DETECTION */}
           <AnimatePresence>
