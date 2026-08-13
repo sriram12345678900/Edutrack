@@ -282,11 +282,11 @@ export default function Dashboard() {
           <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/15">
             Premium Academic Space
           </span>
-          <h1 className="text-4xl md:text-5xl font-black mt-3.5 tracking-tight flex items-center gap-2.5 premium-text-gradient-accent">
-            <span>
+          <h1 className="text-4xl md:text-5xl font-black mt-3.5 tracking-tight flex items-center gap-2.5">
+            <span className="premium-text-gradient-accent">
               Welcome back, {firstName}!
             </span>
-            <span className="shrink-0 drop-shadow-sm select-none">👋</span>
+            <span className="shrink-0 drop-shadow-sm select-none text-3xl md:text-4xl emoji">👋</span>
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-2.5 font-bold text-xs">
             {profile?.className || (userClass ? `Class ${userClass}` : "Class 10")} | Language Preference: {userLanguage}

@@ -296,3 +296,14 @@ body {
   color: #f8fafc;
   background-color: #02040a;
 }
+
+/* Fix for emojis rendering as solid box artifacts inside text-gradient elements */
+.emoji,
+[data-emoji] {
+  display: inline-block;
+  -webkit-text-fill-color: initial !important;
+  background: transparent !important;
+  background-clip: border-box !important;
+  -webkit-background-clip: border-box !important;
+  color: initial !important;
+}
