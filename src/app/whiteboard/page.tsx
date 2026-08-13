@@ -8,11 +8,12 @@ import {
   Palette, Eraser, Trash2, Download, Users, Share2, 
   Sparkles, Check, ChevronRight, Copy, CheckCheck, 
   Square, Circle, Type, Undo2, Redo2, Grid, Sparkle,
-  PenTool, Highlighter, ChevronDown, FileText, X, Hand, Move, LassoSelect, MousePointerClick, RefreshCw
+  PenTool, Highlighter, ChevronDown, FileText, X, Hand, Move, LassoSelect, 
+  Triangle, ArrowRight, ZoomIn, ZoomOut, RotateCcw, Keyboard
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-type DrawTool = "pen" | "highlighter" | "eraser" | "line" | "rect" | "circle" | "text" | "sticky" | "hand" | "stroke_eraser" | "smart_pen" | "lasso";
+type DrawTool = "pen" | "highlighter" | "eraser" | "line" | "rect" | "circle" | "triangle" | "arrow" | "text" | "sticky" | "hand" | "stroke_eraser" | "smart_pen" | "lasso";
 type BackgroundPattern = "dots" | "grid" | "ruled" | "blank";
 
 interface StickyNote {
@@ -38,24 +39,13 @@ interface Stroke {
   text?: string;
 }
 
-// Check if two line segments (p1-p2) and (p3-p4) intersect
+// Check if two line segments intersect
 function segmentsIntersect(p1: Point, p2: Point, p3: Point, p4: Point) {
   const ccw = (A: Point, B: Point, C: Point) => (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x);
   return ccw(p1, p3, p4) !== ccw(p2, p3, p4) && ccw(p1, p2, p3) !== ccw(p1, p2, p4);
 }
 
-// Find intersection coordinate
-function segmentsIntersection(p1: Point, p2: Point, p3: Point, p4: Point) {
-  const denominator = (p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y);
-  if (denominator === 0) return null;
-  const ua = ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x)) / denominator;
-  return {
-    x: p1.x + ua * (p2.x - p1.x),
-    y: p1.y + ua * (p2.y - p1.y)
-  };
-}
-
-// Calculate bounding box of a list of points
+// Calculate bounding box of points
 function getBoundingBox(pts: Point[]) {
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
   for (const p of pts) {
@@ -67,12 +57,10 @@ function getBoundingBox(pts: Point[]) {
   return { minX, maxX, minY, maxY };
 }
 
-// Check if two bounding boxes overlap
 function doBoxesOverlap(a: any, b: any) {
   return !(a.maxX < b.minX || a.minX > b.maxX || a.maxY < b.minY || a.minY > b.maxY);
 }
 
-// Check if two strokes intersect
 function doStrokesIntersect(strokeA: Stroke, strokeB: Stroke) {
   const ptsA = strokeA.points;
   const ptsB = strokeB.points;
@@ -92,8 +80,6 @@ function doStrokesIntersect(strokeA: Stroke, strokeB: Stroke) {
   return false;
 }
 
-
-// Check if point is inside a polygon (Ray-casting algorithm)
 function isPointInPolygon(p: Point, polygon: Point[]) {
   let inside = false;
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
@@ -105,7 +91,6 @@ function isPointInPolygon(p: Point, polygon: Point[]) {
   return inside;
 }
 
-// Check if stroke is enclosed or intersected by lasso polygon
 function isStrokeInLasso(stroke: Stroke, lassoPolygon: Point[]) {
   if (lassoPolygon.length < 3) return false;
   const box = getBoundingBox(lassoPolygon);
@@ -123,10 +108,11 @@ type DetectedShape =
   | { type: "line"; start: Point; end: Point }
   | { type: "circle"; cx: number; cy: number; r: number }
   | { type: "rectangle"; x: number; y: number; w: number; h: number }
+  | { type: "triangle"; start: Point; end: Point }
+  | { type: "arrow"; start: Point; end: Point }
   | { type: "letter"; value: string; x: number; y: number }
   | null;
 
-// Heuristic recognizer for shapes and basic letters
 function detectShapeOrLetter(points: Point[]): DetectedShape {
   if (points.length < 5) return null;
 
@@ -134,7 +120,7 @@ function detectShapeOrLetter(points: Point[]): DetectedShape {
   const endPt = points[points.length - 1];
   const startEndDist = Math.sqrt(Math.pow(endPt.x - startPt.x, 2) + Math.pow(endPt.y - startPt.y, 2));
 
-  // 0. Straight Line Check
+  // Straight line or arrow
   let totalLength = 0;
   for (let i = 0; i < points.length - 1; i++) {
     totalLength += Math.sqrt(Math.pow(points[i+1].x - points[i].x, 2) + Math.pow(points[i+1].y - points[i].y, 2));
@@ -154,10 +140,7 @@ function detectShapeOrLetter(points: Point[]): DetectedShape {
   const cx = minX + w / 2;
   const cy = minY + h / 2;
 
-  // Closed shape check
-  // (startPt, endPt, and startEndDist already computed above)
-
-  // 1. Circle Check: constant distance of points from center of mass, points far from bounding box corners
+  // Circle Check
   const avgX = points.reduce((sum, p) => sum + p.x, 0) / points.length;
   const avgY = points.reduce((sum, p) => sum + p.y, 0) / points.length;
   const radii = points.map(p => Math.sqrt(Math.pow(p.x - avgX, 2) + Math.pow(p.y - avgY, 2)));
@@ -166,19 +149,12 @@ function detectShapeOrLetter(points: Point[]): DetectedShape {
   const radiusStdDev = Math.sqrt(radiusVariance);
   const coefOfVariation = radiusStdDev / avgRadius;
 
-  const tlDist = Math.min(...points.map(p => Math.sqrt(Math.pow(p.x - minX, 2) + Math.pow(p.y - minY, 2))));
-  const trDist = Math.min(...points.map(p => Math.sqrt(Math.pow(p.x - maxX, 2) + Math.pow(p.y - minY, 2))));
-  const blDist = Math.min(...points.map(p => Math.sqrt(Math.pow(p.x - minX, 2) + Math.pow(p.y - maxY, 2))));
-  const brDist = Math.min(...points.map(p => Math.sqrt(Math.pow(p.x - maxX, 2) + Math.pow(p.y - maxY, 2))));
-  const minCornerDist = Math.min(tlDist, trDist, blDist, brDist);
-
-  const isCircle = coefOfVariation < 0.24 && minCornerDist > Math.max(w, h) * 0.12;
-
+  const isCircle = coefOfVariation < 0.24;
   if (isCircle && startEndDist < Math.max(w, h) * 0.6) {
     return { type: "circle", cx: avgX, cy: avgY, r: avgRadius };
   }
 
-  // 2. Rectangle Check: points close to boundaries
+  // Rectangle Check
   let rectDistSum = 0;
   for (const p of points) {
     const distToLeft = Math.abs(p.x - minX);
@@ -188,83 +164,28 @@ function detectShapeOrLetter(points: Point[]): DetectedShape {
     rectDistSum += Math.min(distToLeft, distToRight, distToTop, distToBottom);
   }
   const avgRectDist = rectDistSum / points.length;
-  const isRectangle = avgRectDist < Math.min(w, h) * 0.22;
-
-  if (isRectangle && startEndDist < Math.max(w, h) * 0.5) {
+  if (avgRectDist < Math.min(w, h) * 0.22 && startEndDist < Math.max(w, h) * 0.5) {
     return { type: "rectangle", x: minX, y: minY, w, h };
   }
 
-  // 3. Loop/Crossbar Check for letter 'A':
-  let selfIntersects = false;
-  let intersectionPoint = null;
-  for (let i = 0; i < points.length - 4; i++) {
-    for (let j = i + 4; j < points.length - 1; j++) {
-      if (segmentsIntersect(points[i], points[i+1], points[j], points[j+1])) {
-        selfIntersects = true;
-        intersectionPoint = segmentsIntersection(points[i], points[i+1], points[j], points[j+1]);
-        break;
-      }
-    }
-    if (selfIntersects) break;
+  // Triangle Check (Top peak with bottom flat base)
+  let topPoint = points[0];
+  for (const p of points) {
+    if (p.y < topPoint.y) topPoint = p;
   }
-
-  if (selfIntersects && intersectionPoint) {
-    const relativeY = (intersectionPoint.y - minY) / h;
-    // Intersection should be in the middle of Y range (crossbar)
-    if (relativeY > 0.15 && relativeY < 0.85) {
-      // Find peak point (point with minimum Y)
-      let peakPt = points[0];
-      for (const p of points) {
-        if (p.y < peakPt.y) peakPt = p;
-      }
-      // Check if peak is near horizontal center
-      const peakNearCenter = Math.abs(peakPt.x - cx) / w < 0.35;
-      
-      // Check if there are points extending to bottom-left and bottom-right
-      const leftLegExists = points.some(p => p.y > cy && (p.x - minX) / w < 0.3);
-      const rightLegExists = points.some(p => p.y > cy && (maxX - p.x) / w < 0.3);
-
-      if (peakNearCenter && leftLegExists && rightLegExists) {
-        return { type: "letter", value: "A", x: cx, y: cy };
-      }
-    }
-  }
-
-  // 4. Letter 'C' / 'O' / 'U' gestures
-  if (startEndDist >= Math.max(w, h) * 0.45) {
-    // Check if the path sweeps left and back right (C-like)
-    const quadrants = points.map(p => {
-      const isRight = p.x > cx;
-      const isBottom = p.y > cy;
-      if (isRight && !isBottom) return 0; // TR
-      if (!isRight && !isBottom) return 1; // TL
-      if (!isRight && isBottom) return 2; // BL
-      if (isRight && isBottom) return 3; // BR
-      return 0;
-    });
-    let currentQuad = quadrants[0];
-    let visited = [currentQuad];
-    for (let q of quadrants) {
-      if (q !== currentQuad) {
-        currentQuad = q;
-        visited.push(q);
-      }
-    }
-    const visitedStr = visited.join("");
-    if (visitedStr.includes("0123") || visitedStr.includes("123") || visitedStr.includes("012")) {
-      return { type: "letter", value: "C", x: cx, y: cy };
-    }
+  const peakCentroidDist = Math.abs(topPoint.x - cx) / w;
+  if (peakCentroidDist < 0.35 && startEndDist < Math.max(w, h) * 0.45) {
+    return { type: "triangle", start: { x: minX, y: minY }, end: { x: maxX, y: maxY } };
   }
 
   return null;
 }
 
-// Redraw canvas with all local vector strokes
+// Render canvas with smooth quadratic Bézier curves
 const redrawCanvas = (canvas: HTMLCanvasElement, strokesList: Stroke[]) => {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
-  // Safeguard: Ensure canvas coordinates space matches styling scale
   if (canvas.width !== 3000 || canvas.height !== 2500) {
     canvas.width = 3000;
     canvas.height = 2500;
@@ -284,22 +205,33 @@ const redrawCanvas = (canvas: HTMLCanvasElement, strokesList: Stroke[]) => {
       ctx.globalAlpha = 1.0;
     } else {
       ctx.globalCompositeOperation = "source-over";
-      if (stroke.tool === "highlighter") {
-        ctx.globalAlpha = 0.35;
-      } else {
-        ctx.globalAlpha = 1.0;
-      }
+      ctx.globalAlpha = stroke.tool === "highlighter" ? 0.35 : 1.0;
     }
 
     if (stroke.points.length === 0) continue;
 
     if (stroke.tool === "pen" || stroke.tool === "smart_pen" || stroke.tool === "highlighter" || stroke.tool === "eraser") {
-      ctx.beginPath();
-      ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-      for (let i = 1; i < stroke.points.length; i++) {
-        ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+      if (stroke.points.length === 1) {
+        ctx.beginPath();
+        ctx.arc(stroke.points[0].x, stroke.points[0].y, stroke.brushSize / 2, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (stroke.points.length === 2) {
+        ctx.beginPath();
+        ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+        ctx.lineTo(stroke.points[1].x, stroke.points[1].y);
+        ctx.stroke();
+      } else {
+        // Smooth Quadratic Bézier interpolation
+        ctx.beginPath();
+        ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+        for (let i = 1; i < stroke.points.length - 1; i++) {
+          const xc = (stroke.points[i].x + stroke.points[i + 1].x) / 2;
+          const yc = (stroke.points[i].y + stroke.points[i + 1].y) / 2;
+          ctx.quadraticCurveTo(stroke.points[i].x, stroke.points[i].y, xc, yc);
+        }
+        ctx.lineTo(stroke.points[stroke.points.length - 1].x, stroke.points[stroke.points.length - 1].y);
+        ctx.stroke();
       }
-      ctx.stroke();
     } else if (stroke.tool === "line") {
       const start = stroke.points[0];
       const end = stroke.points[stroke.points.length - 1];
@@ -307,11 +239,39 @@ const redrawCanvas = (canvas: HTMLCanvasElement, strokesList: Stroke[]) => {
       ctx.moveTo(start.x, start.y);
       ctx.lineTo(end.x, end.y);
       ctx.stroke();
+    } else if (stroke.tool === "arrow") {
+      const start = stroke.points[0];
+      const end = stroke.points[stroke.points.length - 1];
+      const angle = Math.atan2(end.y - start.y, end.x - start.x);
+      const headLen = Math.max(16, stroke.brushSize * 3.5);
+      
+      ctx.beginPath();
+      ctx.moveTo(start.x, start.y);
+      ctx.lineTo(end.x, end.y);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(end.x, end.y);
+      ctx.lineTo(end.x - headLen * Math.cos(angle - Math.PI / 6), end.y - headLen * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(end.x - headLen * Math.cos(angle + Math.PI / 6), end.y - headLen * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
     } else if (stroke.tool === "rect") {
       const start = stroke.points[0];
       const end = stroke.points[stroke.points.length - 1];
       ctx.beginPath();
       ctx.rect(start.x, start.y, end.x - start.x, end.y - start.y);
+      if (stroke.fill) ctx.fill();
+      else ctx.stroke();
+    } else if (stroke.tool === "triangle") {
+      const start = stroke.points[0];
+      const end = stroke.points[stroke.points.length - 1];
+      const topX = (start.x + end.x) / 2;
+      ctx.beginPath();
+      ctx.moveTo(topX, start.y);
+      ctx.lineTo(end.x, end.y);
+      ctx.lineTo(start.x, end.y);
+      ctx.closePath();
       if (stroke.fill) ctx.fill();
       else ctx.stroke();
     } else if (stroke.tool === "circle") {
@@ -324,7 +284,7 @@ const redrawCanvas = (canvas: HTMLCanvasElement, strokesList: Stroke[]) => {
       else ctx.stroke();
     } else if (stroke.tool === "text") {
       const start = stroke.points[0];
-      ctx.font = `${stroke.brushSize * 3 + 24}px Inter, sans-serif`;
+      ctx.font = `${stroke.brushSize * 3 + 24}px Outfit, Inter, sans-serif`;
       ctx.fillText(stroke.text || "", start.x, start.y);
     }
   }
@@ -338,17 +298,14 @@ export default function WhiteboardPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const boardRef = useRef<HTMLDivElement>(null);
-  const snapshotRef = useRef<ImageData | null>(null);
 
   const isDrawingRef = useRef(false);
   const lastPointRef = useRef<Point | null>(null);
   const strokePointsRef = useRef<Point[]>([]);
 
-
   const paletteColors = [
-    "#000000", "#ef4444", "#f97316", "#f59e0b", 
-    "#84cc16", "#22c55e", "#06b6d4", "#3b82f6", 
-    "#6366f1", "#a855f7", "#ec4899", "#f43f5e"
+    "#6366f1", "#000000", "#ef4444", "#f97316", "#f59e0b", 
+    "#10b981", "#06b6d4", "#3b82f6", "#a855f7", "#ec4899"
   ];
 
   // States
@@ -358,58 +315,52 @@ export default function WhiteboardPage() {
   const [brushSize, setBrushSize] = useState(4);
   const [fillShapes, setFillShapes] = useState(false);
   const [pattern, setPattern] = useState<BackgroundPattern>("dots");
+  const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedStrokeIds, setSelectedStrokeIds] = useState<string[]>([]);
   const [stickyNotes, setStickyNotes] = useState<StickyNote[]>([]);
+  const [showKeyShortcuts, setShowKeyShortcuts] = useState(false);
   
   // Vector stroke tracking states
   const [strokes, setStrokes] = useState<Stroke[]>([]);
-  const [currentStrokePoints, setCurrentStrokePoints] = useState<Point[]>([]);
-
-  // Smart Pen states
   const [accumulatedSmartStrokes, setAccumulatedSmartStrokes] = useState<Stroke[]>([]);
   const [isRecognizing, setIsRecognizing] = useState(false);
   const smartPenTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Panning/scrolling states
+  // Panning states
   const [startScrollLeft, setStartScrollLeft] = useState(0);
   const [startScrollTop, setStartScrollTop] = useState(0);
+  const [startX, setStartX] = useState(0);
+  const [startY, setStartY] = useState(0);
 
-  // Toast notifications for auto-detection
+  // Toast notifications
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const showToast = (msg: string) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(null), 2500);
   };
 
-  // Room code states
+  // Room states
   const [roomId, setRoomId] = useState("");
   const [roomInput, setRoomInput] = useState("");
   const [joined, setJoined] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [lastUser, setLastUser] = useState("");
-
-  // Coordinates
-  const [startX, setStartX] = useState(0);
-  const [startY, setStartY] = useState(0);
 
   // Text Tool Placement State
   const [textInputPos, setTextInputPos] = useState<{ x: number; y: number } | null>(null);
   const [textValue, setTextValue] = useState("");
 
-  // History Stack for Local Undo/Redo
+  // History Stack
   const [history, setHistory] = useState<string[]>([]);
   const [historyStep, setHistoryStep] = useState(-1);
 
   const nickname = user?.displayName?.split(" ")[0] || user?.email?.split("@")[0] || "User";
 
-  // Generate random room code
   useEffect(() => {
     const randomNum = Math.floor(1000 + Math.random() * 9000);
     setRoomId(`ROOM-${randomNum}`);
     setRoomInput(`ROOM-${randomNum}`);
   }, []);
 
-  // Save current canvas to history
   const pushToHistory = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -420,11 +371,10 @@ export default function WhiteboardPage() {
     setHistoryStep(nextHistory.length - 1);
   };
 
-  // Synchronize whiteboard state to Firebase (Includes canvas drawings & sticky notes)
   const syncCanvas = async (notes = stickyNotes) => {
     const canvas = canvasRef.current;
     if (!canvas || !db || !joined) return;
-    if (user?.uid?.startsWith("mock-")) return; // Bypass Firestore sync for mock sessions
+    if (user?.uid?.startsWith("mock-")) return;
     const dataUrl = canvas.toDataURL("image/png");
     try {
       await setDoc(doc(db, "edutrack_messages", `wb_${roomId}`), {
@@ -439,23 +389,15 @@ export default function WhiteboardPage() {
     }
   };
 
-  // Real-time updates subscription
   useEffect(() => {
     if (!db || !joined || !roomId) return;
-    if (user?.uid?.startsWith("mock-")) return; // Bypass Firestore sync for mock sessions
+    if (user?.uid?.startsWith("mock-")) return;
 
     const unsub = onSnapshot(doc(db, "edutrack_messages", `wb_${roomId}`), (docSnap: any) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        
-        // Sync notes
-        if (data.stickyNotes) {
-          setStickyNotes(data.stickyNotes);
-        }
-
-        // Sync drawing only if modified by someone else
+        if (data.stickyNotes) setStickyNotes(data.stickyNotes);
         if (data.lastUpdatedBy !== nickname) {
-          setLastUser(data.lastUpdatedBy);
           const img = new Image();
           img.onload = () => {
             const canvas = canvasRef.current;
@@ -471,13 +413,49 @@ export default function WhiteboardPage() {
         }
       }
     });
-
     return () => unsub();
   }, [joined, roomId, nickname, user]);
 
-  // Missing functions reconstructed
+  // Global Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
-  // Undo/Redo logic
+      const key = e.key.toLowerCase();
+      if ((e.ctrlKey || e.metaKey) && key === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) handleRedo();
+        else handleUndo();
+      } else if ((e.ctrlKey || e.metaKey) && key === 'y') {
+        e.preventDefault();
+        handleRedo();
+      } else if (key === 'p') {
+        setTool("pen");
+      } else if (key === 's') {
+        setTool("smart_pen");
+      } else if (key === 'e') {
+        setTool("eraser");
+      } else if (key === 'l') {
+        setTool("lasso");
+      } else if (key === 'h') {
+        setTool("hand");
+      } else if (key === 'r') {
+        setTool("rect");
+      } else if (key === 'c') {
+        setTool("circle");
+      } else if (key === 't') {
+        setTool("text");
+      } else if (key === 'delete' || key === 'backspace') {
+        if (selectedStrokeIds.length > 0) {
+          deleteSelectedStrokes();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [historyStep, history, selectedStrokeIds]);
+
   const handleUndo = () => {
     if (historyStep > 0) {
       setHistoryStep(historyStep - 1);
@@ -516,7 +494,6 @@ export default function WhiteboardPage() {
     }
   };
 
-  // Canvas Actions
   const clearCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -552,32 +529,28 @@ export default function WhiteboardPage() {
     }
   };
 
-  // Coordinates extraction
-  const getCoordinates = (e: React.MouseEvent | React.TouchEvent | any) => {
+  const getCoordinates = (e: any) => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
     let x, y;
     if (e.touches && e.touches.length > 0) {
-      x = e.touches[0].clientX - rect.left;
-      y = e.touches[0].clientY - rect.top;
+      x = (e.touches[0].clientX - rect.left) / zoomLevel;
+      y = (e.touches[0].clientY - rect.top) / zoomLevel;
     } else {
-      x = e.clientX - rect.left;
-      y = e.clientY - rect.top;
+      x = (e.clientX - rect.left) / zoomLevel;
+      y = (e.clientY - rect.top) / zoomLevel;
     }
     return { x, y };
   };
 
-  // Smart pen processing
   const processSmartPen = async () => {
     if (accumulatedSmartStrokes.length === 0) return;
     setIsRecognizing(true);
-    
     try {
-      // Create offscreen canvas with strokes
       const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = canvasRef.current?.width || 800;
-      tempCanvas.height = canvasRef.current?.height || 600;
+      tempCanvas.width = canvasRef.current?.width || 3000;
+      tempCanvas.height = canvasRef.current?.height || 2500;
       redrawCanvas(tempCanvas, accumulatedSmartStrokes);
       
       const imgData = tempCanvas.toDataURL("image/png");
@@ -586,7 +559,6 @@ export default function WhiteboardPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image: imgData })
       });
-      
       const data = await res.json();
       
       if (data && data.type && data.type !== "unknown") {
@@ -604,40 +576,30 @@ export default function WhiteboardPage() {
             color,
             brushSize,
             fill: fillShapes,
-            points: data.type === "circle" ? [
-              { x: cx, y: cy },
-              { x: cx + r, y: cy }
-            ] : [
-              { x: box.minX, y: box.minY },
-              { x: box.maxX, y: box.maxY }
-            ],
+            points: data.type === "circle" ? [{ x: cx, y: cy }, { x: cx + r, y: cy }] : [{ x: box.minX, y: box.minY }, { x: box.maxX, y: box.maxY }],
             text: data.type === "text" ? data.value : ""
          };
-         
          setStrokes(prev => [...prev, newStroke]);
       } else {
          showToast("Unrecognized shape, keeping strokes.");
          setStrokes(prev => [...prev, ...accumulatedSmartStrokes]);
       }
     } catch (e) {
-      console.error(e);
       setStrokes(prev => [...prev, ...accumulatedSmartStrokes]);
     }
-    
     setAccumulatedSmartStrokes([]);
     setIsRecognizing(false);
   };
 
-  // Drawing event handlers
-  const startDrawing = (e: React.MouseEvent | React.TouchEvent | any) => {
+  const startDrawing = (e: any) => {
     if (tool === "hand") {
       setIsDrawing(true);
       isDrawingRef.current = true;
       const coords = getCoordinates(e);
       setStartScrollLeft(containerRef.current?.scrollLeft || 0);
       setStartScrollTop(containerRef.current?.scrollTop || 0);
-      setStartX(coords.x);
-      setStartY(coords.y);
+      setStartX(coords.x * zoomLevel);
+      setStartY(coords.y * zoomLevel);
       return;
     }
     
@@ -646,7 +608,6 @@ export default function WhiteboardPage() {
     setIsDrawing(true);
     isDrawingRef.current = true;
     const coords = getCoordinates(e);
-    
     lastPointRef.current = coords;
     strokePointsRef.current = [coords];
     
@@ -656,13 +617,13 @@ export default function WhiteboardPage() {
     }
   };
 
-  const draw = (e: React.MouseEvent | React.TouchEvent | any) => {
+  const draw = (e: any) => {
     if (!isDrawingRef.current) return;
     
     if (tool === "hand") {
       const coords = getCoordinates(e);
-      const dx = coords.x - startX;
-      const dy = coords.y - startY;
+      const dx = coords.x * zoomLevel - startX;
+      const dy = coords.y * zoomLevel - startY;
       if (containerRef.current) {
         containerRef.current.scrollLeft = startScrollLeft - dx;
         containerRef.current.scrollTop = startScrollTop - dy;
@@ -673,7 +634,6 @@ export default function WhiteboardPage() {
     const coords = getCoordinates(e);
     strokePointsRef.current.push(coords);
     
-    // Fast local redraw
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -697,9 +657,8 @@ export default function WhiteboardPage() {
       return;
     }
 
-    if (tool === "line" || tool === "rect" || tool === "circle") {
+    if (["line", "rect", "circle", "triangle", "arrow"].includes(tool)) {
       redrawCanvas(canvas, strokes);
-      
       ctx.lineWidth = brushSize;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
@@ -714,9 +673,31 @@ export default function WhiteboardPage() {
         ctx.moveTo(start.x, start.y);
         ctx.lineTo(coords.x, coords.y);
         ctx.stroke();
+      } else if (tool === "arrow") {
+        const angle = Math.atan2(coords.y - start.y, coords.x - start.x);
+        const headLen = Math.max(16, brushSize * 3.5);
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(coords.x, coords.y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(coords.x, coords.y);
+        ctx.lineTo(coords.x - headLen * Math.cos(angle - Math.PI / 6), coords.y - headLen * Math.sin(angle - Math.PI / 6));
+        ctx.lineTo(coords.x - headLen * Math.cos(angle + Math.PI / 6), coords.y - headLen * Math.sin(angle + Math.PI / 6));
+        ctx.closePath();
+        ctx.fill();
       } else if (tool === "rect") {
         ctx.beginPath();
         ctx.rect(start.x, start.y, coords.x - start.x, coords.y - start.y);
+        if (fillShapes) ctx.fill();
+        else ctx.stroke();
+      } else if (tool === "triangle") {
+        const topX = (start.x + coords.x) / 2;
+        ctx.beginPath();
+        ctx.moveTo(topX, start.y);
+        ctx.lineTo(coords.x, coords.y);
+        ctx.lineTo(start.x, coords.y);
+        ctx.closePath();
         if (fillShapes) ctx.fill();
         else ctx.stroke();
       } else if (tool === "circle") {
@@ -727,10 +708,10 @@ export default function WhiteboardPage() {
         else ctx.stroke();
       }
     } else {
+      // Live smooth Bézier stroke preview
       ctx.lineWidth = brushSize;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      ctx.strokeStyle = color;
       
       if (tool === "eraser" || tool === "stroke_eraser") {
         ctx.globalCompositeOperation = "destination-out";
@@ -738,19 +719,20 @@ export default function WhiteboardPage() {
         ctx.globalAlpha = 1.0;
       } else {
         ctx.globalCompositeOperation = "source-over";
-        if (tool === "highlighter") {
-          ctx.strokeStyle = color;
-          ctx.globalAlpha = 0.35;
-        } else {
-          ctx.globalAlpha = 1.0;
-        }
+        ctx.strokeStyle = color;
+        ctx.globalAlpha = tool === "highlighter" ? 0.35 : 1.0;
       }
       
-      const lastPoint = lastPointRef.current;
-      if (lastPoint) {
+      const pts = strokePointsRef.current;
+      if (pts.length > 2) {
         ctx.beginPath();
-        ctx.moveTo(lastPoint.x, lastPoint.y);
-        ctx.lineTo(coords.x, coords.y);
+        const p1 = pts[pts.length - 3];
+        const p2 = pts[pts.length - 2];
+        const p3 = pts[pts.length - 1];
+        const xc = (p2.x + p3.x) / 2;
+        const yc = (p2.y + p3.y) / 2;
+        ctx.moveTo(p1.x, p1.y);
+        ctx.quadraticCurveTo(p2.x, p2.y, xc, yc);
         ctx.stroke();
       }
     }
@@ -789,47 +771,19 @@ export default function WhiteboardPage() {
       if (detected) {
         let cleanStroke: Stroke | null = null;
         if (detected.type === "line") {
-          cleanStroke = {
-            id: Date.now().toString(),
-            tool: "line",
-            color,
-            brushSize,
-            points: [detected.start, detected.end]
-          };
+          cleanStroke = { id: Date.now().toString(), tool: "line", color, brushSize, points: [detected.start, detected.end] };
           showToast("Snapped to Line ✨");
         } else if (detected.type === "circle") {
           const { cx, cy, r } = detected;
-          cleanStroke = {
-            id: Date.now().toString(),
-            tool: "circle",
-            color,
-            brushSize,
-            fill: fillShapes,
-            points: [{ x: cx, y: cy }, { x: cx + r, y: cy }]
-          };
+          cleanStroke = { id: Date.now().toString(), tool: "circle", color, brushSize, fill: fillShapes, points: [{ x: cx, y: cy }, { x: cx + r, y: cy }] };
           showToast("Snapped to Circle ✨");
         } else if (detected.type === "rectangle") {
           const { x, y, w, h } = detected;
-          cleanStroke = {
-            id: Date.now().toString(),
-            tool: "rect",
-            color,
-            brushSize,
-            fill: fillShapes,
-            points: [{ x, y }, { x: x + w, y: y + h }]
-          };
+          cleanStroke = { id: Date.now().toString(), tool: "rect", color, brushSize, fill: fillShapes, points: [{ x, y }, { x: x + w, y: y + h }] };
           showToast("Snapped to Rectangle ✨");
-        } else if (detected.type === "letter") {
-          const { x, y, value } = detected;
-          cleanStroke = {
-            id: Date.now().toString(),
-            tool: "text",
-            color,
-            brushSize,
-            points: [{ x, y }],
-            text: value
-          };
-          showToast(`Recognized Symbol: ${value} ✨`);
+        } else if (detected.type === "triangle") {
+          cleanStroke = { id: Date.now().toString(), tool: "triangle", color, brushSize, fill: fillShapes, points: [detected.start, detected.end] };
+          showToast("Snapped to Triangle ✨");
         }
 
         if (cleanStroke) {
@@ -863,7 +817,6 @@ export default function WhiteboardPage() {
     strokePointsRef.current = [];
     lastPointRef.current = null;
     
-    // Push history and sync
     setTimeout(() => {
       pushToHistory();
       syncCanvas();
@@ -913,7 +866,6 @@ export default function WhiteboardPage() {
     setTextInputPos(null);
   };
 
-  // Selection Actions
   const deleteSelectedStrokes = () => {
     if (selectedStrokeIds.length === 0) return;
     setStrokes(prev => {
@@ -979,7 +931,6 @@ export default function WhiteboardPage() {
     });
   };
 
-  // Effect to handle initial size setup and redrawing on updates
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -998,30 +949,20 @@ export default function WhiteboardPage() {
     green: "premium-glass-panel !bg-emerald-500/20 text-emerald-100 !border-emerald-500/30"
   };
 
-
   return (
-    <div className="w-full h-full relative font-sans flex flex-col items-center justify-center min-h-[600px] bg-white dark:bg-slate-900">
-      {/* Premium Vanilla CSS Backgrounds */}
+    <div className="w-full h-full relative font-sans flex flex-col items-center justify-center min-h-[600px] bg-slate-50 dark:bg-[#02040a]">
+      {/* Background Mesh */}
       <div className="premium-mesh-bg">
         <div className="premium-mesh-blob-1"></div>
         <div className="premium-mesh-blob-2"></div>
         <div className="premium-mesh-blob-3"></div>
       </div>
-      <style>{`
-        .no-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .no-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
       
       {!joined ? (
         <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto p-6 z-10 relative">
           <button 
              onClick={() => window.history.back()}
-             className="absolute top-4 left-4 p-2 text-slate-500 hover:text-slate-800 font-bold"
+             className="absolute top-4 left-4 p-2 text-slate-500 hover:text-slate-800 dark:hover:text-white font-bold"
           >
              &larr; Back
           </button>
@@ -1036,7 +977,7 @@ export default function WhiteboardPage() {
             </div>
             <h2 className="text-3xl font-black premium-text-gradient mb-3 tracking-tight">Studio Whiteboard</h2>
             <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed mb-8 px-4">
-              Enter a custom room ID to join classmates, or continue with the generated code.
+              Enter a custom room ID to join classmates, or continue with the generated studio code.
             </p>
 
             <div className="space-y-4">
@@ -1045,11 +986,11 @@ export default function WhiteboardPage() {
                 value={roomInput}
                 onChange={(e) => setRoomInput(e.target.value.toUpperCase())}
                 placeholder="ROOM-1234"
-                className="w-full px-6 py-4 rounded-2xl border border-white/10 bg-black/40 font-black text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-white text-center uppercase tracking-[0.2em] shadow-inner transition-all placeholder:font-medium placeholder:tracking-normal placeholder:text-slate-400"
+                className="w-full px-6 py-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-black/40 font-black text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-900 dark:text-white text-center uppercase tracking-[0.2em] shadow-inner transition-all placeholder:font-medium placeholder:tracking-normal placeholder:text-slate-400"
               />
               <button 
                 onClick={joinRoom}
-                className="w-full py-4 bg-[#0d1127] text-white font-extrabold text-sm uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-2 micro-hover-lift premium-glow-border shadow-[0_0_20px_rgba(99,102,241,0.2)]"
+                className="w-full py-4 bg-indigo-600 dark:bg-[#0d1127] text-white font-extrabold text-sm uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-2 micro-hover-lift premium-glow-border shadow-[0_0_20px_rgba(99,102,241,0.3)]"
               >
                 <span>Enter Studio</span>
                 <ChevronRight className="w-5 h-5" />
@@ -1058,15 +999,15 @@ export default function WhiteboardPage() {
           </motion.div>
         </div>
       ) : (
-        <div className="absolute inset-0 bg-[#02040a] overflow-hidden rounded-none shadow-2xl flex flex-col">
+        <div className="absolute inset-0 overflow-hidden flex flex-col select-none">
           
-          {/* FLOATING TOP BAR (Left: Status, Right: Actions) */}
+          {/* FLOATING TOP BAR */}
           <div className="absolute top-6 left-6 right-6 z-40 flex justify-between items-start pointer-events-none">
             
             {/* Properties Panel (Left) */}
-            <div className="pointer-events-auto premium-glass-panel p-5 w-[280px] flex flex-col gap-6 transition-all hover:shadow-2xl">
+            <div className="pointer-events-auto premium-glass-panel p-5 w-[280px] flex flex-col gap-5 transition-all hover:shadow-2xl">
               
-              <div className="flex items-center gap-3 pb-4 border-b border-white/10 relative">
+              <div className="flex items-center gap-3 pb-3.5 border-b border-slate-200/50 dark:border-white/10 relative">
                 <button 
                   onClick={() => setJoined(false)}
                   className="absolute right-0 top-0 p-1.5 text-slate-400 hover:text-slate-800 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -1074,55 +1015,44 @@ export default function WhiteboardPage() {
                 >
                   <X className="w-4 h-4" />
                 </button>
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 text-white">
-                  <Palette className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 text-white">
+                  <Palette className="w-4.5 h-4.5" />
                 </div>
                 <div>
                   <h2 className="font-black text-sm tracking-tight text-slate-900 dark:text-white leading-none mb-1">Studio Board</h2>
-                  <div className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider bg-indigo-500/10 inline-block px-2 py-0.5 rounded-md">
+                  <div className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 inline-block px-2 py-0.5 rounded-md">
                     {roomId}
                   </div>
                 </div>
               </div>
 
-              {/* Colors */}
+              {/* Color Palette Swatches */}
               {tool !== "eraser" && tool !== "sticky" && tool !== "hand" && (
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Colors</h3>
-                  <div className="grid grid-cols-4 gap-3">
+                  <div className="grid grid-cols-5 gap-2">
                     {paletteColors.map((c) => (
                       <button 
                         key={c}
                         onClick={() => setColor(c)}
-                        className={`w-10 h-10 rounded-xl shadow-sm flex items-center justify-center transition-all duration-200 ${
-                          color === c ? "scale-110 ring-[3px] ring-indigo-500 shadow-md z-10" : "hover:scale-105 opacity-90 hover:opacity-100 border border-black/5 dark:border-white/5"
+                        className={`w-9 h-9 rounded-xl shadow-sm flex items-center justify-center transition-all duration-200 ${
+                          color === c ? "scale-110 ring-[3px] ring-indigo-500 shadow-md z-10" : "hover:scale-105 opacity-90 border border-black/5 dark:border-white/5"
                         }`}
                         style={{ backgroundColor: c }}
                       >
-                        {color === c && <Check className="w-5 h-5 text-white drop-shadow-md" />}
+                        {color === c && <Check className="w-4 h-4 text-white drop-shadow-md" />}
                       </button>
                     ))}
-                    <div className="relative w-10 h-10 rounded-xl overflow-hidden hover:scale-105 transition-transform shadow-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 group">
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none group-hover:bg-slate-50 dark:group-hover:bg-slate-700 transition-colors">
-                        <Palette className="w-5 h-5 text-slate-400" />
-                      </div>
-                      <input 
-                        type="color" 
-                        value={color}
-                        onChange={(e) => setColor(e.target.value)}
-                        className="absolute inset-0 w-16 h-16 -translate-x-3 -translate-y-3 cursor-pointer opacity-0"
-                      />
-                    </div>
                   </div>
                 </div>
               )}
 
-              {/* Stroke Size */}
+              {/* Stroke Size Slider */}
               {tool !== "sticky" && tool !== "hand" && (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div className="flex justify-between items-center text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                     <span>{tool === "eraser" || tool === "stroke_eraser" ? "Eraser Size" : "Stroke Size"}</span>
-                    <span className="text-indigo-500 bg-indigo-500/10 px-2 py-0.5 rounded-md font-bold">{brushSize}px</span>
+                    <span className="text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-md font-bold">{brushSize}px</span>
                   </div>
                   <input 
                     type="range" 
@@ -1130,33 +1060,33 @@ export default function WhiteboardPage() {
                     max="40" 
                     value={brushSize}
                     onChange={(e) => setBrushSize(parseInt(e.target.value))}
-                    className="w-full accent-indigo-500 dark:accent-indigo-400 bg-slate-200 dark:bg-slate-800 h-2.5 rounded-full cursor-pointer appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-indigo-500 [&::-webkit-slider-thumb]:rounded-full shadow-inner transition-all hover:[&::-webkit-slider-thumb]:scale-110"
+                    className="w-full accent-indigo-500 dark:accent-indigo-400 bg-slate-200 dark:bg-slate-800 h-2 rounded-full cursor-pointer"
                   />
                 </div>
               )}
 
-              {/* Fill shapes */}
-              {["rect", "circle"].includes(tool) && (
-                <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200/60 dark:border-slate-700/50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" onClick={() => setFillShapes(!fillShapes)}>
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Fill Shapes</span>
-                  <div className={`w-10 h-6 rounded-full transition-all relative p-1 ${fillShapes ? "bg-indigo-500" : "bg-slate-300 dark:bg-slate-600"}`}>
-                    <div className={`w-4 h-4 bg-white rounded-full transition-all shadow-sm ${fillShapes ? "ml-4 shadow-sm" : "ml-0"}`} />
+              {/* Fill Shapes Toggle */}
+              {["rect", "circle", "triangle"].includes(tool) && (
+                <div className="flex items-center justify-between p-2.5 bg-slate-100 dark:bg-slate-800/50 rounded-xl border border-slate-200/60 dark:border-slate-700/50 cursor-pointer" onClick={() => setFillShapes(!fillShapes)}>
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Fill Shape</span>
+                  <div className={`w-9 h-5 rounded-full transition-all relative p-0.5 ${fillShapes ? "bg-indigo-500" : "bg-slate-300 dark:bg-slate-600"}`}>
+                    <div className={`w-4 h-4 bg-white rounded-full transition-all shadow-sm ${fillShapes ? "ml-4" : "ml-0"}`} />
                   </div>
                 </div>
               )}
 
-              {/* Grid Types */}
-              <div className="space-y-3">
-                <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Canvas Background</h3>
-                <div className="grid grid-cols-2 gap-2">
+              {/* Canvas Background Patterns */}
+              <div className="space-y-2">
+                <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Grid Style</h3>
+                <div className="grid grid-cols-2 gap-1.5">
                   {(["blank", "dots", "grid", "ruled"] as BackgroundPattern[]).map((p) => (
                     <button 
                       key={p}
                       onClick={() => setPattern(p)}
-                      className={`py-2 rounded-xl text-xs font-bold capitalize transition-all border ${
+                      className={`py-1.5 rounded-xl text-xs font-bold capitalize transition-all border ${
                         pattern === p
                           ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                          : "bg-slate-50 dark:bg-slate-800/50 border-slate-200/60 dark:border-slate-700 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                          : "bg-slate-100 dark:bg-slate-800/50 border-slate-200/60 dark:border-slate-700 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
                       }`}
                     >
                       {p}
@@ -1164,82 +1094,153 @@ export default function WhiteboardPage() {
                   ))}
                 </div>
               </div>
+
+              {/* Keyboard Shortcuts Hint */}
+              <button
+                onClick={() => setShowKeyShortcuts(!showKeyShortcuts)}
+                className="flex items-center justify-center gap-1.5 text-[10px] font-bold text-slate-400 hover:text-indigo-500 pt-1"
+              >
+                <Keyboard className="w-3.5 h-3.5" />
+                <span>Shortcuts (P, E, L, S, Z, Y)</span>
+              </button>
               
             </div>
 
-            {/* Top Right Actions */}
+            {/* Top Right Action Tools & Zoom */}
             <div className="pointer-events-auto flex flex-col gap-3">
               <div className="premium-glass-panel p-2 flex items-center gap-1 hover:shadow-2xl transition-shadow">
+                
+                {/* Zoom Controls */}
+                <button 
+                  onClick={() => setZoomLevel(prev => Math.max(0.5, prev - 0.15))}
+                  className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
+                  title="Zoom Out (-)"
+                >
+                  <ZoomOut className="w-4 h-4" />
+                </button>
+                <span className="text-[10px] font-extrabold px-1.5 text-slate-600 dark:text-slate-300 min-w-[36px] text-center">
+                  {Math.round(zoomLevel * 100)}%
+                </span>
+                <button 
+                  onClick={() => setZoomLevel(prev => Math.min(2.0, prev + 0.15))}
+                  className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
+                  title="Zoom In (+)"
+                >
+                  <ZoomIn className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={() => setZoomLevel(1)}
+                  className="p-2 rounded-xl text-slate-400 hover:text-indigo-500 hover:bg-slate-100 dark:hover:bg-white/10 transition-all text-xs"
+                  title="Reset Zoom"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                </button>
+
+                <div className="w-[1px] h-6 bg-slate-200 dark:bg-white/10 mx-1"></div>
+
                 <button 
                   onClick={handleUndo}
                   disabled={historyStep <= 0}
-                  className="w-10 h-10 rounded-xl text-slate-300 hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent flex items-center justify-center transition-all micro-hover-lift"
-                  title="Undo"
+                  className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-30 flex items-center justify-center transition-all"
+                  title="Undo (Ctrl+Z)"
                 >
-                  <Undo2 className="w-5 h-5" />
+                  <Undo2 className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={handleRedo}
                   disabled={historyStep >= history.length - 1}
-                  className="w-10 h-10 rounded-xl text-slate-300 hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent flex items-center justify-center transition-all micro-hover-lift"
-                  title="Redo"
+                  className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-30 flex items-center justify-center transition-all"
+                  title="Redo (Ctrl+Y)"
                 >
-                  <Redo2 className="w-5 h-5" />
+                  <Redo2 className="w-4 h-4" />
                 </button>
-                <div className="w-[1px] h-6 bg-white/10 mx-1"></div>
+                
+                <div className="w-[1px] h-6 bg-slate-200 dark:bg-white/10 mx-1"></div>
+
                 <button 
                   onClick={clearCanvas}
-                  className="w-10 h-10 rounded-xl text-rose-400 hover:bg-rose-500/20 flex items-center justify-center transition-all micro-hover-lift"
-                  title="Clear Canvas"
+                  className="p-2 rounded-xl text-rose-500 hover:bg-rose-500/20 flex items-center justify-center transition-all"
+                  title="Clear Board"
                 >
-                  <Trash2 className="w-5 h-5" />
+                  <Trash2 className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={downloadCanvas}
-                  className="w-10 h-10 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+                  className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center transition-all"
                   title="Export PNG"
                 >
-                  <Download className="w-5 h-5" />
+                  <Download className="w-4 h-4" />
                 </button>
               </div>
 
               <div className="flex justify-end">
                 <button 
                   onClick={copyRoomCode}
-                  className="premium-glow-border px-4 py-2.5 rounded-xl shadow-lg font-bold text-xs tracking-wide flex items-center gap-2 transition-all micro-hover-lift bg-[#0d1127]"
+                  className="premium-glow-border px-4 py-2.5 rounded-xl shadow-lg font-bold text-xs tracking-wide flex items-center gap-2 transition-all micro-hover-lift bg-indigo-600 dark:bg-[#0d1127] text-white"
                 >
                   {copied ? <CheckCheck className="w-4 h-4" /> : <Users className="w-4 h-4" />}
-                  <span>{copied ? "Link Copied" : "Invite"}</span>
+                  <span>{copied ? "Copied" : "Invite"}</span>
                 </button>
               </div>
             </div>
 
           </div>
 
-          {/* CANVAS AREA CONTAINER */}
+          {/* KEYBOARD SHORTCUTS MODAL OVERLAY */}
+          <AnimatePresence>
+            {showKeyShortcuts && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="absolute top-24 right-6 z-50 premium-glass-panel p-5 w-64 shadow-2xl text-slate-900 dark:text-white"
+              >
+                <div className="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-white/10 mb-3">
+                  <h4 className="font-extrabold text-xs">Keyboard Shortcuts</h4>
+                  <button onClick={() => setShowKeyShortcuts(false)} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
+                </div>
+                <div className="space-y-1.5 text-[11px] font-medium text-slate-600 dark:text-slate-300">
+                  <div className="flex justify-between"><span>Pen Tool</span><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-white/10 rounded font-mono text-[9px]">P</kbd></div>
+                  <div className="flex justify-between"><span>Smart AI Pen</span><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-white/10 rounded font-mono text-[9px]">S</kbd></div>
+                  <div className="flex justify-between"><span>Eraser</span><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-white/10 rounded font-mono text-[9px]">E</kbd></div>
+                  <div className="flex justify-between"><span>Lasso Select</span><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-white/10 rounded font-mono text-[9px]">L</kbd></div>
+                  <div className="flex justify-between"><span>Hand / Pan</span><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-white/10 rounded font-mono text-[9px]">H</kbd></div>
+                  <div className="flex justify-between"><span>Rectangle</span><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-white/10 rounded font-mono text-[9px]">R</kbd></div>
+                  <div className="flex justify-between"><span>Circle</span><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-white/10 rounded font-mono text-[9px]">C</kbd></div>
+                  <div className="flex justify-between"><span>Text Tool</span><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-white/10 rounded font-mono text-[9px]">T</kbd></div>
+                  <div className="flex justify-between"><span>Undo</span><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-white/10 rounded font-mono text-[9px]">Ctrl+Z</kbd></div>
+                  <div className="flex justify-between"><span>Redo</span><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-white/10 rounded font-mono text-[9px]">Ctrl+Y</kbd></div>
+                  <div className="flex justify-between"><span>Delete Selected</span><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-white/10 rounded font-mono text-[9px]">Del</kbd></div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* CANVAS CONTAINER */}
           <div 
             ref={containerRef}
-            className="absolute inset-0 overflow-auto no-scrollbar select-none"
+            className="absolute inset-0 overflow-auto select-none"
             style={{ touchAction: 'none' }}
           >
-            {/* VIRTUAL INFINITE BOARD */}
             <div
               ref={boardRef}
               style={{
                 width: "3000px",
                 height: "2500px",
                 position: "relative",
-                cursor: tool === "hand" ? (isDrawing ? "grabbing" : "grab") : "crosshair"
+                transform: `scale(${zoomLevel})`,
+                transformOrigin: "top left",
+                cursor: tool === "hand" ? (isDrawing ? "grabbing" : "grab") : tool === "eraser" || tool === "stroke_eraser" ? "cell" : tool === "text" ? "text" : "crosshair"
               }}
             >
-              {/* Background Grid Pattern Rendering */}
+              {/* Background Pattern Rendering */}
               <div className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${
                 pattern === "dots" 
-                  ? "bg-[radial-gradient(#334155_1.5px,transparent_1.5px)] [background-size:32px_32px] opacity-70"
+                  ? "bg-[radial-gradient(#94a3b8_1.5px,transparent_1.5px)] dark:bg-[radial-gradient(#334155_1.5px,transparent_1.5px)] [background-size:32px_32px] opacity-70"
                   : pattern === "grid"
-                  ? "bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] [background-size:32px_32px] opacity-40"
+                  ? "bg-[linear-gradient(to_right,#cbd5e1_1px,transparent_1px),linear-gradient(to_bottom,#cbd5e1_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] [background-size:32px_32px] opacity-50"
                   : pattern === "ruled"
-                  ? "bg-[linear-gradient(to_bottom,#334155_1.5px,transparent_1.5px)] [background-size:100%_32px] opacity-60"
+                  ? "bg-[linear-gradient(to_bottom,#cbd5e1_1.5px,transparent_1.5px)] dark:bg-[linear-gradient(to_bottom,#334155_1.5px,transparent_1.5px)] [background-size:100%_32px] opacity-60"
                   : "opacity-0"
               }`} />
 
@@ -1256,7 +1257,7 @@ export default function WhiteboardPage() {
                 className="absolute inset-0 w-full h-full block"
               />
 
-              {/* COLLABORATIVE DRAGGABLE STICKY NOTES INTERACTIVE OVERLAYS */}
+              {/* STICKY NOTES OVERLAYS */}
               {stickyNotes.map((note) => (
                 <motion.div
                   key={note.id}
@@ -1268,7 +1269,7 @@ export default function WhiteboardPage() {
                   initial={{ opacity: 0, scale: 0.8, x: note.x, y: note.y }}
                   animate={{ opacity: 1, scale: 1, x: note.x, y: note.y }}
                   style={{ position: "absolute", zIndex: 20 }}
-                  className={`w-56 h-56 border p-5 rounded-[1.5rem] shadow-2xl flex flex-col justify-between select-text cursor-default transition-shadow duration-200 hover:z-30 backdrop-blur-md ${
+                  className={`w-56 h-56 border p-4 rounded-2xl shadow-2xl flex flex-col justify-between select-text cursor-default backdrop-blur-md ${
                     stickyColors[note.color as keyof typeof stickyColors] || stickyColors.yellow
                   }`}
                 >
@@ -1278,37 +1279,37 @@ export default function WhiteboardPage() {
                         <button
                           key={colorName}
                           onClick={() => updateNoteColor(note.id, colorName)}
-                          className={`w-4 h-4 rounded-full border border-black/5 hover:scale-110 transition-transform ${
+                          className={`w-3.5 h-3.5 rounded-full border border-black/5 hover:scale-110 transition-transform ${
                             colorName === "yellow" ? "bg-amber-300" : 
                             colorName === "pink" ? "bg-pink-300" :
                             colorName === "blue" ? "bg-blue-300" : "bg-emerald-350"
-                          } ${note.color === colorName ? "ring-2 ring-indigo-500/60 dark:ring-indigo-400 scale-110 shadow-sm" : ""}`}
+                          } ${note.color === colorName ? "ring-2 ring-indigo-500 scale-110" : ""}`}
                         />
                       ))}
                     </div>
                     <button 
                       onClick={() => deleteNote(note.id)}
-                      className="p-1.5 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 text-black/50 dark:text-white/50 hover:text-red-500 transition-colors"
+                      className="p-1 rounded hover:bg-black/10 dark:hover:bg-white/10 text-black/50 dark:text-white/50 hover:text-red-500"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                   <textarea
                     value={note.text}
                     onChange={(e) => updateNoteText(note.id, e.target.value)}
-                    placeholder="Note..."
-                    className="flex-1 bg-transparent resize-none border-none outline-none text-sm font-semibold leading-relaxed mt-3 placeholder-black/30 dark:placeholder-white/30 overflow-y-auto select-text cursor-text"
+                    placeholder="Type note..."
+                    className="flex-1 bg-transparent resize-none border-none outline-none text-sm font-semibold leading-relaxed mt-2 placeholder-black/30 dark:placeholder-white/30 overflow-y-auto select-text cursor-text"
                   />
                 </motion.div>
               ))}
 
-              {/* FLOATING TEXT TOOL OVERLAY CONTAINER */}
+              {/* FLOATING TEXT TOOL OVERLAY */}
               <AnimatePresence>
                 {textInputPos && (
                   <motion.form 
-                    initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
                     onSubmit={handleTextSubmit}
                     onClick={(e) => e.stopPropagation()}
                     onMouseDown={(e) => e.stopPropagation()}
@@ -1321,12 +1322,11 @@ export default function WhiteboardPage() {
                       onChange={(e) => setTextValue(e.target.value)}
                       onBlur={() => handleTextSubmit()}
                       autoFocus
-                      placeholder="Type..."
+                      placeholder="Type text..."
                       className="px-4 py-2 rounded-xl border-2 bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xl focus:outline-none font-bold select-text"
                       style={{ 
                         borderColor: color,
-                        fontSize: `${Math.max(14, brushSize * 1.5 + 10)}px`,
-                        boxShadow: `0 10px 25px -5px ${color}40`
+                        fontSize: `${Math.max(14, brushSize * 1.5 + 10)}px`
                       }}
                     />
                   </motion.form>
@@ -1336,75 +1336,75 @@ export default function WhiteboardPage() {
           </div>
 
           {/* FLOATING BOTTOM TOOLBAR */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
-            <div className="premium-glass-panel premium-glow-border p-2.5 flex items-center gap-1.5 pointer-events-auto shadow-[0_20px_50px_-10px_rgba(0,0,0,0.6)]">
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+            <div className="premium-glass-panel p-2 flex items-center gap-1 pointer-events-auto shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)]">
               
-              <ToolButton active={tool === "hand"} onClick={() => setTool("hand")} icon={Hand} label="Pan" />
-              <div className="w-[1px] h-8 bg-white/10 mx-1"></div>
+              <ToolButton active={tool === "hand"} onClick={() => setTool("hand")} icon={Hand} label="Pan (H)" />
+              <div className="w-[1px] h-7 bg-slate-200 dark:bg-white/10 mx-0.5"></div>
               
-              <ToolButton active={tool === "pen"} onClick={() => setTool("pen")} icon={PenTool} label="Pen" />
-              <ToolButton active={tool === "lasso"} onClick={() => setTool("lasso")} icon={LassoSelect} label="Lasso Select" extraClass="text-indigo-400" />
+              <ToolButton active={tool === "pen"} onClick={() => setTool("pen")} icon={PenTool} label="Pen (P)" />
+              <ToolButton active={tool === "lasso"} onClick={() => setTool("lasso")} icon={LassoSelect} label="Lasso Select (L)" extraClass="text-indigo-500 dark:text-indigo-400" />
+              
               <button 
                 onClick={() => setTool("smart_pen")}
-                className={`group relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                className={`group relative w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 ${
                   tool === "smart_pen"
                     ? "bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] scale-105"
-                    : "text-slate-400 hover:bg-indigo-500/20 hover:text-indigo-300"
+                    : "text-slate-500 dark:text-slate-400 hover:bg-indigo-500/20 hover:text-indigo-500"
                 }`}
-                title="Smart Pen (AI shapes & text)"
+                title="Smart AI Pen (S)"
               >
                 {tool === "smart_pen" && (
                    <motion.div layoutId="activeTool" className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl shadow-[0_0_15px_rgba(99,102,241,0.5)]" style={{ zIndex: -1 }} />
                 )}
-                <Sparkles className={`w-5 h-5 relative z-10 ${isRecognizing ? 'animate-spin text-white' : ''}`} />
-                {isRecognizing && <div className="absolute inset-0 border-2 border-white/50 rounded-xl animate-pulse"></div>}
+                <Sparkles className={`w-4.5 h-4.5 relative z-10 ${isRecognizing ? 'animate-spin text-white' : ''}`} />
                 
-                {/* Tooltip */}
-                <div className="absolute bottom-[calc(100%+14px)] left-1/2 -translate-x-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-bold px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl z-50">
-                  Smart Pen
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-slate-900 dark:border-t-white"></div>
+                <div className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-bold px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl z-50">
+                  Smart AI Pen (S)
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-[4px] border-transparent border-t-slate-900 dark:border-t-white"></div>
                 </div>
               </button>
               
               <ToolButton active={tool === "highlighter"} onClick={() => setTool("highlighter")} icon={Highlighter} label="Highlighter" />
-              <ToolButton active={tool === "eraser"} onClick={() => setTool("eraser")} icon={Eraser} label="Eraser" />
-              <ToolButton active={tool === "stroke_eraser"} onClick={() => setTool("stroke_eraser")} icon={Eraser} label="Stroke Eraser" extraClass="text-rose-500 dark:text-rose-400" />
+              <ToolButton active={tool === "eraser"} onClick={() => setTool("eraser")} icon={Eraser} label="Eraser (E)" />
+              <ToolButton active={tool === "stroke_eraser"} onClick={() => setTool("stroke_eraser")} icon={Eraser} label="Stroke Eraser" extraClass="text-rose-500" />
               
-              <div className="w-[1px] h-8 bg-white/10 mx-1"></div>
+              <div className="w-[1px] h-7 bg-slate-200 dark:bg-white/10 mx-0.5"></div>
               
-              <ToolButton active={tool === "line"} onClick={() => setTool("line")} icon={() => <div className="w-5 h-5 border-t-2 border-current rotate-45 transform origin-center" />} label="Line" />
-              <ToolButton active={tool === "rect"} onClick={() => setTool("rect")} icon={Square} label="Rectangle" />
-              <ToolButton active={tool === "circle"} onClick={() => setTool("circle")} icon={Circle} label="Circle" />
+              <ToolButton active={tool === "line"} onClick={() => setTool("line")} icon={() => <div className="w-4 h-4 border-t-2 border-current rotate-45 transform origin-center" />} label="Line" />
+              <ToolButton active={tool === "arrow"} onClick={() => setTool("arrow")} icon={ArrowRight} label="Arrow (A)" />
+              <ToolButton active={tool === "rect"} onClick={() => setTool("rect")} icon={Square} label="Rectangle (R)" />
+              <ToolButton active={tool === "triangle"} onClick={() => setTool("triangle")} icon={Triangle} label="Triangle" />
+              <ToolButton active={tool === "circle"} onClick={() => setTool("circle")} icon={Circle} label="Circle (C)" />
               
-              <div className="w-[1px] h-8 bg-white/10 mx-1"></div>
+              <div className="w-[1px] h-7 bg-slate-200 dark:bg-white/10 mx-0.5"></div>
               
-              <ToolButton active={tool === "text"} onClick={() => setTool("text")} icon={Type} label="Text" />
+              <ToolButton active={tool === "text"} onClick={() => setTool("text")} icon={Type} label="Text (T)" />
               <ToolButton active={tool === "sticky"} onClick={() => setTool("sticky")} icon={FileText} label="Sticky Note" />
 
             </div>
           </div>
 
-          {/* FLOATING LASSO SELECTION CONTROL HUD */}
+          {/* LASSO HUD */}
           <AnimatePresence>
             {selectedStrokeIds.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                className="absolute top-24 left-1/2 -translate-x-1/2 z-50 premium-glass-panel premium-glow-border px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-4 text-white"
+                className="absolute top-20 left-1/2 -translate-x-1/2 z-50 premium-glass-panel px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-3 text-slate-900 dark:text-white"
               >
-                <div className="flex items-center gap-2 border-r border-white/10 pr-3">
-                  <LassoSelect className="w-5 h-5 text-indigo-400" />
-                  <span className="text-xs font-black tracking-wide">{selectedStrokeIds.length} Selected</span>
+                <div className="flex items-center gap-2 border-r border-slate-200 dark:border-white/10 pr-3">
+                  <LassoSelect className="w-4 h-4 text-indigo-500" />
+                  <span className="text-xs font-extrabold">{selectedStrokeIds.length} Selected</span>
                 </div>
 
-                {/* Recolor swatches */}
-                <div className="flex items-center gap-1.5 border-r border-white/10 pr-3">
+                <div className="flex items-center gap-1 border-r border-slate-200 dark:border-white/10 pr-3">
                   {paletteColors.slice(0, 4).map(c => (
                     <button
                       key={c}
                       onClick={() => recolorSelectedStrokes(c)}
-                      className="w-6 h-6 rounded-full hover:scale-110 transition-transform shadow-sm border border-white/20"
+                      className="w-5 h-5 rounded-full hover:scale-110 transition-transform shadow-sm border border-white/20"
                       style={{ backgroundColor: c }}
                     />
                   ))}
@@ -1412,16 +1412,16 @@ export default function WhiteboardPage() {
 
                 <button
                   onClick={deleteSelectedStrokes}
-                  className="p-2 rounded-xl bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 font-bold text-xs flex items-center gap-1.5 transition-all micro-hover-lift"
-                  title="Delete Selection"
+                  className="p-1.5 rounded-xl bg-rose-500/20 text-rose-500 hover:bg-rose-500/30 font-bold text-xs flex items-center gap-1 transition-all"
+                  title="Delete Selection (Del)"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                   <span>Delete</span>
                 </button>
 
                 <button
                   onClick={() => setSelectedStrokeIds([])}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
                   title="Clear Selection"
                 >
                   <X className="w-4 h-4" />
@@ -1430,18 +1430,16 @@ export default function WhiteboardPage() {
             )}
           </AnimatePresence>
 
-          {/* TOAST NOTIFICATION FOR AUTO-DETECTION */}
+          {/* TOAST NOTIFICATION */}
           <AnimatePresence>
             {toastMsg && (
               <motion.div
                 initial={{ opacity: 0, y: 20, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                className="absolute bottom-28 left-1/2 -translate-x-1/2 z-50 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 font-extrabold text-sm tracking-wide shadow-indigo-500/20"
+                className="absolute bottom-24 left-1/2 -translate-x-1/2 z-50 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 font-extrabold text-xs tracking-wide shadow-indigo-500/20"
               >
-                <div className="bg-indigo-500 p-1.5 rounded-full">
-                   <Sparkles className="w-4 h-4 text-white animate-pulse" />
-                </div>
+                <Sparkles className="w-4 h-4 text-indigo-400 dark:text-indigo-600 animate-pulse" />
                 <span>{toastMsg}</span>
               </motion.div>
             )}
@@ -1458,20 +1456,19 @@ function ToolButton({ active, onClick, icon: Icon, label, extraClass = "" }: any
     <button 
       onClick={onClick}
       title={label}
-      className={`group relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+      className={`group relative w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 ${
         active
-          ? "bg-white text-slate-900 shadow-[0_0_20px_rgba(255,255,255,0.4)] scale-105"
-          : `text-slate-400 hover:bg-white/10 ${extraClass}`
+          ? "bg-indigo-600 text-white dark:bg-white dark:text-slate-900 shadow-[0_0_15px_rgba(99,102,241,0.4)] scale-105"
+          : `text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 ${extraClass}`
       }`}
     >
       {active && (
-         <motion.div layoutId="activeTool" className="absolute inset-0 bg-white rounded-xl shadow-[0_0_15px_rgba(255,255,255,0.3)]" style={{ zIndex: -1 }} />
+         <motion.div layoutId="activeTool" className="absolute inset-0 bg-indigo-600 dark:bg-white rounded-xl" style={{ zIndex: -1 }} />
       )}
-      <Icon className="w-5 h-5 relative z-10" />
-      {/* Tooltip */}
-      <div className="absolute bottom-[calc(100%+14px)] left-1/2 -translate-x-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-bold px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl z-50">
+      <Icon className="w-4.5 h-4.5 relative z-10" />
+      <div className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-bold px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl z-50">
         {label}
-        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-slate-900 dark:border-t-white"></div>
+        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-[4px] border-transparent border-t-slate-900 dark:border-t-white"></div>
       </div>
     </button>
   );

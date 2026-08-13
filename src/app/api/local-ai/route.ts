@@ -20,7 +20,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
     }
 
-    const cleanPrompt = prompt.replace(/\[SYSTEM:[^\]]*\]/gi, "").trim();
+    const cleanPrompt = prompt.replace(/\[SYSTEM:[\s\S]*?\]/gi, "").trim();
     const lowerPrompt = cleanPrompt.toLowerCase();
 
     // 1. Try local Python inference server at http://localhost:5000 first if running

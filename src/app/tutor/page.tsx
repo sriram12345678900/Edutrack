@@ -69,8 +69,12 @@ export default function TutorPage() {
     localStorage.setItem("edutrack_tutor_sessions", JSON.stringify(updatedSessions));
   };
 
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
   }, [currentSessionId, sessions, loading]);
 
   const fileToBase64 = (file: File): Promise<string> => {
@@ -716,7 +720,7 @@ export default function TutorPage() {
             <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-cyan-400/40 pointer-events-none z-20" />
 
             {/* Scrollable Messages Feed Inside Box */}
-            <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-6 custom-scrollbar">
+            <div ref={chatContainerRef} className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-6 custom-scrollbar">
               {!currentSessionId || currentSession?.messages.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center p-6 max-w-xl mx-auto select-none">
                   
