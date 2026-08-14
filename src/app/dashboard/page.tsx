@@ -62,7 +62,7 @@ function SwiperCard({ card, index, activeIndex, totalCards, onSwipeLeft, onSwipe
         }
       }}
       className={cn(
-        "absolute inset-0 premium-glass-panel p-6 flex flex-col justify-between cursor-grab",
+        "!absolute inset-0 premium-glass-panel p-6 flex flex-col justify-between cursor-grab",
         !isTop && "pointer-events-none"
       )}
     >
@@ -89,7 +89,7 @@ function SwiperCard({ card, index, activeIndex, totalCards, onSwipeLeft, onSwipe
         <span className="text-[9px] text-slate-500 font-bold">Card {index + 1} of {totalCards}</span>
       </div>
       
-      <p className="text-center font-extrabold text-sm text-white px-2 mt-2 leading-relaxed relative z-10">{card.front}</p>
+      <p className="text-center font-extrabold text-sm dark:text-white text-slate-900 px-2 mt-2 leading-relaxed relative z-10">{card.front}</p>
       
       {/* Interactive Swipe Hint */}
       <div className="mt-3 text-[10px] text-slate-500 font-black tracking-widest uppercase text-center border-t border-slate-200/60 dark:border-white/5 pt-2 flex justify-between items-center relative z-10">
@@ -252,9 +252,9 @@ export default function Dashboard() {
 
   // Rank badge mapping helper
   const getRankBadge = (rank: number) => {
-    if (rank === 1) return <span className="text-xl shrink-0" title="First Place Gold Crown">👑</span>;
-    if (rank === 2) return <span className="text-lg shrink-0" title="Second Place Shield">🥈</span>;
-    if (rank === 3) return <span className="text-lg shrink-0" title="Third Place Badge">🥉</span>;
+    if (rank === 1) return <span className="text-xs font-black text-amber-400 bg-amber-400/10 border border-amber-400/30 px-1.5 py-0.5 rounded-full shrink-0">#1</span>;
+    if (rank === 2) return <span className="text-xs font-black dark:text-slate-300 text-slate-700 bg-slate-300/10 border border-slate-300/20 px-1.5 py-0.5 rounded-full shrink-0">#2</span>;
+    if (rank === 3) return <span className="text-xs font-black text-amber-700 bg-amber-700/10 border border-amber-700/20 px-1.5 py-0.5 rounded-full shrink-0">#3</span>;
     return <span className="w-5 font-black text-xs text-center font-mono shrink-0 text-slate-500">#{rank}</span>;
   };
 
@@ -282,11 +282,10 @@ export default function Dashboard() {
           <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/15">
             Premium Academic Space
           </span>
-          <h1 className="text-4xl md:text-5xl font-black mt-3.5 tracking-tight flex items-center gap-2.5">
+          <h1 className="text-4xl md:text-5xl font-black mt-3.5 tracking-tight">
             <span className="premium-text-gradient-accent">
               Welcome back, {firstName}!
             </span>
-            <span className="shrink-0 drop-shadow-sm select-none text-3xl md:text-4xl emoji">👋</span>
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-2.5 font-bold text-xs">
             {profile?.className || (userClass ? `Class ${userClass}` : "Class 10")} | Language Preference: {userLanguage}
@@ -386,12 +385,12 @@ export default function Dashboard() {
                   </svg>
                   <div className="absolute flex flex-col items-center justify-center text-center">
                     <span className="text-[8px] font-black uppercase tracking-widest text-indigo-300 opacity-80 leading-none">Level</span>
-                    <span className="text-2.5xl font-black text-white leading-none mt-0.5">{level}</span>
+                    <span className="text-2.5xl font-black dark:text-white text-slate-900 leading-none mt-0.5">{level}</span>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-black text-xl text-white leading-tight flex items-center gap-2">
+                  <h3 className="font-black text-xl dark:text-white text-slate-900 leading-tight flex items-center gap-2">
                     {level <= 1 ? "Study Novice" : level <= 3 ? "Elite Revisionist" : level <= 5 ? "Academic Warrior" : "Grandmaster Scholar"} 🎓
                   </h3>
                   <div className="flex items-center gap-2 mt-1.5 text-xs text-indigo-300 font-bold tracking-wide">
@@ -404,7 +403,7 @@ export default function Dashboard() {
               {/* Progress Detail HUD info */}
               <div className="flex flex-col gap-1 w-full md:w-60">
                 <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest text-right hidden md:block">Progression Tracker</span>
-                <div className="w-full bg-[#050710] h-3.5 rounded-full overflow-hidden border border-slate-200/60 dark:border-white/5 shadow-inner relative mt-1">
+                <div className="w-full dark:bg-[#050710] bg-[#eef1f9] h-3.5 rounded-full overflow-hidden border border-slate-200/60 dark:border-white/5 shadow-inner relative mt-1">
                   <div 
                     className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-400 rounded-full transition-all duration-500 shadow-[0_0_12px_rgba(129,140,248,0.5)]"
                     style={{ width: `${(xp / (level * 200)) * 100}%` }}
@@ -735,7 +734,7 @@ export default function Dashboard() {
                   <div className="w-14 h-14 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
                     <Trophy className="w-7 h-7 text-emerald-400" />
                   </div>
-                  <h3 className="text-base font-black text-white">All Cards Cleared! 🏆</h3>
+                  <h3 className="text-base font-black dark:text-white text-slate-900">All Cards Cleared! 🏆</h3>
                   <p className="text-xs text-slate-500 font-bold mt-1">Great job! You gained bonus XP revision points.</p>
                   <button 
                     onClick={() => setSwiperIndex(0)}
@@ -989,7 +988,7 @@ export default function Dashboard() {
             className="fixed bottom-10 right-10 z-50 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-[2rem] p-6 shadow-2xl flex items-center gap-5 border border-white/20 select-none pointer-events-none"
           >
             <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center shrink-0 border border-white/30 animate-bounce">
-              <Trophy className="w-7 h-7 text-white" />
+              <Trophy className="w-7 h-7 dark:text-white text-slate-900" />
             </div>
             <div>
               <h4 className="font-black text-xl leading-none">Level Up! 🎉</h4>
@@ -1021,7 +1020,7 @@ export default function Dashboard() {
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="bg-[#0c0f1d]/95 backdrop-blur-xl border border-white/10 w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden p-7 text-left text-white"
+              className="dark:bg-[#0c0f1d] bg-[#f5f7ff] backdrop-blur-xl border border-white/10 w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden p-7 text-left dark:text-white text-slate-900"
             >
               <div className="flex justify-between items-start border-b border-slate-200/60 dark:border-white/5 pb-4 mb-4">
                 <div>
@@ -1038,17 +1037,17 @@ export default function Dashboard() {
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between bg-white/[0.02] px-4 py-2.5 rounded-xl border border-slate-200/60 dark:border-white/5">
-                  <span className="text-xs font-semibold text-slate-400">Mastery Progress</span>
+                  <span className="text-xs font-semibold dark:text-slate-400 text-slate-600">Mastery Progress</span>
                   <span className="text-xs font-black text-indigo-400">{selectedNode.percent}% Complete</span>
                 </div>
 
-                <p className="text-slate-400 text-sm font-semibold leading-relaxed">{selectedNode.desc}</p>
+                <p className="dark:text-slate-400 text-slate-600 text-sm font-semibold leading-relaxed">{selectedNode.desc}</p>
                 
                 <div className="bg-white/[0.02] border border-slate-200/60 dark:border-white/5 p-4.5 rounded-2xl">
                   <h4 className="text-[10px] font-black uppercase tracking-wider text-indigo-400 mb-2">High-Yield Board Highlights</h4>
                   <ul className="space-y-2">
                     {selectedNode.keyPoints.map((point: string, idx: number) => (
-                      <li key={idx} className="text-xs text-slate-300 font-bold flex items-start gap-2.5">
+                      <li key={idx} className="text-xs dark:text-slate-300 text-slate-700 font-bold flex items-start gap-2.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0 mt-1.5"></span>
                         <span>{point}</span>
                       </li>
@@ -1068,7 +1067,7 @@ export default function Dashboard() {
                   <Link href="/learn">
                     <button 
                       onClick={() => setSelectedNode(null)}
-                      className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-slate-200 font-extrabold text-xs uppercase tracking-wider py-3.5 rounded-xl border border-slate-200/60 dark:border-white/5 transition-all"
+                      className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 dark:text-slate-200 text-slate-800 font-extrabold text-xs uppercase tracking-wider py-3.5 rounded-xl border border-slate-200/60 dark:border-white/5 transition-all"
                     >
                       <Book className="w-4 h-4" /> Read Theory
                     </button>
@@ -1088,7 +1087,7 @@ export default function Dashboard() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-white dark:bg-[#0c0f1d] border border-slate-200 dark:border-white/10 rounded-3xl p-8 shadow-2xl space-y-6 text-center"
+              className="w-full max-w-md bg-white dark:bg-[#0c0f1d] bg-[#f5f7ff] border border-slate-200 dark:border-white/10 rounded-3xl p-8 shadow-2xl space-y-6 text-center"
             >
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 mb-2">
                 <Sparkles className="w-6 h-6 animate-pulse" />
