@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -237,7 +237,7 @@ const WhiteboardPanel = ({ chatId, nickname, db }: { chatId: string, nickname: s
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-slate-50 dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800">
+    <div className="flex flex-col h-full w-full bg-slate-50 dark:bg-slate-900 bg-slate-100 border-l border-slate-200 dark:border-slate-800">
       <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-950">
         <h3 className="font-black text-sm text-slate-800 dark:text-white flex items-center gap-2">
           <PenTool className="w-4 h-4 text-indigo-500" /> Co-Op Board
@@ -515,7 +515,7 @@ export default function StudyCirclesDMs() {
 
   const initializeDefaultFriends = () => {
     const defaults: Friend[] = [
-      { name: "Aditya Sharma", friendCode: "ADITYA#9581", online: true, avatar: "AS", color: "from-amber-500 to-orange-500", lastMsg: "Hey! Let's balance some NCERT chemistry today 🧪", time: "12:04 PM" },
+      { name: "Aditya Sharma", friendCode: "ADITYA#9581", online: true, avatar: "AS", color: "from-amber-500 to-orange-500", lastMsg: "Hey! Let's balance some NCERT chemistry today ", time: "12:04 PM" },
       { name: "Priya Nair", friendCode: "PRIYA#7204", online: true, avatar: "PN", color: "from-emerald-450 to-teal-500", lastMsg: "Did you finish the spaced repetition flashcards?", time: "Yesterday" },
       { name: "Rohan Das", friendCode: "ROHAN#3401", online: false, avatar: "RD", color: "from-blue-400 to-cyan-500", lastMsg: "I will join the StudyCircle tonight!", time: "2 days ago" }
     ];
@@ -531,7 +531,7 @@ export default function StudyCirclesDMs() {
         avatar: "SA",
         color: "from-purple-500 to-indigo-650",
         members: ["ADITYA#9581", "PRIYA#7204", "ROHAN#3401"],
-        lastMsg: "Let's crack CBSE Class 10 Chemistry together! 💥",
+        lastMsg: "Let's crack CBSE Class 10 Chemistry together! ",
         time: "10:30 AM",
         isGroup: true
       }
@@ -876,7 +876,7 @@ export default function StudyCirclesDMs() {
             online: true,
             avatar: name.substring(0, 2).toUpperCase(),
             color: "from-fuchsia-500 to-pink-650",
-            lastMsg: "We are now connected! Let's study! 📚",
+            lastMsg: "We are now connected! Let's study! ",
             time: "Just now"
           };
           setFriends(prev => {
@@ -902,7 +902,7 @@ export default function StudyCirclesDMs() {
       online: true,
       avatar: name.substring(0, 2).toUpperCase(),
       color: "from-indigo-500 to-pink-650",
-      lastMsg: "I accepted your study request! Let's study! 📚",
+      lastMsg: "I accepted your study request! Let's study! ",
       time: "Just now"
     };
     
@@ -1071,7 +1071,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
 
     // Mock peers simulation (instantly accepts request after 2s for easy demo!)
     if (code === "ADITYA#9581" || code === "PRIYA#7204" || code === "ROHAN#3401" || code.includes("CLASSMATE")) {
-      setAddSuccess("Friend request sent! Classmate accepted instantly! 🎉");
+      setAddSuccess("Friend request sent! Classmate accepted instantly! ");
       setTimeout(() => {
         const parts = code.split("#");
         const name = parts[0];
@@ -1148,7 +1148,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
       avatar: gName.substring(0, 2).toUpperCase(),
       color: "from-purple-500 to-indigo-650",
       members: selectedMembers,
-      lastMsg: "Study Circle created! Welcome everyone! 👋",
+      lastMsg: "Study Circle created! Welcome everyone!",
       time: "Just now",
       isGroup: true
     };
@@ -1174,13 +1174,13 @@ const [liveKitToken, setLiveKitToken] = useState("");
       let replyText = "That's awesome! Let's review the chemical reactions NCERT chapters together.";
       const lower = userMsg.toLowerCase();
       if (lower.includes("hello") || lower.includes("hi")) {
-        replyText = `Hey there study buddy! Ready to balance some CBSE science equations today? 🧪`;
+        replyText = `Hey there study buddy! Ready to balance some CBSE science equations today? `;
       } else if (lower.includes("help") || lower.includes("question") || lower.includes("doubt")) {
-        replyText = `Sure! What problem are you stuck on? Let's check it against the Class 10 board syllabus! 📝`;
+        replyText = `Sure! What problem are you stuck on? Let's check it against the Class 10 board syllabus! `;
       } else if (lower.includes("balanced") || lower.includes("equation")) {
         replyText = `Yes! Balanced equations conform to the Law of Conservation of Mass. For example: ~2H_2 + O_2 ──> 2H_2O~ is perfectly balanced!`;
       } else if (lower.includes("thank")) {
-        replyText = `Anytime! We're here to learn together. Let's aim for 100% in our final board exams! 🏆`;
+        replyText = `Anytime! We're here to learn together. Let's aim for 100% in our final board exams! `;
       }
 
         const botMsg = {
@@ -1250,7 +1250,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
 
         if (hasPriya) {
           setTimeout(async () => {
-            const replyText2 = `Count me in, Aditya! Murali, what do you think? Let's balance the reaction together! 🧪`;
+            const replyText2 = `Count me in, Aditya! Murali, what do you think? Let's balance the reaction together! `;
             const botMsg = {
               id: Date.now().toString() + Math.random(),
               chatId: gCode,
@@ -1340,7 +1340,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
   const handleReadAloud = (text: string) => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
-      const cleanText = text.replace(/<[^>]+>/g, '').replace(/🤖 \*\*StudyBot:\*\*/g, '');
+      const cleanText = text.replace(/<[^>]+>/g, '').replace(/ \*\*StudyBot:\*\*/g, '');
       const utterance = new SpeechSynthesisUtterance(cleanText);
       window.speechSynthesis.speak(utterance);
     }
@@ -1405,7 +1405,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
           chatId: activeChatId!,
           senderId: "study_bot",
           senderCode: "BOT",
-          text: `🤖 **StudyBot:** ${randomResp}`,
+          text: ` **StudyBot:** ${randomResp}`,
           timestamp: new Date()
         };
         
@@ -1477,7 +1477,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
   };
 
   return (
-    <div className="h-full max-h-full bg-slate-50 dark:bg-[#070b13] flex flex-col transition-colors duration-300 relative overflow-hidden">
+    <div className="h-full max-h-full bg-slate-50 dark:bg-[#070b13] bg-[#f5f7ff] flex flex-col transition-colors duration-300 relative overflow-hidden">
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 5px;
@@ -1499,13 +1499,13 @@ const [liveKitToken, setLiveKitToken] = useState("");
       <div className="absolute bottom-[-10%] left-[-5%] w-[450px] h-[450px] bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none"></div>
 
       {/* Direct Chat Hub Area */}
-      <div className="flex-1 w-full max-w-7xl mx-auto flex h-full border-x border-slate-200/50 dark:border-slate-800/50 bg-white/70 dark:bg-[#0d121f]/70 backdrop-blur-2xl shadow-2xl relative z-10 overflow-hidden min-h-0">
+      <div className="flex-1 w-full max-w-7xl mx-auto flex h-full border-x border-slate-200/50 dark:border-slate-800/50 bg-white/70 dark:bg-[#0d121f] bg-[#f5f7ff] backdrop-blur-2xl shadow-2xl relative z-10 overflow-hidden min-h-0">
         
         {/* LEFT PANEL: WHATSAPP SIDEBAR (Chat list & Add Friend / Create Group) */}
-        <aside className="w-80 md:w-96 border-r border-slate-200/50 dark:border-slate-800/50 flex flex-col shrink-0 bg-white/40 dark:bg-[#0a0f18]/45 backdrop-blur-xl">
+        <aside className="w-80 md:w-96 border-r border-slate-200/50 dark:border-slate-800/50 flex flex-col shrink-0 bg-white/40 dark:bg-[#0a0f18] bg-[#eef1f9] backdrop-blur-xl">
           
           {/* Sidebar Header: Profile Information */}
-          <div className="p-5 border-b border-slate-200/40 dark:border-slate-800/40 bg-slate-50/20 dark:bg-slate-900/10 flex flex-col gap-3 shrink-0">
+          <div className="p-5 border-b border-slate-200/40 dark:border-slate-800/40 bg-slate-50/20 dark:bg-slate-900/10 bg-slate-200/10 flex flex-col gap-3 shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Link href="/dashboard" className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition-colors text-slate-500 shrink-0">
@@ -1570,12 +1570,12 @@ const [liveKitToken, setLiveKitToken] = useState("");
             
             {/* 1. STUDY GROUPS SECTION */}
             <div className="space-y-1.5">
-              <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-555 px-3 block mb-1">
+              <span className="text-[9px] font-black uppercase tracking-widest dark:text-slate-400 text-slate-600 dark:text-slate-555 px-3 block mb-1">
                 Group Study Circles
               </span>
               <div className="space-y-0.5">
                 {groups.length === 0 ? (
-                  <p className="text-[10px] text-slate-400 font-semibold px-3 py-2 italic">No group chats created yet.</p>
+                  <p className="text-[10px] dark:text-slate-400 text-slate-600 font-semibold px-3 py-2 italic">No group chats created yet.</p>
                 ) : (
                   groups.map((group) => {
                     const isActive = activeGroup?.groupCode === group.groupCode;
@@ -1587,7 +1587,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                           "flex items-center gap-3.5 p-3.5 rounded-2xl cursor-pointer transition-all select-none border border-transparent",
                           isActive 
                             ? "bg-indigo-500/10 dark:bg-indigo-500/10 border-indigo-200/50 dark:border-indigo-500/20 shadow-md backdrop-blur-md" 
-                            : "hover:bg-slate-50/50 dark:hover:bg-slate-900/20 border-transparent hover:border-slate-200/30 dark:hover:border-slate-800/30"
+                            : "hover:bg-slate-50/50 dark:hover:dark:bg-slate-900/20 bg-slate-200/20 border-transparent hover:border-slate-200/30 dark:hover:border-slate-800/30"
                         )}
                       >
                         <div className={cn(
@@ -1602,7 +1602,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                               {group.name}
                               <span className="text-[8px] font-black uppercase text-indigo-550 dark:text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded-md shrink-0">Group</span>
                             </p>
-                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight shrink-0">{group.time}</span>
+                            <span className="text-[9px] font-bold dark:text-slate-400 text-slate-600 uppercase tracking-tight shrink-0">{group.time}</span>
                           </div>
                           <p className="text-xs text-slate-505 dark:text-slate-450 truncate leading-snug">{group.lastMsg}</p>
                         </div>
@@ -1621,7 +1621,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                 </span>
                 <div className="space-y-1.5 p-2 bg-amber-500/5 rounded-2xl border border-amber-500/10">
                   {pendingRequests.map((req) => (
-                    <div key={req.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+                    <div key={req.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
                       <div className="min-w-0 flex-1">
                         <p className="font-extrabold text-xs text-slate-850 dark:text-slate-200 truncate">{req.senderName}</p>
                         <p className="text-[9px] font-mono text-slate-450 truncate mt-0.5">{req.senderCode}</p>
@@ -1643,12 +1643,12 @@ const [liveKitToken, setLiveKitToken] = useState("");
             {/* 1.7. SENT INVITES SECTION */}
             {sentRequests.length > 0 && (
               <div className="space-y-1.5 mb-4">
-                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-555 px-3 block mb-1">
+                <span className="text-[9px] font-black uppercase tracking-widest dark:text-slate-400 text-slate-600 dark:text-slate-555 px-3 block mb-1">
                   Sent Requests ({sentRequests.length})
                 </span>
                 <div className="space-y-1.5 p-2 bg-slate-500/5 rounded-2xl border border-slate-500/10">
                   {sentRequests.map((req) => (
-                    <div key={req.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+                    <div key={req.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
                       <div className="min-w-0 flex-1">
                         <p className="font-extrabold text-xs text-slate-855 dark:text-slate-200 truncate">{req.recipientCode}</p>
                         <p className="text-[9px] font-bold text-indigo-500 uppercase tracking-widest mt-0.5 animate-pulse">Pending accept...</p>
@@ -1668,12 +1668,12 @@ const [liveKitToken, setLiveKitToken] = useState("");
 
             {/* 2. DIRECT CHATS SECTION */}
             <div className="space-y-1.5">
-              <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-555 px-3 block mb-1">
+              <span className="text-[9px] font-black uppercase tracking-widest dark:text-slate-400 text-slate-600 dark:text-slate-555 px-3 block mb-1">
                 Direct Chats
               </span>
               <div className="space-y-0.5">
                 {friends.length === 0 ? (
-                  <p className="text-[10px] text-slate-400 font-semibold px-3 py-2 italic">Add a classmate by code to start direct chats!</p>
+                  <p className="text-[10px] dark:text-slate-400 text-slate-600 font-semibold px-3 py-2 italic">Add a classmate by code to start direct chats!</p>
                 ) : (
                   friends.map((friend) => {
                     const isActive = activeFriend?.friendCode === friend.friendCode;
@@ -1685,7 +1685,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                           "flex items-center gap-3.5 p-3.5 rounded-2xl cursor-pointer transition-all select-none border border-transparent",
                           isActive 
                             ? "bg-indigo-500/10 dark:bg-indigo-500/10 border-indigo-200/50 dark:border-indigo-500/20 shadow-md backdrop-blur-md" 
-                            : "hover:bg-slate-50/50 dark:hover:bg-slate-900/20 border-transparent hover:border-slate-200/30 dark:hover:border-slate-800/30"
+                            : "hover:bg-slate-50/50 dark:hover:dark:bg-slate-900/20 bg-slate-200/20 border-transparent hover:border-slate-200/30 dark:hover:border-slate-800/30"
                         )}
                       >
                         <div className="relative shrink-0">
@@ -1702,7 +1702,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-baseline mb-0.5">
                             <p className="font-extrabold text-sm text-slate-850 dark:text-slate-100 truncate">{friend.name}</p>
-                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight shrink-0">{friend.time}</span>
+                            <span className="text-[9px] font-bold dark:text-slate-400 text-slate-600 uppercase tracking-tight shrink-0">{friend.time}</span>
                           </div>
                           <p className="text-xs text-slate-505 dark:text-slate-450 truncate leading-snug">{friend.lastMsg}</p>
                         </div>
@@ -1740,26 +1740,26 @@ const [liveKitToken, setLiveKitToken] = useState("");
 
                 {/* Features Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full mb-8">
-                  <div className="p-4 bg-white/40 dark:bg-slate-900/30 border border-slate-200/50 dark:border-white/5 rounded-2xl flex flex-col items-center text-center backdrop-blur-sm shadow-sm hover:scale-[1.03] transition-all duration-300">
+                  <div className="p-4 bg-white/40 dark:bg-slate-900/30 bg-slate-200/30 border border-slate-200/50 dark:border-white/5 rounded-2xl flex flex-col items-center text-center backdrop-blur-sm shadow-sm hover:scale-[1.03] transition-all duration-300">
                     <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 mb-2">
                       <PenTool className="w-4 h-4" />
                     </div>
                     <h3 className="font-extrabold text-[11px] text-slate-800 dark:text-slate-250 uppercase tracking-wider mb-1">Co-Op Board</h3>
-                    <p className="text-[10px] text-slate-400 leading-normal">Real-time canvas sharing to sketch answers together.</p>
+                    <p className="text-[10px] dark:text-slate-400 text-slate-600 leading-normal">Real-time canvas sharing to sketch answers together.</p>
                   </div>
-                  <div className="p-4 bg-white/40 dark:bg-slate-900/30 border border-slate-200/50 dark:border-white/5 rounded-2xl flex flex-col items-center text-center backdrop-blur-sm shadow-sm hover:scale-[1.03] transition-all duration-300">
+                  <div className="p-4 bg-white/40 dark:bg-slate-900/30 bg-slate-200/30 border border-slate-200/50 dark:border-white/5 rounded-2xl flex flex-col items-center text-center backdrop-blur-sm shadow-sm hover:scale-[1.03] transition-all duration-300">
                     <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-2">
                       <Video className="w-4 h-4" />
                     </div>
                     <h3 className="font-extrabold text-[11px] text-slate-800 dark:text-slate-250 uppercase tracking-wider mb-1">Video Calls</h3>
-                    <p className="text-[10px] text-slate-400 leading-normal">Join voice & video rooms instantly with one click.</p>
+                    <p className="text-[10px] dark:text-slate-400 text-slate-600 leading-normal">Join voice & video rooms instantly with one click.</p>
                   </div>
-                  <div className="p-4 bg-white/40 dark:bg-slate-900/30 border border-slate-200/50 dark:border-white/5 rounded-2xl flex flex-col items-center text-center backdrop-blur-sm shadow-sm hover:scale-[1.03] transition-all duration-300">
+                  <div className="p-4 bg-white/40 dark:bg-slate-900/30 bg-slate-200/30 border border-slate-200/50 dark:border-white/5 rounded-2xl flex flex-col items-center text-center backdrop-blur-sm shadow-sm hover:scale-[1.03] transition-all duration-300">
                     <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 mb-2">
                       <Trophy className="w-4 h-4" />
                     </div>
                     <h3 className="font-extrabold text-[11px] text-slate-800 dark:text-slate-250 uppercase tracking-wider mb-1">Quiz Duels</h3>
-                    <p className="text-[10px] text-slate-400 leading-normal">Challenge peers to CBSE syllabus question games.</p>
+                    <p className="text-[10px] dark:text-slate-400 text-slate-600 leading-normal">Challenge peers to CBSE syllabus question games.</p>
                   </div>
                 </div>
 
@@ -1788,7 +1788,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                 {/* Main Content Column */}
                 <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0 min-h-0 relative">
                   {/* Chat Header */}
-                  <div className="p-4 sm:p-5 border-b border-slate-200/50 dark:border-slate-800/55 bg-white/60 dark:bg-[#0c101b]/40 backdrop-blur-xl flex items-center justify-between shrink-0 relative z-20">
+                  <div className="p-4 sm:p-5 border-b border-slate-200/50 dark:border-slate-800/55 bg-white/60 dark:bg-[#0c101b] bg-[#f5f7ff] backdrop-blur-xl flex items-center justify-between shrink-0 relative z-20">
                   <div className="flex items-center gap-3">
                     <div className="relative">
                       <div className={cn(
@@ -1821,7 +1821,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                         "px-3.5 py-2.5 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all flex items-center gap-2 shadow-md border hover:scale-[1.03] active:scale-[0.97]",
                         showWhiteboard
                           ? "bg-amber-500 text-white border-amber-400 shadow-amber-500/20" 
-                          : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20"
+                          : "bg-white dark:bg-slate-900 bg-slate-100 border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20"
                       )}
                     >
                       <PenTool className="w-4 h-4" />
@@ -1833,7 +1833,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                         "px-3.5 py-2.5 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all flex items-center gap-2 shadow-md border hover:scale-[1.03] active:scale-[0.97]",
                         showVideoMeeting 
                           ? "bg-rose-500 text-white border-rose-400 shadow-rose-500/20" 
-                          : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-emerald-650 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
+                          : "bg-white dark:bg-slate-900 bg-slate-100 border-slate-200 dark:border-slate-800 text-emerald-650 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
                       )}
                     >
                       <Video className="w-4 h-4 shrink-0" />
@@ -1843,14 +1843,14 @@ const [liveKitToken, setLiveKitToken] = useState("");
                       onClick={startQuizDuel}
                       className="px-3.5 py-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:to-red-650 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all shadow-md shadow-orange-500/20 hover:scale-[1.03] active:scale-[0.97]"
                     >
-                      ⚔ <span className="hidden sm:inline">Duel</span>
+                       <span className="hidden sm:inline">Duel</span>
                     </button>
 
                     {/* Invite button removed as it is for nothing */}
                     {!activeGroup && (
                       <button 
                         onClick={handleRemoveFriend}
-                        className="px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-rose-500 hover:text-white dark:hover:bg-rose-600 text-rose-600 dark:text-rose-400 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all hover:scale-[1.03] active:scale-[0.97]"
+                        className="px-3.5 py-2.5 bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 hover:bg-rose-500 hover:text-white dark:hover:bg-rose-600 text-rose-600 dark:text-rose-400 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all hover:scale-[1.03] active:scale-[0.97]"
                         title="Remove Friend"
                       >
                         Remove
@@ -1866,11 +1866,11 @@ const [liveKitToken, setLiveKitToken] = useState("");
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "45vh", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="w-full bg-[#0a0f1d] border-b border-white/10 relative z-20 shrink-0 overflow-hidden flex flex-col shadow-[0_10px_40px_rgb(0,0,0,0.5)] ring-1 ring-white/5"
+                      className="w-full dark:bg-[#0a0f1d] bg-[#eef1f9] border-b border-white/10 relative z-20 shrink-0 overflow-hidden flex flex-col shadow-[0_10px_40px_rgb(0,0,0,0.5)] ring-1 ring-white/5"
                     >
                       <button 
                         onClick={() => setShowVideoMeeting(false)}
-                        className="absolute top-4 right-4 z-50 p-2 bg-slate-800/80 hover:bg-slate-700 text-white rounded-full transition-colors backdrop-blur-sm shadow-md border border-white/10"
+                        className="absolute top-4 right-4 z-50 p-2 bg-slate-800/80 hover:bg-slate-700 dark:text-white text-slate-900 rounded-full transition-colors backdrop-blur-sm shadow-md border border-white/10"
                         title="Close Video Meeting"
                       >
                         <X className="w-4 h-4" />
@@ -1894,7 +1894,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                         <div className="flex-1 p-4 flex items-center justify-center h-full w-full">
                           <div className="flex flex-col items-center justify-center text-center">
                             <Loader2 className="w-10 h-10 text-indigo-400 animate-spin mb-4 mx-auto drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]" />
-                            <p className="text-slate-200 font-black text-sm tracking-wide uppercase">Securing video bridge...</p>
+                            <p className="dark:text-slate-200 text-slate-800 font-black text-sm tracking-wide uppercase">Securing video bridge...</p>
                           </div>
                         </div>
                       )}
@@ -1904,18 +1904,18 @@ const [liveKitToken, setLiveKitToken] = useState("");
 
                 {activeDuel ? (
                   /* Quiz Duel Arena Canvas */
-                  <div className="flex-1 flex flex-col h-full bg-[#0a0f1d] text-white overflow-y-auto p-6 relative">
+                  <div className="flex-1 flex flex-col h-full dark:bg-[#0a0f1d] bg-[#eef1f9] dark:text-white text-slate-900 overflow-y-auto p-6 relative">
                     {/* Matchmaking Lobby Screen */}
                     {activeDuel.status === 'waiting' && (
                       <div className="flex-1 flex flex-col items-center justify-center text-center p-8 select-none animate-in fade-in duration-300">
                         <div className="relative mb-6">
                           <div className="absolute inset-0 rounded-full bg-indigo-500/20 animate-ping duration-1000" />
                           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-650 flex items-center justify-center border border-white/20 shadow-2xl">
-                            <Sparkles className="w-10 h-10 text-white animate-pulse" />
+                            <Sparkles className="w-10 h-10 dark:text-white text-slate-900 animate-pulse" />
                           </div>
                         </div>
-                        <h3 className="text-xl font-black text-white tracking-wide">StudyCircle Quiz Lobby</h3>
-                        <p className="text-xs text-slate-400 font-semibold mt-2 max-w-xs leading-relaxed">
+                        <h3 className="text-xl font-black dark:text-white text-slate-900 tracking-wide">StudyCircle Quiz Lobby</h3>
+                        <p className="text-xs dark:text-slate-400 text-slate-600 font-semibold mt-2 max-w-xs leading-relaxed">
                           Classmate <strong>{activeGroup ? activeGroup.name : activeFriend?.name}</strong> is entering the StudyCircle Quiz Arena...
                         </p>
                         {/* Animated loading */}
@@ -1933,14 +1933,14 @@ const [liveKitToken, setLiveKitToken] = useState("");
                       return (
                         <div className="flex-1 flex flex-col h-full justify-between gap-6">
                           {/* Top stats HUD */}
-                          <div className="flex justify-between items-center bg-[#111930] p-4 rounded-2xl border border-white/5 shadow-inner shrink-0">
+                          <div className="flex justify-between items-center dark:bg-[#111930] bg-[#f5f7ff] p-4 rounded-2xl border border-white/5 shadow-inner shrink-0">
                             <div className="flex items-center gap-2">
                               <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center font-extrabold text-[10px] text-white">
                                 {nickname.substring(0, 2).toUpperCase()}
                               </div>
                               <div>
                                 <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest block leading-none">Score</span>
-                                <span className="text-xs font-black text-white mt-0.5 block">{activeDuel.myScore} pts</span>
+                                <span className="text-xs font-black dark:text-white text-slate-900 mt-0.5 block">{activeDuel.myScore} pts</span>
                               </div>
                             </div>
 
@@ -1955,13 +1955,13 @@ const [liveKitToken, setLiveKitToken] = useState("");
                                   className="transition-all duration-1000 ease-linear origin-center -rotate-90"
                                 />
                               </svg>
-                              <span className="absolute text-sm font-black text-white">{activeDuel.timer}s</span>
+                              <span className="absolute text-sm font-black dark:text-white text-slate-900">{activeDuel.timer}s</span>
                             </div>
 
                             <div className="flex items-center gap-2 text-right">
                               <div>
                                 <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest block leading-none">Buddy</span>
-                                <span className="text-xs font-black text-white mt-0.5 block">{activeDuel.buddyScore} pts</span>
+                                <span className="text-xs font-black dark:text-white text-slate-900 mt-0.5 block">{activeDuel.buddyScore} pts</span>
                               </div>
                               <div className="w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center font-extrabold text-[10px] text-white">
                                 {activeFriend ? activeFriend.avatar : "CB"}
@@ -1970,11 +1970,11 @@ const [liveKitToken, setLiveKitToken] = useState("");
                           </div>
 
                           {/* Board question Card */}
-                          <div className="bg-[#111930] border border-white/5 p-6 rounded-3xl text-center shadow-lg relative overflow-hidden flex-1 flex flex-col justify-center">
+                          <div className="dark:bg-[#111930] bg-[#f5f7ff] border border-white/5 p-6 rounded-3xl text-center shadow-lg relative overflow-hidden flex-1 flex flex-col justify-center">
                             <span className="absolute top-4 left-4 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
                               CBSE BOARD QUESTION {activeDuel.currentQuestionIndex + 1} of 3
                             </span>
-                            <h4 className="text-base sm:text-lg font-bold leading-relaxed text-slate-100 mt-4">
+                            <h4 className="text-base sm:text-lg font-bold leading-relaxed dark:text-slate-100 text-slate-900 mt-4">
                               <span dangerouslySetInnerHTML={{
                                 __html: q.question
                                   .replace(/_([a-zA-Z0-9\+\-]+)/g, '<sub>$1</sub>')
@@ -1990,7 +1990,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                               const isCorrectAnswer = option === q.correctAnswer;
                               const hasAnswered = activeDuel.myAnswered !== null;
                               
-                              let btnClass = "bg-[#111930] hover:bg-[#15203d] border-white/5 text-slate-200 hover:border-indigo-500/40";
+                              let btnClass = "dark:bg-[#111930] bg-[#f5f7ff] hover:bg-[#15203d] border-white/5 text-slate-200 hover:border-indigo-500/40";
                               if (hasAnswered) {
                                 if (isCorrectAnswer) {
                                   btnClass = "bg-emerald-700/80 border-emerald-500 text-white shadow-lg shadow-emerald-500/10 pointer-events-none";
@@ -2011,7 +2011,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                                     btnClass
                                   )}
                                 >
-                                  <span className="w-6 h-6 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-bold text-xs shrink-0 select-none text-slate-400">
+                                  <span className="w-6 h-6 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-bold text-xs shrink-0 select-none dark:text-slate-400 text-slate-600">
                                     {String.fromCharCode(65 + idx)}
                                   </span>
                                   <span className="flex-1 break-words">
@@ -2043,13 +2043,13 @@ const [liveKitToken, setLiveKitToken] = useState("");
                           <div className="relative">
                             <div className="absolute inset-0 rounded-full bg-amber-500/20 animate-ping duration-2000" />
                             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center border border-white/20 shadow-2xl">
-                              <Trophy className="w-10 h-10 text-white animate-bounce" />
+                              <Trophy className="w-10 h-10 dark:text-white text-slate-900 animate-bounce" />
                             </div>
                           </div>
 
                           <div>
-                            <h3 className="text-2xl font-black text-white tracking-wide">Classroom Podium</h3>
-                            <p className="text-xs text-slate-400 font-semibold mt-1">
+                            <h3 className="text-2xl font-black dark:text-white text-slate-900 tracking-wide">Classroom Podium</h3>
+                            <p className="text-xs dark:text-slate-400 text-slate-600 font-semibold mt-1">
                               You completed the Chemistry board preparation duel!
                             </p>
                           </div>
@@ -2058,12 +2058,12 @@ const [liveKitToken, setLiveKitToken] = useState("");
                           <div className="flex items-end justify-center gap-4 mt-8 h-40 w-full max-w-xs px-4">
                             {/* Rank 2 (Opponent) */}
                             <div className="flex flex-col items-center flex-1">
-                              <span className="text-[10px] font-black text-slate-300 uppercase truncate max-w-[80px] mb-1.5">
+                              <span className="text-[10px] font-black dark:text-slate-300 text-slate-700 uppercase truncate max-w-[80px] mb-1.5">
                                 {activeFriend ? activeFriend.name.split(" ")[0] : "Buddy"}
                               </span>
                               <div className="bg-slate-700 border border-slate-600 rounded-t-2xl w-full h-16 flex items-center justify-center relative shadow-inner">
-                                <span className="font-mono font-black text-2xl text-slate-200">2</span>
-                                <span className="absolute -bottom-6 text-[10px] font-black text-slate-400 tracking-tight">{activeDuel.buddyScore} pts</span>
+                                <span className="font-mono font-black text-2xl dark:text-slate-200 text-slate-800">2</span>
+                                <span className="absolute -bottom-6 text-[10px] font-black dark:text-slate-400 text-slate-600 tracking-tight">{activeDuel.buddyScore} pts</span>
                               </div>
                             </div>
 
@@ -2084,7 +2084,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
 
                           <div className="bg-emerald-500/10 border border-emerald-500/20 px-6 py-3 rounded-2xl max-w-xs mt-8 shrink-0">
                             <p className="text-xs text-emerald-400 font-extrabold m-0 leading-normal">
-                              🎉 Double Reward Added! You have gained up to <strong>+{activeDuel.myScore * 15 + 10} XP</strong> for board exam practice!
+                               Double Reward Added! You have gained up to <strong>+{activeDuel.myScore * 15 + 10} XP</strong> for board exam practice!
                             </p>
                           </div>
                         </div>
@@ -2105,7 +2105,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                 ) : (
                   <>
                     {/* Direct & Group Message Feed */}
-                    <div ref={messagesEndRef} className="flex-1 h-0 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-4 bg-slate-50/10 dark:bg-[#090d16]/30 backdrop-blur-md custom-scrollbar">
+                    <div ref={messagesEndRef} className="flex-1 h-0 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-4 bg-slate-50/10 dark:bg-[#090d16] bg-[#eef1f9] backdrop-blur-md custom-scrollbar">
                       {error && (
                         <div className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-2xl px-4 py-3 mb-4 text-xs font-semibold">
                           <AlertCircle className="w-4 h-4 shrink-0" /> {error}
@@ -2183,7 +2183,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                                   "px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-md break-words transition-all duration-200 hover:-translate-y-0.5 border",
                                   isOwn 
                                     ? "bg-gradient-to-br from-indigo-600 via-indigo-555 to-purple-650 text-white border-indigo-400/20 shadow-[0_4px_20px_rgba(99,102,241,0.25)]" 
-                                    : "bg-white/60 dark:bg-slate-900/60 border-slate-200/40 dark:border-white/5 backdrop-blur-md text-slate-800 dark:text-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.02)]",
+                                    : "bg-white/60 dark:bg-slate-900/60 bg-slate-200/60 border-slate-200/40 dark:border-white/5 backdrop-blur-md text-slate-800 dark:text-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.02)]",
                                   isOwn && !isConsecutive && "rounded-tr-none",
                                   !isOwn && !isConsecutive && "rounded-tl-none",
                                   isSelected && "ring-4 ring-indigo-500 ring-offset-2 dark:ring-offset-slate-900 scale-[1.02]"
@@ -2215,20 +2215,20 @@ const [liveKitToken, setLiveKitToken] = useState("");
                                   {msg.text && (
                                     <button 
                                       onClick={() => handleReadAloud(msg.text)} 
-                                      className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400 opacity-60 hover:opacity-100"
+                                      className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors dark:text-slate-400 text-slate-600 opacity-60 hover:opacity-100"
                                       title="Read Aloud"
                                     >
                                       <Volume2 className="w-3 h-3" />
                                     </button>
                                   )}
-                                  <span className="text-[9px] font-medium text-slate-400 dark:text-slate-500">
+                                  <span className="text-[9px] font-medium dark:text-slate-400 text-slate-600 dark:text-slate-500">
                                     {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                   </span>
                                   {isOwn && (
                                     msg.read ? (
                                       <CheckCheck className="w-3 h-3 text-indigo-400 shrink-0" />
                                     ) : (
-                                      <Check className="w-3 h-3 text-slate-400 dark:text-slate-500 shrink-0" />
+                                      <Check className="w-3 h-3 dark:text-slate-400 text-slate-600 dark:text-slate-500 shrink-0" />
                                     )
                                   )}
                                 </div>
@@ -2240,13 +2240,13 @@ const [liveKitToken, setLiveKitToken] = useState("");
                     </div>
 
                     {/* Private / Group Message Input Bar */}
-                    <div className="p-4 border-t border-slate-200/50 dark:border-slate-800/55 bg-white/60 dark:bg-[#0c101b]/40 backdrop-blur-xl shrink-0">
+                    <div className="p-4 border-t border-slate-200/50 dark:border-slate-800/55 bg-white/60 dark:bg-[#0c101b] bg-[#f5f7ff] backdrop-blur-xl shrink-0">
                       <form 
                         onSubmit={(e) => handleSend(e)}
                         className="flex gap-2.5 relative max-w-4xl mx-auto w-full items-center"
                       >
                         <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
-                        <button type="button" onClick={() => fileInputRef.current?.click()} className="p-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-500">
+                        <button type="button" onClick={() => fileInputRef.current?.click()} className="p-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-500">
                           <Paperclip className="w-5 h-5" />
                         </button>
                         <input
@@ -2255,7 +2255,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                           onChange={(e) => setChatInput(e.target.value)}
                           placeholder={activeGroup ? `Message ${activeGroup.name}...` : `Message ${activeFriend?.name}...`}
                           maxLength={500}
-                          className="flex-1 rounded-full pl-5 pr-14 py-3.5 bg-slate-50/30 dark:bg-[#111625]/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 shadow-inner text-sm sm:text-base text-slate-855 dark:text-white transition-all focus:border-indigo-500"
+                          className="flex-1 rounded-full pl-5 pr-14 py-3.5 bg-slate-50/30 dark:bg-[#111625] bg-[#f5f7ff] backdrop-blur-md border border-slate-200/60 dark:border-slate-800/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 shadow-inner text-sm sm:text-base text-slate-855 dark:text-white transition-all focus:border-indigo-500"
                         />
                         {chatInput.trim() ? (
                           <button type="submit" className="absolute right-1.5 top-1.5 bottom-1.5 aspect-square bg-indigo-650 hover:bg-indigo-700 text-white rounded-full transition-all flex items-center justify-center shadow-md">
@@ -2300,7 +2300,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6"
+              className="w-full max-w-md bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6"
             >
               <div className="text-center">
                 <div className="flex items-center gap-4 text-slate-800 dark:text-white mb-2">
@@ -2319,14 +2319,14 @@ const [liveKitToken, setLiveKitToken] = useState("");
                   <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase ml-1 block">Friend/Group Code</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Search className="w-5 h-5 text-slate-400" />
+                      <Search className="w-5 h-5 dark:text-slate-400 text-slate-600" />
                     </div>
                     <input
                       type="text"
                       value={searchCode}
                       onChange={(e) => { setSearchCode(e.target.value.toUpperCase()); setAddError(""); }}
                       maxLength={20}
-                      className="block w-full pl-11 pr-4 py-3.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono font-bold tracking-widest text-sm uppercase transition-all"
+                      className="block w-full pl-11 pr-4 py-3.5 bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono font-bold tracking-widest text-sm uppercase transition-all"
                       placeholder="e.g. ADITYA#9581 or GROUP-1234"
                     />
                   </div>
@@ -2374,7 +2374,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6"
+              className="w-full max-w-md bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6"
             >
               <div className="text-center">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/35 border border-indigo-150 dark:border-indigo-850 text-indigo-600 dark:text-indigo-400 mb-4">
@@ -2403,9 +2403,9 @@ const [liveKitToken, setLiveKitToken] = useState("");
                 {/* Buddy checklist selection */}
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase ml-1 block">Select Members</label>
-                  <div className="max-h-40 overflow-y-auto space-y-2 border border-slate-100 dark:border-slate-800 rounded-2xl p-3 bg-slate-50/50 dark:bg-slate-900/40">
+                  <div className="max-h-40 overflow-y-auto space-y-2 border border-slate-100 dark:border-slate-800 rounded-2xl p-3 bg-slate-50/50 dark:bg-slate-900/40 bg-slate-200/40">
                     {friends.length === 0 ? (
-                      <p className="text-[10px] text-slate-400 font-semibold italic text-center py-4">Add some friends by code first before creating a group!</p>
+                      <p className="text-[10px] dark:text-slate-400 text-slate-600 font-semibold italic text-center py-4">Add some friends by code first before creating a group!</p>
                     ) : (
                       friends.map((friend) => {
                         const isChecked = selectedMembers.includes(friend.friendCode);
@@ -2480,7 +2480,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="w-full max-w-sm bg-white/80 dark:bg-[#0c0f1d]/80 backdrop-blur-2xl border border-white/20 dark:border-white/10 rounded-[2rem] p-8 shadow-[0_20px_50px_rgb(0,0,0,0.3)] dark:shadow-[0_20px_50px_rgba(99,102,241,0.15)] ring-1 ring-slate-900/5 space-y-6 text-center relative overflow-hidden"
+              className="w-full max-w-sm bg-white/80 dark:bg-[#0c0f1d] bg-[#f5f7ff] backdrop-blur-2xl border border-white/20 dark:border-white/10 rounded-[2rem] p-8 shadow-[0_20px_50px_rgb(0,0,0,0.3)] dark:shadow-[0_20px_50px_rgba(99,102,241,0.15)] ring-1 ring-slate-900/5 space-y-6 text-center relative overflow-hidden"
             >
               <div className="absolute top-0 left-0 w-full h-32 bg-indigo-500/20 blur-[50px] -z-10 pointer-events-none"></div>
               <motion.div 
@@ -2526,17 +2526,17 @@ const [liveKitToken, setLiveKitToken] = useState("");
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="w-full max-w-sm bg-[#0c0f1d]/80 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 shadow-[0_20px_50px_rgba(99,102,241,0.15)] space-y-6 text-center relative overflow-hidden"
+              className="w-full max-w-sm dark:bg-[#0c0f1d] bg-[#f5f7ff] backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 shadow-[0_20px_50px_rgba(99,102,241,0.15)] space-y-6 text-center relative overflow-hidden"
             >
               <div className="absolute top-0 left-0 w-full h-32 bg-indigo-500/20 blur-[50px] -z-10 pointer-events-none"></div>
-              <div className="w-24 h-24 bg-slate-800 rounded-full mx-auto flex items-center justify-center text-slate-400 text-3xl font-black relative overflow-hidden">
+              <div className="w-24 h-24 bg-slate-800 rounded-full mx-auto flex items-center justify-center dark:text-slate-400 text-slate-600 text-3xl font-black relative overflow-hidden">
                 <div className="absolute w-full h-full bg-indigo-500/20 animate-pulse"></div>
                 <UserPlus className="w-8 h-8 relative z-10" />
               </div>
               
               <div>
-                <h3 className="text-2xl font-black text-white">Calling Buddy...</h3>
-                <p className="text-slate-400 font-bold mt-1">Waiting for them to answer</p>
+                <h3 className="text-2xl font-black dark:text-white text-slate-900">Calling Buddy...</h3>
+                <p className="dark:text-slate-400 text-slate-600 font-bold mt-1">Waiting for them to answer</p>
               </div>
 
               <div className="flex justify-center mt-8">
@@ -2560,7 +2560,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-850 dark:text-white"
+              className="w-full max-w-sm bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-850 dark:text-white"
             >
               {/* Header / Preview */}
               <div className="border-b border-slate-100 dark:border-slate-800 pb-3">
@@ -2573,13 +2573,13 @@ const [liveKitToken, setLiveKitToken] = useState("");
               {/* Info section */}
               <div className="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-850 text-xs space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Sent Time</span>
+                  <span className="text-[10px] font-black dark:text-slate-400 text-slate-600 dark:text-slate-500 uppercase tracking-wider">Sent Time</span>
                   <span className="font-bold text-slate-700 dark:text-slate-300">
                     {new Date(selectedContextMenuMsg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Read Status</span>
+                  <span className="text-[10px] font-black dark:text-slate-400 text-slate-600 dark:text-slate-500 uppercase tracking-wider">Read Status</span>
                   {selectedContextMenuMsg.senderCode === friendCode ? (
                     selectedContextMenuMsg.read ? (
                       <span className="font-black text-indigo-500 flex items-center gap-1">Read by classmate <CheckCheck className="w-3.5 h-3.5 text-indigo-400" /></span>
@@ -2623,7 +2623,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
 
                 <button
                   onClick={() => setSelectedContextMenuMsg(null)}
-                  className="w-full text-center py-3.5 text-xs font-black uppercase tracking-wider text-slate-400 hover:text-slate-500 mt-2 block"
+                  className="w-full text-center py-3.5 text-xs font-black uppercase tracking-wider dark:text-slate-400 text-slate-600 hover:text-slate-500 mt-2 block"
                 >
                   Cancel
                 </button>

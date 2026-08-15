@@ -95,7 +95,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f0f4ff] dark:bg-[#03050c]">
+      <div className="min-h-screen flex items-center justify-center bg-[#eef1f9] dark:bg-[#06080f]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(99,102,241,0.5)]" />
           <p className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest animate-pulse">Initializing Neural Workspace...</p>
@@ -106,7 +106,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f0f4ff] dark:bg-[#03050c]">
+      <div className="min-h-screen flex items-center justify-center bg-[#eef1f9] dark:bg-[#06080f]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(99,102,241,0.5)]" />
           <p className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest animate-pulse">Initializing Neural Workspace...</p>
@@ -120,7 +120,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   const isExpanded = isPinned || isHovered;
 
   return (
-    <div className="h-screen max-h-screen bg-slate-50 dark:bg-[#03050c] text-slate-900 dark:text-slate-100 flex overflow-hidden grid-bg-overlay selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div className="h-screen max-h-screen bg-slate-50 dark:bg-[#06080f] bg-[#eef1f9] text-slate-900 dark:text-slate-100 flex overflow-hidden grid-bg-overlay selection:bg-indigo-500/30 selection:text-indigo-200">
       {/* Mobile Sidebar Overlay */}
       {isMobileOpen && (
         <div
@@ -134,7 +134,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={cn(
-          "fixed md:sticky top-0 h-screen border-r border-slate-200/50 dark:border-white/10 bg-white/95 dark:bg-[#040614]/95 backdrop-blur-3xl flex flex-col z-50 transition-all duration-300 ease-out shadow-2xl",
+          "fixed md:sticky top-0 h-screen border-r border-slate-200/50 dark:border-white/10 bg-white/95 dark:bg-[#040614] bg-[#eef1f9] backdrop-blur-3xl flex flex-col z-50 transition-all duration-300 ease-out shadow-2xl",
           isExpanded ? "w-68 shadow-[0_0_40px_rgba(99,102,241,0.2)]" : "w-20 shadow-none",
           isMobileOpen ? "translate-x-0 w-68" : "-translate-x-full md:translate-x-0"
         )}
@@ -151,7 +151,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         <div className="p-4 border-b border-slate-200/40 dark:border-white/5 flex justify-between items-center shrink-0">
           <Link href="/dashboard" className="flex items-center gap-3 group overflow-hidden">
             <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-500 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)] border border-white/10 group-hover:scale-105 transition-transform shrink-0">
-              <Brain className="w-5.5 h-5.5 text-white" />
+              <Brain className="w-5.5 h-5.5 dark:text-white text-slate-900" />
             </div>
             <div className={cn(
               "flex flex-col transition-all duration-300",
@@ -169,13 +169,13 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
             <button 
               onClick={togglePin}
               title={isPinned ? "Unpin sidebar (Auto-unveil on hover)" : "Pin sidebar"}
-              className="hidden md:flex p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-indigo-400 transition-all text-[10px] font-bold uppercase tracking-wider"
+              className="hidden md:flex p-1.5 rounded-lg bg-white/5 hover:bg-white/10 dark:text-slate-400 text-slate-600 hover:text-indigo-400 transition-all text-[10px] font-bold uppercase tracking-wider"
             >
               {isPinned ? "Pinned" : "Hover"}
             </button>
           )}
 
-          <button className="md:hidden p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl text-slate-400" onClick={() => setIsMobileOpen(false)}>
+          <button className="md:hidden p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl dark:text-slate-400 text-slate-600" onClick={() => setIsMobileOpen(false)}>
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -294,9 +294,9 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
             prefetch={true}
             onClick={() => setIsMobileOpen(false)}
             title={!isExpanded ? "Account Setup" : undefined}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-100 dark:hover:bg-white/[0.03] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-all"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-100 dark:hover:bg-white/[0.03] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:dark:text-slate-200 text-slate-800 transition-all"
           >
-            <Settings className="w-4.5 h-4.5 text-slate-400 shrink-0" /> 
+            <Settings className="w-4.5 h-4.5 dark:text-slate-400 text-slate-600 shrink-0" /> 
             <span className={cn(
               "transition-all duration-300 whitespace-nowrap",
               isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden"
@@ -321,8 +321,8 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       </aside>
 
         {/* Mobile Navbar Header */}
-        <header className="md:hidden flex items-center justify-between p-4 border-b border-slate-200/40 dark:border-white/5 bg-white/90 dark:bg-[#040612]/90 backdrop-blur-xl sticky top-0 z-30 shrink-0">
-          <button onClick={() => setIsMobileOpen(true)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl text-slate-400">
+        <header className="md:hidden flex items-center justify-between p-4 border-b border-slate-200/40 dark:border-white/5 bg-white/90 dark:bg-[#040612] bg-[#eef1f9] backdrop-blur-xl sticky top-0 z-30 shrink-0">
+          <button onClick={() => setIsMobileOpen(true)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl dark:text-slate-400 text-slate-600">
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">

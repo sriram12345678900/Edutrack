@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -45,11 +45,11 @@ export default function StudyPlanner() {
   }, []);
 
   const getLevelTitle = (lvl: number) => {
-    if (lvl === 1) return "Novice Scholar ☕";
-    if (lvl === 2) return "Dedicated Apprentice ⚡";
-    if (lvl === 3) return "Intellectual Master 👑";
-    if (lvl === 4) return "Venerable Sage 🧠";
-    return "Academic Legend 🌟";
+    if (lvl === 1) return "Novice Scholar";
+    if (lvl === 2) return "Dedicated Apprentice";
+    if (lvl === 3) return "Intellectual Master";
+    if (lvl === 4) return "Venerable Sage";
+    return "Academic Legend";
   };
 
   const handleGenerate = async (e: React.FormEvent) => {
@@ -148,7 +148,7 @@ export default function StudyPlanner() {
         const ach = ACHIEVEMENTS.find(a => a.id === id);
         if (ach) {
           const achId = Date.now() + Math.random();
-          setFloatingXps(prev => [...prev, { id: achId, text: `🔓 Unlocked: ${ach.title}!`, x: window.innerWidth / 2, y: 150 }]);
+          setFloatingXps(prev => [...prev, { id: achId, text: ` Unlocked: ${ach.title}!`, x: window.innerWidth / 2, y: 150 }]);
           setTimeout(() => {
             setFloatingXps(prev => prev.filter(f => f.id !== achId));
           }, 2500);
@@ -211,7 +211,7 @@ export default function StudyPlanner() {
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="bg-slate-900 border-2 border-amber-500/50 rounded-[3rem] p-8 md:p-12 shadow-[0_0_80px_rgba(245,158,11,0.25)] max-w-md w-full text-center relative overflow-hidden ring-1 ring-white/10"
+              className="dark:bg-slate-900 bg-slate-100 border-2 border-amber-500/50 rounded-[3rem] p-8 md:p-12 shadow-[0_0_80px_rgba(245,158,11,0.25)] max-w-md w-full text-center relative overflow-hidden ring-1 ring-white/10"
             >
               {/* Glowing back bubbles */}
               <div className="absolute -top-24 -left-24 w-48 h-48 bg-amber-500/20 rounded-full blur-3xl"></div>
@@ -241,8 +241,8 @@ export default function StudyPlanner() {
                 </div>
 
                 <div className="bg-slate-950/60 p-5 rounded-2xl border border-white/5 shadow-inner">
-                  <span className="text-slate-500 text-sm font-semibold block">Level {levelUpData.oldLevel} ➔ Level {levelUpData.newLevel}</span>
-                  <span className="text-white font-extrabold text-lg mt-1 block tracking-wide">{getLevelTitle(levelUpData.newLevel)}</span>
+                  <span className="text-slate-500 text-sm font-semibold block">Level {levelUpData.oldLevel}  Level {levelUpData.newLevel}</span>
+                  <span className="dark:text-white text-slate-900 font-extrabold text-lg mt-1 block tracking-wide">{getLevelTitle(levelUpData.newLevel)}</span>
                 </div>
 
                 <p className="text-sm text-slate-500 dark:text-slate-400 font-medium px-4">
@@ -261,7 +261,7 @@ export default function StudyPlanner() {
         )}
       </AnimatePresence>
 
-      <header className="relative p-8 rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <header className="relative p-8 rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 bg-slate-100 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl"></div>
         <div className="relative z-10">
@@ -291,7 +291,7 @@ export default function StudyPlanner() {
           initial={{ opacity: 0, y: 20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.4, type: "spring", stiffness: 200 }}
-          className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-2xl rounded-[2rem] p-8 md:p-12 shadow-2xl border border-slate-200/50 dark:border-white/10 max-w-2xl mx-auto ring-1 ring-slate-900/5 dark:ring-white/5 relative overflow-hidden"
+          className="bg-white/80 dark:bg-slate-900/60 bg-slate-200/60 backdrop-blur-2xl rounded-[2rem] p-8 md:p-12 shadow-2xl border border-slate-200/50 dark:border-white/10 max-w-2xl mx-auto ring-1 ring-slate-900/5 dark:ring-white/5 relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
           <div className="text-center mb-10">
@@ -310,7 +310,7 @@ export default function StudyPlanner() {
                   required
                   value={subject}
                   onChange={e => setSubject(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-slate-50 dark:bg-white/60 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-medium appearance-none"
+                  className="w-full px-4 py-3.5 bg-slate-50 dark:bg-white/60 dark:bg-slate-900/50 bg-slate-200/50 border border-slate-200 dark:border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-medium appearance-none"
                 >
                   <option value="" disabled>Select Subject</option>
                   <option value="Science">Science</option>
@@ -329,7 +329,7 @@ export default function StudyPlanner() {
                   required
                   value={days}
                   onChange={e => setDays(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-slate-50 dark:bg-white/60 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-medium"
+                  className="w-full px-4 py-3.5 bg-slate-50 dark:bg-white/60 dark:bg-slate-900/50 bg-slate-200/50 border border-slate-200 dark:border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-medium"
                 />
               </div>
             </div>
@@ -340,7 +340,7 @@ export default function StudyPlanner() {
                 placeholder="e.g. Light reflection, Trigonometry formulas"
                 value={weakAreas}
                 onChange={e => setWeakAreas(e.target.value)}
-                className="w-full px-4 py-3.5 bg-slate-50 dark:bg-white/60 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-medium"
+                className="w-full px-4 py-3.5 bg-slate-50 dark:bg-white/60 dark:bg-slate-900/50 bg-slate-200/50 border border-slate-200 dark:border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-medium"
               />
             </div>
 
@@ -359,7 +359,7 @@ export default function StudyPlanner() {
           <div className="lg:col-span-1 space-y-6">
             
             {/* Level Panel */}
-            <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-slate-200/50 dark:border-white/10 sticky top-8 space-y-6 hover:shadow-indigo-500/10 transition-shadow">
+            <div className="bg-white/70 dark:bg-slate-900/70 bg-slate-200/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-slate-200/50 dark:border-white/10 sticky top-8 space-y-6 hover:shadow-indigo-500/10 transition-shadow">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl">
                   <Trophy className="w-6 h-6" />
@@ -408,7 +408,7 @@ export default function StudyPlanner() {
             </div>
 
             {/* Achievements Trophy Hall */}
-            <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-slate-200/50 dark:border-white/10 sticky top-[30rem] space-y-4 hover:shadow-purple-500/10 transition-shadow">
+            <div className="bg-white/70 dark:bg-slate-900/70 bg-slate-200/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-slate-200/50 dark:border-white/10 sticky top-[30rem] space-y-4 hover:shadow-purple-500/10 transition-shadow">
               <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Trophy Milestones</h4>
               <div className="grid grid-cols-1 gap-2.5">
                 {ACHIEVEMENTS.map((ach) => {
@@ -418,8 +418,8 @@ export default function StudyPlanner() {
                       key={ach.id} 
                       className={`flex items-center gap-3 p-3 rounded-2xl border transition-all duration-300 ${
                         isUnlocked 
-                          ? 'bg-slate-50/50 dark:bg-slate-900/30 border-indigo-200 dark:border-indigo-900/40 shadow-sm' 
-                          : 'bg-slate-50/20 dark:bg-slate-900/10 border-slate-100 dark:border-slate-800/60 opacity-60'
+                          ? 'bg-slate-50/50 dark:bg-slate-900/30 bg-slate-200/30 border-indigo-200 dark:border-indigo-900/40 shadow-sm' 
+                          : 'bg-slate-50/20 dark:bg-slate-900/10 bg-slate-200/10 border-slate-100 dark:border-slate-800/60 opacity-60'
                       }`}
                     >
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 ${
@@ -445,7 +445,7 @@ export default function StudyPlanner() {
             </div>
 
             {/* Plan Completion Progress */}
-            <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-slate-200/50 dark:border-white/10 sticky top-[48rem] hover:shadow-teal-500/10 transition-shadow">
+            <div className="bg-white/70 dark:bg-slate-900/70 bg-slate-200/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-slate-200/50 dark:border-white/10 sticky top-[48rem] hover:shadow-teal-500/10 transition-shadow">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-xl">
                   <Target className="w-6 h-6" />
@@ -498,7 +498,7 @@ export default function StudyPlanner() {
                   </div>
                   
                   {/* Card */}
-                  <div className={`w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-3xl shadow-xl backdrop-blur-xl border transition-all duration-300 ${day.completed ? 'bg-slate-50/60 dark:bg-slate-900/40 border-emerald-200/50 dark:border-emerald-900/30 opacity-80' : 'bg-white/80 dark:bg-slate-900/70 border-slate-200/50 dark:border-white/10 hover:border-emerald-300/80 dark:hover:border-emerald-500/50 hover:shadow-emerald-500/10 hover:-translate-y-1 hover:scale-[1.01]'}`}>
+                  <div className={`w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-3xl shadow-xl backdrop-blur-xl border transition-all duration-300 ${day.completed ? 'bg-slate-50/60 dark:bg-slate-900/40 bg-slate-200/40 border-emerald-200/50 dark:border-emerald-900/30 opacity-80' : 'bg-white/80 dark:bg-slate-900/70 bg-slate-200/70 border-slate-200/50 dark:border-white/10 hover:border-emerald-300/80 dark:hover:border-emerald-500/50 hover:shadow-emerald-500/10 hover:-translate-y-1 hover:scale-[1.01]'}`}>
                     <div className="flex items-center justify-between mb-3">
                       <span className={`text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-full ${day.completed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400'}`}>
                         {day.completed ? 'Completed' : 'Upcoming'}

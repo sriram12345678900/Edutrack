@@ -82,7 +82,7 @@ export default function Signup() {
           <Link href="/" className="flex items-center gap-3.5 group">
             <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 via-indigo-650 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/25 border border-white/10 group-hover:scale-105 transition-transform duration-350 relative overflow-hidden">
               <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-500 -skew-x-12" />
-              <Brain className="w-6.5 h-6.5 text-white relative z-10" />
+              <Brain className="w-6.5 h-6.5 dark:text-white text-slate-900 relative z-10" />
             </div>
             <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">EduTrack</span>
           </Link>
@@ -145,7 +145,7 @@ export default function Signup() {
             {/* Separator Divider */}
             <motion.div variants={itemVariants} className="flex items-center gap-4 py-1.5">
               <div className="flex-1 h-px bg-slate-200/70 dark:bg-white/5" />
-              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-black tracking-widest uppercase">Or register</span>
+              <span className="text-[10px] dark:text-slate-400 text-slate-600 dark:text-slate-500 font-black tracking-widest uppercase">Or register</span>
               <div className="flex-1 h-px bg-slate-200/70 dark:bg-white/5" />
             </motion.div>
 
@@ -155,7 +155,7 @@ export default function Signup() {
               <motion.div variants={itemVariants} className="space-y-1.5">
                 <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
                 <div className="relative">
-                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
+                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 dark:text-slate-400 text-slate-600" />
                   <input
                     type="text"
                     value={name}
@@ -170,7 +170,7 @@ export default function Signup() {
               <motion.div variants={itemVariants} className="space-y-1.5">
                 <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 dark:text-slate-400 text-slate-600" />
                   <input
                     type="email"
                     value={email}
@@ -185,7 +185,7 @@ export default function Signup() {
               <motion.div variants={itemVariants} className="space-y-1.5">
                 <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 dark:text-slate-400 text-slate-600" />
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
@@ -196,7 +196,7 @@ export default function Signup() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 focus:outline-none"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 dark:text-slate-400 text-slate-600 hover:text-slate-600 dark:hover:dark:text-slate-300 text-slate-700 focus:outline-none"
                   >
                     {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
                   </button>

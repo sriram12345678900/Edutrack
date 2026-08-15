@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -84,7 +84,7 @@ export default function PYQPage({ params }: { params: { subject: string } }) {
         <div className="space-y-6">
           {pyqs.map((pyq) => (
             <div key={pyq.id} className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <div className="bg-slate-50 dark:bg-slate-900/50 p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+              <div className="bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
                 <div className="flex items-center gap-4">
                   <span className="flex items-center gap-1 text-sm font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-full">
                     <Calendar className="w-4 h-4" /> CBSE {pyq.year}
@@ -101,7 +101,7 @@ export default function PYQPage({ params }: { params: { subject: string } }) {
                     <span className="group-open:rotate-180 transition-transform">▼</span>
                     View Model Solution
                   </summary>
-                  <div className="mt-4 p-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+                  <div className="mt-4 p-6 bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300">
                     <p className="font-medium whitespace-pre-wrap">{pyq.solution}</p>
                   </div>
                 </details>
@@ -117,7 +117,7 @@ export default function PYQPage({ params }: { params: { subject: string } }) {
                 <div className="w-12 h-12 bg-rose-100 dark:bg-rose-900/30 rounded-2xl flex items-center justify-center text-rose-600 dark:text-rose-400">
                   <FileText className="w-6 h-6" />
                 </div>
-                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 px-3 py-1 rounded-full">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 bg-slate-100 px-3 py-1 rounded-full">
                   PDF
                 </span>
               </div>

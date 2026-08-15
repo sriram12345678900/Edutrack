@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -68,7 +68,7 @@ export default function LearnHub() {
       animate="show"
       className="space-y-12 pb-10"
     >
-      <motion.header variants={item} className="relative p-8 rounded-[2rem] overflow-hidden bg-white dark:bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm">
+      <motion.header variants={item} className="relative p-8 rounded-[2rem] overflow-hidden bg-white dark:bg-slate-50 dark:bg-slate-900 bg-slate-100 border border-slate-100 dark:border-slate-800 shadow-sm">
         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl"></div>
         <div className="relative z-10">
@@ -108,7 +108,7 @@ export default function LearnHub() {
                     </div>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <Link href="/learn/english-communicative" className="flex items-center gap-4 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-purple-400 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-md group">
+                      <Link href="/learn/english-communicative" className="flex items-center gap-4 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 border border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-purple-400 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-md group">
                         <div className="w-12 h-12 rounded-xl bg-white dark:bg-white dark:bg-slate-800 shadow-sm text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all">
                           <MessageCircle className="w-6 h-6" />
                         </div>
@@ -118,7 +118,7 @@ export default function LearnHub() {
                         </div>
                       </Link>
 
-                      <Link href="/learn/english-literature" className="flex items-center gap-4 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-fuchsia-400 dark:hover:border-fuchsia-500 hover:bg-fuchsia-50 dark:hover:bg-fuchsia-900/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-md group">
+                      <Link href="/learn/english-literature" className="flex items-center gap-4 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 border border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-fuchsia-400 dark:hover:border-fuchsia-500 hover:bg-fuchsia-50 dark:hover:bg-fuchsia-900/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-md group">
                         <div className="w-12 h-12 rounded-xl bg-white dark:bg-white dark:bg-slate-800 shadow-sm text-fuchsia-600 dark:text-fuchsia-400 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:bg-fuchsia-600 group-hover:text-white transition-all">
                           <BookOpen className="w-6 h-6" />
                         </div>
@@ -144,7 +144,7 @@ export default function LearnHub() {
                       <h3 className="text-2xl font-bold mb-2 text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{subject.name}</h3>
                       <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 font-medium mb-8 flex-grow">{subject.chapters} Chapters</p>
                       
-                      <div className="mt-auto bg-slate-50 dark:bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl">
+                      <div className="mt-auto bg-slate-50 dark:bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 p-4 rounded-2xl">
                         <div className="flex flex-col gap-1 mb-2">
                           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Progress</p>
                           <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400">In Progress</p>

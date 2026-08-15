@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { 
@@ -210,7 +210,7 @@ export default function PomodoroPage() {
       <div className="grid md:grid-cols-3 gap-8 items-start">
         
         {/* TIMER CORE UNIT (Spans 2 columns) */}
-        <div className="md:col-span-2 flex flex-col items-center justify-center bg-white dark:bg-slate-50 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 p-8 rounded-[2rem] shadow-sm relative overflow-hidden">
+        <div className="md:col-span-2 flex flex-col items-center justify-center bg-white dark:bg-slate-50 dark:bg-slate-900/60 bg-slate-200/60 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 p-8 rounded-[2rem] shadow-sm relative overflow-hidden">
           {/* Ambient Glow */}
           <div className="absolute top-[-40%] left-[-20%] w-[300px] h-[300px] bg-indigo-500/5 rounded-full blur-[80px]" />
           
@@ -291,7 +291,7 @@ export default function PomodoroPage() {
           <div className="flex items-center gap-4 relative z-10 mb-8">
             <button 
               onClick={resetTimer}
-              className="p-4 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 text-slate-600 dark:text-slate-500 dark:text-slate-400 rounded-2xl transition-all active:scale-95"
+              className="p-4 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-50 dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-850 text-slate-600 dark:text-slate-500 dark:text-slate-400 rounded-2xl transition-all active:scale-95"
               title="Reset Timer"
             >
               <RotateCcw className="w-5 h-5" />
@@ -347,7 +347,7 @@ export default function PomodoroPage() {
         {/* STATS & SETTINGS BLOCK (1 column) */}
         <div className="space-y-6">
           {/* STATS PANEL */}
-          <div className="bg-white dark:bg-slate-50 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 p-6 rounded-[2rem] shadow-sm">
+          <div className="bg-white dark:bg-slate-50 dark:bg-slate-900/60 bg-slate-200/60 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 p-6 rounded-[2rem] shadow-sm">
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2 mb-6">
               <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl">
                 <Award className="w-4.5 h-4.5 text-indigo-600 dark:text-indigo-400" />
@@ -389,7 +389,7 @@ export default function PomodoroPage() {
           </div>
 
           {/* INTERACTIVE EXTRA OPTIONS */}
-          <div className="bg-white dark:bg-slate-50 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 p-6 rounded-[2rem] shadow-sm">
+          <div className="bg-white dark:bg-slate-50 dark:bg-slate-900/60 bg-slate-200/60 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 p-6 rounded-[2rem] shadow-sm">
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2 mb-6">
               <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl">
                 <Lightbulb className="w-4.5 h-4.5 text-indigo-600 dark:text-indigo-400" />

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -602,7 +602,7 @@ export default function WhiteboardPage() {
     setDeckPages(prev => [...prev, newPg]);
     setActivePageIndex(deckPages.length);
     setSelectedStrokeIds([]);
-    showToast(`Created Page ${newPgNumber} 📄`);
+    showToast(`Created Page ${newPgNumber} `);
   };
 
   // Image Upload / Import Handler
@@ -631,7 +631,7 @@ export default function WhiteboardPage() {
 
           setStrokes(prev => [...prev, newStroke]);
           setSelectedStrokeIds([newStroke.id]);
-          showToast("Imported Image to Canvas 🖼️");
+          showToast("Imported Image to Canvas ️");
           pushToHistory();
           syncCanvas();
         };
@@ -808,7 +808,7 @@ export default function WhiteboardPage() {
     setSelectedStrokeIds([]);
     pushToHistory();
     syncCanvas([]);
-    showToast("Canvas Cleared 🧹");
+    showToast("Canvas Cleared ");
   };
 
   const downloadCanvas = () => {
@@ -818,7 +818,7 @@ export default function WhiteboardPage() {
     link.download = `edutrack-whiteboard-${roomId}-page${activePageIndex + 1}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
-    showToast("Downloaded PNG Export 🎨");
+    showToast("Downloaded PNG Export ");
   };
 
   const solveWhiteboardWithAI = async () => {
@@ -895,7 +895,7 @@ export default function WhiteboardPage() {
       return next;
     });
     setShowPresetBank(false);
-    showToast(`Inserted ${type.replace("_", " ")} preset ✨`);
+    showToast(`Inserted ${type.replace("_", " ")} preset `);
   };
 
   // Selection Manipulation Actions
@@ -911,7 +911,7 @@ export default function WhiteboardPage() {
     const newIds = newStrokes.map(s => s.id);
     setStrokes(prev => [...prev, ...newStrokes]);
     setSelectedStrokeIds(newIds);
-    showToast(`Duplicated ${newStrokes.length} element${newStrokes.length > 1 ? "s" : ""} 📋`);
+    showToast(`Duplicated ${newStrokes.length} element${newStrokes.length > 1 ? "s" : ""} `);
     pushToHistory();
     syncCanvas();
   };
@@ -925,7 +925,7 @@ export default function WhiteboardPage() {
       if (canvas) redrawCanvas(canvas, next, selectedStrokeIds, showRuler, rulerPos);
       return next;
     });
-    showToast("Recolored selected elements 🎨");
+    showToast("Recolored selected elements ");
     pushToHistory();
     syncCanvas();
   };
@@ -954,7 +954,7 @@ export default function WhiteboardPage() {
       if (canvas) redrawCanvas(canvas, next, selectedStrokeIds, showRuler, rulerPos);
       return next;
     });
-    showToast(`Scaled elements (${scaleFactor > 1 ? "Enlarged" : "Shrunk"}) 🔍`);
+    showToast(`Scaled elements (${scaleFactor > 1 ? "Enlarged" : "Shrunk"}) `);
     pushToHistory();
     syncCanvas();
   };
@@ -1197,18 +1197,18 @@ export default function WhiteboardPage() {
         let cleanStroke: Stroke | null = null;
         if (detected.type === "line") {
           cleanStroke = { id: Date.now().toString(), tool: "line", color, brushSize, points: [detected.start, detected.end] };
-          showToast("Snapped to Line ✨");
+          showToast("Snapped to Line ");
         } else if (detected.type === "circle") {
           const { cx, cy, r } = detected;
           cleanStroke = { id: Date.now().toString(), tool: "circle", color, brushSize, fill: fillShapes, points: [{ x: cx, y: cy }, { x: cx + r, y: cy }] };
-          showToast("Snapped to Circle ✨");
+          showToast("Snapped to Circle ");
         } else if (detected.type === "rectangle") {
           const { x, y, w, h } = detected;
           cleanStroke = { id: Date.now().toString(), tool: "rect", color, brushSize, fill: fillShapes, points: [{ x, y }, { x: x + w, y: y + h }] };
-          showToast("Snapped to Rectangle ✨");
+          showToast("Snapped to Rectangle ");
         } else if (detected.type === "triangle") {
           cleanStroke = { id: Date.now().toString(), tool: "triangle", color, brushSize, fill: fillShapes, points: [detected.start, detected.end] };
-          showToast("Snapped to Triangle ✨");
+          showToast("Snapped to Triangle ");
         }
 
         if (cleanStroke) {
@@ -1229,7 +1229,7 @@ export default function WhiteboardPage() {
       const selected = strokes.filter(s => isStrokeInLasso(s, points)).map(s => s.id);
       setSelectedStrokeIds(selected);
       if (selected.length > 0) {
-        showToast(`Selected ${selected.length} element${selected.length > 1 ? "s" : ""} 🎯`);
+        showToast(`Selected ${selected.length} element${selected.length > 1 ? "s" : ""} `);
       } else {
         setSelectedStrokeIds([]);
       }
@@ -1300,7 +1300,7 @@ export default function WhiteboardPage() {
       return next;
     });
     setSelectedStrokeIds([]);
-    showToast("Deleted selected elements 🗑️");
+    showToast("Deleted selected elements ️");
     pushToHistory();
     syncCanvas();
   };
@@ -1316,7 +1316,7 @@ export default function WhiteboardPage() {
       setRoomId(roomInput.toUpperCase());
       setJoined(true);
       setTimeout(() => pushToHistory(), 500);
-      showToast(`Joined Room ${roomInput.toUpperCase()} 🚀`);
+      showToast(`Joined Room ${roomInput.toUpperCase()} `);
     }
   };
 
@@ -1343,7 +1343,7 @@ export default function WhiteboardPage() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-slate-900/90 text-slate-100 border border-slate-700/60 rounded-full shadow-2xl backdrop-blur-md text-xs font-semibold flex items-center gap-2"
+            className="absolute top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 dark:bg-slate-900/90 bg-slate-200/90 dark:text-slate-100 text-slate-900 border border-slate-700/60 rounded-full shadow-2xl backdrop-blur-md text-xs font-semibold flex items-center gap-2"
           >
             <Sparkles className="w-4 h-4 text-amber-400" />
             <span>{toastMsg}</span>
@@ -1358,7 +1358,7 @@ export default function WhiteboardPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="absolute z-50 transform -translate-x-1/2 flex items-center gap-1.5 p-1.5 bg-slate-900/95 border border-indigo-500/50 rounded-2xl shadow-2xl backdrop-blur-2xl text-slate-100"
+            className="absolute z-50 transform -translate-x-1/2 flex items-center gap-1.5 p-1.5 dark:bg-slate-900/95 bg-slate-200/95 border border-indigo-500/50 rounded-2xl shadow-2xl backdrop-blur-2xl dark:text-slate-100 text-slate-900"
             style={{
               left: Math.max(160, Math.min(window.innerWidth - 160, (selBox.minX + selBox.maxX) / 2)),
               top: Math.max(80, selBox.minY - 55)
@@ -1366,7 +1366,7 @@ export default function WhiteboardPage() {
           >
             <button
               onClick={duplicateSelectedStrokes}
-              className="p-2 hover:bg-slate-800 rounded-xl text-slate-200 hover:text-white transition-all flex items-center gap-1 text-xs font-semibold"
+              className="p-2 hover:bg-slate-800 rounded-xl dark:text-slate-200 text-slate-800 hover:dark:text-white text-slate-900 transition-all flex items-center gap-1 text-xs font-semibold"
               title="Duplicate (Clone)"
             >
               <Copy className="w-3.5 h-3.5 text-indigo-400" />
@@ -1375,7 +1375,7 @@ export default function WhiteboardPage() {
 
             <button
               onClick={() => scaleSelectedStrokes(1.2)}
-              className="p-2 hover:bg-slate-800 rounded-xl text-slate-200 hover:text-white transition-all flex items-center gap-1 text-xs font-semibold"
+              className="p-2 hover:bg-slate-800 rounded-xl dark:text-slate-200 text-slate-800 hover:dark:text-white text-slate-900 transition-all flex items-center gap-1 text-xs font-semibold"
               title="Enlarge"
             >
               <Maximize2 className="w-3.5 h-3.5 text-cyan-400" />
@@ -1383,7 +1383,7 @@ export default function WhiteboardPage() {
 
             <button
               onClick={() => scaleSelectedStrokes(0.8)}
-              className="p-2 hover:bg-slate-800 rounded-xl text-slate-200 hover:text-white transition-all flex items-center gap-1 text-xs font-semibold"
+              className="p-2 hover:bg-slate-800 rounded-xl dark:text-slate-200 text-slate-800 hover:dark:text-white text-slate-900 transition-all flex items-center gap-1 text-xs font-semibold"
               title="Shrink"
             >
               <Minimize2 className="w-3.5 h-3.5 text-cyan-400" />
@@ -1412,7 +1412,7 @@ export default function WhiteboardPage() {
 
             <button
               onClick={() => setSelectedStrokeIds([])}
-              className="p-2 hover:bg-slate-800 rounded-xl text-slate-400 hover:text-white transition-all"
+              className="p-2 hover:bg-slate-800 rounded-xl dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 transition-all"
               title="Deselect"
             >
               <X className="w-3.5 h-3.5" />
@@ -1424,7 +1424,7 @@ export default function WhiteboardPage() {
       {/* Top Floating Bar */}
       <header className="absolute top-4 left-4 right-4 z-40 flex items-center justify-between pointer-events-none">
         <div className="flex items-center gap-3 pointer-events-auto">
-          <div className="px-3 py-2 bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl flex items-center gap-2">
+          <div className="px-3 py-2 dark:bg-slate-900/80 bg-slate-200/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl flex items-center gap-2">
             <div className="p-1.5 bg-gradient-to-tr from-indigo-500 to-cyan-400 rounded-xl text-white shadow-md">
               <Zap className="w-4 h-4" />
             </div>
@@ -1432,16 +1432,16 @@ export default function WhiteboardPage() {
               <h1 className="text-xs font-bold tracking-wide bg-gradient-to-r from-indigo-300 via-cyan-200 to-white bg-clip-text text-transparent">
                 EduTrack Pro Whiteboard
               </h1>
-              <p className="text-[10px] text-slate-400 font-medium">Infinite Canvas & Multi-Page Deck</p>
+              <p className="text-[10px] dark:text-slate-400 text-slate-600 font-medium">Infinite Canvas & Multi-Page Deck</p>
             </div>
           </div>
 
           {/* Multi-Page Slide Deck Switcher */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl text-xs font-semibold">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 dark:bg-slate-900/80 bg-slate-200/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl text-xs font-semibold">
             <button
               onClick={() => setActivePageIndex(prev => Math.max(0, prev - 1))}
               disabled={activePageIndex === 0}
-              className="p-1 hover:bg-slate-800 rounded-lg text-slate-300 disabled:opacity-40"
+              className="p-1 hover:bg-slate-800 rounded-lg dark:text-slate-300 text-slate-700 disabled:opacity-40"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
             </button>
@@ -1451,7 +1451,7 @@ export default function WhiteboardPage() {
             <button
               onClick={() => setActivePageIndex(prev => Math.min(deckPages.length - 1, prev + 1))}
               disabled={activePageIndex === deckPages.length - 1}
-              className="p-1 hover:bg-slate-800 rounded-lg text-slate-300 disabled:opacity-40"
+              className="p-1 hover:bg-slate-800 rounded-lg dark:text-slate-300 text-slate-700 disabled:opacity-40"
             >
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
@@ -1467,7 +1467,7 @@ export default function WhiteboardPage() {
           {/* Theme Toggle */}
           <button
             onClick={() => setCanvasTheme(t => t === "dark" ? "light" : "dark")}
-            className="p-2.5 bg-slate-900/80 hover:bg-slate-800 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl text-slate-300 transition-all"
+            className="p-2.5 dark:bg-slate-900/80 bg-slate-200/80 hover:bg-slate-800 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl dark:text-slate-300 text-slate-700 transition-all"
             title="Toggle Canvas Theme"
           >
             {canvasTheme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
@@ -1479,7 +1479,7 @@ export default function WhiteboardPage() {
           {/* Import Image */}
           <button
             onClick={() => imageUploadInputRef.current?.click()}
-            className="px-3 py-2 bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-slate-200 rounded-2xl text-xs font-semibold backdrop-blur-xl shadow-lg flex items-center gap-1.5 transition-all"
+            className="px-3 py-2 dark:bg-slate-900/80 bg-slate-200/80 hover:bg-slate-800 border border-slate-800 dark:text-slate-200 text-slate-800 rounded-2xl text-xs font-semibold backdrop-blur-xl shadow-lg flex items-center gap-1.5 transition-all"
             title="Import Image to Canvas"
           >
             <ImageIcon className="w-4 h-4 text-emerald-400" />
@@ -1490,10 +1490,10 @@ export default function WhiteboardPage() {
           <button
             onClick={() => {
               setShowRuler(!showRuler);
-              showToast(showRuler ? "Hidden Metric Ruler" : "Metric Ruler Active 📏");
+              showToast(showRuler ? "Hidden Metric Ruler" : "Metric Ruler Active ");
             }}
             className={`px-3 py-2 border rounded-2xl text-xs font-semibold backdrop-blur-xl shadow-lg flex items-center gap-1.5 transition-all ${
-              showRuler ? "bg-indigo-600 border-indigo-500 text-white" : "bg-slate-900/80 hover:bg-slate-800 border-slate-800 text-slate-200"
+              showRuler ? "bg-indigo-600 border-indigo-500 text-white" : "dark:bg-slate-900/80 bg-slate-200/80 hover:bg-slate-800 border-slate-800 text-slate-200"
             }`}
             title="Toggle Metric Ruler"
           >
@@ -1514,7 +1514,7 @@ export default function WhiteboardPage() {
           {/* Preset Diagrams */}
           <button
             onClick={() => setShowPresetBank(true)}
-            className="px-3 py-2 bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-slate-200 rounded-2xl text-xs font-semibold backdrop-blur-xl shadow-lg flex items-center gap-1.5 transition-all"
+            className="px-3 py-2 dark:bg-slate-900/80 bg-slate-200/80 hover:bg-slate-800 border border-slate-800 dark:text-slate-200 text-slate-800 rounded-2xl text-xs font-semibold backdrop-blur-xl shadow-lg flex items-center gap-1.5 transition-all"
           >
             <Library className="w-4 h-4 text-indigo-400" />
             <span>Diagram Presets</span>
@@ -1523,7 +1523,7 @@ export default function WhiteboardPage() {
           {/* Export PNG */}
           <button
             onClick={downloadCanvas}
-            className="p-2.5 bg-slate-900/80 hover:bg-slate-800 backdrop-blur-xl border border-slate-800 rounded-2xl text-slate-300 hover:text-white transition-all shadow-lg"
+            className="p-2.5 dark:bg-slate-900/80 bg-slate-200/80 hover:bg-slate-800 backdrop-blur-xl border border-slate-800 rounded-2xl dark:text-slate-300 text-slate-700 hover:dark:text-white text-slate-900 transition-all shadow-lg"
             title="Download PNG"
           >
             <Download className="w-4 h-4" />
@@ -1532,7 +1532,7 @@ export default function WhiteboardPage() {
           {/* Shortcuts */}
           <button
             onClick={() => setShowKeyShortcuts(true)}
-            className="p-2.5 bg-slate-900/80 hover:bg-slate-800 backdrop-blur-xl border border-slate-800 rounded-2xl text-slate-300 hover:text-white transition-all shadow-lg"
+            className="p-2.5 dark:bg-slate-900/80 bg-slate-200/80 hover:bg-slate-800 backdrop-blur-xl border border-slate-800 rounded-2xl dark:text-slate-300 text-slate-700 hover:dark:text-white text-slate-900 transition-all shadow-lg"
             title="Keyboard Shortcuts"
           >
             <Keyboard className="w-4 h-4" />
@@ -1590,14 +1590,14 @@ export default function WhiteboardPage() {
               className="absolute z-30 transform -translate-y-1/2"
               style={{ left: textInputPos.x, top: textInputPos.y }}
             >
-              <form onSubmit={handleTextSubmit} className="flex items-center gap-1 bg-slate-900/90 border border-indigo-500 rounded-xl p-1.5 shadow-2xl backdrop-blur-md">
+              <form onSubmit={handleTextSubmit} className="flex items-center gap-1 dark:bg-slate-900/90 bg-slate-200/90 border border-indigo-500 rounded-xl p-1.5 shadow-2xl backdrop-blur-md">
                 <input
                   type="text"
                   autoFocus
                   value={textValue}
                   onChange={(e) => setTextValue(e.target.value)}
                   placeholder="Type on whiteboard..."
-                  className="bg-transparent text-white text-sm px-2 focus:outline-none w-48 font-medium"
+                  className="bg-transparent dark:text-white text-slate-900 text-sm px-2 focus:outline-none w-48 font-medium"
                 />
                 <button type="submit" className="p-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg">
                   <Check className="w-4 h-4" />
@@ -1649,7 +1649,7 @@ export default function WhiteboardPage() {
 
       {/* Floating Bottom Toolbar */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2">
-        <div className="px-3 py-2 bg-slate-900/90 backdrop-blur-2xl border border-slate-800 rounded-3xl shadow-2xl flex items-center gap-1.5 text-slate-300">
+        <div className="px-3 py-2 dark:bg-slate-900/90 bg-slate-200/90 backdrop-blur-2xl border border-slate-800 rounded-3xl shadow-2xl flex items-center gap-1.5 dark:text-slate-300 text-slate-700">
           {/* Primary Tools */}
           <button
             onClick={() => setTool("pen")}
@@ -1698,7 +1698,7 @@ export default function WhiteboardPage() {
                   style={{ width: `${Math.min(14, Math.max(3, brushSize))}px`, height: `${Math.min(14, Math.max(3, brushSize))}px` }}
                 />
               </div>
-              <span className="font-mono text-[10px] text-slate-300">{brushSize}px</span>
+              <span className="font-mono text-[10px] dark:text-slate-300 text-slate-700">{brushSize}px</span>
             </button>
 
             {/* Thickness Slider Popover */}
@@ -1708,9 +1708,9 @@ export default function WhiteboardPage() {
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute bottom-12 left-0 z-50 p-3.5 bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl backdrop-blur-xl w-52 text-slate-200"
+                  className="absolute bottom-12 left-0 z-50 p-3.5 dark:bg-slate-900/95 bg-slate-200/95 border border-slate-800 rounded-2xl shadow-2xl backdrop-blur-xl w-52 dark:text-slate-200 text-slate-800"
                 >
-                  <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 mb-2">
+                  <div className="flex items-center justify-between text-[11px] font-bold dark:text-slate-400 text-slate-600 mb-2">
                     <span>Brush Thickness</span>
                     <span className="font-mono text-indigo-400">{brushSize}px</span>
                   </div>
@@ -1853,7 +1853,7 @@ export default function WhiteboardPage() {
                 className="w-6 h-6 rounded-full border border-slate-700 bg-gradient-to-tr from-pink-500 via-indigo-500 to-cyan-400 flex items-center justify-center hover:scale-110 transition-transform"
                 title="Custom RGB Color Picker"
               >
-                <Palette className="w-3 h-3 text-white drop-shadow-md" />
+                <Palette className="w-3 h-3 dark:text-white text-slate-900 drop-shadow-md" />
               </button>
             </div>
           </div>
@@ -1880,7 +1880,7 @@ export default function WhiteboardPage() {
             initial={{ opacity: 0, x: 300 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 300 }}
-            className="absolute top-20 right-6 w-96 max-h-[80vh] overflow-y-auto z-50 bg-slate-900/95 border border-indigo-500/40 rounded-3xl p-5 shadow-2xl backdrop-blur-2xl text-slate-100"
+            className="absolute top-20 right-6 w-96 max-h-[80vh] overflow-y-auto z-50 dark:bg-slate-900/95 bg-slate-200/95 border border-indigo-500/40 rounded-3xl p-5 shadow-2xl backdrop-blur-2xl dark:text-slate-100 text-slate-900"
           >
             <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2">
@@ -1889,11 +1889,11 @@ export default function WhiteboardPage() {
                 </div>
                 <h3 className="text-sm font-bold">AI Math & Science Solution</h3>
               </div>
-              <button onClick={() => setAiSolution(null)} className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white">
+              <button onClick={() => setAiSolution(null)} className="p-1 hover:bg-slate-800 rounded-lg dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900">
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="text-xs text-slate-300 whitespace-pre-line leading-relaxed font-sans">
+            <div className="text-xs dark:text-slate-300 text-slate-700 whitespace-pre-line leading-relaxed font-sans">
               {aiSolution}
             </div>
           </motion.div>
@@ -1908,14 +1908,14 @@ export default function WhiteboardPage() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl"
+              className="w-full max-w-lg dark:bg-slate-900 bg-slate-100 border border-slate-800 rounded-3xl p-6 shadow-2xl"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Library className="w-5 h-5 text-indigo-400" />
                   <h3 className="text-base font-bold">Educational Diagram Presets</h3>
                 </div>
-                <button onClick={() => setShowPresetBank(false)} className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white">
+                <button onClick={() => setShowPresetBank(false)} className="p-1 hover:bg-slate-800 rounded-lg dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -1925,32 +1925,32 @@ export default function WhiteboardPage() {
                   className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
                 >
                   <Compass className="w-5 h-5 text-indigo-400 mb-2 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xs font-bold text-slate-200">X-Y Coordinate Axes</h4>
-                  <p className="text-[10px] text-slate-400 mt-1">2D Graph plane with origin & axes</p>
+                  <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">X-Y Coordinate Axes</h4>
+                  <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">2D Graph plane with origin & axes</p>
                 </button>
                 <button
                   onClick={() => insertPresetDiagram("triangle")}
                   className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
                 >
                   <Triangle className="w-5 h-5 text-cyan-400 mb-2 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xs font-bold text-slate-200">Labeled Triangle</h4>
-                  <p className="text-[10px] text-slate-400 mt-1">Geometric triangle with vertices A, B, C</p>
+                  <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">Labeled Triangle</h4>
+                  <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">Geometric triangle with vertices A, B, C</p>
                 </button>
                 <button
                   onClick={() => insertPresetDiagram("unit_circle")}
                   className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
                 >
                   <Circle className="w-5 h-5 text-amber-400 mb-2 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xs font-bold text-slate-200">Trig Unit Circle</h4>
-                  <p className="text-[10px] text-slate-400 mt-1">Unit circle marked with 0° & 90° angles</p>
+                  <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">Trig Unit Circle</h4>
+                  <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">Unit circle marked with 0° & 90° angles</p>
                 </button>
                 <button
                   onClick={() => insertPresetDiagram("venn")}
                   className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
                 >
                   <Layers className="w-5 h-5 text-pink-400 mb-2 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xs font-bold text-slate-200">Venn Diagram</h4>
-                  <p className="text-[10px] text-slate-400 mt-1">Two overlapping set circles</p>
+                  <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">Venn Diagram</h4>
+                  <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">Two overlapping set circles</p>
                 </button>
               </div>
             </motion.div>
@@ -1966,14 +1966,14 @@ export default function WhiteboardPage() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl"
+              className="w-full max-w-md dark:bg-slate-900 bg-slate-100 border border-slate-800 rounded-3xl p-6 shadow-2xl"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-base font-bold flex items-center gap-2">
                   <Keyboard className="w-5 h-5 text-indigo-400" />
                   Whiteboard Shortcuts
                 </h3>
-                <button onClick={() => setShowKeyShortcuts(false)} className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white">
+                <button onClick={() => setShowKeyShortcuts(false)} className="p-1 hover:bg-slate-800 rounded-lg dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900">
                   <X className="w-5 h-5" />
                 </button>
               </div>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { Home, Trophy, Medal, Star, Flame, Crown } from 'lucide-react';
@@ -14,7 +14,7 @@ export default function TrophiesPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-[#0b0f19] text-slate-700 dark:text-slate-200 font-sans p-6 overflow-hidden relative perspective-1000">
+    <div className="min-h-screen bg-slate-100 dark:bg-[#0b0f19] bg-[#eef1f9] text-slate-700 dark:text-slate-200 font-sans p-6 overflow-hidden relative perspective-1000">
       {/* Background ambient lighting */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-[500px] bg-indigo-500/10 blur-[120px] rounded-full pointer-events-none" />
 
@@ -47,7 +47,7 @@ export default function TrophiesPage() {
             >
               {/* Inner card content */}
               <div 
-                className={`w-full h-full rounded-[22px] flex flex-col items-center justify-center p-6 text-center ${item.unlocked ? `bg-gradient-to-br ${item.color}` : 'bg-slate-50 dark:bg-slate-900'} relative overflow-hidden`}
+                className={`w-full h-full rounded-[22px] flex flex-col items-center justify-center p-6 text-center ${item.unlocked ? `bg-gradient-to-br ${item.color}` : 'bg-slate-50 dark:bg-slate-900 bg-slate-100'} relative overflow-hidden`}
                 style={{ transform: 'translateZ(30px)' }}
               >
                 {/* Glare effect */}

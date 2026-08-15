@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from 'react';
 import { 
@@ -9,7 +9,7 @@ import {
 import Link from 'next/link';
 
 // ==========================================
-// 🧪 CHEMISTRY SIMULATOR TYPES & DATA
+//  CHEMISTRY SIMULATOR TYPES & DATA
 // ==========================================
 
 type Reagent = {
@@ -60,7 +60,7 @@ type ReactionResult = {
 const CHEMISTRY_REACTIONS: Record<string, ReactionResult> = {
   // Neutralization
   'HCl-NaOH': {
-    equation: 'HCl + NaOH ➔ NaCl + H₂O',
+    equation: 'HCl + NaOH  NaCl + H₂O',
     product: 'NaCl + H₂O',
     name: 'Sodium Chloride & Water',
     type: 'Neutralization (Acid + Base)',
@@ -71,7 +71,7 @@ const CHEMISTRY_REACTIONS: Record<string, ReactionResult> = {
     tempChange: '+4.5°C (Exothermic)',
   },
   'H2SO4-NaOH': {
-    equation: 'H₂SO₄ + 2NaOH ➔ Na₂SO₄ + 2H₂O',
+    equation: 'H₂SO₄ + 2NaOH  Na₂SO₄ + 2H₂O',
     product: 'Na₂SO₄ + 2H₂O',
     name: 'Sodium Sulfate & Water',
     type: 'Neutralization',
@@ -84,7 +84,7 @@ const CHEMISTRY_REACTIONS: Record<string, ReactionResult> = {
 
   // Single Displacement
   'CuSO4-Fe': {
-    equation: 'Fe + CuSO₄ ➔ FeSO₄ + Cu↓',
+    equation: 'Fe + CuSO₄  FeSO₄ + Cu↓',
     product: 'FeSO₄ + Cu (Reddish-brown ppt)',
     name: 'Iron(II) Sulfate & Copper Deposit',
     type: 'Single Displacement Reaction',
@@ -95,7 +95,7 @@ const CHEMISTRY_REACTIONS: Record<string, ReactionResult> = {
     tempChange: '+3.0°C',
   },
   'HCl-Mg': {
-    equation: 'Mg + 2HCl ➔ MgCl₂ + H₂↑',
+    equation: 'Mg + 2HCl  MgCl₂ + H₂↑',
     product: 'MgCl₂ + H₂ Gas',
     name: 'Magnesium Chloride & Hydrogen Gas',
     type: 'Displacement & Gas Evolution',
@@ -108,7 +108,7 @@ const CHEMISTRY_REACTIONS: Record<string, ReactionResult> = {
 
   // Combination / Synthesis
   'H-H-O': {
-    equation: '2H₂ + O₂ ➔ 2H₂O',
+    equation: '2H₂ + O₂  2H₂O',
     product: 'H₂O',
     name: 'Water Synthesis',
     type: 'Combination (Exothermic)',
@@ -119,7 +119,7 @@ const CHEMISTRY_REACTIONS: Record<string, ReactionResult> = {
     tempChange: '+15.0°C',
   },
   'Cl-Na': {
-    equation: '2Na + Cl₂ ➔ 2NaCl',
+    equation: '2Na + Cl₂  2NaCl',
     product: 'NaCl',
     name: 'Sodium Chloride (Table Salt)',
     type: 'Ionic Combination',
@@ -130,7 +130,7 @@ const CHEMISTRY_REACTIONS: Record<string, ReactionResult> = {
     tempChange: '+20.0°C',
   },
   'C-O-O': {
-    equation: 'C + O₂ ➔ CO₂↑',
+    equation: 'C + O₂  CO₂↑',
     product: 'CO₂ Gas',
     name: 'Carbon Dioxide',
     type: 'Combustion',
@@ -141,7 +141,7 @@ const CHEMISTRY_REACTIONS: Record<string, ReactionResult> = {
     tempChange: '+18.0°C',
   },
   'Fe-S': {
-    equation: 'Fe + S ➔ FeS',
+    equation: 'Fe + S  FeS',
     product: 'FeS',
     name: 'Iron(II) Sulfide',
     type: 'Direct Combination',
@@ -154,7 +154,7 @@ const CHEMISTRY_REACTIONS: Record<string, ReactionResult> = {
 
   // Decomposition
   'CaCO3': {
-    equation: 'CaCO₃ + Heat ➔ CaO + CO₂↑',
+    equation: 'CaCO₃ + Heat  CaO + CO₂↑',
     product: 'CaO + CO₂ Gas',
     name: 'Quicklime & Carbon Dioxide',
     type: 'Thermal Decomposition',
@@ -165,7 +165,7 @@ const CHEMISTRY_REACTIONS: Record<string, ReactionResult> = {
     tempChange: '-2.0°C (Endothermic)',
   },
   'CaCO3-HCl': {
-    equation: 'CaCO₃ + 2HCl ➔ CaCl₂ + H₂O + CO₂↑',
+    equation: 'CaCO₃ + 2HCl  CaCl₂ + H₂O + CO₂↑',
     product: 'CaCl₂ + H₂O + CO₂ Gas',
     name: 'Calcium Chloride, Water & Carbon Dioxide',
     type: 'Double Displacement & Decomposition',
@@ -178,7 +178,7 @@ const CHEMISTRY_REACTIONS: Record<string, ReactionResult> = {
 };
 
 // ==========================================
-// 👁️ OPTICS SIMULATOR TYPES & PHYSICS ENGINE
+// ️ OPTICS SIMULATOR TYPES & PHYSICS ENGINE
 // ==========================================
 
 type OpticElementType = 'convex_lens' | 'concave_lens' | 'concave_mirror' | 'convex_mirror' | 'plane_mirror';
@@ -292,7 +292,7 @@ function calculateOptics(type: OpticElementType, fMag: number, uMag: number, ho:
 }
 
 // ==========================================
-// 🚀 MAIN SANDBOX PAGE COMPONENT
+//  MAIN SANDBOX PAGE COMPONENT
 // ==========================================
 
 export default function SandboxPage() {
@@ -395,7 +395,7 @@ export default function SandboxPage() {
   const filteredReagents = REAGENTS.filter(r => chemCategory === 'all' || r.category === chemCategory);
 
   return (
-    <div className="min-h-screen bg-[#03050d] text-slate-100 font-sans p-3 sm:p-6 lg:p-8 relative selection:bg-indigo-500/30">
+    <div className="min-h-screen dark:bg-[#03050d] bg-[#eef1f9] text-slate-100 font-sans p-3 sm:p-6 lg:p-8 relative selection:bg-indigo-500/30">
       
       {/* Background Orbs */}
       <div className="fixed top-0 left-1/3 w-[50vw] h-[50vw] bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none" />
@@ -405,7 +405,7 @@ export default function SandboxPage() {
       <header className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 relative z-10">
         <div className="flex items-center gap-3.5">
           <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-3 rounded-2xl border border-white/10 shadow-lg shadow-indigo-500/30">
-            <Beaker className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+            <Beaker className="w-6 h-6 sm:w-7 sm:h-7 dark:text-white text-slate-900" />
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-300">
@@ -443,16 +443,16 @@ export default function SandboxPage() {
       </header>
 
       {/* ───────────────────────────────────────────────────────────── */}
-      {/* 🧪 TAB 1: ENHANCED CHEMISTRY MOLECULAR LABORATORY             */}
+      {/*  TAB 1: ENHANCED CHEMISTRY MOLECULAR LABORATORY             */}
       {/* ───────────────────────────────────────────────────────────── */}
       {activeTab === 'chemistry' && (
         <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
           
           {/* Left Panel: Categorized Shelf (4 Cols) */}
-          <div className="lg:col-span-4 bg-[#070916]/90 border border-white/10 rounded-3xl p-5 shadow-2xl backdrop-blur-xl flex flex-col h-[580px]">
+          <div className="lg:col-span-4 dark:bg-[#070916] bg-[#eef1f9] border border-white/10 rounded-3xl p-5 shadow-2xl backdrop-blur-xl flex flex-col h-[580px]">
             
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-black text-white flex items-center gap-2 uppercase tracking-wider">
+              <h2 className="text-sm font-black dark:text-white text-slate-900 flex items-center gap-2 uppercase tracking-wider">
                 <Atom className="w-4 h-4 text-indigo-400" /> Reagent & Element Shelf
               </h2>
               <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg border border-white/10">
@@ -491,7 +491,7 @@ export default function SandboxPage() {
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-md ${r.color}`}>
                     {r.symbol}
                   </div>
-                  <span className="text-[11px] font-bold text-slate-200 text-center line-clamp-1">{r.name}</span>
+                  <span className="text-[11px] font-bold dark:text-slate-200 text-slate-800 text-center line-clamp-1">{r.name}</span>
                   <span className="text-[9px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-tighter">
                     {r.state} • pH {r.pH}
                   </span>
@@ -502,25 +502,25 @@ export default function SandboxPage() {
             {/* Quick NCERT Mixing Hints */}
             <div className="mt-3 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl">
               <p className="text-[11px] text-indigo-300 font-semibold leading-relaxed">
-                💡 <strong>Try mixing:</strong><br />
-                • <strong className="text-white">Fe + CuSO₄</strong> (Displacement & color change)<br />
-                • <strong className="text-white">HCl + NaOH</strong> (Neutralization to pH 7.0)<br />
-                • <strong className="text-white">Mg + HCl</strong> (Effervescence H₂ gas)
+                 <strong>Try mixing:</strong><br />
+                • <strong className="dark:text-white text-slate-900">Fe + CuSO₄</strong> (Displacement & color change)<br />
+                • <strong className="dark:text-white text-slate-900">HCl + NaOH</strong> (Neutralization to pH 7.0)<br />
+                • <strong className="dark:text-white text-slate-900">Mg + HCl</strong> (Effervescence H₂ gas)
               </p>
             </div>
           </div>
 
           {/* Right Panel: Beaker Visualizer & Workbench (8 Cols) */}
-          <div className="lg:col-span-8 bg-[#070916]/90 border border-white/10 rounded-3xl p-6 shadow-2xl backdrop-blur-xl flex flex-col relative overflow-hidden min-h-[580px]">
+          <div className="lg:col-span-8 dark:bg-[#070916] bg-[#eef1f9] border border-white/10 rounded-3xl p-6 shadow-2xl backdrop-blur-xl flex flex-col relative overflow-hidden min-h-[580px]">
             
             {/* Top Toolbar */}
             <div className="flex items-center justify-between mb-4 relative z-10 border-b border-white/5 pb-3">
-              <h2 className="text-sm font-black text-white flex items-center gap-2 uppercase tracking-wider">
+              <h2 className="text-sm font-black dark:text-white text-slate-900 flex items-center gap-2 uppercase tracking-wider">
                 <Flame className="w-4 h-4 text-orange-400" /> Reaction Deck & Animated Beaker
               </h2>
               <button 
                 onClick={clearWorkspace}
-                className="flex items-center gap-1.5 text-xs font-black uppercase text-slate-500 dark:text-slate-400 hover:text-white transition-colors px-3 py-1.5 bg-white/5 rounded-xl border border-white/10"
+                className="flex items-center gap-1.5 text-xs font-black uppercase text-slate-500 dark:text-slate-400 hover:dark:text-white text-slate-900 transition-colors px-3 py-1.5 bg-white/5 rounded-xl border border-white/10"
               >
                 <RefreshCw className="w-3.5 h-3.5" /> Clear Beaker
               </button>
@@ -546,7 +546,7 @@ export default function SandboxPage() {
                               {r.symbol}
                             </span>
                             <div>
-                              <div className="text-xs font-bold text-white">{r.name}</div>
+                              <div className="text-xs font-bold dark:text-white text-slate-900">{r.name}</div>
                               <div className="text-[10px] text-slate-500 dark:text-slate-400">pH {r.pH} • {r.category}</div>
                             </div>
                           </div>
@@ -665,14 +665,14 @@ export default function SandboxPage() {
 
             {/* Reaction Result Banner */}
             {result && (
-              <div className="mt-4 p-4 bg-[#080b1e]/95 backdrop-blur-2xl border border-white/10 rounded-2xl animate-in slide-in-from-bottom-4 duration-300">
+              <div className="mt-4 p-4 dark:bg-[#080b1e] bg-[#eef1f9] backdrop-blur-2xl border border-white/10 rounded-2xl animate-in slide-in-from-bottom-4 duration-300">
                 <div className="flex items-start gap-3">
                   <div className={`p-2.5 rounded-xl shrink-0 ${result.type.includes('No Reaction') ? 'bg-slate-500/20 text-slate-600 dark:text-slate-300' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
                     {result.type.includes('No Reaction') ? <Info className="w-5 h-5" /> : <CheckCircle2 className="w-5 h-5" />}
                   </div>
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <h3 className="text-base font-black text-white font-mono">{result.equation}</h3>
+                      <h3 className="text-base font-black dark:text-white text-slate-900 font-mono">{result.equation}</h3>
                       <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
                         {result.type}
                       </span>
@@ -693,13 +693,13 @@ export default function SandboxPage() {
       )}
 
       {/* ───────────────────────────────────────────────────────────── */}
-      {/* 👁️ TAB 2: LIGHT OPTICS (LENSES & MIRRORS RAY SIMULATOR)      */}
+      {/* ️ TAB 2: LIGHT OPTICS (LENSES & MIRRORS RAY SIMULATOR)      */}
       {/* ───────────────────────────────────────────────────────────── */}
       {activeTab === 'optics' && (
         <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
           
           {/* Controls Panel (4 Cols) */}
-          <div className="lg:col-span-4 bg-[#070916]/90 border border-white/10 rounded-3xl p-5 shadow-2xl backdrop-blur-xl flex flex-col space-y-5">
+          <div className="lg:col-span-4 dark:bg-[#070916] bg-[#eef1f9] border border-white/10 rounded-3xl p-5 shadow-2xl backdrop-blur-xl flex flex-col space-y-5">
             
             {/* Mode Switcher inside Optics */}
             <div className="flex p-1 bg-black/40 border border-white/5 rounded-xl">
@@ -709,7 +709,7 @@ export default function SandboxPage() {
                   opticsMode === 'ray_optics' ? 'bg-indigo-600 text-white shadow' : 'text-slate-500 dark:text-slate-400 hover:text-white'
                 }`}
               >
-                🔍 Lenses & Mirrors
+                 Lenses & Mirrors
               </button>
               <button
                 onClick={() => setOpticsMode('snell_refraction')}
@@ -717,7 +717,7 @@ export default function SandboxPage() {
                   opticsMode === 'snell_refraction' ? 'bg-indigo-600 text-white shadow' : 'text-slate-500 dark:text-slate-400 hover:text-white'
                 }`}
               >
-                📐 Snell's Refraction
+                Snell's Refraction
               </button>
             </div>
 
@@ -804,7 +804,7 @@ export default function SandboxPage() {
                 {/* Live Formula Badge */}
                 <div className="p-3 bg-indigo-950/40 border border-indigo-500/20 rounded-xl space-y-1 text-xs font-mono">
                   <div className="text-[10px] font-black uppercase text-indigo-300">NCERT Sign Formula:</div>
-                  <div className="text-white font-bold">
+                  <div className="dark:text-white text-slate-900 font-bold">
                     {elementType.includes('lens') ? '1/f = 1/v - 1/u (Lens)' : '1/f = 1/v + 1/u (Mirror)'}
                   </div>
                   <div className="text-emerald-400 font-bold">
@@ -857,7 +857,7 @@ export default function SandboxPage() {
 
                 <div className="p-3 bg-indigo-950/40 border border-indigo-500/20 rounded-xl space-y-1 text-xs font-mono">
                   <div className="text-[10px] font-black uppercase text-indigo-300">Snell's Law:</div>
-                  <div className="text-white font-bold">n₂₁ = sin(i) / sin(r) = {refractiveIndex}</div>
+                  <div className="dark:text-white text-slate-900 font-bold">n₂₁ = sin(i) / sin(r) = {refractiveIndex}</div>
                   <div className="text-emerald-400 font-bold">Refracted Angle (r) = {refractedAngle.toFixed(2)}°</div>
                 </div>
               </div>
@@ -866,12 +866,12 @@ export default function SandboxPage() {
           </div>
 
           {/* Canvas SVG Panel (8 Cols) */}
-          <div className="lg:col-span-8 bg-[#070916]/90 border border-white/10 rounded-3xl p-6 shadow-2xl backdrop-blur-xl flex flex-col justify-between relative overflow-hidden min-h-[580px]">
+          <div className="lg:col-span-8 dark:bg-[#070916] bg-[#eef1f9] border border-white/10 rounded-3xl p-6 shadow-2xl backdrop-blur-xl flex flex-col justify-between relative overflow-hidden min-h-[580px]">
             
             {/* Top Canvas Header */}
             <div className="flex justify-between items-center border-b border-white/5 pb-3">
               <span className="text-xs font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">
-                {opticsMode === 'ray_optics' ? `Ray Diagram (${elementType.replace('_', ' ').toUpperCase()})` : `Refraction: Air ➔ ${mediumName}`}
+                {opticsMode === 'ray_optics' ? `Ray Diagram (${elementType.replace('_', ' ').toUpperCase()})` : `Refraction: Air  ${mediumName}`}
               </span>
               {opticsMode === 'ray_optics' && (
                 <span className="text-xs font-extrabold text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">
@@ -1091,7 +1091,7 @@ export default function SandboxPage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-white/5 pt-3">
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
                   <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Image Distance (v)</div>
-                  <div className="text-xs font-mono font-black text-white">
+                  <div className="text-xs font-mono font-black dark:text-white text-slate-900">
                     {opticsRes.v === Infinity ? '∞' : `${opticsRes.v.toFixed(1)} cm`}
                   </div>
                 </div>

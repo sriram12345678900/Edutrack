@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { 
@@ -402,7 +402,7 @@ export default function TutorPage() {
         return (
           <div 
             key={idx} 
-            className="flex justify-center my-3 p-3.5 bg-[#050c22] border border-cyan-500/40 rounded-xl font-mono text-sm sm:text-base text-cyan-300 tracking-wider font-extrabold select-all shadow-[0_0_20px_rgba(6,182,212,0.15)]"
+            className="flex justify-center my-3 p-3.5 dark:bg-[#050c22] bg-[#f5f7ff] border border-cyan-500/40 rounded-xl font-mono text-sm sm:text-base text-cyan-300 tracking-wider font-extrabold select-all shadow-[0_0_20px_rgba(6,182,212,0.15)]"
             dangerouslySetInnerHTML={{ __html: cleanMathLaTeX(mathText) }}
           />
         );
@@ -412,7 +412,7 @@ export default function TutorPage() {
         return (
           <div 
             key={idx} 
-            className="my-2 p-2.5 px-3.5 bg-[#060e28]/80 border border-cyan-500/30 rounded-xl font-mono text-xs sm:text-sm text-cyan-200 tracking-wide font-bold select-all shadow-sm flex items-center gap-2"
+            className="my-2 p-2.5 px-3.5 dark:bg-[#060e28] bg-[#f5f7ff] border border-cyan-500/30 rounded-xl font-mono text-xs sm:text-sm text-cyan-200 tracking-wide font-bold select-all shadow-sm flex items-center gap-2"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0 shadow-[0_0_6px_#22d3ee]" />
             <span dangerouslySetInnerHTML={{ __html: cleanMathLaTeX(trimmed) }} />
@@ -437,7 +437,7 @@ export default function TutorPage() {
                 return <strong key={i} className="font-black text-cyan-200 bg-cyan-500/10 px-1 py-0.5 rounded border border-cyan-500/20">{part.slice(2, -2)}</strong>;
               }
               if (part.startsWith("*") && part.endsWith("*") && part.length > 2) {
-                return <em key={i} className="italic text-slate-300">{part.slice(1, -1)}</em>;
+                return <em key={i} className="italic dark:text-slate-300 text-slate-700">{part.slice(1, -1)}</em>;
               }
               return part;
             })}
@@ -467,12 +467,12 @@ export default function TutorPage() {
           );
         } else if (level === 2) {
           return (
-            <h2 key={idx} className="text-base font-extrabold text-white mt-4 mb-2 tracking-tight flex items-center gap-2">
+            <h2 key={idx} className="text-base font-extrabold dark:text-white text-slate-900 mt-4 mb-2 tracking-tight flex items-center gap-2">
               {headingContent}
             </h2>
           );
         } else {
-          return <h3 key={idx} className="text-sm font-extrabold text-white mt-3 mb-1 tracking-tight">{headingContent}</h3>;
+          return <h3 key={idx} className="text-sm font-extrabold dark:text-white text-slate-900 mt-3 mb-1 tracking-tight">{headingContent}</h3>;
         }
       }
 
@@ -483,7 +483,7 @@ export default function TutorPage() {
         return (
           <div key={idx} className="flex items-start gap-2.5 ml-2 my-1.5 select-text">
             <span className="text-cyan-400 mt-1 text-xs">•</span>
-            <span className="text-slate-300 text-sm font-medium leading-relaxed">{parseMix(line.trim().substring(2))}</span>
+            <span className="dark:text-slate-300 text-slate-700 text-sm font-medium leading-relaxed">{parseMix(line.trim().substring(2))}</span>
           </div>
         );
       }
@@ -494,14 +494,14 @@ export default function TutorPage() {
           return (
             <div key={idx} className="flex items-start gap-2.5 ml-1 my-2 select-text">
               <span className="text-cyan-400 font-extrabold text-xs bg-cyan-500/10 px-2 py-0.5 rounded-lg border border-cyan-500/30 shrink-0">{numMatch[1]}</span>
-              <span className="text-slate-200 text-sm font-semibold leading-relaxed pt-0.5">{parseMix(numMatch[2])}</span>
+              <span className="dark:text-slate-200 text-slate-800 text-sm font-semibold leading-relaxed pt-0.5">{parseMix(numMatch[2])}</span>
             </div>
           );
         }
       }
 
       return (
-        <p key={idx} className="text-slate-300 text-sm font-medium mb-2 last:mb-0 leading-relaxed select-text">
+        <p key={idx} className="dark:text-slate-300 text-slate-700 text-sm font-medium mb-2 last:mb-0 leading-relaxed select-text">
           {parseMix(line)}
         </p>
       );
@@ -509,19 +509,19 @@ export default function TutorPage() {
   };
 
   return (
-    <div className="w-full h-full flex-1 min-h-0 flex flex-col bg-[#020309] text-slate-100 font-sans relative overflow-hidden">
+    <div className="w-full h-full flex-1 min-h-0 flex flex-col dark:bg-[#020309] bg-[#eef1f9] dark:text-slate-100 text-slate-900 font-sans relative overflow-hidden">
       
       {/* Ambient Background Glows */}
       <div className="absolute top-[-15%] left-[10vw] w-[45vw] h-[45vw] bg-cyan-600/12 rounded-full blur-[160px] pointer-events-none" />
       <div className="absolute bottom-[-15%] right-[10vw] w-[45vw] h-[45vw] bg-indigo-600/12 rounded-full blur-[160px] pointer-events-none" />
 
       {/* Top Compact Controls Header Bar */}
-      <header className="sticky top-0 z-20 shrink-0 bg-[#040613]/95 backdrop-blur-3xl border-b border-white/10 px-4 sm:px-6 py-2.5 flex flex-col lg:flex-row items-center justify-between gap-3 shadow-xl">
+      <header className="sticky top-0 z-20 shrink-0 dark:bg-[#040613] bg-[#eef1f9] backdrop-blur-3xl border-b border-white/10 px-4 sm:px-6 py-2.5 flex flex-col lg:flex-row items-center justify-between gap-3 shadow-xl">
         
         {/* Left: AI Tutor Identity */}
         <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-start">
           <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white transition-all shadow-sm active:scale-95">
+            <Link href="/dashboard" className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 transition-all shadow-sm active:scale-95">
               <ChevronLeft className="w-4 h-4" />
             </Link>
             <div className="flex items-center gap-2.5">
@@ -530,13 +530,13 @@ export default function TutorPage() {
                 <div className="absolute inset-0 bg-cyan-500/10 mix-blend-overlay" />
               </div>
               <div>
-                <h1 className="text-sm font-black text-white leading-tight flex items-center gap-2">
+                <h1 className="text-sm font-black dark:text-white text-slate-900 leading-tight flex items-center gap-2">
                   Professor AI Tutor 
                   <span className="text-[9px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 px-2 py-0.5 rounded-full uppercase tracking-wider font-extrabold flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" /> Live Core
                   </span>
                 </h1>
-                <p className="text-[10px] text-slate-400 font-medium">NCERT CBSE Class 10 Specialist</p>
+                <p className="text-[10px] dark:text-slate-400 text-slate-600 font-medium">NCERT CBSE Class 10 Specialist</p>
               </div>
             </div>
           </div>
@@ -584,7 +584,7 @@ export default function TutorPage() {
             className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 via-teal-500 to-indigo-600 hover:from-cyan-600 hover:to-indigo-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-lg shadow-cyan-500/25 active:scale-95 border border-white/20"
             title="Start a new AI study conversation"
           >
-            <Plus className="w-4 h-4 text-white" />
+            <Plus className="w-4 h-4 dark:text-white text-slate-900" />
             <span>New Chat</span>
           </button>
 
@@ -609,11 +609,11 @@ export default function TutorPage() {
                 setUserLanguage(e.target.value);
                 localStorage.setItem("edutrack_language", e.target.value);
               }}
-              className="bg-transparent text-white font-extrabold focus:outline-none cursor-pointer text-xs pr-1"
+              className="bg-transparent dark:text-white text-slate-900 font-extrabold focus:outline-none cursor-pointer text-xs pr-1"
             >
-              <option value="Hinglish" className="bg-[#080b18] text-white">Hinglish</option>
-              <option value="English" className="bg-[#080b18] text-white">English</option>
-              <option value="Hindi" className="bg-[#080b18] text-white">Hindi</option>
+              <option value="Hinglish" className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900 text-slate-900">Hinglish</option>
+              <option value="English" className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900 text-slate-900">English</option>
+              <option value="Hindi" className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900 text-slate-900">Hindi</option>
             </select>
           </div>
         </div>
@@ -624,12 +624,12 @@ export default function TutorPage() {
       <div className="flex-1 flex overflow-hidden min-h-0 relative z-10">
         
         {/* ── COLLAPSIBLE SESSIONS DRAWER ── */}
-        <aside className={`fixed lg:relative top-0 bottom-0 left-0 w-72 border-r border-white/10 bg-[#040614]/95 lg:bg-[#040614]/80 backdrop-blur-2xl p-4 flex flex-col gap-3 z-30 transition-all duration-300 ${
+        <aside className={`fixed lg:relative top-0 bottom-0 left-0 w-72 border-r border-white/10 dark:bg-[#040614] bg-[#eef1f9] lg:dark:bg-[#040614] bg-[#eef1f9] backdrop-blur-2xl p-4 flex flex-col gap-3 z-30 transition-all duration-300 ${
           isHistoryOpen ? "translate-x-0 ml-0" : "-translate-x-full lg:translate-x-0 lg:-ml-72"
         }`}>
           <div className="flex items-center justify-between pt-2">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Study Sessions</span>
-            <button onClick={() => setIsHistoryOpen(false)} className="p-1 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white">
+            <span className="text-[10px] font-black uppercase tracking-widest dark:text-slate-400 text-slate-600">Study Sessions</span>
+            <button onClick={() => setIsHistoryOpen(false)} className="p-1 hover:bg-white/10 rounded-lg dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -646,7 +646,7 @@ export default function TutorPage() {
             {sessions.length === 0 ? (
               <div className="text-center py-8 border border-dashed border-white/10 rounded-xl bg-white/[0.01] p-3">
                 <MessageSquare className="w-6 h-6 text-slate-600 mx-auto mb-1.5 opacity-50" />
-                <p className="text-slate-400 text-xs font-semibold">No previous chats.</p>
+                <p className="dark:text-slate-400 text-slate-600 text-xs font-semibold">No previous chats.</p>
               </div>
             ) : (
               sessions.map(s => {
@@ -682,16 +682,16 @@ export default function TutorPage() {
         </aside>
 
         {/* ── MAIN EXPANSIVE CHAT VIEWPORT ── */}
-        <section className="flex-1 flex flex-col min-w-0 bg-[#03040d]/60 relative p-2 sm:p-3 pb-0 sm:pb-0 overflow-hidden h-full min-h-0">
+        <section className="flex-1 flex flex-col min-w-0 dark:bg-[#03040d] bg-[#eef1f9] relative p-2 sm:p-3 pb-0 sm:pb-0 overflow-hidden h-full min-h-0">
           
           {/* Framed Chat Box Container */}
-          <div className="w-full flex-1 min-h-0 max-w-6xl mx-auto bg-[#050718]/90 backdrop-blur-3xl border border-cyan-500/30 rounded-t-2xl rounded-b-none sm:rounded-t-2xl flex flex-col overflow-hidden shadow-[0_0_50px_rgba(6,182,212,0.12)] relative">
+          <div className="w-full flex-1 min-h-0 max-w-6xl mx-auto dark:bg-[#050718] bg-[#f5f7ff] backdrop-blur-3xl border border-cyan-500/30 rounded-t-2xl rounded-b-none sm:rounded-t-2xl flex flex-col overflow-hidden shadow-[0_0_50px_rgba(6,182,212,0.12)] relative">
             
             {/* Top Cyan Glow Beam Rim */}
             <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-cyan-400 to-indigo-500 shrink-0 shadow-[0_0_12px_#22d3ee]" />
 
             {/* Box Header Bar */}
-            <div className="px-5 py-3 border-b border-cyan-500/20 bg-[#070b22]/80 backdrop-blur-md flex items-center justify-between shrink-0 z-20">
+            <div className="px-5 py-3 border-b border-cyan-500/20 dark:bg-[#070b22] bg-[#f5f7ff] backdrop-blur-md flex items-center justify-between shrink-0 z-20">
               <div className="flex items-center gap-2.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]" />
                 <span className="text-xs font-black text-cyan-200 uppercase tracking-widest truncate max-w-[240px] sm:max-w-md">
@@ -727,7 +727,7 @@ export default function TutorPage() {
                   {/* Avatar Icon */}
                   <div className="relative mb-5 flex items-center justify-center">
                     <div className="absolute w-36 h-36 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" />
-                    <div className="relative w-24 h-24 rounded-3xl overflow-hidden shadow-2xl border-2 border-cyan-400/40 p-1 bg-[#070a1a] hover:scale-105 transition-transform duration-300">
+                    <div className="relative w-24 h-24 rounded-3xl overflow-hidden shadow-2xl border-2 border-cyan-400/40 p-1 dark:bg-[#070a1a] bg-[#f5f7ff] hover:scale-105 transition-transform duration-300">
                       <img src="/ai_tutor_avatar.jpg" alt="Holographic AI Tutor" className="w-full h-full object-cover rounded-2xl" />
                       {activeSpeakingMsg && (
                         <div className="absolute inset-0 bg-cyan-500/30 flex items-center justify-center gap-1 backdrop-blur-xs">
@@ -740,7 +740,7 @@ export default function TutorPage() {
                   <h2 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-teal-300 mb-2 tracking-tight">
                     How can I help your study today?
                   </h2>
-                  <p className="text-slate-400 text-xs sm:text-sm font-semibold mb-6 max-w-md leading-relaxed">
+                  <p className="dark:text-slate-400 text-slate-600 text-xs sm:text-sm font-semibold mb-6 max-w-md leading-relaxed">
                     Ask any doubt, upload homework photos, or select a topic below. Active in <strong className="text-cyan-400 uppercase tracking-wider">{personaMode.replace('_', ' ')}</strong> mode in <strong className="text-cyan-400">{userLanguage}</strong>.
                   </p>
 
@@ -821,7 +821,7 @@ export default function TutorPage() {
                           <div className={`p-4 sm:p-5 rounded-3xl shadow-2xl border leading-relaxed select-text ${
                             msg.role === "user"
                               ? "bg-gradient-to-br from-cyan-600 via-teal-600 to-indigo-600 text-white rounded-tr-none border-cyan-400/30 font-bold text-sm shadow-[0_4px_20px_rgba(6,182,212,0.25)]"
-                              : "bg-[#070b22]/95 backdrop-blur-2xl text-slate-100 rounded-tl-none border-white/10 border-l-4 border-l-cyan-400 font-medium text-sm shadow-[0_6px_30px_rgba(0,0,0,0.5)]"
+                              : "dark:bg-[#070b22] bg-[#f5f7ff] backdrop-blur-2xl dark:text-slate-100 text-slate-900 rounded-tl-none border-white/10 border-l-4 border-l-cyan-400 font-medium text-sm shadow-[0_6px_30px_rgba(0,0,0,0.5)]"
                           }`}>
                             {msg.role === "user" ? (
                               <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
@@ -835,7 +835,7 @@ export default function TutorPage() {
                           {isAi && (
                             <button
                               onClick={() => speakText(msg.content, identifier)}
-                              className="absolute -right-10 top-3 p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-400 hover:text-white border border-white/10 shadow-lg transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 active:scale-95"
+                              className="absolute -right-10 top-3 p-2 rounded-xl dark:bg-slate-900/90 bg-slate-200/90 hover:bg-slate-800 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 border border-white/10 shadow-lg transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 active:scale-95"
                               title="Read text aloud"
                             >
                               {activeSpeakingMsg === identifier ? (
@@ -885,7 +885,7 @@ export default function TutorPage() {
                       <div className="w-9 h-9 rounded-2xl bg-cyan-950/60 text-cyan-400 border border-cyan-500/30 flex items-center justify-center shrink-0 shadow-lg">
                         <Bot className="w-4.5 h-4.5 animate-pulse text-cyan-400" />
                       </div>
-                      <div className="bg-[#080d26]/95 backdrop-blur-xl rounded-3xl rounded-tl-none border border-cyan-500/20 border-l-4 border-l-cyan-400 px-5 py-3.5 flex items-center gap-2 shadow-2xl">
+                      <div className="dark:bg-[#080d26] bg-[#f5f7ff] backdrop-blur-xl rounded-3xl rounded-tl-none border border-cyan-500/20 border-l-4 border-l-cyan-400 px-5 py-3.5 flex items-center gap-2 shadow-2xl">
                         <span className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
                         <span className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
                         <span className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
@@ -899,23 +899,23 @@ export default function TutorPage() {
             </div>
 
             {/* Fixed Input Dock Inside Box */}
-            <div className="p-3 sm:p-4 pb-4 sm:pb-5 bg-[#040616]/95 border-t border-cyan-500/20 backdrop-blur-2xl shrink-0 z-20 shadow-[0_-15px_40px_rgba(0,0,0,0.5)]">
+            <div className="p-3 sm:p-4 pb-4 sm:pb-5 dark:bg-[#040616] bg-[#eef1f9] border-t border-cyan-500/20 backdrop-blur-2xl shrink-0 z-20 shadow-[0_-15px_40px_rgba(0,0,0,0.5)]">
               <div className="max-w-5xl mx-auto">
                 
                 {attachedImage && (
-                  <div className="mb-2.5 p-2.5 bg-slate-900/90 border border-cyan-500/30 rounded-2xl flex items-center justify-between w-fit gap-3 shadow-xl backdrop-blur-md">
+                  <div className="mb-2.5 p-2.5 dark:bg-slate-900/90 bg-slate-200/90 border border-cyan-500/30 rounded-2xl flex items-center justify-between w-fit gap-3 shadow-xl backdrop-blur-md">
                     <div className="flex items-center gap-2.5">
                       <div className="w-9 h-9 rounded-xl overflow-hidden border border-white/20 shadow-md">
                         <img src={attachedImage} alt="Homework draft" className="w-full h-full object-cover" />
                       </div>
                       <div>
-                        <p className="text-xs font-extrabold text-slate-200">Homework Photo Attached</p>
+                        <p className="text-xs font-extrabold dark:text-slate-200 text-slate-800">Homework Photo Attached</p>
                         <p className="text-[10px] text-cyan-400 font-bold uppercase tracking-wide">Ready for analysis</p>
                       </div>
                     </div>
                     <button 
                       onClick={() => setAttachedImage(null)}
-                      className="p-1 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-full transition-all active:scale-95"
+                      className="p-1 bg-slate-800 hover:bg-slate-700 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 rounded-full transition-all active:scale-95"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -928,7 +928,7 @@ export default function TutorPage() {
                     value={chatInputValue}
                     onChange={(e) => setChatInputValue(e.target.value)}
                     placeholder={isListening ? "Listening closely to your voice..." : "Ask your doubt (e.g. solve 2x² - 5x + 3 = 0, or upload photo)..."}
-                    className={`w-full bg-[#030514]/95 border ${
+                    className={`w-full dark:bg-[#030514] bg-[#eef1f9] border ${
                       isListening 
                         ? "border-red-500/60 focus:ring-red-500" 
                         : "border-white/10 focus:border-cyan-500/60 focus:ring-2 focus:ring-cyan-500/25"
@@ -938,7 +938,7 @@ export default function TutorPage() {
                   <button 
                     type="button"
                     onClick={() => chatFileInputRef.current?.click()}
-                    className="absolute left-3 w-9 h-9 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/15 border border-white/10 text-slate-400 hover:text-white transition-all active:scale-95 shadow-sm"
+                    className="absolute left-3 w-9 h-9 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/15 border border-white/10 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 transition-all active:scale-95 shadow-sm"
                     title="Attach homework photo"
                   >
                     <Paperclip className="w-4 h-4" />

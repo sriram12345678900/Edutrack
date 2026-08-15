@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     // 1. If an image is attached, run EduTrack Vision & Optical Image Reader Engine
     if (image && typeof image === "string") {
       const visionResult = analyzeHomeworkImage(image, cleanPrompt);
-      const replyText = `📷 **EduTrack Lens & AI Vision Analysis**\n\n` +
+      const replyText = ` **EduTrack Lens & AI Vision Analysis**\n\n` +
         `**Subject:** ${visionResult.subject} (${visionResult.chapter})\n` +
         `**Extracted Content:** *"${visionResult.extractedText}"*\n\n` +
         `### Step-by-Step Solution & Concept Breakdown:\n` +

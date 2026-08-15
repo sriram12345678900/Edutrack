@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -458,7 +458,7 @@ export default function SubjectPage({ params }: { params: { subject: string } })
                 key={chapter.id} 
                 className={`group border ${
                   chapter.status === 'locked' 
-                    ? 'border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/30 opacity-75' 
+                    ? 'border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/30 bg-slate-200/30 opacity-75' 
                     : 'border-slate-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 bg-white dark:bg-slate-800'
                 } p-4 md:p-6 rounded-2xl flex flex-col gap-4 transition-all`}
               >
@@ -545,7 +545,7 @@ export default function SubjectPage({ params }: { params: { subject: string } })
 
                               return (
                                 <Link href={deck.link} key={deck.id} className="block group">
-                                  <div className="relative bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden p-6 flex flex-col gap-4 hover:border-slate-700 hover:shadow-xl hover:-translate-y-0.5 transition-all text-white">
+                                  <div className="relative dark:bg-slate-900 bg-slate-100 border border-slate-800 rounded-3xl overflow-hidden p-6 flex flex-col gap-4 hover:border-slate-700 hover:shadow-xl hover:-translate-y-0.5 transition-all dark:text-white text-slate-900">
                                     {/* Color accent top bar */}
                                     <div className={`absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r ${gradient}`} />
 
@@ -571,11 +571,11 @@ export default function SubjectPage({ params }: { params: { subject: string } })
                                       </div>
                                     </div>
 
-                                    <h4 className="text-lg font-bold text-white leading-snug group-hover:text-emerald-400 transition-colors">
+                                    <h4 className="text-lg font-bold dark:text-white text-slate-900 leading-snug group-hover:text-emerald-400 transition-colors">
                                       {deck.title}
                                     </h4>
 
-                                    <div className="flex items-center gap-4 text-xs text-slate-400 font-semibold">
+                                    <div className="flex items-center gap-4 text-xs dark:text-slate-400 text-slate-600 font-semibold">
                                       <span className="flex items-center gap-1.5">
                                         <Layers className="w-4 h-4 text-slate-500" /> {total} cards
                                       </span>
@@ -586,7 +586,7 @@ export default function SubjectPage({ params }: { params: { subject: string } })
 
                                     <div className="space-y-1.5">
                                       <div className="flex justify-between text-xs font-bold">
-                                        <span className="text-slate-400">Mastery</span>
+                                        <span className="dark:text-slate-400 text-slate-600">Mastery</span>
                                         <span className="text-emerald-400">{progress}%</span>
                                       </div>
                                       <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
@@ -599,7 +599,7 @@ export default function SubjectPage({ params }: { params: { subject: string } })
                                       <span className="text-sm font-bold text-indigo-400 flex items-center gap-1 group-hover:gap-2 transition-all">
                                         Study Now <ArrowRight className="w-4 h-4" />
                                       </span>
-                                      <span className="text-xs text-slate-400 font-medium">
+                                      <span className="text-xs dark:text-slate-400 text-slate-600 font-medium">
                                         {mastered}/{total} mastered
                                       </span>
                                     </div>
@@ -611,8 +611,8 @@ export default function SubjectPage({ params }: { params: { subject: string } })
                         )}
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between text-sm py-1 bg-slate-50 dark:bg-slate-900/10 px-3 rounded-xl border border-slate-100 dark:border-slate-800">
-                        <p className="text-slate-400 font-medium text-xs">No flashcards generated yet.</p>
+                      <div className="flex items-center justify-between text-sm py-1 bg-slate-50 dark:bg-slate-900/10 bg-slate-200/10 px-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <p className="dark:text-slate-400 text-slate-600 font-medium text-xs">No flashcards generated yet.</p>
                         <button
                           onClick={() => generateFlashcardsForChapter(chapter.id, chapter.title)}
                           disabled={generatingChapterId === chapter.id}

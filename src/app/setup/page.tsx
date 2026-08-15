@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -124,12 +124,12 @@ export default function SignupWizard() {
       <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      <div className="w-full max-w-2xl bg-white/70 dark:bg-slate-50 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl relative z-10 p-8 md:p-12 my-8">
+      <div className="w-full max-w-2xl bg-white/70 dark:bg-slate-50 dark:bg-slate-900/70 bg-slate-200/70 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl relative z-10 p-8 md:p-12 my-8">
         
         {/* Header */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-650 shadow-lg shadow-indigo-500/30 mb-6 border border-indigo-400/20">
-            <Sparkles className="w-8 h-8 text-white" />
+            <Sparkles className="w-8 h-8 dark:text-white text-slate-900" />
           </div>
           <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white mb-3">
             Set Up Your Profile
@@ -307,18 +307,18 @@ export default function SignupWizard() {
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-[280px] overflow-y-auto pr-2 scrollbar-thin">
                   {[
-                    { code: "English", label: "English", flag: "🇬🇧" },
-                    { code: "Hinglish", label: "Hinglish (Hindi+Eng)", flag: "🇮🇳" },
-                    { code: "Telgish", label: "Telgish (Telugu+Eng)", flag: "🇮🇳" },
-                    { code: "Tanglish", label: "Tanglish (Tamil+Eng)", flag: "🇮🇳" },
-                    { code: "Marathish", label: "Marathish (Marathi+Eng)", flag: "🇮🇳" },
-                    { code: "Benglish", label: "Benglish (Bengali+Eng)", flag: "🇮🇳" },
-                    { code: "Hindi", label: "Hindi (हिंदी)", flag: "🇮🇳" },
-                    { code: "Telugu", label: "Telugu (తెలుగు)", flag: "🇮🇳" },
-                    { code: "Tamil", label: "Tamil (தமிழ்)", flag: "🇮🇳" },
-                    { code: "Marathi", label: "Marathi (मराठी)", flag: "🇮🇳" },
-                    { code: "Bengali", label: "Bengali (বাংলা)", flag: "🇮🇳" },
-                    { code: "Kannada", label: "Kannada (ಕನ್ನಡ)", flag: "🇮🇳" }
+                    { code: "English", label: "English", flag: "" },
+                    { code: "Hinglish", label: "Hinglish (Hindi+Eng)", flag: "" },
+                    { code: "Telgish", label: "Telgish (Telugu+Eng)", flag: "" },
+                    { code: "Tanglish", label: "Tanglish (Tamil+Eng)", flag: "" },
+                    { code: "Marathish", label: "Marathish (Marathi+Eng)", flag: "" },
+                    { code: "Benglish", label: "Benglish (Bengali+Eng)", flag: "" },
+                    { code: "Hindi", label: "Hindi (हिंदी)", flag: "" },
+                    { code: "Telugu", label: "Telugu (తెలుగు)", flag: "" },
+                    { code: "Tamil", label: "Tamil (தமிழ்)", flag: "" },
+                    { code: "Marathi", label: "Marathi (मराठी)", flag: "" },
+                    { code: "Bengali", label: "Bengali (বাংলা)", flag: "" },
+                    { code: "Kannada", label: "Kannada (ಕನ್ನಡ)", flag: "" }
                   ].map((lang) => (
                     <button
                       key={lang.code}

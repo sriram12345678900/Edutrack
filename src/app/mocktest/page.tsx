@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -133,13 +133,13 @@ export default function MockTestPage() {
         </div>
         <div className="relative z-10">
           <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 bg-indigo-550/10 px-3.5 py-1.5 rounded-full border border-indigo-500/20">Exam Prep Center</span>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-white mt-3.5 tracking-tight flex items-center gap-3">
+          <h1 className="text-3xl md:text-4xl font-extrabold dark:text-white text-slate-900 mt-3.5 tracking-tight flex items-center gap-3">
             CBSE AI Mock Tests
           </h1>
           <p className="text-slate-500 dark:text-slate-400 font-medium text-xs mt-1.5">Grade short answers against board patterns in real-time.</p>
         </div>
         <div className="flex items-center gap-3 relative z-10">
-          <Link href="/dashboard" className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-2xl transition-colors border border-white/10">
+          <Link href="/dashboard" className="p-3 bg-white/10 hover:bg-white/20 dark:text-white text-slate-900 rounded-2xl transition-colors border border-white/10">
             <Home className="w-5 h-5" />
           </Link>
         </div>
@@ -151,7 +151,7 @@ export default function MockTestPage() {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white/60 dark:bg-[#040612]/60 backdrop-blur-xl border border-slate-200/50 dark:border-white/5 p-8 rounded-[2rem] text-center max-w-xl mx-auto space-y-6 shadow-xl"
+            className="bg-white/60 dark:bg-[#040612] bg-[#eef1f9] backdrop-blur-xl border border-slate-200/50 dark:border-white/5 p-8 rounded-[2rem] text-center max-w-xl mx-auto space-y-6 shadow-xl"
           >
             <div className="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto border border-indigo-500/20">
               <Clock className="w-8 h-8 text-indigo-400" />
@@ -161,7 +161,7 @@ export default function MockTestPage() {
               <p className="text-slate-500 dark:text-slate-455 text-xs font-bold leading-relaxed mt-1">10-minute short test. 3 board questions graded by Gemini.</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 p-1.5 bg-[#050812]/50 border border-white/5 rounded-2xl max-w-sm mx-auto">
+            <div className="grid grid-cols-2 gap-3 p-1.5 dark:bg-[#050812] bg-[#eef1f9] border border-white/5 rounded-2xl max-w-sm mx-auto">
               {(["Science", "Mathematics"] as const).map(sub => (
                 <button
                   key={sub}
@@ -192,7 +192,7 @@ export default function MockTestPage() {
                 <span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-ping" />
                 <span className="text-xs font-black text-red-400 uppercase tracking-widest">Exam in Progress</span>
               </div>
-              <div className="flex items-center gap-2 text-white font-black text-sm uppercase tracking-wider bg-white/5 border border-white/10 px-4 py-2 rounded-xl">
+              <div className="flex items-center gap-2 dark:text-white text-slate-900 font-black text-sm uppercase tracking-wider bg-white/5 border border-white/10 px-4 py-2 rounded-xl">
                 <Clock className="w-4 h-4 text-indigo-400 animate-pulse" />
                 <span>Timer: {formatTime(timeLeft)}</span>
               </div>
@@ -200,7 +200,7 @@ export default function MockTestPage() {
 
             <div className="space-y-5">
               {activeQuestions.map((q, idx) => (
-                <div key={q.id} className="bg-white/60 dark:bg-[#040612]/60 border border-slate-200/50 dark:border-white/5 p-6 rounded-[2rem] shadow-sm space-y-4">
+                <div key={q.id} className="bg-white/60 dark:bg-[#040612] bg-[#eef1f9] border border-slate-200/50 dark:border-white/5 p-6 rounded-[2rem] shadow-sm space-y-4">
                   <div className="flex justify-between items-start">
                     <span className="text-xs font-black text-indigo-650 dark:text-indigo-455 uppercase tracking-widest bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/15">Question {idx + 1}</span>
                     <span className="text-xs text-slate-500 font-bold uppercase tracking-wider bg-slate-100 dark:bg-white/5 px-2.5 py-1 rounded-full border border-slate-200/50 dark:border-white/5">{q.maxMarks} Marks</span>
@@ -211,7 +211,7 @@ export default function MockTestPage() {
                     value={answers[q.id] || ""}
                     onChange={(e) => handleAnswerChange(q.id, e.target.value)}
                     placeholder="Write your explanation or step-by-step methodology here..."
-                    className="w-full bg-[#050813]/60 border border-slate-200 dark:border-slate-800 focus:border-indigo-500 rounded-2xl p-4 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 placeholder:text-slate-500 text-slate-900 dark:text-slate-200"
+                    className="w-full dark:bg-[#050813] bg-[#eef1f9] border border-slate-200 dark:border-slate-800 focus:border-indigo-500 rounded-2xl p-4 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 placeholder:text-slate-500 text-slate-900 dark:text-slate-200"
                   />
                 </div>
               ))}
@@ -256,12 +256,12 @@ export default function MockTestPage() {
                   <Trophy className="w-7 h-7 text-emerald-400" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-black text-white">CBSE Mock Test Scorecard</h2>
+                  <h2 className="text-2xl font-black dark:text-white text-slate-900">CBSE Mock Test Scorecard</h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1">AI Evaluator Graded Report Card</p>
                 </div>
                 
                 {/* Total Marks Gauge */}
-                <div className="text-4xl font-black text-white tracking-tight pt-2">
+                <div className="text-4xl font-black dark:text-white text-slate-900 tracking-tight pt-2">
                   Total Score:{" "}
                   <span className="text-emerald-400">
                     {scorecard?.reduce((sum, item) => sum + item.marksGained, 0)}
@@ -279,10 +279,10 @@ export default function MockTestPage() {
             {/* Detailed Question Review Cards */}
             <div className="space-y-5">
               {scorecard?.map((item, idx) => (
-                <div key={idx} className="bg-white/60 dark:bg-[#040612]/60 border border-slate-200/50 dark:border-white/5 p-6 rounded-[2rem] shadow-sm space-y-4 text-left">
+                <div key={idx} className="bg-white/60 dark:bg-[#040612] bg-[#eef1f9] border border-slate-200/50 dark:border-white/5 p-6 rounded-[2rem] shadow-sm space-y-4 text-left">
                   <div className="flex justify-between items-start border-b border-white/5 pb-3">
                     <span className="text-xs font-black text-indigo-400 uppercase tracking-widest">Question {idx + 1} Review</span>
-                    <span className="text-sm font-black text-white">
+                    <span className="text-sm font-black dark:text-white text-slate-900">
                       Score: <span className="text-emerald-400">{item.marksGained}</span>/{item.maxMarks} Marks
                     </span>
                   </div>

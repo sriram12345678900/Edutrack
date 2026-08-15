@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -103,10 +103,10 @@ const formatMarkdown = (md: string) => {
   html = html.replace(/_(.*?)_/g, "<em class='italic'>$1</em>");
 
   // Code block: ```code``` -> <pre><code>code</code></pre>
-  html = html.replace(/```([\s\S]*?)```/g, "<pre class='bg-slate-100 dark:bg-slate-900/60 p-4 rounded-xl my-4 overflow-x-auto'><code class='font-mono text-sm'>$1</code></pre>");
+  html = html.replace(/```([\s\S]*?)```/g, "<pre class='bg-slate-100 dark:bg-slate-900/60 bg-slate-200/60 p-4 rounded-xl my-4 overflow-x-auto'><code class='font-mono text-sm'>$1</code></pre>");
 
   // Inline code: `code` -> <code>code</code>
-  html = html.replace(/`(.*?)`/g, "<code class='bg-slate-100 dark:bg-slate-900/80 px-1.5 py-0.5 rounded font-mono text-sm'>$1</code>");
+  html = html.replace(/`(.*?)`/g, "<code class='bg-slate-100 dark:bg-slate-900/80 bg-slate-200/80 px-1.5 py-0.5 rounded font-mono text-sm'>$1</code>");
 
   // Blockquotes: > quote -> <blockquote>quote</blockquote>
   html = html.replace(/^>\s+(.+)$/gm, "<blockquote class='border-l-4 border-indigo-500 pl-4 italic text-slate-600 dark:text-slate-400 my-4'>$1</blockquote>");
@@ -152,7 +152,7 @@ const getLeitnerBox = (deckId: string, cardId: string): number => {
 
 const getBoxConfig = (box: number) => {
   switch(box) {
-    case 5: return { label: "Box 5: Mastered 🏆", color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" };
+    case 5: return { label: "Box 5: Mastered ", color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" };
     case 4: return { label: "Box 4: Spaced Review (9d)", color: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30" };
     case 3: return { label: "Box 3: Mid Spacing (5d)", color: "bg-amber-500/20 text-amber-400 border-amber-500/30" };
     case 2: return { label: "Box 2: Short Spacing (2d)", color: "bg-orange-500/20 text-orange-400 border-orange-500/30" };
@@ -662,7 +662,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
         setStudySessionFlipped(false);
       }, 300); // Sleek delay for high satisfying micro-animation feedback
     } else {
-      alert("✨ Congratulations! You've finished studying all the cards in this deck!");
+      alert(" Congratulations! You've finished studying all the cards in this deck!");
     }
   };
 
@@ -756,7 +756,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
               {activeTab === "learn" && (
                 <div className="space-y-6">
                   {/* Floating Action Header inside Learn Theory */}
-                  <div className="not-prose flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800 rounded-2xl mb-4">
+                  <div className="not-prose flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-slate-50 dark:bg-slate-900/40 bg-slate-200/40 border border-slate-200/60 dark:border-slate-800 rounded-2xl mb-4">
                     <div>
                       <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500">Premium NCERT Textbook Draft</span>
                       <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 mt-0.5">Exhaustive Curriculum Study Guide</h3>
@@ -787,7 +787,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                       </div>
                     </div>
                   ) : (
-                    <div className="text-center py-10 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-slate-200 dark:border-slate-700">
+                    <div className="text-center py-10 bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 rounded-3xl border border-slate-200 dark:border-slate-700">
                       <p className="text-slate-500 font-medium">Loading AI textbook theory...</p>
                     </div>
                   )}
@@ -838,7 +838,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                       
                       {Array.isArray(quiz?.questions) ? (
                         quiz.questions.map((q: any, i: number) => (
-                          <div key={q.id} className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 mb-4">
+                          <div key={q.id} className="bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 mb-4">
                             <p className="font-bold text-lg mb-4">{i + 1}. {q.question}</p>
                             <div className="space-y-3">
                               {Array.isArray(q.options) && q.options.map((option: string, j: number) => (
@@ -851,7 +851,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                           </div>
                         ))
                       ) : (
-                        <div className="text-center py-8 bg-slate-50 dark:bg-slate-900/30 rounded-3xl border border-slate-100 dark:border-slate-800 text-slate-500 font-semibold mb-6">
+                        <div className="text-center py-8 bg-slate-50 dark:bg-slate-900/30 bg-slate-200/30 rounded-3xl border border-slate-100 dark:border-slate-800 text-slate-500 font-semibold mb-6">
                           {quiz?.error || "AI was unable to generate quiz questions at this moment. Please refresh the page or try again."}
                         </div>
                       )}
@@ -870,7 +870,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                       </button>
                     </div>
                   ) : (
-                    <div className="text-center py-10 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-slate-200 dark:border-slate-700">
+                    <div className="text-center py-10 bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 rounded-3xl border border-slate-200 dark:border-slate-700">
                       <p className="text-slate-500 font-medium">Loading AI quiz...</p>
                     </div>
                   )}
@@ -940,18 +940,18 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                               </div>
                             </div>
 
-                            <h4 className="text-lg font-bold text-white leading-snug group-hover:text-emerald-400 transition-colors">
+                            <h4 className="text-lg font-bold dark:text-white text-slate-900 leading-snug group-hover:text-emerald-400 transition-colors">
                               {deck.title}
                             </h4>
 
-                            <div className="flex items-center gap-4 text-xs text-slate-400 font-semibold">
+                            <div className="flex items-center gap-4 text-xs dark:text-slate-400 text-slate-600 font-semibold">
                               <span className="flex items-center gap-1.5"><Layers className="w-4 h-4 text-slate-500" /> {total} cards</span>
                               <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-slate-500" /> {new Date(deck.createdAt).toLocaleDateString()}</span>
                             </div>
 
                             <div className="space-y-1.5">
                               <div className="flex justify-between text-xs font-bold">
-                                <span className="text-slate-400">Mastery</span>
+                                <span className="dark:text-slate-400 text-slate-600">Mastery</span>
                                 <span className="text-emerald-400">{progress}%</span>
                               </div>
                               <div className="w-full bg-slate-800/80 h-1.5 rounded-full overflow-hidden">
@@ -962,9 +962,9 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
 
                             <div className="flex items-center justify-between pt-2 border-t border-slate-800/50">
                               <span className="text-sm font-bold text-indigo-400 flex items-center gap-1 group-hover:gap-2 transition-all">
-                                {isSelected ? 'Active Deck ✓' : 'Select Deck →'}
+                                {isSelected ? 'Active Deck ' : 'Select Deck →'}
                               </span>
-                              <span className="text-xs text-slate-400 font-medium">
+                              <span className="text-xs dark:text-slate-400 text-slate-600 font-medium">
                                 {mastered}/{total} mastered
                               </span>
                             </div>
@@ -973,7 +973,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                       })}
                     </div>
                   ) : (
-                    <div className="text-center py-12 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-slate-200 dark:border-slate-750">
+                    <div className="text-center py-12 bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 rounded-3xl border border-slate-200 dark:border-slate-750">
                       <Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-500 mb-3" />
                       <p className="text-slate-500 font-medium">Preparing your flashcards...</p>
                     </div>
@@ -988,7 +988,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                             <Sparkles className="w-5 h-5 text-indigo-500" />
                             {activeDeck.title} — Study Session
                           </h3>
-                          <p className="text-xs text-slate-400 font-semibold mt-1">
+                          <p className="text-xs dark:text-slate-400 text-slate-600 font-semibold mt-1">
                             {activeDeck.cards.filter((c: any) => c.status === "mastered" || c.status === "complete").length} of {activeDeck.cards.length} cards mastered
                           </p>
                         </div>
@@ -1009,7 +1009,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                                 : 'bg-slate-100 dark:bg-slate-800/80 text-slate-500 hover:text-slate-755'
                             }`}
                           >
-                            🎯 Interactive Mode
+                             Interactive Mode
                           </button>
                           <button
                             onClick={() => setShowGridView(true)}
@@ -1049,12 +1049,12 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                                 </div>
                                 
                                 {/* Back */}
-                                <div className="absolute inset-0 backface-hidden rotate-y-180 bg-slate-900 border-2 border-indigo-500/60 rounded-3xl p-8 flex flex-col justify-between shadow-md">
+                                <div className="absolute inset-0 backface-hidden rotate-y-180 dark:bg-slate-900 bg-slate-100 border-2 border-indigo-500/60 rounded-3xl p-8 flex flex-col justify-between shadow-md">
                                   <span className="text-xs font-bold uppercase tracking-wider text-indigo-650 bg-indigo-500/10 px-3 py-1 rounded-full mb-4 w-fit flex items-center gap-1">
                                     <CheckSquare className="w-3 h-3" /> Answer
                                   </span>
-                                  <p className="font-semibold text-lg text-slate-200 leading-relaxed text-center my-auto">{topic.flashcard.back}</p>
-                                  <p className="text-slate-400 text-xs mt-6 text-center font-bold">Tap to flip back ↺</p>
+                                  <p className="font-semibold text-lg dark:text-slate-200 text-slate-800 leading-relaxed text-center my-auto">{topic.flashcard.back}</p>
+                                  <p className="dark:text-slate-400 text-slate-600 text-xs mt-6 text-center font-bold">Tap to flip back ↺</p>
                                 </div>
                               </div>
                             </div>
@@ -1114,11 +1114,11 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                                     <span className="text-xs font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">
                                       Answer Revealed
                                     </span>
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate max-w-[120px]" title={activeDeck.title}>
+                                    <span className="text-[10px] font-bold dark:text-slate-400 text-slate-600 uppercase tracking-widest truncate max-w-[120px]" title={activeDeck.title}>
                                       {activeDeck.title}
                                     </span>
                                   </div>
-                                  <p className="font-bold text-lg md:text-xl text-center text-slate-100 leading-relaxed my-auto px-4 max-h-[140px] overflow-y-auto relative z-10">
+                                  <p className="font-bold text-lg md:text-xl text-center dark:text-slate-100 text-slate-900 leading-relaxed my-auto px-4 max-h-[140px] overflow-y-auto relative z-10">
                                     {activeDeck.cards[currentCardIndex].flashcard.back}
                                   </p>
                                   <div className="text-center relative z-10">
@@ -1139,7 +1139,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                                 setCurrentCardIndex(prev => Math.max(0, prev - 1));
                                 setStudySessionFlipped(false);
                               }}
-                              className="w-12 h-12 rounded-full border border-slate-800 bg-slate-900 text-slate-400 hover:text-white disabled:opacity-20 hover:border-slate-700 transition-all flex items-center justify-center shadow-lg active:scale-95"
+                              className="w-12 h-12 rounded-full border border-slate-800 dark:bg-slate-900 bg-slate-100 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 disabled:opacity-20 hover:border-slate-700 transition-all flex items-center justify-center shadow-lg active:scale-95"
                             >
                               <ChevronLeft className="w-6 h-6" />
                             </button>
@@ -1163,7 +1163,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                                 setCurrentCardIndex(prev => Math.min(activeDeck.cards.length - 1, prev + 1));
                                 setStudySessionFlipped(false);
                               }}
-                              className="w-12 h-12 rounded-full border border-slate-800 bg-slate-900 text-slate-400 hover:text-white disabled:opacity-20 hover:border-slate-700 transition-all flex items-center justify-center shadow-lg active:scale-95"
+                              className="w-12 h-12 rounded-full border border-slate-800 dark:bg-slate-900 bg-slate-100 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 disabled:opacity-20 hover:border-slate-700 transition-all flex items-center justify-center shadow-lg active:scale-95"
                             >
                               <ChevronRight className="w-6 h-6" />
                             </button>
@@ -1175,13 +1175,13 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                               onClick={() => handleMarkStatus("learning")}
                               className="flex-1 py-3.5 bg-gradient-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-white rounded-2xl text-sm font-extrabold shadow-[0_4px_25px_rgba(244,63,94,0.25)] hover:shadow-[0_4px_35px_rgba(244,63,94,0.45)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300"
                             >
-                              ❌ Still Learning
+                               Still Learning
                             </button>
                             <button
                               onClick={() => handleMarkStatus("mastered")}
                               className="flex-1 py-3.5 bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white rounded-2xl text-sm font-extrabold shadow-[0_4px_25px_rgba(16,185,129,0.25)] hover:shadow-[0_4px_35px_rgba(16,185,129,0.45)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300 flex items-center justify-center gap-1.5"
                             >
-                              ✓ Mastered!
+                               Mastered!
                             </button>
                           </div>
 
@@ -1229,7 +1229,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
 
                   {summary ? (
                     summary.error ? (
-                      <div className="text-center py-10 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-slate-200 dark:border-slate-700">
+                      <div className="text-center py-10 bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 rounded-3xl border border-slate-200 dark:border-slate-700">
                         <p className="text-rose-500 font-medium">{summary.error}</p>
                       </div>
                     ) : (
@@ -1237,7 +1237,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                         {/* Column 1: Board Must-Knows & Key Terms */}
                         <div className="lg:col-span-2 space-y-6">
                           {/* Board Must-Knows */}
-                          <div className="bg-slate-900 text-white border border-slate-800 p-6 rounded-[2rem] shadow-xl relative overflow-hidden">
+                          <div className="dark:bg-slate-900 bg-slate-100 dark:text-white text-slate-900 border border-slate-800 p-6 rounded-[2rem] shadow-xl relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
                             <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400 mb-4 flex items-center gap-2">
                               <Trophy className="w-5 h-5 text-amber-400" />
@@ -1249,14 +1249,14 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                                   <span className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xs font-black shrink-0 mt-0.5">
                                     {idx + 1}
                                   </span>
-                                  <p className="text-sm font-semibold text-slate-200 leading-relaxed">{fact}</p>
+                                  <p className="text-sm font-semibold dark:text-slate-200 text-slate-800 leading-relaxed">{fact}</p>
                                 </div>
                               ))}
                             </div>
                           </div>
 
                           {/* Key Vocabulary / Terms */}
-                          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/60 p-6 rounded-[2rem] shadow-sm">
+                          <div className="bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-700/60 p-6 rounded-[2rem] shadow-sm">
                             <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                               <BookOpen className="w-5 h-5 text-indigo-500" />
                               Core Key Terms
@@ -1284,12 +1284,12 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                             </h3>
                             <div className="space-y-4">
                               {summary.equations?.map((eq: any, idx: number) => (
-                                <div key={idx} className="bg-slate-900/80 p-4 rounded-xl border border-indigo-955/50 space-y-2">
+                                <div key={idx} className="dark:bg-slate-900/80 bg-slate-200/80 p-4 rounded-xl border border-indigo-955/50 space-y-2">
                                   <p className="text-xs font-black text-indigo-300 uppercase tracking-widest leading-none">{eq.name}</p>
                                   <code className="block bg-slate-950 px-3 py-2 rounded font-mono text-sm text-emerald-450 border border-slate-850/80 text-center w-full">
                                     {eq.formula}
                                   </code>
-                                  <p className="text-[11px] text-slate-400 leading-normal">{eq.description}</p>
+                                  <p className="text-[11px] dark:text-slate-400 text-slate-600 leading-normal">{eq.description}</p>
                                 </div>
                               ))}
                             </div>
@@ -1303,7 +1303,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                                 <Sparkles className="w-4 h-4" /> Mnemonic Trick
                               </h3>
                               <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">Concept: {m.concept}</p>
-                              <div className="bg-white/40 dark:bg-slate-900/40 p-4 rounded-2xl border border-fuchsia-500/10 font-bold text-sm text-slate-800 dark:text-slate-100 italic leading-relaxed">
+                              <div className="bg-white/40 dark:bg-slate-900/40 bg-slate-200/40 p-4 rounded-2xl border border-fuchsia-500/10 font-bold text-sm text-slate-800 dark:text-slate-100 italic leading-relaxed">
                                 {m.trick}
                               </div>
                             </div>
@@ -1312,7 +1312,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                       </div>
                     )
                   ) : (
-                    <div className="text-center py-12 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-slate-200 dark:border-slate-700">
+                    <div className="text-center py-12 bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 rounded-3xl border border-slate-200 dark:border-slate-700">
                       <Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-500 mb-3" />
                       <p className="text-slate-500 font-medium">Preparing Board Cheat Sheet...</p>
                     </div>
@@ -1339,24 +1339,24 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
           <div className="w-full flex items-center justify-between relative z-10 max-w-4xl border-b border-white/5 pb-6">
             <button
               onClick={() => setIsFullscreen(false)}
-              className="flex items-center gap-2 text-slate-400 hover:text-white bg-slate-900/80 border border-slate-800 px-5 py-2.5 rounded-2xl transition-all shadow-lg active:scale-95 text-sm font-bold uppercase tracking-wider"
+              className="flex items-center gap-2 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 dark:bg-slate-900/80 bg-slate-200/80 border border-slate-800 px-5 py-2.5 rounded-2xl transition-all shadow-lg active:scale-95 text-sm font-bold uppercase tracking-wider"
             >
               ← Exit Fullscreen <span className="text-[10px] text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded font-mono ml-1">ESC</span>
             </button>
             
             <div className="text-center">
-              <h2 className="text-xl font-bold text-white tracking-tight leading-none mb-1.5">{activeDeck.title}</h2>
+              <h2 className="text-xl font-bold dark:text-white text-slate-900 tracking-tight leading-none mb-1.5">{activeDeck.title}</h2>
               <span className="text-xs text-indigo-400 font-extrabold tracking-widest uppercase">
                 {subjectName} Hub • CBSE Class {userClass}
               </span>
             </div>
             
             <div className="w-40 hidden md:block">
-              <div className="flex justify-between text-xs font-bold text-slate-400 mb-1">
+              <div className="flex justify-between text-xs font-bold dark:text-slate-400 text-slate-600 mb-1">
                 <span>Mastered</span>
                 <span>{Math.round((activeDeck.cards.filter((c: any) => c.status === "mastered" || c.status === "complete").length / activeDeck.cards.length) * 100) || 0}%</span>
               </div>
-              <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-white/5">
+              <div className="w-full dark:bg-slate-900 bg-slate-100 h-1.5 rounded-full overflow-hidden border border-white/5">
                 <div 
                   className="h-full bg-emerald-500 rounded-full transition-all duration-500" 
                   style={{ width: `${(activeDeck.cards.filter((c: any) => c.status === "mastered" || c.status === "complete").length / activeDeck.cards.length) * 100}%` }}
@@ -1408,12 +1408,12 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                     <span className="text-sm font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-400 px-4 py-1.5 rounded-full border border-emerald-500/20">
                       Answer Revealed
                     </span>
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest truncate max-w-[200px]" title={activeDeck.title}>
+                    <span className="text-xs font-bold dark:text-slate-400 text-slate-600 uppercase tracking-widest truncate max-w-[200px]" title={activeDeck.title}>
                       {activeDeck.title}
                     </span>
                   </div>
                   
-                  <p className="font-bold text-xl md:text-2xl text-center text-slate-100 leading-relaxed my-auto px-6 max-h-[220px] overflow-y-auto relative z-10">
+                  <p className="font-bold text-xl md:text-2xl text-center dark:text-slate-100 text-slate-900 leading-relaxed my-auto px-6 max-h-[220px] overflow-y-auto relative z-10">
                     {activeDeck.cards[currentCardIndex].flashcard.back}
                   </p>
                   
@@ -1438,7 +1438,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                   setCurrentCardIndex(prev => Math.max(0, prev - 1));
                   setStudySessionFlipped(false);
                 }}
-                className="w-14 h-14 rounded-full border border-slate-800 bg-slate-900 text-slate-400 hover:text-white disabled:opacity-20 hover:border-slate-700 transition-all flex items-center justify-center shadow-lg active:scale-95 hover:shadow-indigo-500/5"
+                className="w-14 h-14 rounded-full border border-slate-800 dark:bg-slate-900 bg-slate-100 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 disabled:opacity-20 hover:border-slate-700 transition-all flex items-center justify-center shadow-lg active:scale-95 hover:shadow-indigo-500/5"
               >
                 <ChevronLeft className="w-8 h-8" />
               </button>
@@ -1461,7 +1461,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                   setCurrentCardIndex(prev => Math.min(activeDeck.cards.length - 1, prev + 1));
                   setStudySessionFlipped(false);
                 }}
-                className="w-14 h-14 rounded-full border border-slate-800 bg-slate-900 text-slate-400 hover:text-white disabled:opacity-20 hover:border-slate-700 transition-all flex items-center justify-center shadow-lg active:scale-95 hover:shadow-indigo-500/5"
+                className="w-14 h-14 rounded-full border border-slate-800 dark:bg-slate-900 bg-slate-100 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 disabled:opacity-20 hover:border-slate-700 transition-all flex items-center justify-center shadow-lg active:scale-95 hover:shadow-indigo-500/5"
               >
                 <ChevronRight className="w-8 h-8" />
               </button>
@@ -1473,13 +1473,13 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                 onClick={() => handleMarkStatus("learning")}
                 className="flex-1 py-4.5 bg-gradient-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-white rounded-2xl text-base font-extrabold shadow-[0_4px_25px_rgba(244,63,94,0.25)] hover:shadow-[0_4px_35px_rgba(244,63,94,0.45)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300"
               >
-                ❌ Still Learning
+                 Still Learning
               </button>
               <button
                 onClick={() => handleMarkStatus("mastered")}
                 className="flex-1 py-4.5 bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white rounded-2xl text-base font-extrabold shadow-[0_4px_25px_rgba(16,185,129,0.25)] hover:shadow-[0_4px_35px_rgba(16,185,129,0.45)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2"
               >
-                ✓ Mastered!
+                 Mastered!
               </button>
             </div>
 
@@ -1491,14 +1491,14 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
       {showLineByLineModal && lineByLineData && (
         <div className="fixed inset-0 z-[150] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-8 select-none overflow-y-auto animate-in fade-in duration-300">
           
-          <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200 print-view">
+          <div className="bg-white dark:bg-slate-900 bg-slate-100 rounded-[2.5rem] shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200 print-view">
             
             {/* Modal Header */}
-            <div className="p-6 bg-slate-900 text-white shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 relative">
+            <div className="p-6 dark:bg-slate-900 bg-slate-100 dark:text-white text-slate-900 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 relative">
               <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-indigo-600" />
               <div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">NCERT Active Annotation Study Guide</span>
-                <h3 className="text-xl font-bold text-white mt-1 leading-none">{chapterName} — Line-by-Line Breakdown</h3>
+                <h3 className="text-xl font-bold dark:text-white text-slate-900 mt-1 leading-none">{chapterName} — Line-by-Line Breakdown</h3>
               </div>
               <div className="flex items-center gap-3">
                 <button
@@ -1510,7 +1510,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                 </button>
                 <button
                   onClick={() => setShowLineByLineModal(false)}
-                  className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-xl transition-all border border-slate-700"
+                  className="p-2.5 bg-slate-800 hover:bg-slate-700 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 rounded-xl transition-all border border-slate-700"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1522,16 +1522,16 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
               
               <div className="bg-indigo-50/50 dark:bg-indigo-950/10 border-l-4 border-indigo-500 p-4 rounded-r-2xl mb-4">
                 <p className="text-xs text-indigo-800 dark:text-indigo-300 font-bold leading-relaxed m-0">
-                  ⚡ <strong>CBSE Board Exam Advantage</strong>: Below are the exact high-frequency lines extracted from your NCERT textbook, paired side-by-side with high-yield conceptual annotations, evaluator tips, and misconceptions. Perfect for scoring 100% in board short-answer and long-answer questions.
+                   <strong>CBSE Board Exam Advantage</strong>: Below are the exact high-frequency lines extracted from your NCERT textbook, paired side-by-side with high-yield conceptual annotations, evaluator tips, and misconceptions. Perfect for scoring 100% in board short-answer and long-answer questions.
                 </p>
               </div>
 
               <div className="space-y-6">
                 {lineByLineData.lines?.map((line: any, idx: number) => (
-                  <div key={idx} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden flex flex-col md:grid md:grid-cols-2">
+                  <div key={idx} className="bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden flex flex-col md:grid md:grid-cols-2">
                     
                     {/* Left Column: Original NCERT Quote */}
-                    <div className="p-6 bg-slate-50 dark:bg-slate-900/30 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                    <div className="p-6 bg-slate-50 dark:bg-slate-900/30 bg-slate-200/30 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                       <div>
                         <span className="inline-block px-2.5 py-0.5 bg-amber-500/10 text-amber-500 text-[9px] font-black tracking-widest uppercase rounded-full mb-3 border border-amber-500/20">
                           NCERT Textbook Line {idx + 1}
@@ -1540,7 +1540,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                           "{line.original}"
                         </blockquote>
                       </div>
-                      <span className="text-[10px] text-slate-400 font-bold tracking-widest uppercase mt-4 block opacity-50">
+                      <span className="text-[10px] dark:text-slate-400 text-slate-600 font-bold tracking-widest uppercase mt-4 block opacity-50">
                         Official Curriculum Quote
                       </span>
                     </div>
@@ -1570,7 +1570,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                       {/* Misconception */}
                       <div className="space-y-1">
                         <span className="text-[10px] font-black text-rose-500 tracking-widest uppercase flex items-center gap-1">
-                          ❌ Common Student Misconception
+                           Common Student Misconception
                         </span>
                         <p className="text-xs text-rose-600 dark:text-rose-450 font-semibold bg-rose-500/5 p-3 rounded-xl border border-rose-500/10 leading-normal">
                           {line.misconception}

@@ -212,11 +212,11 @@ export default function Dashboard() {
   const userTotalXp = xp + (level === 1 ? 0 : Array.from({length: level - 1}, (_, i) => (i + 1) * 200).reduce((a, b) => a + b, 0));
   
   const classmates = [
-    { name: "Aditya Sharma", totalXp: 950, status: "Active Study ✍️", online: true, avatar: "AS", color: "from-amber-500 to-orange-500" },
-    { name: "Priya Nair", totalXp: 720, status: "In Call Arena 📞", online: true, avatar: "PN", color: "from-emerald-400 to-teal-500" },
-    { name: `${firstName} (You)`, totalXp: userTotalXp, status: "On Dashboard 🏆", online: true, isSelf: true, avatar: initials, color: "from-indigo-500 to-purple-600" },
+    { name: "Aditya Sharma", totalXp: 950, status: "Active Study ️", online: true, avatar: "AS", color: "from-amber-500 to-orange-500" },
+    { name: "Priya Nair", totalXp: 720, status: "In Call Arena ", online: true, avatar: "PN", color: "from-emerald-400 to-teal-500" },
+    { name: `${firstName} (You)`, totalXp: userTotalXp, status: "On Dashboard ", online: true, isSelf: true, avatar: initials, color: "from-indigo-500 to-purple-600" },
     { name: "Rohan Das", totalXp: 340, status: "Idle", online: false, avatar: "RD", color: "from-blue-400 to-cyan-500" },
-    { name: "Sneha Patel", totalXp: 180, status: "Active Study ✍️", online: true, avatar: "SP", color: "from-fuchsia-400 to-pink-500" }
+    { name: "Sneha Patel", totalXp: 180, status: "Active Study ️", online: true, avatar: "SP", color: "from-fuchsia-400 to-pink-500" }
   ];
 
   const skillNodes = [
@@ -391,7 +391,7 @@ export default function Dashboard() {
 
                 <div>
                   <h3 className="font-black text-xl dark:text-white text-slate-900 leading-tight flex items-center gap-2">
-                    {level <= 1 ? "Study Novice" : level <= 3 ? "Elite Revisionist" : level <= 5 ? "Academic Warrior" : "Grandmaster Scholar"} 🎓
+                    {level <= 1 ? "Study Novice" : level <= 3 ? "Elite Revisionist" : level <= 5 ? "Academic Warrior" : "Grandmaster Scholar"} 
                   </h3>
                   <div className="flex items-center gap-2 mt-1.5 text-xs text-indigo-300 font-bold tracking-wide">
                     <Star className="w-3.5 h-3.5 fill-current text-indigo-400" />
@@ -734,7 +734,7 @@ export default function Dashboard() {
                   <div className="w-14 h-14 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
                     <Trophy className="w-7 h-7 text-emerald-400" />
                   </div>
-                  <h3 className="text-base font-black dark:text-white text-slate-900">All Cards Cleared! 🏆</h3>
+                  <h3 className="text-base font-black dark:text-white text-slate-900">All Cards Cleared! </h3>
                   <p className="text-xs text-slate-500 font-bold mt-1">Great job! You gained bonus XP revision points.</p>
                   <button 
                     onClick={() => setSwiperIndex(0)}
@@ -991,7 +991,7 @@ export default function Dashboard() {
               <Trophy className="w-7 h-7 dark:text-white text-slate-900" />
             </div>
             <div>
-              <h4 className="font-black text-xl leading-none">Level Up! 🎉</h4>
+              <h4 className="font-black text-xl leading-none">Level Up! </h4>
               <p className="text-sm font-bold opacity-90 mt-1">You reached Level {level}! Keep studying!</p>
             </div>
           </motion.div>
@@ -1008,7 +1008,7 @@ export default function Dashboard() {
               <Sparkles className="w-6.5 h-6.5 text-yellow-300" />
             </div>
             <div>
-              <h4 className="font-black text-lg leading-none">All Quests Completed! 🏆</h4>
+              <h4 className="font-black text-lg leading-none">All Quests Completed! </h4>
               <p className="text-xs font-bold opacity-90 mt-1.5">Fantastic job! You've conquered all daily study missions!</p>
             </div>
           </motion.div>

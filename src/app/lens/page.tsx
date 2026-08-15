@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { 
@@ -399,7 +399,7 @@ export default function LensPage() {
         const parts = plainText.split(/\*\*/g);
         return (
           <React.Fragment key={`plain-${keyIdx}`}>
-            {parts.map((part, i) => i % 2 === 1 ? <strong key={i} className="font-extrabold text-white">{part}</strong> : part)}
+            {parts.map((part, i) => i % 2 === 1 ? <strong key={i} className="font-extrabold dark:text-white text-slate-900">{part}</strong> : part)}
           </React.Fragment>
         );
       };
@@ -431,7 +431,7 @@ export default function LensPage() {
             </h2>
           );
         } else {
-          return <h3 key={idx} className="text-sm font-extrabold text-white mt-3 mb-1.5 tracking-tight">{headingContent}</h3>;
+          return <h3 key={idx} className="text-sm font-extrabold dark:text-white text-slate-900 mt-3 mb-1.5 tracking-tight">{headingContent}</h3>;
         }
       }
 
@@ -442,7 +442,7 @@ export default function LensPage() {
         return (
           <div key={idx} className="flex items-start gap-2.5 ml-2.5 my-1.5 select-text">
             <span className="text-emerald-400 mt-1.5 text-xs">•</span>
-            <span className="text-slate-300 text-sm font-medium leading-relaxed">{parseMix(line.trim().substring(2))}</span>
+            <span className="dark:text-slate-300 text-slate-700 text-sm font-medium leading-relaxed">{parseMix(line.trim().substring(2))}</span>
           </div>
         );
       }
@@ -453,7 +453,7 @@ export default function LensPage() {
           return (
             <div key={idx} className="flex items-start gap-2.5 ml-2.5 my-1.5 select-text">
               <span className="text-emerald-400 font-bold mt-0.5 text-sm">{numMatch[1]}</span>
-              <span className="text-slate-300 text-sm font-medium leading-relaxed">{parseMix(numMatch[2])}</span>
+              <span className="dark:text-slate-300 text-slate-700 text-sm font-medium leading-relaxed">{parseMix(numMatch[2])}</span>
             </div>
           );
         }
@@ -462,7 +462,7 @@ export default function LensPage() {
       if (!line.trim()) return <div key={idx} className="h-2.5" />;
 
       return (
-        <p key={idx} className="text-slate-300 text-sm font-medium mb-2.5 last:mb-0 leading-relaxed select-text">
+        <p key={idx} className="dark:text-slate-300 text-slate-700 text-sm font-medium mb-2.5 last:mb-0 leading-relaxed select-text">
           {parseMix(line)}
         </p>
       );
@@ -471,40 +471,40 @@ export default function LensPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#05060f]">
+      <div className="min-h-screen flex items-center justify-center dark:bg-[#05060f] bg-[#eef1f9]">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-12 h-12 text-emerald-500 animate-spin" />
-          <p className="text-slate-400 text-sm font-semibold">Loading doubt solver lens...</p>
+          <p className="dark:text-slate-400 text-slate-600 text-sm font-semibold">Loading doubt solver lens...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full min-h-screen flex flex-col bg-[#03050d] text-slate-100 font-sans relative overflow-hidden selection:bg-emerald-500/30">
+    <div className="w-full h-full min-h-screen flex flex-col dark:bg-[#03050d] bg-[#eef1f9] text-slate-100 font-sans relative overflow-hidden selection:bg-emerald-500/30">
       
       {/* Background Gradients */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
 
       {/* ── TOP HEADER ── */}
-      <header className="p-4 sm:p-6 border-b border-white/10 bg-[#050816]/90 backdrop-blur-2xl flex flex-row items-center justify-between gap-4 z-10 shrink-0">
+      <header className="p-4 sm:p-6 border-b border-white/10 dark:bg-[#050816] bg-[#eef1f9] backdrop-blur-2xl flex flex-row items-center justify-between gap-4 z-10 shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 bg-gradient-to-br from-emerald-500 to-teal-600 border border-white/10 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/25">
             <Camera className="w-5.5 h-5.5" />
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 tracking-tight flex items-center gap-2">
-              AI Doubt-Solver Lens 🔍
+              AI Doubt-Solver Lens 
             </h1>
-            <p className="text-slate-400 text-xs font-semibold mt-0.5">
+            <p className="dark:text-slate-400 text-slate-600 text-xs font-semibold mt-0.5">
               Instant Optical Character Recognition & Step-by-Step Solutions
             </p>
           </div>
         </div>
 
         <Link href="/dashboard">
-          <button className="px-4.5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-extrabold transition-all flex items-center gap-2 shadow-sm">
+          <button className="px-4.5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 dark:text-slate-300 text-slate-700 hover:dark:text-white text-slate-900 text-xs font-extrabold transition-all flex items-center gap-2 shadow-sm">
             <Home className="w-4 h-4" />
             Back to Dashboard
           </button>
@@ -519,7 +519,7 @@ export default function LensPage() {
           
           {/* Holographic HUD Viewport */}
           <div 
-            className={`relative bg-[#060a1c]/90 backdrop-blur-3xl border-2 border-dashed ${
+            className={`relative dark:bg-[#060a1c] bg-[#f5f7ff] backdrop-blur-3xl border-2 border-dashed ${
               lensImage ? "border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)]" : "border-white/15 hover:border-emerald-500/50"
             } rounded-3xl p-3 aspect-[4/3] flex flex-col items-center justify-center overflow-hidden transition-all group shrink-0 relative`}
             onDrop={handleLensDrop}
@@ -554,17 +554,25 @@ export default function LensPage() {
               </div>
             ) : (
               <div className="text-center p-8 select-none relative z-10 w-full h-full flex flex-col items-center justify-center rounded-2xl overflow-hidden">
-                <div className="absolute inset-0 opacity-15 bg-cover bg-center pointer-events-none mix-blend-screen" style={{ backgroundImage: "url('/ai_lens_scanner.jpg')" }} />
-                <div className="w-20 h-20 bg-emerald-500/10 border border-emerald-500/30 rounded-3xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-[0_0_25px_rgba(16,185,129,0.25)] relative z-10 backdrop-blur-md">
-                  <Camera className="w-9 h-9 text-emerald-400" />
+                <div className="absolute inset-0 opacity-10 bg-cover bg-center pointer-events-none mix-blend-screen" style={{ backgroundImage: "url('/ai_lens_scanner.jpg')" }} />
+                
+                <div className="relative mb-6 group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                  <div className="absolute -inset-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-full blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500" />
+                  <div className="w-24 h-24 dark:bg-[#0a1128] bg-[#f5f7ff] border border-emerald-500/30 rounded-full flex items-center justify-center mx-auto group-hover:scale-105 group-hover:border-emerald-400/50 transition-all duration-300 shadow-[0_0_30px_rgba(16,185,129,0.15)] relative z-10 backdrop-blur-xl">
+                    <Camera className="w-10 h-10 text-emerald-400 group-hover:text-emerald-300 transition-colors" />
+                  </div>
                 </div>
-                <h3 className="text-xl font-black text-white mb-1.5 relative z-10 tracking-tight">Drag & Drop Homework Photo</h3>
-                <p className="text-slate-400 text-xs font-semibold mb-6 relative z-10 max-w-xs">Scan math equations, physics diagrams, or chemistry formulas instantly</p>
+
+                <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400 mb-2 relative z-10 tracking-tight">Drop Homework Photo</h3>
+                <p className="dark:text-slate-400 text-slate-600 text-sm font-medium mb-8 relative z-10 max-w-[280px] mx-auto leading-relaxed">
+                  Scan math equations, physics diagrams, or chemistry formulas for instant step-by-step solutions.
+                </p>
+                
                 <button 
                   onClick={() => fileInputRef.current?.click()}
-                  className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white px-7 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center gap-2.5 transition-all border border-white/20 mx-auto active:scale-95 shadow-xl shadow-emerald-500/25 relative z-10"
+                  className="bg-white/5 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 px-8 py-4 rounded-2xl font-bold text-sm tracking-wide flex items-center gap-3 transition-all border border-emerald-500/30 hover:border-emerald-400/60 mx-auto active:scale-95 shadow-xl shadow-emerald-900/20 relative z-10 group"
                 >
-                  <Upload className="w-4.5 h-4.5" /> Browse Homework Image
+                  <Upload className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" /> Browse Gallery
                 </button>
                 <input 
                   type="file" 
@@ -578,9 +586,9 @@ export default function LensPage() {
           </div>
 
           {/* Sample NCERT Doubt Presets Deck */}
-          <div className="bg-[#070918]/90 border border-white/10 rounded-3xl p-6 shadow-2xl backdrop-blur-xl shrink-0">
+          <div className="dark:bg-[#070918] bg-[#eef1f9] border border-white/10 rounded-3xl p-6 shadow-2xl backdrop-blur-xl shrink-0">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xs font-black text-slate-300 uppercase tracking-widest flex items-center gap-2">
+              <h3 className="text-xs font-black dark:text-slate-300 text-slate-700 uppercase tracking-widest flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-emerald-400" /> Test Sample NCERT Doubts
               </h3>
               <span className="text-[10px] font-extrabold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
@@ -600,11 +608,11 @@ export default function LensPage() {
                       <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase">
                         {sd.subject}
                       </span>
-                      <span className="text-xs font-bold text-white group-hover:text-emerald-300 transition-colors">
+                      <span className="text-xs font-bold dark:text-white text-slate-900 group-hover:text-emerald-300 transition-colors">
                         {sd.title}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400 line-clamp-1 font-semibold">{sd.query}</p>
+                    <p className="text-xs dark:text-slate-400 text-slate-600 line-clamp-1 font-semibold">{sd.query}</p>
                   </div>
                   <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 shrink-0 mt-2 transition-transform group-hover:translate-x-1" />
                 </button>
@@ -614,40 +622,40 @@ export default function LensPage() {
         </div>
 
         {/* Right Column: Split Screen Interactive AI Canvas */}
-        <div className="bg-[#060817]/90 border border-white/10 rounded-3xl overflow-hidden flex flex-col h-full shadow-2xl relative min-h-0 backdrop-blur-xl">
+        <div className="dark:bg-[#060817] bg-[#eef1f9] border border-white/10 rounded-3xl overflow-hidden flex flex-col h-full shadow-2xl relative min-h-0 backdrop-blur-xl">
           {!lensChatStarted ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-8 relative z-10 select-none">
-              <div className="relative mb-5 flex items-center justify-center">
-                <div className="absolute w-28 h-28 bg-emerald-500/15 rounded-full blur-2xl animate-pulse" />
-                <div className="w-18 h-18 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl flex items-center justify-center text-white relative z-10 shadow-2xl border border-white/20">
-                  <Bot className="w-9 h-9" />
+              <div className="relative mb-6 flex items-center justify-center">
+                <div className="absolute w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl animate-pulse" />
+                <div className="w-20 h-20 dark:bg-[#0a1128] bg-[#f5f7ff] border border-emerald-500/20 rounded-[2rem] flex items-center justify-center text-emerald-400 relative z-10 shadow-2xl backdrop-blur-xl">
+                  <Bot className="w-10 h-10" />
                 </div>
               </div>
 
-              <h2 className="text-2xl font-black text-white mb-2 tracking-tight">
-                AI Solution Canvas Ready
+              <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400 mb-3 tracking-tight">
+                AI Solution Canvas
               </h2>
-              <p className="text-slate-400 text-xs font-semibold mb-6 max-w-sm leading-relaxed">
-                Upload a homework image or click a sample NCERT doubt to generate step-by-step explanations.
+              <p className="dark:text-slate-400 text-slate-600 text-sm font-medium mb-8 max-w-md leading-relaxed mx-auto">
+                Upload a homework image or select a sample doubt from the left to generate detailed, step-by-step explanations.
               </p>
 
               {isScanning && (
-                <div className="mt-4 flex flex-col items-center gap-3">
-                  <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
-                  <span className="text-emerald-400 font-extrabold text-xs tracking-widest uppercase animate-pulse">Running OCR & Analyzing Equations...</span>
+                <div className="mt-2 flex flex-col items-center gap-4 bg-emerald-950/30 px-6 py-4 rounded-2xl border border-emerald-500/20">
+                  <Loader2 className="w-7 h-7 text-emerald-400 animate-spin" />
+                  <span className="text-emerald-400 font-bold text-xs tracking-widest uppercase">Analyzing Image...</span>
                 </div>
               )}
             </div>
           ) : (
             <>
               {/* Chat Header */}
-              <div className="bg-[#080b1e]/90 p-4 flex items-center justify-between border-b border-white/10 backdrop-blur-md shrink-0">
+              <div className="dark:bg-[#080b1e] bg-[#eef1f9] p-4 flex items-center justify-between border-b border-white/10 backdrop-blur-md shrink-0">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 bg-emerald-500/20 border border-emerald-500/30 rounded-xl flex items-center justify-center text-emerald-400 shadow-md">
                     <Bot className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-extrabold text-white text-sm">Professor Doubt Solver</h3>
+                    <h3 className="font-extrabold dark:text-white text-slate-900 text-sm">Professor Doubt Solver</h3>
                     <p className="text-[10px] text-emerald-400 uppercase tracking-widest font-black">Active Session</p>
                   </div>
                 </div>
@@ -693,10 +701,10 @@ export default function LensPage() {
                           </div>
                         )}
                         
-                        <div className={`p-4 sm:p-5 rounded-3xl shadow-2xl border leading-relaxed ${
+                        <div className={`p-5 sm:p-6 rounded-[2rem] shadow-2xl border leading-relaxed ${
                           msg.role === "user" 
-                            ? "bg-gradient-to-br from-emerald-600 to-teal-600 text-white rounded-tr-none border-emerald-400/20 font-bold text-sm" 
-                            : "bg-[#080a18]/90 backdrop-blur-md text-slate-200 rounded-tl-none border-white/10 font-medium text-sm"
+                            ? "bg-gradient-to-br from-emerald-600 to-teal-700 text-white rounded-tr-sm border-emerald-400/20 font-bold text-sm shadow-emerald-900/20" 
+                            : "dark:bg-[#0a1128] bg-[#f5f7ff] backdrop-blur-xl text-slate-200 rounded-tl-sm border-white/5 font-medium text-[15px]"
                         }`}>
                           {msg.role === "user" ? (
                             <p className="select-text whitespace-pre-wrap">{msg.content}</p>
@@ -710,7 +718,7 @@ export default function LensPage() {
                         {isAi && (
                           <button
                             onClick={() => speakText(msg.content, identifier)}
-                            className="absolute -right-10 top-3 p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-400 hover:text-white border border-white/10 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
+                            className="absolute -right-10 top-3 p-2 rounded-xl dark:bg-slate-900/90 bg-slate-200/90 hover:bg-slate-800 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 border border-white/10 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
                             title="Read aloud"
                           >
                             {activeSpeakingMsg === identifier ? (
@@ -756,7 +764,7 @@ export default function LensPage() {
                     <div className="w-8 h-8 rounded-xl bg-emerald-950/60 text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0">
                       <Bot className="w-4 h-4" />
                     </div>
-                    <div className="bg-[#080a18]/90 backdrop-blur-md rounded-2xl rounded-tl-none border border-white/10 px-5 py-4 flex items-center gap-2 shadow-md">
+                    <div className="dark:bg-[#080a18] bg-[#eef1f9] backdrop-blur-md rounded-2xl rounded-tl-none border border-white/10 px-5 py-4 flex items-center gap-2 shadow-md">
                       <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
                       <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
                       <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
@@ -768,14 +776,14 @@ export default function LensPage() {
               </div>
 
               {/* Chat Input */}
-              <div className="p-4 bg-[#050816]/90 border-t border-white/10 backdrop-blur-md shrink-0">
+              <div className="p-4 dark:bg-[#050816] bg-[#eef1f9] border-t border-white/10 backdrop-blur-md shrink-0">
                 <form onSubmit={handleLensSend} className="relative flex items-center">
                   <input 
                     type="text" 
                     value={lensInputValue}
                     onChange={(e) => setLensInputValue(e.target.value)}
                     placeholder={isListening ? "Listening closely..." : "Ask a follow-up question about this scanned doubt..."}
-                    className={`w-full bg-[#03040c]/90 border ${
+                    className={`w-full dark:bg-[#03040c] bg-[#eef1f9] border ${
                       isListening ? "border-red-500/50 focus:ring-red-500" : "border-white/10 focus:border-emerald-500/50 focus:ring-emerald-500/30"
                     } rounded-full pl-5 pr-26 py-4 text-sm focus:outline-none focus:ring-1 text-slate-100 placeholder:text-slate-500 transition-all font-semibold`}
                   />

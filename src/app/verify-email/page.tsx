@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -60,7 +60,7 @@ export default function VerifyEmail() {
   if (loading || !user) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 bg-slate-100 flex items-center justify-center p-6">
       <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-8 border border-slate-100 dark:border-slate-700 text-center">
         <div className="w-20 h-20 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
           <Mail className="w-10 h-10 text-indigo-600 dark:text-indigo-400" />
@@ -98,7 +98,7 @@ export default function VerifyEmail() {
 
         <button
           onClick={logout}
-          className="mt-8 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 flex items-center justify-center gap-2 mx-auto"
+          className="mt-8 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:dark:text-slate-200 text-slate-800 flex items-center justify-center gap-2 mx-auto"
         >
           <LogOut className="w-4 h-4" /> Use a different account
         </button>

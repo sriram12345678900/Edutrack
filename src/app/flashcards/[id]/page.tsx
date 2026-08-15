@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -14,7 +14,7 @@ const getLeitnerBox = (deckId: string, cardId: string): number => {
 
 const getBoxConfig = (box: number) => {
   switch(box) {
-    case 5: return { label: "Box 5: Mastered 🏆", color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" };
+    case 5: return { label: "Box 5: Mastered ", color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" };
     case 4: return { label: "Box 4: Spaced Review (9d)", color: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30" };
     case 3: return { label: "Box 3: Mid Spacing (5d)", color: "bg-amber-500/20 text-amber-400 border-amber-500/30" };
     case 2: return { label: "Box 2: Short Spacing (2d)", color: "bg-orange-500/20 text-orange-400 border-orange-500/30" };
@@ -174,10 +174,10 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
   return (
     <div className="fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 flex flex-col">
       {/* Header */}
-      <header className="px-6 py-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md">
+      <header className="px-6 py-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 bg-slate-200/50 backdrop-blur-md">
         <button 
           onClick={() => router.push("/flashcards")}
-          className="flex items-center gap-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white font-bold transition-colors"
+          className="flex items-center gap-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:dark:text-white text-slate-900 font-bold transition-colors"
         >
           <ArrowLeft className="w-5 h-5" /> Exit
         </button>
@@ -215,7 +215,7 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
               >
                 {/* Front */}
                 <div className="absolute inset-0 backface-hidden bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center p-8 text-center">
-                  <span className="absolute top-6 left-6 text-xs font-extrabold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                  <span className="absolute top-6 left-6 text-xs font-extrabold uppercase tracking-widest dark:text-slate-400 text-slate-600 flex items-center gap-2">
                     Question
                     <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border normal-case tracking-normal ${
                       getBoxConfig(getLeitnerBox(deck.id, currentCard.id || `card_${currentIndex}`)).color
@@ -235,7 +235,7 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
                   <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white leading-relaxed">
                     {currentCard.front}
                   </h2>
-                  <p className="absolute bottom-6 text-sm text-slate-400 animate-pulse">Tap to flip</p>
+                  <p className="absolute bottom-6 text-sm dark:text-slate-400 text-slate-600 animate-pulse">Tap to flip</p>
                 </div>
 
                 {/* Back */}
@@ -255,7 +255,7 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
                   <button 
                     onClick={(e) => playAudio(e, currentCard.back)}
                     disabled={isPlayingAudio}
-                    className="absolute top-6 right-6 p-2 rounded-full bg-white/50 dark:bg-slate-900/50 text-fuchsia-600 hover:text-indigo-600 transition-colors backdrop-blur-sm"
+                    className="absolute top-6 right-6 p-2 rounded-full bg-white/50 dark:bg-slate-900/50 bg-slate-200/50 text-fuchsia-600 hover:text-indigo-600 transition-colors backdrop-blur-sm"
                   >
                     {isPlayingAudio ? <Loader2 className="w-5 h-5 animate-spin" /> : <Volume2 className="w-5 h-5" />}
                   </button>

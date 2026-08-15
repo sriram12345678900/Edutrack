@@ -63,7 +63,7 @@ Use simple analogies, real-world examples, and be encouraging!`;
         if (m.attachments) {
           m.attachments.forEach(att => {
             if (att.type.startsWith("image/")) {
-              const base64Data = att.data.split(",")[1];
+              const base64Data = att.data.includes(",") ? att.data.split(",")[1] : att.data;
               parts.push({
                 inlineData: {
                   mimeType: att.type,
@@ -100,7 +100,7 @@ Use simple analogies, real-world examples, and be encouraging!`;
   });
 
   const hasImage = messages.some(m => m.attachments?.some(att => att.type.startsWith("image/")));
-  const modelToUse = hasImage ? "meta-llama/llama-4-scout-17b-16e-instruct" : "llama-3.3-70b-versatile";
+  const modelToUse = hasImage ? "llama-3.2-11b-vision-preview" : "llama-3.3-70b-versatile";
 
   const formattedMessages = messages.map(m => {
     const containsImage = m.attachments?.some(att => att.type.startsWith("image/"));

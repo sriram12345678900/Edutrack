@@ -33,11 +33,11 @@ export interface Achievement {
 }
 
 export const ACHIEVEMENTS: Achievement[] = [
-  { id: 'first_step', title: 'First Step', description: 'Completed your first study day!', icon: '🏆', points: 100 },
-  { id: 'streak_3', title: 'High Voltage', description: 'Maintained a 3-day study streak!', icon: '⚡', points: 150 },
-  { id: 'streak_7', title: 'Relentless', description: 'Maintained a 7-day study streak!', icon: '🔥', points: 300 },
-  { id: 'complete_plan', title: 'Plan Conqueror', description: 'Completed 100% of an AI plan!', icon: '👑', points: 500 },
-  { id: 'night_owl', title: 'Night Owl', description: 'Studied after 8:00 PM local time!', icon: '🦉', points: 100 },
+  { id: 'first_step', title: 'First Step', description: 'Completed your first study day!', icon: 'trophy', points: 100 },
+  { id: 'streak_3', title: 'High Voltage', description: 'Maintained a 3-day study streak!', icon: 'zap', points: 150 },
+  { id: 'streak_7', title: 'Relentless', description: 'Maintained a 7-day study streak!', icon: 'flame', points: 300 },
+  { id: 'complete_plan', title: 'Plan Conqueror', description: 'Completed 100% of an AI plan!', icon: 'star', points: 500 },
+  { id: 'night_owl', title: 'Night Owl', description: 'Studied after 8:00 PM local time!', icon: 'moon', points: 100 },
 ];
 
 const STORAGE_KEY = "edutrack_plans";

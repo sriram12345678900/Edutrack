@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ArrowLeft, Camera, Upload, CheckCircle2, AlertCircle, Loader2, BookOpen, Target, Trophy, Dumbbell, ChevronRight, Timer, Star, X, RotateCcw } from "lucide-react";
@@ -371,13 +371,13 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
         <main className="flex-1 max-w-lg w-full mx-auto p-6 flex flex-col justify-center gap-8">
           {/* Quiz info card */}
           <div className={`bg-gradient-to-br ${gradient} rounded-3xl p-6 text-white text-center shadow-xl`}>
-            <div className="text-5xl mb-3">🎯</div>
+            <div className="text-5xl mb-3"></div>
             <h2 className="text-2xl font-extrabold mb-1">MCQ Quiz</h2>
             <p className="text-white/70 text-sm">{totalMCQs} questions available • 45s per question</p>
           </div>
 
           {/* How many? */}
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="bg-white dark:bg-slate-900 bg-slate-100 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
             <h3 className="font-bold text-slate-800 dark:text-slate-200 text-lg mb-1">How many questions?</h3>
             <p className="text-slate-500 text-sm mb-5">Choose how many MCQs you want to attempt in this session.</p>
 
@@ -409,7 +409,7 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
                 onChange={e => setQuizCount(Math.min(totalMCQs, Math.max(1, parseInt(e.target.value) || 1)))}
                 className="flex-1 border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-xl px-4 py-2 font-bold text-center text-lg focus:border-indigo-500 outline-none transition-colors"
               />
-              <span className="text-sm font-semibold text-slate-400">/ {totalMCQs}</span>
+              <span className="text-sm font-semibold dark:text-slate-400 text-slate-600">/ {totalMCQs}</span>
             </div>
 
             {/* Start button */}
@@ -421,7 +421,7 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
               }}
               className={`w-full py-4 rounded-2xl font-extrabold text-lg text-white shadow-lg transition-all hover:scale-[1.02] bg-gradient-to-r ${gradient}`}
             >
-              Start Quiz — {quizCount} Questions 🚀
+              Start Quiz — {quizCount} Questions 
             </button>
           </div>
         </main>
@@ -459,7 +459,7 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
         <main className="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6 space-y-3">
           {questions.map((q, idx) => (
             <button key={q.id || idx} onClick={() => { setWrittenIndex(idx); setImgSrc(''); setEvaluation(null); setPhase('written-test'); }}
-              className="w-full text-left bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm hover:shadow-md border border-slate-200 dark:border-slate-800 hover:border-indigo-300 transition-all flex flex-col gap-2 group">
+              className="w-full text-left bg-white dark:bg-slate-900 bg-slate-100 p-5 rounded-2xl shadow-sm hover:shadow-md border border-slate-200 dark:border-slate-800 hover:border-indigo-300 transition-all flex flex-col gap-2 group">
               <div className="flex justify-between items-center">
                 <span className="font-bold text-indigo-600 dark:text-indigo-400">Q{idx + 1}</span>
                 <span className="text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-full">{q.year} • {q.marks}M</span>
@@ -502,7 +502,7 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
                   strokeDasharray={`${2 * Math.PI * 17}`} strokeDashoffset={`${2 * Math.PI * 17 * (1 - timerPercent / 100)}`}
                   strokeLinecap="round" style={{ transition: "stroke-dashoffset 1s linear, stroke 0.3s" }} />
               </svg>
-              <span className="text-white font-black text-sm z-10">{timeLeft}</span>
+              <span className="dark:text-white text-slate-900 font-black text-sm z-10">{timeLeft}</span>
             </div>
           </div>
           {/* Progress bar */}
@@ -517,11 +517,11 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
             <span className="inline-flex items-center gap-1.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-bold px-3 py-1 rounded-full text-sm">
               <Star className="w-4 h-4" /> Score: {score}
             </span>
-            <span className="text-xs font-semibold text-slate-400">{q.year} Board</span>
+            <span className="text-xs font-semibold dark:text-slate-400 text-slate-600">{q.year} Board</span>
           </div>
 
           {/* Question */}
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow border border-slate-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-900 bg-slate-100 rounded-3xl p-6 shadow border border-slate-200 dark:border-slate-800">
             <p className="text-base md:text-lg font-semibold text-slate-800 dark:text-slate-200 leading-relaxed">{cleanMathText(stem)}</p>
           </div>
 
@@ -534,11 +534,11 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
               if (!revealed) {
                 cls += isSelected
                   ? "border-indigo-500 bg-indigo-50 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-200"
-                  : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-indigo-300 hover:bg-indigo-50/50";
+                  : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 bg-slate-100 text-slate-700 dark:text-slate-300 hover:border-indigo-300 hover:bg-indigo-50/50";
               } else {
                 if (isCorrect) cls += "border-emerald-500 bg-emerald-50 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 scale-[1.01]";
                 else if (isSelected) cls += "border-red-400 bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300";
-                else cls += "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500 opacity-60";
+                else cls += "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 bg-slate-100 text-slate-400 dark:text-slate-500 opacity-60";
               }
               return (
                 <button key={opt.label} onClick={() => handleOptionSelect(opt.label)} disabled={revealed} className={cls}>
@@ -560,7 +560,7 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
                     revealed && opt === correctLetter ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30' :
                     revealed && opt === selectedOption ? 'border-red-400 bg-red-50 text-red-700' :
                     selectedOption === opt ? 'border-indigo-500 bg-indigo-50 text-indigo-700' :
-                    'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-indigo-300'
+                    'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 bg-slate-100 text-slate-700 dark:text-slate-300 hover:border-indigo-300'
                   }`}>
                   Option {opt}
                 </button>
@@ -570,7 +570,7 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
 
           {/* Revealed: Show answer explanation + Next */}
           {revealed && (
-            <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-emerald-200 dark:border-emerald-900/50 shadow space-y-3">
+            <div className="bg-white dark:bg-slate-900 bg-slate-100 rounded-3xl p-5 border border-emerald-200 dark:border-emerald-900/50 shadow space-y-3">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-emerald-500" />
                 <h4 className="font-bold text-emerald-700 dark:text-emerald-400">Correct Answer: ({correctLetter})</h4>
@@ -578,7 +578,7 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
               <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">{cleanMathText(q.officialAnswer || "")}</p>
               <button onClick={handleNextMCQ}
                 className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-colors mt-2">
-                {quizIndex + 1 < questions.length ? "Next Question →" : "See Results 🏆"}
+                {quizIndex + 1 < questions.length ? "Next Question →" : "See Results "}
               </button>
             </div>
           )}
@@ -595,7 +595,7 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
   // ── MCQ RESULTS ──
   if (phase === "mcq-results") {
     const percent = Math.round((score / questions.length) * 100);
-    const emoji = percent >= 80 ? "🏆" : percent >= 60 ? "👍" : percent >= 40 ? "😐" : "📚";
+    const emoji = percent >= 80 ? "" : percent >= 60 ? "" : percent >= 40 ? "" : "";
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
         <header className={`bg-gradient-to-r ${gradient} p-4 text-white shadow-md flex items-center gap-4`}>
@@ -624,7 +624,7 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
             {quizResults.map((r, i) => {
               const { stem } = parseQuestion(r.q.question);
               return (
-                <div key={i} className={`bg-white dark:bg-slate-900 rounded-2xl p-4 border-2 ${r.correct ? 'border-emerald-200 dark:border-emerald-900/50' : 'border-red-200 dark:border-red-900/50'}`}>
+                <div key={i} className={`bg-white dark:bg-slate-900 bg-slate-100 rounded-2xl p-4 border-2 ${r.correct ? 'border-emerald-200 dark:border-emerald-900/50' : 'border-red-200 dark:border-red-900/50'}`}>
                   <div className="flex items-start gap-3">
                     <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 font-black text-sm ${r.correct ? 'bg-emerald-500 text-white' : 'bg-red-400 text-white'}`}>{i + 1}</div>
                     <div className="flex-1 min-w-0">
@@ -664,13 +664,13 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
       </header>
 
       <main className="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6 flex flex-col gap-6">
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+        <div className="bg-white dark:bg-slate-900 bg-slate-100 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
           <span className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">{writtenQ.year} Board Exam</span>
           <p className="text-lg md:text-xl text-slate-800 dark:text-slate-200 font-medium leading-relaxed mt-4 whitespace-pre-wrap">{writtenQ.question}</p>
         </div>
 
         {!evaluation && (
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-900 bg-slate-100 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
             <h3 className="font-bold text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-2">
               <Camera className="w-5 h-5 text-indigo-500" /> Upload Your Answer
             </h3>
@@ -703,7 +703,7 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
 
         {evaluation && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-4">
-            <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+            <div className="bg-white dark:bg-slate-900 bg-slate-100 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
               <div className="flex flex-col md:flex-row gap-6 mb-6 border-b border-slate-100 dark:border-slate-800 pb-6">
                 <div className="flex flex-col items-center shrink-0">
                   <div className="relative w-28 h-28 flex items-center justify-center rounded-full border-8 border-indigo-100 dark:border-indigo-900/50">
@@ -712,14 +712,14 @@ export default function PYQTestPage({ params }: { params: { subject: string, cha
                     </svg>
                     <div className="text-center z-10">
                       <span className="text-3xl font-black text-slate-800 dark:text-slate-200">{evaluation.marksGained}</span>
-                      <span className="text-lg text-slate-400 font-bold">/{writtenQ.marks}</span>
+                      <span className="text-lg dark:text-slate-400 text-slate-600 font-bold">/{writtenQ.marks}</span>
                     </div>
                   </div>
                   <span className="mt-2 font-bold text-slate-500 uppercase tracking-widest text-xs">Marks</span>
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">
-                    {evaluation.marksGained === writtenQ.marks ? "Perfect Score! 🏆" : "Good Effort! 👍"}
+                    {evaluation.marksGained === writtenQ.marks ? "Perfect Score! " : "Good Effort! "}
                   </h3>
                   <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{evaluation.feedback}</p>
                 </div>
@@ -752,7 +752,7 @@ function CategoryCard({ title, desc, icon, count, onClick }: { title: string; de
   const disabled = count === 0;
   return (
     <button onClick={onClick} disabled={disabled}
-      className={`p-6 rounded-3xl border text-left transition-all flex flex-col gap-4 ${disabled ? 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 opacity-50 cursor-not-allowed' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-indigo-400 hover:shadow-lg hover:-translate-y-1'}`}>
+      className={`p-6 rounded-3xl border text-left transition-all flex flex-col gap-4 ${disabled ? 'bg-slate-100 dark:bg-slate-900 bg-slate-100 border-slate-200 dark:border-slate-800 opacity-50 cursor-not-allowed' : 'bg-white dark:bg-slate-900 bg-slate-100 border-slate-200 dark:border-slate-700 hover:border-indigo-400 hover:shadow-lg hover:-translate-y-1'}`}>
       <div className="w-16 h-16 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-100 dark:border-slate-700">{icon}</div>
       <div>
         <h3 className="font-bold text-xl text-slate-800 dark:text-slate-200">{title}</h3>

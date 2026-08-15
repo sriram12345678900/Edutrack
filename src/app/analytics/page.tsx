@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { Home, TrendingUp, Activity, BookOpen, Brain, Zap, Target } from 'lucide-react';
@@ -28,7 +28,7 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0b0f19] text-slate-700 dark:text-slate-200 font-sans p-6 pb-20">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0b0f19] bg-[#eef1f9] text-slate-700 dark:text-slate-200 font-sans p-6 pb-20">
       <header className="max-w-6xl mx-auto flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
           <div className="bg-indigo-500/20 p-3 rounded-2xl border border-indigo-500/30">
@@ -47,7 +47,7 @@ export default function AnalyticsPage() {
       <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Radar Chart (Mastery) */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col items-center">
+        <div className="bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col items-center">
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
           <h2 className="text-lg font-bold text-slate-900 dark:text-white w-full flex items-center gap-2 mb-8">
             <Target className="w-5 h-5 text-indigo-400" /> Subject Mastery
@@ -114,7 +114,7 @@ export default function AnalyticsPage() {
         <div className="lg:col-span-2 grid grid-rows-2 gap-6">
           
           {/* Heatmap */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col justify-center">
+          <div className="bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col justify-center">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
               <TrendingUp className="w-5 h-5 text-emerald-400" /> 28-Day Study Streak
             </h2>
@@ -142,7 +142,7 @@ export default function AnalyticsPage() {
               <Brain className="w-5 h-5 text-indigo-400" /> AI Recommendations
             </h2>
             <div className="space-y-4 relative z-10">
-              <div className="bg-white dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-200/70 dark:border-slate-700/50 flex gap-3">
+              <div className="bg-white dark:bg-slate-900/50 bg-slate-200/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-200/70 dark:border-slate-700/50 flex gap-3">
                 <div className="bg-amber-500/20 p-2 rounded-xl h-fit">
                   <Zap className="w-4 h-4 text-amber-400" />
                 </div>
@@ -151,7 +151,7 @@ export default function AnalyticsPage() {
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Your mastery in Biology is currently at 45%. We recommend reviewing <strong className="text-indigo-300">Chapter 6: Life Processes</strong>.</p>
                 </div>
               </div>
-              <div className="bg-white dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-200/70 dark:border-slate-700/50 flex gap-3">
+              <div className="bg-white dark:bg-slate-900/50 bg-slate-200/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-200/70 dark:border-slate-700/50 flex gap-3">
                 <div className="bg-emerald-500/20 p-2 rounded-xl h-fit">
                   <BookOpen className="w-4 h-4 text-emerald-400" />
                 </div>

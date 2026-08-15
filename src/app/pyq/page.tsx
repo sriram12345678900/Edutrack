@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { BookOpen, ChevronRight, Brain, Trophy, Book, ArrowLeft } from "lucide-react";
@@ -68,7 +68,7 @@ export default function SubjectHubPage() {
                   className={`relative overflow-hidden rounded-3xl p-6 text-left transition-all duration-300 border-2 shadow-sm hover:shadow-xl hover:-translate-y-1 ${
                     isSelected 
                       ? 'border-indigo-500 shadow-indigo-500/20' 
-                      : 'border-transparent bg-white dark:bg-slate-50 dark:bg-slate-900 shadow-slate-200/50 dark:shadow-none'
+                      : 'border-transparent bg-white dark:bg-slate-50 dark:bg-slate-900 bg-slate-100 shadow-slate-200/50 dark:shadow-none'
                   }`}
                 >
                   <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${gradient} opacity-10 rounded-full blur-2xl -mr-10 -mt-10`}></div>
@@ -86,7 +86,7 @@ export default function SubjectHubPage() {
                   <motion.div 
                     initial={{ opacity: 0, height: 0 }} 
                     animate={{ opacity: 1, height: 'auto' }} 
-                    className="bg-white dark:bg-slate-50 dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-lg"
+                    className="bg-white dark:bg-slate-50 dark:bg-slate-900 bg-slate-100 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-lg"
                   >
                     <div className="p-4 bg-slate-50 dark:bg-white dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                       <h4 className="font-bold text-slate-700 dark:text-slate-600 dark:text-slate-300 text-sm uppercase tracking-wider flex items-center gap-2">

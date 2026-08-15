@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -133,7 +133,7 @@ export default function FlashcardsHub() {
           <p className="text-slate-500 dark:text-slate-400 font-medium">Master concepts quickly with smart spaced repetition.</p>
         </div>
         <div className="flex items-center gap-3 relative z-10">
-          <Link href="/dashboard" className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-2xl transition-colors border border-white/10">
+          <Link href="/dashboard" className="p-3 bg-white/10 hover:bg-white/20 dark:text-white text-slate-900 rounded-2xl transition-colors border border-white/10">
             <Home className="w-5 h-5" />
           </Link>
           <button onClick={() => setIsModalOpen(true)}
@@ -164,7 +164,7 @@ export default function FlashcardsHub() {
 
       {/* ── LEITNER BOX DISTRIBUTION ── */}
       {decks.length > 0 && (
-        <div className="bg-slate-50 dark:bg-slate-900/95 backdrop-blur-md border border-slate-800 p-6 rounded-[2rem] shadow-xl text-white">
+        <div className="bg-slate-50 dark:bg-slate-900/95 bg-slate-200/95 backdrop-blur-md border border-slate-800 p-6 rounded-[2rem] shadow-xl dark:text-white text-slate-900">
           <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-indigo-400 mb-4 flex items-center gap-2">
             <Layers className="w-5 h-5 text-indigo-400" />
             Spaced Repetition Stats Hub
@@ -205,7 +205,7 @@ export default function FlashcardsHub() {
               { label: "Box 2", desc: "2d Spacing", badge: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
               { label: "Box 3", desc: "5d Spacing", badge: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
               { label: "Box 4", desc: "9d Spacing", badge: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" },
-              { label: "Box 5", desc: "Mastered 🏆", badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" }
+              { label: "Box 5", desc: "Mastered ", badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" }
             ].map((box, idx) => (
               <div key={idx} className="flex flex-col items-center gap-1.5">
                 <span className={`px-2.5 py-1 rounded-full border text-[10px] font-black tracking-widest uppercase ${box.badge}`}>
@@ -238,7 +238,7 @@ export default function FlashcardsHub() {
                     ? "bg-fuchsia-600 text-white shadow-md"
                     : "bg-white dark:bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-fuchsia-400"
                 }`}>
-                {s === "recent" ? "⏱ Recent" : s === "mastery" ? "🏆 Mastery" : "🔤 A–Z"}
+                {s === "recent" ? "⏱ Recent" : s === "mastery" ? " Mastery" : " A–Z"}
               </button>
             ))}
           </div>
@@ -280,7 +280,7 @@ export default function FlashcardsHub() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
                   whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                  className="group relative bg-white dark:bg-slate-50 dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-fuchsia-300 dark:hover:border-fuchsia-700/50 transition-all overflow-hidden h-full flex flex-col"
+                  className="group relative bg-white dark:bg-slate-50 dark:bg-slate-900 bg-slate-100 rounded-3xl border border-slate-200 dark:border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-fuchsia-300 dark:hover:border-fuchsia-700/50 transition-all overflow-hidden h-full flex flex-col"
                 >
                   {/* Color accent top bar */}
                   <div className={`h-1.5 w-full bg-gradient-to-r ${gradient}`} />
@@ -351,7 +351,7 @@ export default function FlashcardsHub() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: filtered.length * 0.05 }}
             onClick={() => setIsModalOpen(true)}
-            className="group border-2 border-dashed border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-fuchsia-400 dark:hover:border-fuchsia-600 rounded-3xl p-8 flex flex-col items-center justify-center gap-3 text-slate-500 dark:text-slate-400 hover:text-fuchsia-500 transition-all min-h-[200px] bg-white/50 dark:bg-slate-50 dark:bg-slate-900/50"
+            className="group border-2 border-dashed border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-fuchsia-400 dark:hover:border-fuchsia-600 rounded-3xl p-8 flex flex-col items-center justify-center gap-3 text-slate-500 dark:text-slate-400 hover:text-fuchsia-500 transition-all min-h-[200px] bg-white/50 dark:bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50"
           >
             <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-white dark:bg-slate-800 group-hover:bg-fuchsia-50 dark:group-hover:bg-fuchsia-900/20 flex items-center justify-center transition-colors">
               <Sparkles className="w-7 h-7 group-hover:scale-110 transition-transform" />
@@ -364,17 +364,17 @@ export default function FlashcardsHub() {
       {/* ── GENERATE MODAL ── */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-50 dark:bg-slate-900/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-50 dark:bg-slate-900/60 bg-slate-200/60 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-white dark:bg-slate-50 dark:bg-slate-900 w-full max-w-md rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+              className="bg-white dark:bg-slate-50 dark:bg-slate-900 bg-slate-100 w-full max-w-md rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
               <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-gradient-to-r from-fuchsia-600 to-indigo-600">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <h3 className="text-lg font-bold dark:text-white text-slate-900 flex items-center gap-2">
                   <Sparkles className="w-5 h-5" /> Generate Flashcard Deck
                 </h3>
-                <button onClick={() => setIsModalOpen(false)} className="p-1.5 bg-white/20 hover:bg-white/30 rounded-xl transition-colors text-white">
+                <button onClick={() => setIsModalOpen(false)} className="p-1.5 bg-white/20 hover:bg-white/30 rounded-xl transition-colors dark:text-white text-slate-900">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -410,7 +410,7 @@ export default function FlashcardsHub() {
                 </div>
                 <button type="submit" disabled={loading}
                   className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 to-indigo-600 text-white font-bold py-3.5 rounded-xl hover:shadow-lg hover:shadow-fuchsia-500/30 transition-all disabled:opacity-70">
-                  {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> Generating...</> : <><Sparkles className="w-5 h-5" /> Generate Magic ✨</>}
+                  {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> Generating...</> : <><Sparkles className="w-5 h-5" /> Generate Magic </>}
                 </button>
               </form>
             </motion.div>

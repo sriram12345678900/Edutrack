@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       ? `Use ${language || "Hinglish"} for explanations. You MUST strictly use the English alphabet (Roman script). DO NOT use native scripts (Devanagari, Telugu, Tamil, etc.). Keep technical terms in English.`
       : `Use ${language || "English"} for explanations. Keep technical terms in English.`;
 
-    const chemFormattingInstruction = `⚠️ CRITICAL CHEMICAL FORMULA FORMATTING RULE: You MUST write all chemical formulas, equations, or ionic charges using HTML <sub> and <sup> tags (or standard markdown ~sub~ and ^sup^ notations) so that they render perfectly with subscripts and superscripts in the browser. For example, write H<sub>2</sub>O or H~2~O, CO<sub>2</sub> or CO~2~, Ca(OH)<sub>2</sub> or Ca(OH)~2~, Fe<sup>3+</sup> or Fe^3+^, and SO<sub>4</sub><sup>2-</sup> or SO~4~^2-^. DO NOT write flat chemical numbers like H2O or CO2 under any circumstances.`;
+    const chemFormattingInstruction = `️ CRITICAL CHEMICAL FORMULA FORMATTING RULE: You MUST write all chemical formulas, equations, or ionic charges using HTML <sub> and <sup> tags (or standard markdown ~sub~ and ^sup^ notations) so that they render perfectly with subscripts and superscripts in the browser. For example, write H<sub>2</sub>O or H~2~O, CO<sub>2</sub> or CO~2~, Ca(OH)<sub>2</sub> or Ca(OH)~2~, Fe<sup>3+</sup> or Fe^3+^, and SO<sub>4</sub><sup>2-</sup> or SO~4~^2-^. DO NOT write flat chemical numbers like H2O or CO2 under any circumstances.`;
 
     // We will generate the chapter in multiple sequential parts to guarantee it is fully extended (3500-5000 words)
     // with extreme academic rigor, detailed experiments, and solved exemplars.
@@ -86,7 +86,7 @@ export async function POST(req: Request) {
         - ## Solved NCERT Conceptual & In-text Questions: Provide 5 highly detailed, step-by-step solved walkthroughs of conceptual, balancing, or observation-based question walkthroughs matching the highest standard of CBSE Class 10 NCERT.
         - ## Accurate Board Exam Weightage Blueprint: Explain how this chapter belongs to Unit 1 (Chemical Substances - Nature and Behaviour) and typically carries exactly 5 to 6 marks in Class 10 Board exams.
         
-        ⚠️ STRICT SCOPE LOCK:
+        ️ STRICT SCOPE LOCK:
         Absolutely DO NOT include any Mole Concept, molar mass, molecular weight, Avogadro's number, or stoichiometric mass-mass/mole calculations. Keep everything strictly within Class 10 NCERT Science boundaries.
         All numericals or solved exemplars MUST be typical Class 10 CBSE conceptual questions, equation-balancing walkthroughs, or substance identification questions based on experimental observations (e.g., 'A shiny brown element X on heating in air becomes black...').
         
@@ -139,7 +139,7 @@ export async function POST(req: Request) {
         - ## Solved NCERT Board Exemplars: Provide 5 highly detailed, step-by-step solved conceptual, numerical, or reasoning question walkthroughs.
         - ## Board Exam Blueprint: Detailed weightage analysis for CBSE Class 10.
         
-        ⚠️ STRICT SCOPE LOCK:
+        ️ STRICT SCOPE LOCK:
         Absolutely DO NOT include any advanced, college-level formulas or university-level syllabus topics. Keep everything strictly within Class 10 NCERT curriculum boundaries (specifically, NO mole concept or stoichiometric calculations).
         
         Format the response in beautiful, professional Markdown.
