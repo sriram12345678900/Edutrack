@@ -453,7 +453,7 @@ export default function SandboxPage() {
             
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-sm font-black dark:text-white text-slate-900 flex items-center gap-2 uppercase tracking-wider">
-                <Atom className="w-4 h-4 text-indigo-400" /> Reagent & Element Shelf
+                <Atom className="w-4 h-4 dark:text-indigo-400 text-indigo-700" /> Reagent & Element Shelf
               </h2>
               <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg border border-white/10">
                 {filteredReagents.length} Available
@@ -501,7 +501,7 @@ export default function SandboxPage() {
 
             {/* Quick NCERT Mixing Hints */}
             <div className="mt-3 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl">
-              <p className="text-[11px] text-indigo-300 font-semibold leading-relaxed">
+              <p className="text-[11px] dark:text-indigo-300 text-indigo-700 font-semibold leading-relaxed">
                  <strong>Try mixing:</strong><br />
                 • <strong className="dark:text-white text-slate-900">Fe + CuSO₄</strong> (Displacement & color change)<br />
                 • <strong className="dark:text-white text-slate-900">HCl + NaOH</strong> (Neutralization to pH 7.0)<br />
@@ -534,7 +534,7 @@ export default function SandboxPage() {
                   <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Reagents in Beaker:</h3>
                   {workspace.length === 0 ? (
                     <div className="p-6 border border-dashed border-white/10 rounded-2xl text-center text-slate-500">
-                      <Atom className="w-8 h-8 mx-auto mb-2 opacity-40 text-indigo-400" />
+                      <Atom className="w-8 h-8 mx-auto mb-2 opacity-40 dark:text-indigo-400 text-indigo-700" />
                       <p className="text-xs font-semibold">Click elements on the left shelf to place them in the reaction beaker.</p>
                     </div>
                   ) : (
@@ -680,8 +680,8 @@ export default function SandboxPage() {
                     <p className="text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed mt-1">{result.desc}</p>
                     <div className="flex items-center gap-4 mt-2 text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 border-t border-white/5 pt-2">
                       <span>Temp Change: <strong className="text-orange-400">{result.tempChange}</strong></span>
-                      <span>Final pH: <strong className="text-emerald-400">{result.finalPH.toFixed(1)}</strong></span>
-                      <span>Result State: <strong className="text-indigo-300">{result.product}</strong></span>
+                      <span>Final pH: <strong className="dark:text-emerald-400 text-emerald-700">{result.finalPH.toFixed(1)}</strong></span>
+                      <span>Result State: <strong className="dark:text-indigo-300 text-indigo-700">{result.product}</strong></span>
                     </div>
                   </div>
                 </div>
@@ -745,7 +745,7 @@ export default function SandboxPage() {
                         }`}
                       >
                         <span className="text-xs">{item.label}</span>
-                        <span className="text-[10px] font-mono text-indigo-400 font-bold">{item.desc}</span>
+                        <span className="text-[10px] font-mono dark:text-indigo-400 text-indigo-700 font-bold">{item.desc}</span>
                       </button>
                     ))}
                   </div>
@@ -756,7 +756,7 @@ export default function SandboxPage() {
                   <div>
                     <div className="flex justify-between items-center mb-1">
                       <label className="text-xs font-bold text-slate-600 dark:text-slate-300">Focal Length magnitude (|f|):</label>
-                      <span className="text-xs font-mono font-black text-indigo-400">{focalLength} cm</span>
+                      <span className="text-xs font-mono font-black dark:text-indigo-400 text-indigo-700">{focalLength} cm</span>
                     </div>
                     <input 
                       type="range"
@@ -773,7 +773,7 @@ export default function SandboxPage() {
                 <div>
                   <div className="flex justify-between items-center mb-1">
                     <label className="text-xs font-bold text-slate-600 dark:text-slate-300">Object Distance (|u|):</label>
-                    <span className="text-xs font-mono font-black text-indigo-400">{objectDistance} cm</span>
+                    <span className="text-xs font-mono font-black dark:text-indigo-400 text-indigo-700">{objectDistance} cm</span>
                   </div>
                   <input 
                     type="range"
@@ -789,7 +789,7 @@ export default function SandboxPage() {
                 <div>
                   <div className="flex justify-between items-center mb-1">
                     <label className="text-xs font-bold text-slate-600 dark:text-slate-300">Object Height (hₒ):</label>
-                    <span className="text-xs font-mono font-black text-indigo-400">{objectHeight} cm</span>
+                    <span className="text-xs font-mono font-black dark:text-indigo-400 text-indigo-700">{objectHeight} cm</span>
                   </div>
                   <input 
                     type="range"
@@ -803,11 +803,11 @@ export default function SandboxPage() {
 
                 {/* Live Formula Badge */}
                 <div className="p-3 bg-indigo-950/40 border border-indigo-500/20 rounded-xl space-y-1 text-xs font-mono">
-                  <div className="text-[10px] font-black uppercase text-indigo-300">NCERT Sign Formula:</div>
+                  <div className="text-[10px] font-black uppercase dark:text-indigo-300 text-indigo-700">NCERT Sign Formula:</div>
                   <div className="dark:text-white text-slate-900 font-bold">
                     {elementType.includes('lens') ? '1/f = 1/v - 1/u (Lens)' : '1/f = 1/v + 1/u (Mirror)'}
                   </div>
-                  <div className="text-emerald-400 font-bold">
+                  <div className="dark:text-emerald-400 text-emerald-700 font-bold">
                     Image v = {opticsRes.v === Infinity ? '∞' : `${opticsRes.v.toFixed(1)} cm`}
                   </div>
                 </div>
@@ -820,7 +820,7 @@ export default function SandboxPage() {
                 <div>
                   <div className="flex justify-between items-center mb-1">
                     <label className="text-xs font-bold text-slate-600 dark:text-slate-300">Angle of Incidence (i):</label>
-                    <span className="text-xs font-mono font-black text-indigo-400">{incidentAngle}°</span>
+                    <span className="text-xs font-mono font-black dark:text-indigo-400 text-indigo-700">{incidentAngle}°</span>
                   </div>
                   <input 
                     type="range"
@@ -849,16 +849,16 @@ export default function SandboxPage() {
                         }`}
                       >
                         <span className="text-xs">{m.name}</span>
-                        <span className="text-xs font-mono font-bold text-indigo-400">n = {m.n}</span>
+                        <span className="text-xs font-mono font-bold dark:text-indigo-400 text-indigo-700">n = {m.n}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div className="p-3 bg-indigo-950/40 border border-indigo-500/20 rounded-xl space-y-1 text-xs font-mono">
-                  <div className="text-[10px] font-black uppercase text-indigo-300">Snell's Law:</div>
+                  <div className="text-[10px] font-black uppercase dark:text-indigo-300 text-indigo-700">Snell's Law:</div>
                   <div className="dark:text-white text-slate-900 font-bold">n₂₁ = sin(i) / sin(r) = {refractiveIndex}</div>
-                  <div className="text-emerald-400 font-bold">Refracted Angle (r) = {refractedAngle.toFixed(2)}°</div>
+                  <div className="dark:text-emerald-400 text-emerald-700 font-bold">Refracted Angle (r) = {refractedAngle.toFixed(2)}°</div>
                 </div>
               </div>
             )}
@@ -1097,19 +1097,19 @@ export default function SandboxPage() {
                 </div>
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
                   <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Magnification (m)</div>
-                  <div className="text-xs font-mono font-black text-indigo-400">
+                  <div className="text-xs font-mono font-black dark:text-indigo-400 text-indigo-700">
                     {opticsRes.m === Infinity ? '∞' : `${opticsRes.m.toFixed(2)}x`}
                   </div>
                 </div>
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
                   <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Image Height (hᵢ)</div>
-                  <div className="text-xs font-mono font-black text-emerald-400">
+                  <div className="text-xs font-mono font-black dark:text-emerald-400 text-emerald-700">
                     {opticsRes.hi === Infinity ? '∞' : `${opticsRes.hi.toFixed(1)} cm`}
                   </div>
                 </div>
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
                   <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Image Location</div>
-                  <div className="text-[10px] font-bold text-amber-300 line-clamp-1">
+                  <div className="text-[10px] font-bold dark:text-amber-300 text-amber-700 line-clamp-1">
                     {opticsRes.positionText}
                   </div>
                 </div>

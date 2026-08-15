@@ -368,7 +368,7 @@ export default function SignupWizard() {
                       theme === "dark" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-indigo-300'
                     }`}
                   >
-                    <Moon className="w-8 h-8 text-indigo-400" />
+                    <Moon className="w-8 h-8 dark:text-indigo-400 text-indigo-700" />
                     <span className="font-bold text-slate-900 dark:text-white">Dark Mode</span>
                   </button>
                   <button

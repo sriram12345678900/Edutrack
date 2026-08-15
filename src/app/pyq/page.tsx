@@ -39,7 +39,7 @@ export default function SubjectHubPage() {
       <motion.div variants={container} initial="hidden" animate="show" className="max-w-5xl mx-auto space-y-8">
         <motion.header variants={item} className="space-y-4">
           {/* Back to Dashboard */}
-          <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors mb-2">
+          <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-indigo-600 dark:hover:dark:text-indigo-400 text-indigo-700 transition-colors mb-2">
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </Link>
           <div className="text-center space-y-4">
@@ -97,7 +97,7 @@ export default function SubjectHubPage() {
                       {Array.from({ length: book.chapters }, (_, i) => i + 1).map(ch => (
                         <Link key={ch} href={`/pyq/${book.code}/${ch}`}>
                           <div className="flex items-center justify-between p-4 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-2xl transition-colors group cursor-pointer">
-                            <span className="font-semibold text-slate-700 dark:text-slate-600 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                            <span className="font-semibold text-slate-700 dark:text-slate-600 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:dark:text-indigo-400 text-indigo-700">
                               Chapter {ch}
                             </span>
                             <div className="flex items-center gap-2">

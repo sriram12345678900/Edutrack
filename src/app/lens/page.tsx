@@ -441,7 +441,7 @@ export default function LensPage() {
       if (isBullet) {
         return (
           <div key={idx} className="flex items-start gap-2.5 ml-2.5 my-1.5 select-text">
-            <span className="text-emerald-400 mt-1.5 text-xs">•</span>
+            <span className="dark:text-emerald-400 text-emerald-700 mt-1.5 text-xs">•</span>
             <span className="dark:text-slate-300 text-slate-700 text-sm font-medium leading-relaxed">{parseMix(line.trim().substring(2))}</span>
           </div>
         );
@@ -452,7 +452,7 @@ export default function LensPage() {
         if (numMatch) {
           return (
             <div key={idx} className="flex items-start gap-2.5 ml-2.5 my-1.5 select-text">
-              <span className="text-emerald-400 font-bold mt-0.5 text-sm">{numMatch[1]}</span>
+              <span className="dark:text-emerald-400 text-emerald-700 font-bold mt-0.5 text-sm">{numMatch[1]}</span>
               <span className="dark:text-slate-300 text-slate-700 text-sm font-medium leading-relaxed">{parseMix(numMatch[2])}</span>
             </div>
           );
@@ -559,7 +559,7 @@ export default function LensPage() {
                 <div className="relative mb-6 group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                   <div className="absolute -inset-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-full blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500" />
                   <div className="w-24 h-24 dark:bg-[#0a1128] bg-[#f5f7ff] border border-emerald-500/30 rounded-full flex items-center justify-center mx-auto group-hover:scale-105 group-hover:border-emerald-400/50 transition-all duration-300 shadow-[0_0_30px_rgba(16,185,129,0.15)] relative z-10 backdrop-blur-xl">
-                    <Camera className="w-10 h-10 text-emerald-400 group-hover:text-emerald-300 transition-colors" />
+                    <Camera className="w-10 h-10 dark:text-emerald-400 text-emerald-700 group-hover:dark:text-emerald-300 text-emerald-700 transition-colors" />
                   </div>
                 </div>
 
@@ -589,7 +589,7 @@ export default function LensPage() {
           <div className="dark:bg-[#070918] bg-[#eef1f9] border border-white/10 rounded-3xl p-6 shadow-2xl backdrop-blur-xl shrink-0">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xs font-black dark:text-slate-300 text-slate-700 uppercase tracking-widest flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-emerald-400" /> Test Sample NCERT Doubts
+                <BookOpen className="w-4 h-4 dark:text-emerald-400 text-emerald-700" /> Test Sample NCERT Doubts
               </h3>
               <span className="text-[10px] font-extrabold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
                 1-Click Demo
@@ -608,13 +608,13 @@ export default function LensPage() {
                       <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase">
                         {sd.subject}
                       </span>
-                      <span className="text-xs font-bold dark:text-white text-slate-900 group-hover:text-emerald-300 transition-colors">
+                      <span className="text-xs font-bold dark:text-white text-slate-900 group-hover:dark:text-emerald-300 text-emerald-700 transition-colors">
                         {sd.title}
                       </span>
                     </div>
                     <p className="text-xs dark:text-slate-400 text-slate-600 line-clamp-1 font-semibold">{sd.query}</p>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 shrink-0 mt-2 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="w-4 h-4 text-slate-500 group-hover:dark:text-emerald-400 text-emerald-700 shrink-0 mt-2 transition-transform group-hover:translate-x-1" />
                 </button>
               ))}
             </div>
@@ -627,7 +627,7 @@ export default function LensPage() {
             <div className="flex-1 flex flex-col items-center justify-center text-center p-8 relative z-10 select-none">
               <div className="relative mb-6 flex items-center justify-center">
                 <div className="absolute w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl animate-pulse" />
-                <div className="w-20 h-20 dark:bg-[#0a1128] bg-[#f5f7ff] border border-emerald-500/20 rounded-[2rem] flex items-center justify-center text-emerald-400 relative z-10 shadow-2xl backdrop-blur-xl">
+                <div className="w-20 h-20 dark:bg-[#0a1128] bg-[#f5f7ff] border border-emerald-500/20 rounded-[2rem] flex items-center justify-center dark:text-emerald-400 text-emerald-700 relative z-10 shadow-2xl backdrop-blur-xl">
                   <Bot className="w-10 h-10" />
                 </div>
               </div>
@@ -641,8 +641,8 @@ export default function LensPage() {
 
               {isScanning && (
                 <div className="mt-2 flex flex-col items-center gap-4 bg-emerald-950/30 px-6 py-4 rounded-2xl border border-emerald-500/20">
-                  <Loader2 className="w-7 h-7 text-emerald-400 animate-spin" />
-                  <span className="text-emerald-400 font-bold text-xs tracking-widest uppercase">Analyzing Image...</span>
+                  <Loader2 className="w-7 h-7 dark:text-emerald-400 text-emerald-700 animate-spin" />
+                  <span className="dark:text-emerald-400 text-emerald-700 font-bold text-xs tracking-widest uppercase">Analyzing Image...</span>
                 </div>
               )}
             </div>
@@ -656,7 +656,7 @@ export default function LensPage() {
                   </div>
                   <div>
                     <h3 className="font-extrabold dark:text-white text-slate-900 text-sm">Professor Doubt Solver</h3>
-                    <p className="text-[10px] text-emerald-400 uppercase tracking-widest font-black">Active Session</p>
+                    <p className="text-[10px] dark:text-emerald-400 text-emerald-700 uppercase tracking-widest font-black">Active Session</p>
                   </div>
                 </div>
 
@@ -673,7 +673,7 @@ export default function LensPage() {
                       </>
                     ) : (
                       <>
-                        <FileText className="w-3.5 h-3.5 text-emerald-400" />
+                        <FileText className="w-3.5 h-3.5 dark:text-emerald-400 text-emerald-700" />
                         <span>Generate Conclusion</span>
                       </>
                     )}
@@ -738,8 +738,8 @@ export default function LensPage() {
                   <div className="bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent border border-emerald-500/30 rounded-3xl p-5 shadow-2xl relative overflow-hidden my-6 border-l-4 border-l-emerald-500">
                     <div className="flex items-center justify-between border-b border-emerald-500/20 pb-3 mb-4">
                       <div className="flex items-center gap-2">
-                        <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
-                        <h4 className="font-extrabold text-xs text-emerald-300 uppercase tracking-widest">Study Session Summary</h4>
+                        <Sparkles className="w-5 h-5 dark:text-emerald-400 text-emerald-700 animate-pulse" />
+                        <h4 className="font-extrabold text-xs dark:text-emerald-300 text-emerald-700 uppercase tracking-widest">Study Session Summary</h4>
                       </div>
                       <button
                         type="button"

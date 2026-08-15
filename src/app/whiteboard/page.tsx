@@ -1345,7 +1345,7 @@ export default function WhiteboardPage() {
             exit={{ opacity: 0, y: -20 }}
             className="absolute top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 dark:bg-slate-900/90 bg-slate-200/90 dark:text-slate-100 text-slate-900 border border-slate-700/60 rounded-full shadow-2xl backdrop-blur-md text-xs font-semibold flex items-center gap-2"
           >
-            <Sparkles className="w-4 h-4 text-amber-400" />
+            <Sparkles className="w-4 h-4 dark:text-amber-400 text-amber-700" />
             <span>{toastMsg}</span>
           </motion.div>
         )}
@@ -1369,7 +1369,7 @@ export default function WhiteboardPage() {
               className="p-2 hover:bg-slate-800 rounded-xl dark:text-slate-200 text-slate-800 hover:dark:text-white text-slate-900 transition-all flex items-center gap-1 text-xs font-semibold"
               title="Duplicate (Clone)"
             >
-              <Copy className="w-3.5 h-3.5 text-indigo-400" />
+              <Copy className="w-3.5 h-3.5 dark:text-indigo-400 text-indigo-700" />
               <span>Duplicate</span>
             </button>
 
@@ -1378,7 +1378,7 @@ export default function WhiteboardPage() {
               className="p-2 hover:bg-slate-800 rounded-xl dark:text-slate-200 text-slate-800 hover:dark:text-white text-slate-900 transition-all flex items-center gap-1 text-xs font-semibold"
               title="Enlarge"
             >
-              <Maximize2 className="w-3.5 h-3.5 text-cyan-400" />
+              <Maximize2 className="w-3.5 h-3.5 dark:text-cyan-400 text-cyan-700" />
             </button>
 
             <button
@@ -1386,7 +1386,7 @@ export default function WhiteboardPage() {
               className="p-2 hover:bg-slate-800 rounded-xl dark:text-slate-200 text-slate-800 hover:dark:text-white text-slate-900 transition-all flex items-center gap-1 text-xs font-semibold"
               title="Shrink"
             >
-              <Minimize2 className="w-3.5 h-3.5 text-cyan-400" />
+              <Minimize2 className="w-3.5 h-3.5 dark:text-cyan-400 text-cyan-700" />
             </button>
 
             <div className="w-px h-4 bg-slate-800 my-auto" />
@@ -1445,7 +1445,7 @@ export default function WhiteboardPage() {
             >
               <ChevronLeft className="w-3.5 h-3.5" />
             </button>
-            <span className="font-mono text-indigo-300">
+            <span className="font-mono dark:text-indigo-300 text-indigo-700">
               {activePageIndex + 1} / {deckPages.length}
             </span>
             <button
@@ -1470,7 +1470,7 @@ export default function WhiteboardPage() {
             className="p-2.5 dark:bg-slate-900/80 bg-slate-200/80 hover:bg-slate-800 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl dark:text-slate-300 text-slate-700 transition-all"
             title="Toggle Canvas Theme"
           >
-            {canvasTheme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
+            {canvasTheme === "dark" ? <Sun className="w-4 h-4 dark:text-amber-400 text-amber-700" /> : <Moon className="w-4 h-4 dark:text-indigo-400 text-indigo-700" />}
           </button>
         </div>
 
@@ -1482,7 +1482,7 @@ export default function WhiteboardPage() {
             className="px-3 py-2 dark:bg-slate-900/80 bg-slate-200/80 hover:bg-slate-800 border border-slate-800 dark:text-slate-200 text-slate-800 rounded-2xl text-xs font-semibold backdrop-blur-xl shadow-lg flex items-center gap-1.5 transition-all"
             title="Import Image to Canvas"
           >
-            <ImageIcon className="w-4 h-4 text-emerald-400" />
+            <ImageIcon className="w-4 h-4 dark:text-emerald-400 text-emerald-700" />
             <span>Import Image</span>
           </button>
 
@@ -1497,7 +1497,7 @@ export default function WhiteboardPage() {
             }`}
             title="Toggle Metric Ruler"
           >
-            <Ruler className="w-4 h-4 text-amber-400" />
+            <Ruler className="w-4 h-4 dark:text-amber-400 text-amber-700" />
             <span>Ruler</span>
           </button>
 
@@ -1507,7 +1507,7 @@ export default function WhiteboardPage() {
             disabled={solvingAI}
             className="px-3 py-2 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white rounded-2xl text-xs font-semibold shadow-lg shadow-indigo-500/25 flex items-center gap-1.5 transition-all disabled:opacity-50"
           >
-            {solvingAI ? <Sparkles className="w-4 h-4 animate-spin" /> : <Calculator className="w-4 h-4 text-cyan-200" />}
+            {solvingAI ? <Sparkles className="w-4 h-4 animate-spin" /> : <Calculator className="w-4 h-4 dark:text-cyan-200 text-cyan-800" />}
             <span>{solvingAI ? "Solving..." : "AI Math Solve"}</span>
           </button>
 
@@ -1516,7 +1516,7 @@ export default function WhiteboardPage() {
             onClick={() => setShowPresetBank(true)}
             className="px-3 py-2 dark:bg-slate-900/80 bg-slate-200/80 hover:bg-slate-800 border border-slate-800 dark:text-slate-200 text-slate-800 rounded-2xl text-xs font-semibold backdrop-blur-xl shadow-lg flex items-center gap-1.5 transition-all"
           >
-            <Library className="w-4 h-4 text-indigo-400" />
+            <Library className="w-4 h-4 dark:text-indigo-400 text-indigo-700" />
             <span>Diagram Presets</span>
           </button>
 
@@ -1712,7 +1712,7 @@ export default function WhiteboardPage() {
                 >
                   <div className="flex items-center justify-between text-[11px] font-bold dark:text-slate-400 text-slate-600 mb-2">
                     <span>Brush Thickness</span>
-                    <span className="font-mono text-indigo-400">{brushSize}px</span>
+                    <span className="font-mono dark:text-indigo-400 text-indigo-700">{brushSize}px</span>
                   </div>
                   <input
                     type="range"
@@ -1912,7 +1912,7 @@ export default function WhiteboardPage() {
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <Library className="w-5 h-5 text-indigo-400" />
+                  <Library className="w-5 h-5 dark:text-indigo-400 text-indigo-700" />
                   <h3 className="text-base font-bold">Educational Diagram Presets</h3>
                 </div>
                 <button onClick={() => setShowPresetBank(false)} className="p-1 hover:bg-slate-800 rounded-lg dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900">
@@ -1924,7 +1924,7 @@ export default function WhiteboardPage() {
                   onClick={() => insertPresetDiagram("axes")}
                   className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
                 >
-                  <Compass className="w-5 h-5 text-indigo-400 mb-2 group-hover:scale-110 transition-transform" />
+                  <Compass className="w-5 h-5 dark:text-indigo-400 text-indigo-700 mb-2 group-hover:scale-110 transition-transform" />
                   <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">X-Y Coordinate Axes</h4>
                   <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">2D Graph plane with origin & axes</p>
                 </button>
@@ -1932,7 +1932,7 @@ export default function WhiteboardPage() {
                   onClick={() => insertPresetDiagram("triangle")}
                   className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
                 >
-                  <Triangle className="w-5 h-5 text-cyan-400 mb-2 group-hover:scale-110 transition-transform" />
+                  <Triangle className="w-5 h-5 dark:text-cyan-400 text-cyan-700 mb-2 group-hover:scale-110 transition-transform" />
                   <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">Labeled Triangle</h4>
                   <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">Geometric triangle with vertices A, B, C</p>
                 </button>
@@ -1940,7 +1940,7 @@ export default function WhiteboardPage() {
                   onClick={() => insertPresetDiagram("unit_circle")}
                   className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
                 >
-                  <Circle className="w-5 h-5 text-amber-400 mb-2 group-hover:scale-110 transition-transform" />
+                  <Circle className="w-5 h-5 dark:text-amber-400 text-amber-700 mb-2 group-hover:scale-110 transition-transform" />
                   <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">Trig Unit Circle</h4>
                   <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">Unit circle marked with 0° & 90° angles</p>
                 </button>
@@ -1948,7 +1948,7 @@ export default function WhiteboardPage() {
                   onClick={() => insertPresetDiagram("venn")}
                   className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
                 >
-                  <Layers className="w-5 h-5 text-pink-400 mb-2 group-hover:scale-110 transition-transform" />
+                  <Layers className="w-5 h-5 dark:text-pink-400 text-pink-700 mb-2 group-hover:scale-110 transition-transform" />
                   <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">Venn Diagram</h4>
                   <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">Two overlapping set circles</p>
                 </button>
@@ -1970,7 +1970,7 @@ export default function WhiteboardPage() {
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-base font-bold flex items-center gap-2">
-                  <Keyboard className="w-5 h-5 text-indigo-400" />
+                  <Keyboard className="w-5 h-5 dark:text-indigo-400 text-indigo-700" />
                   Whiteboard Shortcuts
                 </h3>
                 <button onClick={() => setShowKeyShortcuts(false)} className="p-1 hover:bg-slate-800 rounded-lg dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900">
@@ -1978,12 +1978,12 @@ export default function WhiteboardPage() {
                 </button>
               </div>
               <div className="space-y-2 text-xs">
-                <div className="flex justify-between py-1.5 border-b border-slate-800"><span>Pen / Smart Pen</span><span className="font-mono text-indigo-400">P / S</span></div>
-                <div className="flex justify-between py-1.5 border-b border-slate-800"><span>Laser Pointer</span><span className="font-mono text-rose-400">X</span></div>
-                <div className="flex justify-between py-1.5 border-b border-slate-800"><span>Rectangle / Circle / Text</span><span className="font-mono text-indigo-400">R / C / T</span></div>
-                <div className="flex justify-between py-1.5 border-b border-slate-800"><span>Eraser / Lasso Select</span><span className="font-mono text-indigo-400">E / L</span></div>
-                <div className="flex justify-between py-1.5 border-b border-slate-800"><span>Pan Hand</span><span className="font-mono text-indigo-400">H</span></div>
-                <div className="flex justify-between py-1.5 border-b border-slate-800"><span>Undo / Redo</span><span className="font-mono text-indigo-400">Ctrl+Z / Ctrl+Y</span></div>
+                <div className="flex justify-between py-1.5 border-b border-slate-800"><span>Pen / Smart Pen</span><span className="font-mono dark:text-indigo-400 text-indigo-700">P / S</span></div>
+                <div className="flex justify-between py-1.5 border-b border-slate-800"><span>Laser Pointer</span><span className="font-mono dark:text-rose-400 text-rose-700">X</span></div>
+                <div className="flex justify-between py-1.5 border-b border-slate-800"><span>Rectangle / Circle / Text</span><span className="font-mono dark:text-indigo-400 text-indigo-700">R / C / T</span></div>
+                <div className="flex justify-between py-1.5 border-b border-slate-800"><span>Eraser / Lasso Select</span><span className="font-mono dark:text-indigo-400 text-indigo-700">E / L</span></div>
+                <div className="flex justify-between py-1.5 border-b border-slate-800"><span>Pan Hand</span><span className="font-mono dark:text-indigo-400 text-indigo-700">H</span></div>
+                <div className="flex justify-between py-1.5 border-b border-slate-800"><span>Undo / Redo</span><span className="font-mono dark:text-indigo-400 text-indigo-700">Ctrl+Z / Ctrl+Y</span></div>
               </div>
             </motion.div>
           </div>

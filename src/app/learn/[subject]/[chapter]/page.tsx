@@ -799,7 +799,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                         <p className="font-bold text-indigo-700 dark:text-indigo-300 flex items-center gap-2"><RotateCcw className="w-4 h-4" /> Study Flashcards</p>
                         <p className="text-indigo-600/70 dark:text-indigo-400/70 text-sm mt-0.5">AI-generated for this lesson</p>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-indigo-400 group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight className="w-4 h-4 dark:text-indigo-400 text-indigo-700 group-hover:translate-x-1 transition-transform" />
                     </Link>
                     {userClass === 10 && (
                       <Link href={`/pyq/${subjectCode}/${chapterNum}`}
@@ -808,7 +808,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                           <p className="font-bold text-amber-700 dark:text-amber-400 flex items-center gap-2"><Trophy className="w-4 h-4" /> PYQ Mock Test</p>
                           <p className="text-amber-600/70 dark:text-amber-400/70 text-sm mt-0.5">Real board exam questions</p>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-amber-400 group-hover:translate-x-1 transition-transform" />
+                        <ChevronRight className="w-4 h-4 dark:text-amber-400 text-amber-700 group-hover:translate-x-1 transition-transform" />
                       </Link>
                     )}
                   </div>
@@ -935,12 +935,12 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                                   </svg>
                                 </button>
                                 <span className="inline-block px-2 py-0.5 bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 text-xs font-bold rounded-full flex items-center gap-1">
-                                  <Flame className="w-3.5 h-3.5 text-emerald-400" /> Studied
+                                  <Flame className="w-3.5 h-3.5 dark:text-emerald-400 text-emerald-700" /> Studied
                                 </span>
                               </div>
                             </div>
 
-                            <h4 className="text-lg font-bold dark:text-white text-slate-900 leading-snug group-hover:text-emerald-400 transition-colors">
+                            <h4 className="text-lg font-bold dark:text-white text-slate-900 leading-snug group-hover:dark:text-emerald-400 text-emerald-700 transition-colors">
                               {deck.title}
                             </h4>
 
@@ -952,7 +952,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                             <div className="space-y-1.5">
                               <div className="flex justify-between text-xs font-bold">
                                 <span className="dark:text-slate-400 text-slate-600">Mastery</span>
-                                <span className="text-emerald-400">{progress}%</span>
+                                <span className="dark:text-emerald-400 text-emerald-700">{progress}%</span>
                               </div>
                               <div className="w-full bg-slate-800/80 h-1.5 rounded-full overflow-hidden">
                                 <div className="h-full bg-emerald-500 rounded-full transition-all duration-500"
@@ -961,7 +961,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                             </div>
 
                             <div className="flex items-center justify-between pt-2 border-t border-slate-800/50">
-                              <span className="text-sm font-bold text-indigo-400 flex items-center gap-1 group-hover:gap-2 transition-all">
+                              <span className="text-sm font-bold dark:text-indigo-400 text-indigo-700 flex items-center gap-1 group-hover:gap-2 transition-all">
                                 {isSelected ? 'Active Deck ' : 'Select Deck →'}
                               </span>
                               <span className="text-xs dark:text-slate-400 text-slate-600 font-medium">
@@ -1086,7 +1086,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                                   <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
                                   
                                   <div className="flex justify-between items-center relative z-10">
-                                    <span className="text-xs font-bold uppercase tracking-widest bg-white/10 text-indigo-300 px-3 py-1 rounded-full border border-white/5">
+                                    <span className="text-xs font-bold uppercase tracking-widest bg-white/10 dark:text-indigo-300 text-indigo-700 px-3 py-1 rounded-full border border-white/5">
                                       Card {currentCardIndex + 1} of {activeDeck.cards.length}
                                     </span>
                                     <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border flex items-center gap-1 uppercase ${
@@ -1146,7 +1146,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                             
                             {/* Linear percentage bubble */}
                             <div className="flex flex-col items-center">
-                              <span className="text-sm font-extrabold text-indigo-400 tracking-wider">
+                              <span className="text-sm font-extrabold dark:text-indigo-400 text-indigo-700 tracking-wider">
                                 CARD {currentCardIndex + 1} OF {activeDeck.cards.length}
                               </span>
                               <div className="w-24 bg-slate-800 h-1 rounded-full overflow-hidden mt-1.5">
@@ -1240,7 +1240,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                           <div className="dark:bg-slate-900 bg-slate-100 dark:text-white text-slate-900 border border-slate-800 p-6 rounded-[2rem] shadow-xl relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
                             <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400 mb-4 flex items-center gap-2">
-                              <Trophy className="w-5 h-5 text-amber-400" />
+                              <Trophy className="w-5 h-5 dark:text-amber-400 text-amber-700" />
                               CBSE Board Must-Knows
                             </h3>
                             <div className="space-y-4">
@@ -1279,13 +1279,13 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                           {/* Equations & Formula Cheat Sheet */}
                           <div className="bg-gradient-to-b from-indigo-950/80 to-slate-950/90 backdrop-blur-md border border-indigo-900/30 p-6 rounded-[2rem] shadow-2xl text-white">
                             <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-4 flex items-center gap-2">
-                              <PenTool className="w-5 h-5 text-indigo-400" />
+                              <PenTool className="w-5 h-5 dark:text-indigo-400 text-indigo-700" />
                               Formulas &amp; Laws
                             </h3>
                             <div className="space-y-4">
                               {summary.equations?.map((eq: any, idx: number) => (
                                 <div key={idx} className="dark:bg-slate-900/80 bg-slate-200/80 p-4 rounded-xl border border-indigo-955/50 space-y-2">
-                                  <p className="text-xs font-black text-indigo-300 uppercase tracking-widest leading-none">{eq.name}</p>
+                                  <p className="text-xs font-black dark:text-indigo-300 text-indigo-700 uppercase tracking-widest leading-none">{eq.name}</p>
                                   <code className="block bg-slate-950 px-3 py-2 rounded font-mono text-sm text-emerald-450 border border-slate-850/80 text-center w-full">
                                     {eq.formula}
                                   </code>
@@ -1346,7 +1346,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
             
             <div className="text-center">
               <h2 className="text-xl font-bold dark:text-white text-slate-900 tracking-tight leading-none mb-1.5">{activeDeck.title}</h2>
-              <span className="text-xs text-indigo-400 font-extrabold tracking-widest uppercase">
+              <span className="text-xs dark:text-indigo-400 text-indigo-700 font-extrabold tracking-widest uppercase">
                 {subjectName} Hub • CBSE Class {userClass}
               </span>
             </div>
@@ -1381,7 +1381,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                   <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
                   
                   <div className="flex justify-between items-center relative z-10">
-                    <span className="text-sm font-bold uppercase tracking-widest bg-white/10 text-indigo-300 px-4 py-1.5 rounded-full border border-white/5">
+                    <span className="text-sm font-bold uppercase tracking-widest bg-white/10 dark:text-indigo-300 text-indigo-700 px-4 py-1.5 rounded-full border border-white/5">
                       Card {currentCardIndex + 1} of {activeDeck.cards.length}
                     </span>
                     <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1.5 uppercase tracking-wider">
@@ -1444,7 +1444,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
               </button>
               
               <div className="flex flex-col items-center">
-                <span className="text-xs font-extrabold text-indigo-400 tracking-widest uppercase">
+                <span className="text-xs font-extrabold dark:text-indigo-400 text-indigo-700 tracking-widest uppercase">
                   PROGRESS TRACKER
                 </span>
                 <div className="w-48 bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2 border border-white/5">
@@ -1497,7 +1497,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
             <div className="p-6 dark:bg-slate-900 bg-slate-100 dark:text-white text-slate-900 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 relative">
               <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-indigo-600" />
               <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">NCERT Active Annotation Study Guide</span>
+                <span className="text-[10px] font-black uppercase tracking-widest dark:text-indigo-400 text-indigo-700">NCERT Active Annotation Study Guide</span>
                 <h3 className="text-xl font-bold dark:text-white text-slate-900 mt-1 leading-none">{chapterName} — Line-by-Line Breakdown</h3>
               </div>
               <div className="flex items-center gap-3">

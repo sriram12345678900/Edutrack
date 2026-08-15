@@ -866,7 +866,7 @@ export default function NcertViewer() {
                       </span>
                       <span className="text-indigo-900 dark:text-indigo-200 font-bold text-sm">Prelims &amp; Syllabus</span>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-indigo-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
+                    <ChevronRight className="w-4 h-4 dark:text-indigo-400 text-indigo-700 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
                   </button>
                 )}
 
@@ -1004,7 +1004,7 @@ export default function NcertViewer() {
                     className="group flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white/90 hover:dark:text-white text-slate-900 px-3.5 py-2 rounded-2xl backdrop-blur-md transition-all border border-white/10 hover:border-white/20 hover:scale-105"
                     title="Hide Header Bar for Full-Screen View"
                   >
-                    <EyeOff className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform" />
+                    <EyeOff className="w-4 h-4 dark:text-indigo-400 text-indigo-700 group-hover:scale-110 transition-transform" />
                     <span className="hidden sm:inline font-bold text-sm">Hide Header</span>
                   </button>
                   <a
@@ -1034,7 +1034,7 @@ export default function NcertViewer() {
                 onClick={handleCloseViewer}
                 className="pointer-events-auto flex items-center gap-2 dark:bg-slate-900/90 bg-slate-200/90 hover:bg-slate-800 dark:text-white text-slate-900 px-4 py-2 rounded-2xl shadow-2xl backdrop-blur-md transition-all border border-slate-700/80 hover:scale-105"
               >
-                <ArrowLeft className="w-4 h-4 text-indigo-400" />
+                <ArrowLeft className="w-4 h-4 dark:text-indigo-400 text-indigo-700" />
                 <span className="font-bold text-sm">Back</span>
               </button>
               <button
@@ -1042,7 +1042,7 @@ export default function NcertViewer() {
                 className="pointer-events-auto flex items-center gap-2 dark:bg-slate-900/90 bg-slate-200/90 hover:bg-slate-800 dark:text-white text-slate-900 px-4 py-2 rounded-2xl shadow-2xl backdrop-blur-md transition-all border border-slate-700/80 hover:scale-105"
                 title="Show Header Bar"
               >
-                <Eye className="w-4 h-4 text-emerald-400" />
+                <Eye className="w-4 h-4 dark:text-emerald-400 text-emerald-700" />
                 <span className="font-bold text-sm">Show Header</span>
               </button>
             </div>
@@ -1083,14 +1083,14 @@ export default function NcertViewer() {
             {/* Custom PDF Controls (Floating Bottom) */}
             <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800/90 backdrop-blur-md px-4 py-2 rounded-full shadow-2xl shadow-black/50 border border-slate-700 flex items-center gap-4 z-[110]">
               <div className="flex items-center gap-1">
-                <button onClick={fetchLineByLine} disabled={lineByLineLoading} className="p-2 rounded-full hover:bg-slate-700 text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1" title="Generate Side-by-Side Line-by-Line Study Guide (PDF)">
+                <button onClick={fetchLineByLine} disabled={lineByLineLoading} className="p-2 rounded-full hover:bg-slate-700 dark:text-amber-400 text-amber-700 hover:dark:text-amber-300 text-amber-700 transition-colors flex items-center gap-1" title="Generate Side-by-Side Line-by-Line Study Guide (PDF)">
                   {lineByLineLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 text-amber-450" />}
-                  <span className="text-[10px] font-extrabold pr-1 hidden md:inline text-amber-300">NCERT Guide</span>
+                  <span className="text-[10px] font-extrabold pr-1 hidden md:inline dark:text-amber-300 text-amber-700">NCERT Guide</span>
                 </button>
                 <div className="w-px h-6 bg-slate-600 mx-1"></div>
-                <button onClick={() => fetchTheory()} disabled={theoryLoading} className="p-2 rounded-full hover:bg-slate-700 text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1" title="Generate Premium NCERT Textbook Draft / Exhaustive Study Guide">
-                  {theoryLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <BookOpen className="w-4 h-4 text-indigo-400" />}
-                  <span className="text-[10px] font-extrabold pr-1 hidden md:inline text-indigo-300">Study Guide</span>
+                <button onClick={() => fetchTheory()} disabled={theoryLoading} className="p-2 rounded-full hover:bg-slate-700 dark:text-indigo-400 text-indigo-700 hover:dark:text-indigo-300 text-indigo-700 transition-colors flex items-center gap-1" title="Generate Premium NCERT Textbook Draft / Exhaustive Study Guide">
+                  {theoryLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <BookOpen className="w-4 h-4 dark:text-indigo-400 text-indigo-700" />}
+                  <span className="text-[10px] font-extrabold pr-1 hidden md:inline dark:text-indigo-300 text-indigo-700">Study Guide</span>
                 </button>
                 <div className="w-px h-6 bg-slate-600 mx-1"></div>
                 <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 rounded-full transition-colors ${isDarkMode ? 'bg-indigo-500 text-white' : 'hover:bg-slate-700 text-slate-300'}`} title="Dark Mode">
@@ -1414,7 +1414,7 @@ export default function NcertViewer() {
                   /* Mind-Map View */
                   <div className="space-y-6">
                     <div className="bg-indigo-950/20 border border-indigo-900/50 p-4 rounded-2xl">
-                      <p className="text-xs text-indigo-300 font-bold leading-normal m-0">
+                      <p className="text-xs dark:text-indigo-300 text-indigo-700 font-bold leading-normal m-0">
                          <strong>Interactive SVG Concept Map</strong>: Hover over nodes to see core definitions, high-yield chemistry reaction formulas, and CBSE board tips!
                       </p>
                     </div>
@@ -1549,14 +1549,14 @@ export default function NcertViewer() {
                                 </div>
                                 <div className="space-y-3">
                                   <div>
-                                    <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest block mb-1">Concept Definition</span>
+                                    <span className="text-[9px] font-black dark:text-indigo-400 text-indigo-700 uppercase tracking-widest block mb-1">Concept Definition</span>
                                     <p className="text-xs dark:text-slate-300 text-slate-700 leading-relaxed font-semibold">{selectedNode.definition}</p>
                                   </div>
 
                                   {selectedNode.equation && (
                                     <div>
-                                      <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest block mb-1"> High-Yield Equation</span>
-                                      <div className="dark:bg-[#0b0f19] bg-[#eef1f9] p-3 rounded-2xl border border-white/5 text-center text-xs font-mono font-bold text-emerald-400">
+                                      <span className="text-[9px] font-black dark:text-emerald-400 text-emerald-700 uppercase tracking-widest block mb-1"> High-Yield Equation</span>
+                                      <div className="dark:bg-[#0b0f19] bg-[#eef1f9] p-3 rounded-2xl border border-white/5 text-center text-xs font-mono font-bold dark:text-emerald-400 text-emerald-700">
                                         <span dangerouslySetInnerHTML={{
                                           __html: selectedNode.equation
                                             .replace(/~([^~]+)~/g, "$1")
@@ -1572,7 +1572,7 @@ export default function NcertViewer() {
                                       <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest block mb-1 flex items-center gap-1">
                                         <Trophy className="w-3.5 h-3.5" /> Board Evaluator Tip
                                       </span>
-                                      <p className="text-xs text-amber-400 font-semibold m-0 leading-normal">{selectedNode.tip}</p>
+                                      <p className="text-xs dark:text-amber-400 text-amber-700 font-semibold m-0 leading-normal">{selectedNode.tip}</p>
                                     </div>
                                   )}
                                 </div>
@@ -1606,7 +1606,7 @@ export default function NcertViewer() {
             <div className="p-6 dark:bg-slate-900 bg-slate-100 dark:text-white text-slate-900 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 relative">
               <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-indigo-600" />
               <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">NCERT Active Annotation Study Guide</span>
+                <span className="text-[10px] font-black uppercase tracking-widest dark:text-indigo-400 text-indigo-700">NCERT Active Annotation Study Guide</span>
                 <h3 className="text-xl font-bold dark:text-white text-slate-900 mt-1 leading-none">{openBook ? openBook.title : "NCERT"} — Line-by-Line Breakdown</h3>
               </div>
               <div className="flex items-center gap-3">

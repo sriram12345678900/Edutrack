@@ -113,7 +113,7 @@ export default function LearnHub() {
                           <MessageCircle className="w-6 h-6" />
                         </div>
                         <div>
-                          <p className="font-bold text-slate-800 dark:text-slate-200 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Communicative</p>
+                          <p className="font-bold text-slate-800 dark:text-slate-200 group-hover:text-purple-600 dark:group-hover:dark:text-purple-400 text-purple-700 transition-colors">Communicative</p>
                           <p className="text-sm font-medium text-slate-500 dark:text-slate-500 dark:text-slate-400 mt-0.5">14 Chapters</p>
                         </div>
                       </Link>
@@ -123,7 +123,7 @@ export default function LearnHub() {
                           <BookOpen className="w-6 h-6" />
                         </div>
                         <div>
-                          <p className="font-bold text-slate-800 dark:text-slate-200 group-hover:text-fuchsia-600 dark:group-hover:text-fuchsia-400 transition-colors">Lang & Lit</p>
+                          <p className="font-bold text-slate-800 dark:text-slate-200 group-hover:text-fuchsia-600 dark:group-hover:dark:text-fuchsia-400 text-fuchsia-700 transition-colors">Lang & Lit</p>
                           <p className="text-sm font-medium text-slate-500 dark:text-slate-500 dark:text-slate-400 mt-0.5">28 Chapters</p>
                         </div>
                       </Link>
@@ -141,7 +141,7 @@ export default function LearnHub() {
                       <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-inner ${subject.color}`}>
                         <Icon className="w-8 h-8" />
                       </div>
-                      <h3 className="text-2xl font-bold mb-2 text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{subject.name}</h3>
+                      <h3 className="text-2xl font-bold mb-2 text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:dark:text-indigo-400 text-indigo-700 transition-colors">{subject.name}</h3>
                       <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 font-medium mb-8 flex-grow">{subject.chapters} Chapters</p>
                       
                       <div className="mt-auto bg-slate-50 dark:bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 p-4 rounded-2xl">

@@ -154,7 +154,7 @@ export default function MockTestPage() {
             className="bg-white/60 dark:bg-[#040612] bg-[#eef1f9] backdrop-blur-xl border border-slate-200/50 dark:border-white/5 p-8 rounded-[2rem] text-center max-w-xl mx-auto space-y-6 shadow-xl"
           >
             <div className="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto border border-indigo-500/20">
-              <Clock className="w-8 h-8 text-indigo-400" />
+              <Clock className="w-8 h-8 dark:text-indigo-400 text-indigo-700" />
             </div>
             <div>
               <h2 className="text-2xl font-black text-slate-900 dark:text-white">Configure Your Mock Exam</h2>
@@ -193,7 +193,7 @@ export default function MockTestPage() {
                 <span className="text-xs font-black text-red-400 uppercase tracking-widest">Exam in Progress</span>
               </div>
               <div className="flex items-center gap-2 dark:text-white text-slate-900 font-black text-sm uppercase tracking-wider bg-white/5 border border-white/10 px-4 py-2 rounded-xl">
-                <Clock className="w-4 h-4 text-indigo-400 animate-pulse" />
+                <Clock className="w-4 h-4 dark:text-indigo-400 text-indigo-700 animate-pulse" />
                 <span>Timer: {formatTime(timeLeft)}</span>
               </div>
             </div>
@@ -253,7 +253,7 @@ export default function MockTestPage() {
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,#10b9811c,transparent_50%)]" />
               <div className="relative z-10 max-w-xl mx-auto space-y-4">
                 <div className="w-14 h-14 bg-emerald-500/15 rounded-full flex items-center justify-center mx-auto border border-emerald-500/35 animate-bounce">
-                  <Trophy className="w-7 h-7 text-emerald-400" />
+                  <Trophy className="w-7 h-7 dark:text-emerald-400 text-emerald-700" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-black dark:text-white text-slate-900">CBSE Mock Test Scorecard</h2>
@@ -263,7 +263,7 @@ export default function MockTestPage() {
                 {/* Total Marks Gauge */}
                 <div className="text-4xl font-black dark:text-white text-slate-900 tracking-tight pt-2">
                   Total Score:{" "}
-                  <span className="text-emerald-400">
+                  <span className="dark:text-emerald-400 text-emerald-700">
                     {scorecard?.reduce((sum, item) => sum + item.marksGained, 0)}
                   </span>
                   <span className="text-slate-600">
@@ -281,9 +281,9 @@ export default function MockTestPage() {
               {scorecard?.map((item, idx) => (
                 <div key={idx} className="bg-white/60 dark:bg-[#040612] bg-[#eef1f9] border border-slate-200/50 dark:border-white/5 p-6 rounded-[2rem] shadow-sm space-y-4 text-left">
                   <div className="flex justify-between items-start border-b border-white/5 pb-3">
-                    <span className="text-xs font-black text-indigo-400 uppercase tracking-widest">Question {idx + 1} Review</span>
+                    <span className="text-xs font-black dark:text-indigo-400 text-indigo-700 uppercase tracking-widest">Question {idx + 1} Review</span>
                     <span className="text-sm font-black dark:text-white text-slate-900">
-                      Score: <span className="text-emerald-400">{item.marksGained}</span>/{item.maxMarks} Marks
+                      Score: <span className="dark:text-emerald-400 text-emerald-700">{item.marksGained}</span>/{item.maxMarks} Marks
                     </span>
                   </div>
                   
@@ -298,7 +298,7 @@ export default function MockTestPage() {
                       <p className="text-xs text-slate-350 mt-1 leading-relaxed italic">{item.studentAnswer || "(No answer provided)"}</p>
                     </div>
                     <div className="bg-emerald-500/[0.02] border border-emerald-500/10 p-4 rounded-xl">
-                      <h4 className="text-[9px] font-black uppercase tracking-widest text-emerald-400">CBSE Baseline Reference</h4>
+                      <h4 className="text-[9px] font-black uppercase tracking-widest dark:text-emerald-400 text-emerald-700">CBSE Baseline Reference</h4>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{activeQuestions[idx].officialAnswer}</p>
                     </div>
                   </div>
@@ -317,9 +317,9 @@ export default function MockTestPage() {
 
                     {item.improvements && (
                       <div className="flex items-start gap-3 bg-indigo-500/5 p-3.5 rounded-xl border border-indigo-500/10 text-xs">
-                        <Sparkles className="w-4.5 h-4.5 text-indigo-400 shrink-0 mt-0.5" />
+                        <Sparkles className="w-4.5 h-4.5 dark:text-indigo-400 text-indigo-700 shrink-0 mt-0.5" />
                         <div>
-                          <h5 className="font-black text-indigo-400 uppercase tracking-wider text-[9px] mb-1">Board-Pattern Layout Recommendations</h5>
+                          <h5 className="font-black dark:text-indigo-400 text-indigo-700 uppercase tracking-wider text-[9px] mb-1">Board-Pattern Layout Recommendations</h5>
                           <p className="text-slate-600 dark:text-slate-300 font-bold leading-normal">{item.improvements}</p>
                         </div>
                       </div>
@@ -327,7 +327,7 @@ export default function MockTestPage() {
 
                     {item.feedback && (
                       <div className="flex items-start gap-3 bg-slate-100/50 dark:bg-white/5 p-3.5 rounded-xl border border-slate-200/50 dark:border-white/5 text-xs">
-                        <CheckCircle className="w-4.5 h-4.5 text-emerald-400 shrink-0 mt-0.5" />
+                        <CheckCircle className="w-4.5 h-4.5 dark:text-emerald-400 text-emerald-700 shrink-0 mt-0.5" />
                         <div>
                           <h5 className="font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[9px] mb-1">AI Evaluator Feedback</h5>
                           <p className="text-slate-600 dark:text-slate-300 font-bold leading-normal">{item.feedback}</p>

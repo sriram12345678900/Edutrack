@@ -318,7 +318,7 @@ export default function Dashboard() {
               <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">AI Lens</span>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/formulas')} className="premium-glass-panel micro-hover-lift p-5 flex flex-col items-center justify-center text-center cursor-pointer group">
-              <Compass className="w-7 h-7 sm:w-8 sm:h-8 text-cyan-400 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(34,211,238,0.35)]" />
+              <Compass className="w-7 h-7 sm:w-8 sm:h-8 dark:text-cyan-400 text-cyan-700 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(34,211,238,0.35)]" />
               <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Formulas</span>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/sandbox')} className="premium-glass-panel micro-hover-lift p-5 flex flex-col items-center justify-center text-center cursor-pointer group">
@@ -384,7 +384,7 @@ export default function Dashboard() {
                     </defs>
                   </svg>
                   <div className="absolute flex flex-col items-center justify-center text-center">
-                    <span className="text-[8px] font-black uppercase tracking-widest text-indigo-300 opacity-80 leading-none">Level</span>
+                    <span className="text-[8px] font-black uppercase tracking-widest dark:text-indigo-300 text-indigo-700 opacity-80 leading-none">Level</span>
                     <span className="text-2.5xl font-black dark:text-white text-slate-900 leading-none mt-0.5">{level}</span>
                   </div>
                 </div>
@@ -393,8 +393,8 @@ export default function Dashboard() {
                   <h3 className="font-black text-xl dark:text-white text-slate-900 leading-tight flex items-center gap-2">
                     {level <= 1 ? "Study Novice" : level <= 3 ? "Elite Revisionist" : level <= 5 ? "Academic Warrior" : "Grandmaster Scholar"} 
                   </h3>
-                  <div className="flex items-center gap-2 mt-1.5 text-xs text-indigo-300 font-bold tracking-wide">
-                    <Star className="w-3.5 h-3.5 fill-current text-indigo-400" />
+                  <div className="flex items-center gap-2 mt-1.5 text-xs dark:text-indigo-300 text-indigo-700 font-bold tracking-wide">
+                    <Star className="w-3.5 h-3.5 fill-current dark:text-indigo-400 text-indigo-700" />
                     <span>{xp} / {level * 200} XP to Level UP</span>
                   </div>
                 </div>
@@ -436,7 +436,7 @@ export default function Dashboard() {
                     <Sparkles className="w-5 h-5 drop-shadow-[0_0_8px_rgba(99,102,241,0.4)]" />
                   </div>
                   <div>
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors text-xs uppercase tracking-wider">AI Study Bot</h4>
+                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:dark:text-indigo-400 text-indigo-700 transition-colors text-xs uppercase tracking-wider">AI Study Bot</h4>
                     <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1.5 font-bold">Instant doubt solver & learning coach.</p>
                   </div>
                 </div>
@@ -449,7 +449,7 @@ export default function Dashboard() {
                     <Book className="w-5 h-5 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
                   </div>
                   <div>
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-emerald-650 dark:group-hover:text-emerald-400 transition-colors text-xs uppercase tracking-wider">Study Hub</h4>
+                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-emerald-650 dark:group-hover:dark:text-emerald-400 text-emerald-700 transition-colors text-xs uppercase tracking-wider">Study Hub</h4>
                     <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1.5 font-bold">NCERT books & dynamic summaries.</p>
                   </div>
                 </div>
@@ -462,7 +462,7 @@ export default function Dashboard() {
                     <Palette className="w-5 h-5 drop-shadow-[0_0_8px_rgba(236,72,153,0.4)]" />
                   </div>
                   <div>
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-pink-650 dark:group-hover:text-pink-400 transition-colors text-xs uppercase tracking-wider">Whiteboard</h4>
+                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-pink-650 dark:group-hover:dark:text-pink-400 text-pink-700 transition-colors text-xs uppercase tracking-wider">Whiteboard</h4>
                     <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1.5 font-bold">Collaborative sketching & notes canvas.</p>
                   </div>
                 </div>
@@ -475,7 +475,7 @@ export default function Dashboard() {
                     <Timer className="w-5 h-5 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]" />
                   </div>
                   <div>
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors text-xs uppercase tracking-wider">Focus Timer</h4>
+                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:dark:text-amber-400 text-amber-700 transition-colors text-xs uppercase tracking-wider">Focus Timer</h4>
                     <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1.5 font-bold">Structured study & break cycles.</p>
                   </div>
                 </div>
@@ -524,7 +524,7 @@ export default function Dashboard() {
                     <span className="text-[10px] font-black uppercase tracking-wider text-indigo-500 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/10">Step 1</span>
                   </div>
                   <div className="mt-4">
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors text-base">NCERT Theory</h4>
+                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:dark:text-indigo-400 text-indigo-700 transition-colors text-base">NCERT Theory</h4>
                     <p className="text-slate-500 dark:text-slate-400 text-xs mt-1.5 leading-relaxed font-bold">Read dynamic AI Textbook chapters without mole concepts.</p>
                   </div>
                 </div>
@@ -540,7 +540,7 @@ export default function Dashboard() {
                     <span className="text-[10px] font-black uppercase tracking-wider text-purple-500 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/10">Step 2</span>
                   </div>
                   <div className="mt-4">
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors text-base">Spaced Recall</h4>
+                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:dark:text-purple-400 text-purple-700 transition-colors text-base">Spaced Recall</h4>
                     <p className="text-slate-500 dark:text-slate-400 text-xs mt-1.5 leading-relaxed font-bold">Master high-yield questions using active Leitner boxes.</p>
                   </div>
                 </div>
@@ -556,7 +556,7 @@ export default function Dashboard() {
                     <span className="text-[10px] font-black uppercase tracking-wider text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/10">Step 3</span>
                   </div>
                   <div className="mt-4">
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors text-base">StudyCircles</h4>
+                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:dark:text-emerald-400 text-emerald-700 transition-colors text-base">StudyCircles</h4>
                     <p className="text-slate-500 dark:text-slate-400 text-xs mt-1.5 leading-relaxed font-bold">Join code-based rooms to message friends in real-time.</p>
                   </div>
                 </div>
@@ -732,7 +732,7 @@ export default function Dashboard() {
                   className="text-center py-6"
                 >
                   <div className="w-14 h-14 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
-                    <Trophy className="w-7 h-7 text-emerald-400" />
+                    <Trophy className="w-7 h-7 dark:text-emerald-400 text-emerald-700" />
                   </div>
                   <h3 className="text-base font-black dark:text-white text-slate-900">All Cards Cleared! </h3>
                   <p className="text-xs text-slate-500 font-bold mt-1">Great job! You gained bonus XP revision points.</p>
@@ -909,7 +909,7 @@ export default function Dashboard() {
                           {buddy.name}
                         </p>
                         <p className="text-[10px] text-slate-500 dark:text-slate-450 leading-none mt-1 font-bold">
-                          Lvl {buddy.isSelf ? level : Math.floor(buddy.totalXp / 200) + 1} • {buddy.totalXp} XP • <span className="text-indigo-400 font-semibold">{buddy.status}</span>
+                          Lvl {buddy.isSelf ? level : Math.floor(buddy.totalXp / 200) + 1} • {buddy.totalXp} XP • <span className="dark:text-indigo-400 text-indigo-700 font-semibold">{buddy.status}</span>
                         </p>
                       </div>
                     </div>
@@ -953,7 +953,7 @@ export default function Dashboard() {
                 weakSubjects.map((subject, idx) => (
                   <div key={idx} className="group bg-slate-50/50 dark:bg-white/[0.01] hover:bg-indigo-500/5 dark:hover:bg-indigo-550/5 p-4.5 rounded-2xl flex justify-between items-center transition-all border border-slate-200/30 dark:border-slate-200/60 dark:border-white/5 hover:border-indigo-500/20">
                     <div className="overflow-hidden mr-2">
-                      <p className="font-black text-sm text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">{subject}</p>
+                      <p className="font-black text-sm text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:dark:text-indigo-400 text-indigo-700 transition-colors truncate">{subject}</p>
                       <p className="text-[10px] font-bold text-red-500 mt-1 flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Needs Focus
                       </p>
@@ -1038,13 +1038,13 @@ export default function Dashboard() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between bg-white/[0.02] px-4 py-2.5 rounded-xl border border-slate-200/60 dark:border-white/5">
                   <span className="text-xs font-semibold dark:text-slate-400 text-slate-600">Mastery Progress</span>
-                  <span className="text-xs font-black text-indigo-400">{selectedNode.percent}% Complete</span>
+                  <span className="text-xs font-black dark:text-indigo-400 text-indigo-700">{selectedNode.percent}% Complete</span>
                 </div>
 
                 <p className="dark:text-slate-400 text-slate-600 text-sm font-semibold leading-relaxed">{selectedNode.desc}</p>
                 
                 <div className="bg-white/[0.02] border border-slate-200/60 dark:border-white/5 p-4.5 rounded-2xl">
-                  <h4 className="text-[10px] font-black uppercase tracking-wider text-indigo-400 mb-2">High-Yield Board Highlights</h4>
+                  <h4 className="text-[10px] font-black uppercase tracking-wider dark:text-indigo-400 text-indigo-700 mb-2">High-Yield Board Highlights</h4>
                   <ul className="space-y-2">
                     {selectedNode.keyPoints.map((point: string, idx: number) => (
                       <li key={idx} className="text-xs dark:text-slate-300 text-slate-700 font-bold flex items-start gap-2.5">

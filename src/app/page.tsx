@@ -136,7 +136,7 @@ export default function Home() {
               style={{ borderRadius: 999 }}
             >
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-300">
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] dark:text-indigo-300 text-indigo-700">
                 Next-Generation Academic OS
               </span>
             </motion.div>
@@ -198,7 +198,7 @@ export default function Home() {
                 className="premium-glass-panel group flex items-center justify-center gap-2 px-9 py-4 hover:bg-white/10 dark:text-white text-slate-900 font-semibold text-sm uppercase tracking-widest rounded-full transition-all micro-hover-lift"
                 style={{ borderRadius: 999 }}
               >
-                <Play className="w-3.5 h-3.5 text-indigo-400 fill-indigo-400" />
+                <Play className="w-3.5 h-3.5 dark:text-indigo-400 text-indigo-700 fill-indigo-400" />
                 Explore Demo
               </Link>
             </motion.div>
@@ -221,12 +221,12 @@ export default function Home() {
                   <div className="w-3 h-3 rounded-full bg-[#28c840]" />
                 </div>
                 <div className="flex items-center gap-2 bg-black/50 border border-white/[0.08] rounded-full px-5 py-1 text-[11px] dark:text-slate-400 text-slate-600 font-mono">
-                  <Shield className="w-3 h-3 text-emerald-400" />
+                  <Shield className="w-3 h-3 dark:text-emerald-400 text-emerald-700" />
                   app.edutrack.space/dashboard
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[9px] font-bold uppercase text-emerald-400 tracking-wider hidden sm:block">Live</span>
+                  <span className="text-[9px] font-bold uppercase dark:text-emerald-400 text-emerald-700 tracking-wider hidden sm:block">Live</span>
                 </div>
               </div>
 
@@ -240,7 +240,7 @@ export default function Home() {
                     </div>
                     <div>
                       <div className="text-xs font-black dark:text-white text-slate-900">EduTrack</div>
-                      <div className="text-[9px] text-indigo-400">AI Workspace</div>
+                      <div className="text-[9px] dark:text-indigo-400 text-indigo-700">AI Workspace</div>
                     </div>
                   </div>
                   {SIDEBAR_ITEMS.map((item, i) => (
@@ -261,7 +261,7 @@ export default function Home() {
                 {/* Main content mock */}
                 <div className="col-span-12 md:col-span-9 flex flex-col gap-4">
                   <div className="premium-glass-panel p-5">
-                    <div className="text-[9px] font-bold text-indigo-400 uppercase tracking-widest">Class 10 — CBSE Space</div>
+                    <div className="text-[9px] font-bold dark:text-indigo-400 text-indigo-700 uppercase tracking-widest">Class 10 — CBSE Space</div>
                     <div className="text-base font-black dark:text-white text-slate-900 mt-0.5">Welcome back, Scholar</div>
                   </div>
 
@@ -316,8 +316,8 @@ export default function Home() {
             className="text-center mb-14"
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full premium-glass-panel mb-5" style={{ borderRadius: 999 }}>
-              <GraduationCap className="w-3.5 h-3.5 text-indigo-400" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-300">Built for Serious Students</span>
+              <GraduationCap className="w-3.5 h-3.5 dark:text-indigo-400 text-indigo-700" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] dark:text-indigo-300 text-indigo-700">Built for Serious Students</span>
             </div>
             <h2 className="text-3xl md:text-5xl font-black dark:text-white text-slate-900 tracking-tight">
               Everything you need to{" "}
@@ -350,7 +350,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-lg font-black mb-2.5 dark:text-white text-slate-900 tracking-tight">{f.title}</h3>
                 <p className="dark:text-slate-400 text-slate-600 font-medium leading-relaxed text-sm">{f.body}</p>
-                <div className="mt-5 flex items-center gap-1 text-indigo-400 text-[11px] font-bold uppercase tracking-wider group-hover:gap-2 transition-all">
+                <div className="mt-5 flex items-center gap-1 dark:text-indigo-400 text-indigo-700 text-[11px] font-bold uppercase tracking-wider group-hover:gap-2 transition-all">
                   Learn more <ChevronRight className="w-3 h-3" />
                 </div>
               </motion.div>
@@ -368,7 +368,7 @@ export default function Home() {
             className="max-w-4xl mx-auto premium-glass-panel premium-glow-border p-10 md:p-16 text-center"
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.07] mb-6" style={{ borderRadius: 999 }}>
-              <Zap className="w-3.5 h-3.5 text-amber-400" />
+              <Zap className="w-3.5 h-3.5 dark:text-amber-400 text-amber-700" />
               <span className="text-[10px] font-bold uppercase tracking-[0.18em] dark:text-slate-300 text-slate-700">Free to Start</span>
             </div>
             <h2 className="text-3xl md:text-5xl font-black dark:text-white text-slate-900 tracking-tight mb-4 leading-tight">

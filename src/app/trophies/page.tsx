@@ -9,7 +9,7 @@ export default function TrophiesPage() {
   const achievements = [
     { id: 1, title: 'Speed Reader', desc: 'Finished 5 chapters in one day', icon: <Flame className="w-8 h-8 text-orange-400" />, color: 'from-orange-500 to-red-600', shadow: 'shadow-orange-500/50', unlocked: true },
     { id: 2, title: 'Quiz Champion', desc: 'Won 10 multiplayer duels', icon: <Crown className="w-8 h-8 text-yellow-300" />, color: 'from-yellow-400 to-amber-600', shadow: 'shadow-yellow-500/50', unlocked: true },
-    { id: 3, title: 'Science Whiz', desc: 'Mastered 3 Science subjects', icon: <Star className="w-8 h-8 text-blue-300" />, color: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/50', unlocked: true },
+    { id: 3, title: 'Science Whiz', desc: 'Mastered 3 Science subjects', icon: <Star className="w-8 h-8 dark:text-blue-300 text-blue-700" />, color: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/50', unlocked: true },
     { id: 4, title: 'Perfect Streak', desc: 'Study for 30 consecutive days', icon: <Medal className="w-8 h-8 text-slate-500 dark:text-slate-400" />, color: 'from-slate-700 to-slate-900', shadow: 'shadow-none', unlocked: false },
   ];
 

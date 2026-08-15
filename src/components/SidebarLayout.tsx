@@ -169,7 +169,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
             <button 
               onClick={togglePin}
               title={isPinned ? "Unpin sidebar (Auto-unveil on hover)" : "Pin sidebar"}
-              className="hidden md:flex p-1.5 rounded-lg bg-white/5 hover:bg-white/10 dark:text-slate-400 text-slate-600 hover:text-indigo-400 transition-all text-[10px] font-bold uppercase tracking-wider"
+              className="hidden md:flex p-1.5 rounded-lg bg-white/5 hover:bg-white/10 dark:text-slate-400 text-slate-600 hover:dark:text-indigo-400 text-indigo-700 transition-all text-[10px] font-bold uppercase tracking-wider"
             >
               {isPinned ? "Pinned" : "Hover"}
             </button>
@@ -218,10 +218,10 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                   localStorage.setItem('edutrack_theme', 'dark');
                 }
               }}
-              className="p-1.5 rounded-xl bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-indigo-500 dark:hover:text-indigo-400 hover:scale-105 active:scale-95 transition-all shrink-0 shadow-sm"
+              className="p-1.5 rounded-xl bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-indigo-500 dark:hover:dark:text-indigo-400 text-indigo-700 hover:scale-105 active:scale-95 transition-all shrink-0 shadow-sm"
               title="Toggle Light/Dark Theme"
             >
-              <Moon className="w-3.5 h-3.5 hidden dark:block text-indigo-400" />
+              <Moon className="w-3.5 h-3.5 hidden dark:block dark:text-indigo-400 text-indigo-700" />
               <Sun className="w-3.5 h-3.5 block dark:hidden text-amber-500" />
             </button>
           )}

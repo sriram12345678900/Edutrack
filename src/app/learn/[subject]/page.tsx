@@ -518,7 +518,7 @@ export default function SubjectPage({ params }: { params: { subject: string } })
                         <div className="flex items-center justify-between">
                           <button
                             onClick={() => toggleAccordion(chapter.id)}
-                            className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                            className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:dark:text-indigo-400 text-indigo-700 transition-colors"
                           >
                             {expandedChapters[chapter.id] ? (
                               <>
@@ -566,12 +566,12 @@ export default function SubjectPage({ params }: { params: { subject: string } })
                                           </svg>
                                         </button>
                                         <span className="inline-block px-2 py-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold rounded-full flex items-center gap-1">
-                                          <Flame className="w-3.5 h-3.5 text-emerald-400" /> Studied
+                                          <Flame className="w-3.5 h-3.5 dark:text-emerald-400 text-emerald-700" /> Studied
                                         </span>
                                       </div>
                                     </div>
 
-                                    <h4 className="text-lg font-bold dark:text-white text-slate-900 leading-snug group-hover:text-emerald-400 transition-colors">
+                                    <h4 className="text-lg font-bold dark:text-white text-slate-900 leading-snug group-hover:dark:text-emerald-400 text-emerald-700 transition-colors">
                                       {deck.title}
                                     </h4>
 
@@ -587,7 +587,7 @@ export default function SubjectPage({ params }: { params: { subject: string } })
                                     <div className="space-y-1.5">
                                       <div className="flex justify-between text-xs font-bold">
                                         <span className="dark:text-slate-400 text-slate-600">Mastery</span>
-                                        <span className="text-emerald-400">{progress}%</span>
+                                        <span className="dark:text-emerald-400 text-emerald-700">{progress}%</span>
                                       </div>
                                       <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
                                         <div className="h-full bg-emerald-500 rounded-full transition-all duration-500"
@@ -596,7 +596,7 @@ export default function SubjectPage({ params }: { params: { subject: string } })
                                     </div>
 
                                     <div className="flex items-center justify-between pt-2 border-t border-slate-800">
-                                      <span className="text-sm font-bold text-indigo-400 flex items-center gap-1 group-hover:gap-2 transition-all">
+                                      <span className="text-sm font-bold dark:text-indigo-400 text-indigo-700 flex items-center gap-1 group-hover:gap-2 transition-all">
                                         Study Now <ArrowRight className="w-4 h-4" />
                                       </span>
                                       <span className="text-xs dark:text-slate-400 text-slate-600 font-medium">

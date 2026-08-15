@@ -1893,7 +1893,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                       ) : (
                         <div className="flex-1 p-4 flex items-center justify-center h-full w-full">
                           <div className="flex flex-col items-center justify-center text-center">
-                            <Loader2 className="w-10 h-10 text-indigo-400 animate-spin mb-4 mx-auto drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]" />
+                            <Loader2 className="w-10 h-10 dark:text-indigo-400 text-indigo-700 animate-spin mb-4 mx-auto drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]" />
                             <p className="dark:text-slate-200 text-slate-800 font-black text-sm tracking-wide uppercase">Securing video bridge...</p>
                           </div>
                         </div>
@@ -1939,7 +1939,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                                 {nickname.substring(0, 2).toUpperCase()}
                               </div>
                               <div>
-                                <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest block leading-none">Score</span>
+                                <span className="text-[9px] font-black dark:text-indigo-400 text-indigo-700 uppercase tracking-widest block leading-none">Score</span>
                                 <span className="text-xs font-black dark:text-white text-slate-900 mt-0.5 block">{activeDuel.myScore} pts</span>
                               </div>
                             </div>
@@ -1960,7 +1960,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
 
                             <div className="flex items-center gap-2 text-right">
                               <div>
-                                <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest block leading-none">Buddy</span>
+                                <span className="text-[9px] font-black dark:text-emerald-400 text-emerald-700 uppercase tracking-widest block leading-none">Buddy</span>
                                 <span className="text-xs font-black dark:text-white text-slate-900 mt-0.5 block">{activeDuel.buddyScore} pts</span>
                               </div>
                               <div className="w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center font-extrabold text-[10px] text-white">
@@ -2069,21 +2069,21 @@ const [liveKitToken, setLiveKitToken] = useState("");
 
                             {/* Rank 1 (User or Winner) */}
                             <div className="flex flex-col items-center flex-1">
-                              <span className="text-[10px] font-black text-amber-400 uppercase truncate max-w-[80px] mb-1.5 animate-pulse">
+                              <span className="text-[10px] font-black dark:text-amber-400 text-amber-700 uppercase truncate max-w-[80px] mb-1.5 animate-pulse">
                                 You
                               </span>
                               <div className="bg-amber-650 border border-amber-500 rounded-t-2xl w-full h-24 flex items-center justify-center relative shadow-inner">
                                 <div className="absolute top-2 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center">
                                   <Sparkles className="w-2.5 h-2.5 text-slate-900" />
                                 </div>
-                                <span className="font-mono font-black text-3xl text-amber-200">1</span>
-                                <span className="absolute -bottom-6 text-[10px] font-black text-amber-400 tracking-tight">{activeDuel.myScore} pts</span>
+                                <span className="font-mono font-black text-3xl dark:text-amber-200 text-amber-800">1</span>
+                                <span className="absolute -bottom-6 text-[10px] font-black dark:text-amber-400 text-amber-700 tracking-tight">{activeDuel.myScore} pts</span>
                               </div>
                             </div>
                           </div>
 
                           <div className="bg-emerald-500/10 border border-emerald-500/20 px-6 py-3 rounded-2xl max-w-xs mt-8 shrink-0">
-                            <p className="text-xs text-emerald-400 font-extrabold m-0 leading-normal">
+                            <p className="text-xs dark:text-emerald-400 text-emerald-700 font-extrabold m-0 leading-normal">
                                Double Reward Added! You have gained up to <strong>+{activeDuel.myScore * 15 + 10} XP</strong> for board exam practice!
                             </p>
                           </div>
@@ -2226,7 +2226,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                                   </span>
                                   {isOwn && (
                                     msg.read ? (
-                                      <CheckCheck className="w-3 h-3 text-indigo-400 shrink-0" />
+                                      <CheckCheck className="w-3 h-3 dark:text-indigo-400 text-indigo-700 shrink-0" />
                                     ) : (
                                       <Check className="w-3 h-3 dark:text-slate-400 text-slate-600 dark:text-slate-500 shrink-0" />
                                     )
@@ -2582,7 +2582,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                   <span className="text-[10px] font-black dark:text-slate-400 text-slate-600 dark:text-slate-500 uppercase tracking-wider">Read Status</span>
                   {selectedContextMenuMsg.senderCode === friendCode ? (
                     selectedContextMenuMsg.read ? (
-                      <span className="font-black text-indigo-500 flex items-center gap-1">Read by classmate <CheckCheck className="w-3.5 h-3.5 text-indigo-400" /></span>
+                      <span className="font-black text-indigo-500 flex items-center gap-1">Read by classmate <CheckCheck className="w-3.5 h-3.5 dark:text-indigo-400 text-indigo-700" /></span>
                     ) : (
                       <span className="font-black text-slate-455 dark:text-slate-400 flex items-center gap-1">Delivered <Check className="w-3.5 h-3.5" /></span>
                     )

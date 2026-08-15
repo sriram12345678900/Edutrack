@@ -126,7 +126,7 @@ export default function FlashcardsHub() {
         <div className="relative z-10">
           <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-indigo-400 tracking-tight flex items-center gap-3 mb-2">
             <div className="bg-fuchsia-500/20 p-2.5 rounded-2xl border border-fuchsia-500/30">
-              <Layers className="w-7 h-7 text-fuchsia-400" />
+              <Layers className="w-7 h-7 dark:text-fuchsia-400 text-fuchsia-700" />
             </div>
             AI Flashcards
           </h1>
@@ -166,7 +166,7 @@ export default function FlashcardsHub() {
       {decks.length > 0 && (
         <div className="bg-slate-50 dark:bg-slate-900/95 bg-slate-200/95 backdrop-blur-md border border-slate-800 p-6 rounded-[2rem] shadow-xl dark:text-white text-slate-900">
           <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-indigo-400 mb-4 flex items-center gap-2">
-            <Layers className="w-5 h-5 text-indigo-400" />
+            <Layers className="w-5 h-5 dark:text-indigo-400 text-indigo-700" />
             Spaced Repetition Stats Hub
           </h3>
           

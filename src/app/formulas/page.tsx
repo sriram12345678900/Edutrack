@@ -402,7 +402,7 @@ export default function FormulasPage() {
                 : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-600 dark:text-slate-300 border-slate-200/70 dark:border-white/10 hover:bg-white/10"
             }`}
           >
-            {practiceMode ? <EyeOff className="w-4 h-4 text-amber-400" /> : <Eye className="w-4 h-4 text-indigo-400" />}
+            {practiceMode ? <EyeOff className="w-4 h-4 dark:text-amber-400 text-amber-700" /> : <Eye className="w-4 h-4 dark:text-indigo-400 text-indigo-700" />}
             <span>{practiceMode ? "Recall Test Mode ON" : "Recall Practice Mode"}</span>
           </button>
         </div>
@@ -413,14 +413,14 @@ export default function FormulasPage() {
         {/* Banner Section */}
         <div className="mb-10 text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-4 backdrop-blur-md">
-            <Sparkles className="w-4 h-4 text-indigo-400 animate-pulse" />
-            <span className="text-xs font-black uppercase tracking-widest text-indigo-300">NCERT Exam Ready Formula Sheets</span>
+            <Sparkles className="w-4 h-4 dark:text-indigo-400 text-indigo-700 animate-pulse" />
+            <span className="text-xs font-black uppercase tracking-widest dark:text-indigo-300 text-indigo-700">NCERT Exam Ready Formula Sheets</span>
           </div>
           <h2 className="text-4xl sm:text-5xl font-black tracking-tight mb-4 bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
             Physics, Maths & Chemistry Master Deck
           </h2>
           <p className="text-slate-600 dark:text-slate-600 dark:text-slate-300 text-base sm:text-lg font-medium leading-relaxed">
-            Search formulas, test active recall, or launch the <strong className="text-indigo-400">Live Interactive Calculator</strong> to solve numericals step-by-step!
+            Search formulas, test active recall, or launch the <strong className="dark:text-indigo-400 text-indigo-700">Live Interactive Calculator</strong> to solve numericals step-by-step!
           </p>
         </div>
 
@@ -494,7 +494,7 @@ export default function FormulasPage() {
                       <span className="text-xs font-black text-slate-500 dark:text-slate-400">{item.classLevel}</span>
                     </div>
 
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white mb-3 group-hover:text-indigo-300 transition-colors">
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white mb-3 group-hover:dark:text-indigo-300 text-indigo-700 transition-colors">
                       {item.title}
                     </h3>
 
@@ -503,12 +503,12 @@ export default function FormulasPage() {
                       {practiceMode && !isRevealed ? (
                         <div 
                           onClick={() => toggleReveal(item.id)}
-                          className="py-2.5 text-center text-amber-400 font-bold text-xs uppercase tracking-wider cursor-pointer hover:underline flex items-center justify-center gap-2"
+                          className="py-2.5 text-center dark:text-amber-400 text-amber-700 font-bold text-xs uppercase tracking-wider cursor-pointer hover:underline flex items-center justify-center gap-2"
                         >
                           <EyeOff className="w-4 h-4" /> Click to Reveal Formula (Recall Test)
                         </div>
                       ) : (
-                        <div className="text-indigo-300 text-lg sm:text-xl font-black tracking-wider leading-relaxed pr-10">
+                        <div className="dark:text-indigo-300 text-indigo-700 text-lg sm:text-xl font-black tracking-wider leading-relaxed pr-10">
                           {item.formula}
                         </div>
                       )}
@@ -519,7 +519,7 @@ export default function FormulasPage() {
                           className="absolute right-3.5 top-1/2 -translate-y-1/2 p-2 rounded-xl bg-white/10 hover:bg-white/20 border border-slate-200/70 dark:border-white/10 transition-all text-slate-600 dark:text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white"
                           title="Copy Formula"
                         >
-                          {isCopied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                          {isCopied ? <Check className="w-4 h-4 dark:text-emerald-400 text-emerald-700" /> : <Copy className="w-4 h-4" />}
                         </button>
                       )}
                     </div>
@@ -539,8 +539,8 @@ export default function FormulasPage() {
                   {/* Actions Footer: Board Tip & Live Calculator Trigger */}
                   <div className="space-y-3 pt-4 border-t border-slate-200/50 dark:border-white/5">
                     <div className="flex items-start gap-2.5 text-xs text-amber-300/90 font-medium bg-amber-500/5 p-3 rounded-xl border border-amber-500/10">
-                      <Flame className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                      <span><strong className="text-amber-300 uppercase tracking-wider font-bold">Board Tip:</strong> {item.examTip}</span>
+                      <Flame className="w-4 h-4 dark:text-amber-400 text-amber-700 shrink-0 mt-0.5" />
+                      <span><strong className="dark:text-amber-300 text-amber-700 uppercase tracking-wider font-bold">Board Tip:</strong> {item.examTip}</span>
                     </div>
 
                     {item.calcType && (
@@ -580,7 +580,7 @@ export default function FormulasPage() {
               </div>
               <div>
                 <h3 className="text-xl font-black text-slate-900 dark:text-white">{activeCalcFormula.title}</h3>
-                <p className="text-xs text-indigo-400 font-bold">Live Numerical Solver</p>
+                <p className="text-xs dark:text-indigo-400 text-indigo-700 font-bold">Live Numerical Solver</p>
               </div>
             </div>
 
@@ -644,9 +644,9 @@ export default function FormulasPage() {
             {/* Computed Output Box */}
             {calcOutput && (
               <div className="bg-indigo-950/40 border border-indigo-500/30 p-5 rounded-2xl space-y-3 font-mono">
-                <div className="text-xs text-indigo-300 font-bold uppercase tracking-wider">Formula Equation:</div>
+                <div className="text-xs dark:text-indigo-300 text-indigo-700 font-bold uppercase tracking-wider">Formula Equation:</div>
                 <div className="text-slate-900 dark:text-white text-base font-black">{calcOutput.equation}</div>
-                <div className="text-emerald-400 text-lg font-black pt-2 border-t border-indigo-500/20">
+                <div className="dark:text-emerald-400 text-emerald-700 text-lg font-black pt-2 border-t border-indigo-500/20">
                   Result: {calcOutput.result}
                 </div>
                 <div className="space-y-1 text-xs text-slate-600 dark:text-slate-600 dark:text-slate-300 font-sans pt-2">

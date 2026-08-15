@@ -402,7 +402,7 @@ export default function TutorPage() {
         return (
           <div 
             key={idx} 
-            className="flex justify-center my-3 p-3.5 dark:bg-[#050c22] bg-[#f5f7ff] border border-cyan-500/40 rounded-xl font-mono text-sm sm:text-base text-cyan-300 tracking-wider font-extrabold select-all shadow-[0_0_20px_rgba(6,182,212,0.15)]"
+            className="flex justify-center my-3 p-3.5 dark:bg-[#050c22] bg-[#f5f7ff] border border-cyan-500/40 rounded-xl font-mono text-sm sm:text-base dark:text-cyan-300 text-cyan-700 tracking-wider font-extrabold select-all shadow-[0_0_20px_rgba(6,182,212,0.15)]"
             dangerouslySetInnerHTML={{ __html: cleanMathLaTeX(mathText) }}
           />
         );
@@ -412,7 +412,7 @@ export default function TutorPage() {
         return (
           <div 
             key={idx} 
-            className="my-2 p-2.5 px-3.5 dark:bg-[#060e28] bg-[#f5f7ff] border border-cyan-500/30 rounded-xl font-mono text-xs sm:text-sm text-cyan-200 tracking-wide font-bold select-all shadow-sm flex items-center gap-2"
+            className="my-2 p-2.5 px-3.5 dark:bg-[#060e28] bg-[#f5f7ff] border border-cyan-500/30 rounded-xl font-mono text-xs sm:text-sm dark:text-cyan-200 text-cyan-800 tracking-wide font-bold select-all shadow-sm flex items-center gap-2"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0 shadow-[0_0_6px_#22d3ee]" />
             <span dangerouslySetInnerHTML={{ __html: cleanMathLaTeX(trimmed) }} />
@@ -423,7 +423,7 @@ export default function TutorPage() {
       const formatMathInline = (mathText: string, keyIdx: number) => (
         <span 
           key={`math-${keyIdx}`}
-          className="font-mono text-cyan-300 font-bold text-xs tracking-wide bg-cyan-500/20 px-2 py-0.5 rounded-md border border-cyan-500/30 inline-block mx-0.5 select-all"
+          className="font-mono dark:text-cyan-300 text-cyan-700 font-bold text-xs tracking-wide bg-cyan-500/20 px-2 py-0.5 rounded-md border border-cyan-500/30 inline-block mx-0.5 select-all"
           dangerouslySetInnerHTML={{ __html: cleanMathLaTeX(mathText) }}
         />
       );
@@ -434,7 +434,7 @@ export default function TutorPage() {
           <React.Fragment key={`plain-${keyIdx}`}>
             {parts.map((part, i) => {
               if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
-                return <strong key={i} className="font-black text-cyan-200 bg-cyan-500/10 px-1 py-0.5 rounded border border-cyan-500/20">{part.slice(2, -2)}</strong>;
+                return <strong key={i} className="font-black dark:text-cyan-200 text-cyan-800 bg-cyan-500/10 px-1 py-0.5 rounded border border-cyan-500/20">{part.slice(2, -2)}</strong>;
               }
               if (part.startsWith("*") && part.endsWith("*") && part.length > 2) {
                 return <em key={i} className="italic dark:text-slate-300 text-slate-700">{part.slice(1, -1)}</em>;
@@ -482,7 +482,7 @@ export default function TutorPage() {
       if (isBullet) {
         return (
           <div key={idx} className="flex items-start gap-2.5 ml-2 my-1.5 select-text">
-            <span className="text-cyan-400 mt-1 text-xs">•</span>
+            <span className="dark:text-cyan-400 text-cyan-700 mt-1 text-xs">•</span>
             <span className="dark:text-slate-300 text-slate-700 text-sm font-medium leading-relaxed">{parseMix(line.trim().substring(2))}</span>
           </div>
         );
@@ -493,7 +493,7 @@ export default function TutorPage() {
         if (numMatch) {
           return (
             <div key={idx} className="flex items-start gap-2.5 ml-1 my-2 select-text">
-              <span className="text-cyan-400 font-extrabold text-xs bg-cyan-500/10 px-2 py-0.5 rounded-lg border border-cyan-500/30 shrink-0">{numMatch[1]}</span>
+              <span className="dark:text-cyan-400 text-cyan-700 font-extrabold text-xs bg-cyan-500/10 px-2 py-0.5 rounded-lg border border-cyan-500/30 shrink-0">{numMatch[1]}</span>
               <span className="dark:text-slate-200 text-slate-800 text-sm font-semibold leading-relaxed pt-0.5">{parseMix(numMatch[2])}</span>
             </div>
           );
@@ -532,7 +532,7 @@ export default function TutorPage() {
               <div>
                 <h1 className="text-sm font-black dark:text-white text-slate-900 leading-tight flex items-center gap-2">
                   Professor AI Tutor 
-                  <span className="text-[9px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 px-2 py-0.5 rounded-full uppercase tracking-wider font-extrabold flex items-center gap-1">
+                  <span className="text-[9px] bg-cyan-500/20 dark:text-cyan-300 text-cyan-700 border border-cyan-500/40 px-2 py-0.5 rounded-full uppercase tracking-wider font-extrabold flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" /> Live Core
                   </span>
                 </h1>
@@ -544,7 +544,7 @@ export default function TutorPage() {
           {/* Mobile History Toggle */}
           <button 
             onClick={() => setIsHistoryOpen(!isHistoryOpen)}
-            className="lg:hidden p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 flex items-center gap-1.5 text-xs font-bold"
+            className="lg:hidden p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 dark:text-cyan-300 text-cyan-700 flex items-center gap-1.5 text-xs font-bold"
           >
             <MessageSquare className="w-4 h-4" />
             <span>History</span>
@@ -596,13 +596,13 @@ export default function TutorPage() {
                 : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white"
             }`}
           >
-            <MessageSquare className="w-3.5 h-3.5 text-cyan-400" />
+            <MessageSquare className="w-3.5 h-3.5 dark:text-cyan-400 text-cyan-700" />
             <span className="hidden sm:inline">Saved Chats ({sessions.length})</span>
             <span className="sm:hidden">({sessions.length})</span>
           </button>
 
           <div className="flex items-center gap-1 bg-black/40 border border-white/10 rounded-xl px-2.5 py-1 text-xs">
-            <Globe className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            <Globe className="w-3.5 h-3.5 dark:text-cyan-400 text-cyan-700 shrink-0" />
             <select
               value={userLanguage}
               onChange={(e) => {
@@ -694,20 +694,20 @@ export default function TutorPage() {
             <div className="px-5 py-3 border-b border-cyan-500/20 dark:bg-[#070b22] bg-[#f5f7ff] backdrop-blur-md flex items-center justify-between shrink-0 z-20">
               <div className="flex items-center gap-2.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]" />
-                <span className="text-xs font-black text-cyan-200 uppercase tracking-widest truncate max-w-[240px] sm:max-w-md">
+                <span className="text-xs font-black dark:text-cyan-200 text-cyan-800 uppercase tracking-widest truncate max-w-[240px] sm:max-w-md">
                   {currentSession ? currentSession.title : "Active Study Session"}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={startNewSession}
-                  className="px-3 py-1 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all active:scale-95 shadow-sm"
+                  className="px-3 py-1 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 dark:text-cyan-300 text-cyan-700 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all active:scale-95 shadow-sm"
                   title="Start a new session"
                 >
-                  <Plus className="w-3.5 h-3.5 text-cyan-400" />
+                  <Plus className="w-3.5 h-3.5 dark:text-cyan-400 text-cyan-700" />
                   <span className="hidden sm:inline">New Chat</span>
                 </button>
-                <span className="text-[10px] text-cyan-400 font-extrabold uppercase tracking-wider px-3 py-1 bg-cyan-500/15 border border-cyan-500/30 rounded-lg shadow-sm">
+                <span className="text-[10px] dark:text-cyan-400 text-cyan-700 font-extrabold uppercase tracking-wider px-3 py-1 bg-cyan-500/15 border border-cyan-500/30 rounded-lg shadow-sm">
                   {currentSession ? `${currentSession.messages.length} Messages` : "Live Core"}
                 </span>
               </div>
@@ -731,7 +731,7 @@ export default function TutorPage() {
                       <img src="/ai_tutor_avatar.jpg" alt="Holographic AI Tutor" className="w-full h-full object-cover rounded-2xl" />
                       {activeSpeakingMsg && (
                         <div className="absolute inset-0 bg-cyan-500/30 flex items-center justify-center gap-1 backdrop-blur-xs">
-                          <Activity className="w-7 h-7 text-cyan-200 animate-bounce" />
+                          <Activity className="w-7 h-7 dark:text-cyan-200 text-cyan-800 animate-bounce" />
                         </div>
                       )}
                     </div>
@@ -741,14 +741,14 @@ export default function TutorPage() {
                     How can I help your study today?
                   </h2>
                   <p className="dark:text-slate-400 text-slate-600 text-xs sm:text-sm font-semibold mb-6 max-w-md leading-relaxed">
-                    Ask any doubt, upload homework photos, or select a topic below. Active in <strong className="text-cyan-400 uppercase tracking-wider">{personaMode.replace('_', ' ')}</strong> mode in <strong className="text-cyan-400">{userLanguage}</strong>.
+                    Ask any doubt, upload homework photos, or select a topic below. Active in <strong className="dark:text-cyan-400 text-cyan-700 uppercase tracking-wider">{personaMode.replace('_', ' ')}</strong> mode in <strong className="dark:text-cyan-400 text-cyan-700">{userLanguage}</strong>.
                   </p>
 
                   {/* Quick Chips Suggestion Deck */}
                   <div className="w-full space-y-2.5 text-left">
                     <div className="flex items-center justify-between px-1">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-spin-slow" /> Interactive CBSE Doubts
+                      <span className="text-[10px] font-black uppercase tracking-widest dark:text-cyan-400 text-cyan-700 flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 dark:text-cyan-400 text-cyan-700 animate-spin-slow" /> Interactive CBSE Doubts
                       </span>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -782,12 +782,12 @@ export default function TutorPage() {
                       >
                         {generatingSummary ? (
                           <>
-                            <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
+                            <Loader2 className="w-4 h-4 animate-spin dark:text-cyan-400 text-cyan-700" />
                             <span>Compiling Summary...</span>
                           </>
                         ) : (
                           <>
-                            <FileText className="w-4 h-4 text-cyan-400" />
+                            <FileText className="w-4 h-4 dark:text-cyan-400 text-cyan-700" />
                             <span>Generate Session Summary</span>
                           </>
                         )}
@@ -807,7 +807,7 @@ export default function TutorPage() {
                             ? "bg-gradient-to-br from-cyan-950 to-indigo-950 text-cyan-300 border-cyan-500/40 shadow-cyan-500/10 ring-2 ring-cyan-500/20" 
                             : "bg-gradient-to-br from-purple-950 to-indigo-950 text-purple-300 border-purple-500/40 shadow-purple-500/10"
                         }`}>
-                          {isAi ? <Bot className="w-4.5 h-4.5 text-cyan-400" /> : <User className="w-4.5 h-4.5 text-purple-300" />}
+                          {isAi ? <Bot className="w-4.5 h-4.5 dark:text-cyan-400 text-cyan-700" /> : <User className="w-4.5 h-4.5 dark:text-purple-300 text-purple-700" />}
                         </div>
 
                         <div className="relative group max-w-[85%] sm:max-w-[82%]">
@@ -841,7 +841,7 @@ export default function TutorPage() {
                               {activeSpeakingMsg === identifier ? (
                                 <VolumeX className="w-4 h-4 text-red-400 animate-pulse" />
                               ) : (
-                                <Volume2 className="w-4 h-4 text-cyan-400" />
+                                <Volume2 className="w-4 h-4 dark:text-cyan-400 text-cyan-700" />
                               )}
                             </button>
                           )}
@@ -857,8 +857,8 @@ export default function TutorPage() {
                     <div className="bg-gradient-to-br from-cyan-500/15 via-indigo-500/10 to-transparent border border-cyan-500/40 rounded-3xl p-5 shadow-2xl relative overflow-hidden border-l-4 border-l-cyan-400">
                       <div className="flex items-center justify-between border-b border-cyan-500/20 pb-3 mb-3.5">
                         <div className="flex items-center gap-2.5">
-                          <Sparkles className="w-4.5 h-4.5 text-cyan-400 animate-pulse" />
-                          <h4 className="font-black text-xs text-cyan-300 uppercase tracking-widest">Study Session Summary</h4>
+                          <Sparkles className="w-4.5 h-4.5 dark:text-cyan-400 text-cyan-700 animate-pulse" />
+                          <h4 className="font-black text-xs dark:text-cyan-300 text-cyan-700 uppercase tracking-widest">Study Session Summary</h4>
                         </div>
                         <button
                           type="button"
@@ -866,7 +866,7 @@ export default function TutorPage() {
                             navigator.clipboard.writeText(currentSession.conclusion || "");
                             alert("Summary copied to clipboard!");
                           }}
-                          className="flex items-center gap-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-md"
+                          className="flex items-center gap-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 dark:text-cyan-300 text-cyan-700 border border-cyan-500/40 px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-md"
                         >
                           <Copy className="w-3.5 h-3.5" />
                           <span>Copy Summary</span>
@@ -882,8 +882,8 @@ export default function TutorPage() {
                   {/* Loading Typing Indicator */}
                   {loading && (
                     <div className="flex gap-4">
-                      <div className="w-9 h-9 rounded-2xl bg-cyan-950/60 text-cyan-400 border border-cyan-500/30 flex items-center justify-center shrink-0 shadow-lg">
-                        <Bot className="w-4.5 h-4.5 animate-pulse text-cyan-400" />
+                      <div className="w-9 h-9 rounded-2xl bg-cyan-950/60 dark:text-cyan-400 text-cyan-700 border border-cyan-500/30 flex items-center justify-center shrink-0 shadow-lg">
+                        <Bot className="w-4.5 h-4.5 animate-pulse dark:text-cyan-400 text-cyan-700" />
                       </div>
                       <div className="dark:bg-[#080d26] bg-[#f5f7ff] backdrop-blur-xl rounded-3xl rounded-tl-none border border-cyan-500/20 border-l-4 border-l-cyan-400 px-5 py-3.5 flex items-center gap-2 shadow-2xl">
                         <span className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
@@ -910,7 +910,7 @@ export default function TutorPage() {
                       </div>
                       <div>
                         <p className="text-xs font-extrabold dark:text-slate-200 text-slate-800">Homework Photo Attached</p>
-                        <p className="text-[10px] text-cyan-400 font-bold uppercase tracking-wide">Ready for analysis</p>
+                        <p className="text-[10px] dark:text-cyan-400 text-cyan-700 font-bold uppercase tracking-wide">Ready for analysis</p>
                       </div>
                     </div>
                     <button 

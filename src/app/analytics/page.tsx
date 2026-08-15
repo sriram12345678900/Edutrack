@@ -32,7 +32,7 @@ export default function AnalyticsPage() {
       <header className="max-w-6xl mx-auto flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
           <div className="bg-indigo-500/20 p-3 rounded-2xl border border-indigo-500/30">
-            <Activity className="w-8 h-8 text-indigo-400" />
+            <Activity className="w-8 h-8 dark:text-indigo-400 text-indigo-700" />
           </div>
           <div>
             <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Mastery Dashboard</h1>
@@ -50,7 +50,7 @@ export default function AnalyticsPage() {
         <div className="bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col items-center">
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
           <h2 className="text-lg font-bold text-slate-900 dark:text-white w-full flex items-center gap-2 mb-8">
-            <Target className="w-5 h-5 text-indigo-400" /> Subject Mastery
+            <Target className="w-5 h-5 dark:text-indigo-400 text-indigo-700" /> Subject Mastery
           </h2>
           
           <div className="relative w-48 h-48 mb-4">
@@ -103,10 +103,10 @@ export default function AnalyticsPage() {
             </svg>
             
             {/* Labels */}
-            <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-blue-400">Physics (85%)</span>
-            <span className="absolute top-1/2 -right-10 -translate-y-1/2 text-xs font-bold text-purple-400">Chem (65%)</span>
-            <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold text-emerald-400">Maths (92%)</span>
-            <span className="absolute top-1/2 -left-12 -translate-y-1/2 text-xs font-bold text-amber-400">Bio (45%)</span>
+            <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold dark:text-blue-400 text-blue-700">Physics (85%)</span>
+            <span className="absolute top-1/2 -right-10 -translate-y-1/2 text-xs font-bold dark:text-purple-400 text-purple-700">Chem (65%)</span>
+            <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold dark:text-emerald-400 text-emerald-700">Maths (92%)</span>
+            <span className="absolute top-1/2 -left-12 -translate-y-1/2 text-xs font-bold dark:text-amber-400 text-amber-700">Bio (45%)</span>
           </div>
         </div>
 
@@ -116,7 +116,7 @@ export default function AnalyticsPage() {
           {/* Heatmap */}
           <div className="bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col justify-center">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
-              <TrendingUp className="w-5 h-5 text-emerald-400" /> 28-Day Study Streak
+              <TrendingUp className="w-5 h-5 dark:text-emerald-400 text-emerald-700" /> 28-Day Study Streak
             </h2>
             <div className="grid grid-cols-7 gap-2 mx-auto sm:mx-0 w-full">
               {['M','T','W','T','F','S','S'].map((d, i) => (
@@ -139,21 +139,21 @@ export default function AnalyticsPage() {
           <div className="bg-gradient-to-br from-indigo-900/40 to-purple-900/40 border border-indigo-500/20 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl" />
             <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
-              <Brain className="w-5 h-5 text-indigo-400" /> AI Recommendations
+              <Brain className="w-5 h-5 dark:text-indigo-400 text-indigo-700" /> AI Recommendations
             </h2>
             <div className="space-y-4 relative z-10">
               <div className="bg-white dark:bg-slate-900/50 bg-slate-200/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-200/70 dark:border-slate-700/50 flex gap-3">
                 <div className="bg-amber-500/20 p-2 rounded-xl h-fit">
-                  <Zap className="w-4 h-4 text-amber-400" />
+                  <Zap className="w-4 h-4 dark:text-amber-400 text-amber-700" />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200">Focus on Biology</h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Your mastery in Biology is currently at 45%. We recommend reviewing <strong className="text-indigo-300">Chapter 6: Life Processes</strong>.</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Your mastery in Biology is currently at 45%. We recommend reviewing <strong className="dark:text-indigo-300 text-indigo-700">Chapter 6: Life Processes</strong>.</p>
                 </div>
               </div>
               <div className="bg-white dark:bg-slate-900/50 bg-slate-200/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-200/70 dark:border-slate-700/50 flex gap-3">
                 <div className="bg-emerald-500/20 p-2 rounded-xl h-fit">
-                  <BookOpen className="w-4 h-4 text-emerald-400" />
+                  <BookOpen className="w-4 h-4 dark:text-emerald-400 text-emerald-700" />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200">Maths Streak Achieved!</h4>

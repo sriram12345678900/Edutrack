@@ -232,7 +232,7 @@ export default function StudyPlanner() {
 
               <div className="relative z-10 space-y-6">
                 <div className="w-24 h-24 bg-amber-500/10 border-2 border-amber-500 rounded-full flex items-center justify-center mx-auto shadow-inner animate-pulse">
-                  <Award className="w-12 h-12 text-amber-400" />
+                  <Award className="w-12 h-12 dark:text-amber-400 text-amber-700" />
                 </div>
 
                 <div className="space-y-2">
