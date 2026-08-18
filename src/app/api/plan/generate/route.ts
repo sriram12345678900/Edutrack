@@ -37,7 +37,11 @@ Example format:
     
     let schedule = [];
     try {
-      const parsed = JSON.parse(resultText);
+      let cleanText = resultText.trim();
+      if (cleanText.startsWith('```json')) cleanText = cleanText.replace(/^```json\n?/, '').replace(/\n?```$/, '');
+      else if (cleanText.startsWith('```')) cleanText = cleanText.replace(/^```\n?/, '').replace(/\n?```$/, '');
+      
+      const parsed = JSON.parse(cleanText);
       schedule = parsed.schedule || [];
     } catch(e) {
       console.error("JSON parse error from Gemini:", e);

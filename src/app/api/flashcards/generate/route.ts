@@ -44,7 +44,10 @@ Example format:
 
       const result = await model.generateContent(prompt);
       const resultText = result.response.text();
-      const parsed = JSON.parse(resultText);
+      let cleanText = resultText.trim();
+      if (cleanText.startsWith('```json')) cleanText = cleanText.replace(/^```json\n?/, '').replace(/\n?```$/, '');
+      else if (cleanText.startsWith('```')) cleanText = cleanText.replace(/^```\n?/, '').replace(/\n?```$/, '');
+      const parsed = JSON.parse(cleanText);
 
       return NextResponse.json({ flashcards: parsed.flashcards || [] });
     } catch (apiErr: any) {
