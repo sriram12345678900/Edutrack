@@ -146,7 +146,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
-              className="text-[3.2rem] sm:text-[4.2rem] md:text-[5.5rem] lg:text-[6.5rem] font-black tracking-[-0.03em] leading-[0.92] mb-8 max-w-4xl"
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-[6.5rem] font-black tracking-[-0.03em] leading-[1.1] sm:leading-[0.92] mb-8 max-w-4xl"
             >
               <span className="dark:text-white text-slate-900">Study</span>{" "}
               <span className="text-white/30 font-light italic tracking-[-0.04em]">Smarter.</span>
@@ -185,21 +185,12 @@ export default function Home() {
               <Link
                 href="/signup"
                 id="cta-launch"
-                className="premium-glow-border group relative inline-flex items-center justify-center gap-2.5 px-9 py-4 bg-white text-slate-950 font-bold text-sm uppercase tracking-widest rounded-full overflow-hidden micro-hover-lift shadow-[0_0_50px_rgba(255,255,255,0.3)]"
+                className="premium-glow-border group relative inline-flex items-center justify-center gap-2.5 px-10 py-4 bg-white text-slate-950 font-bold text-sm uppercase tracking-widest rounded-full overflow-hidden micro-hover-lift shadow-[0_0_50px_rgba(255,255,255,0.3)]"
               >
                 <span className="relative z-10 flex items-center gap-2">
                   Launch Workspace
                   <Rocket className="w-4.5 h-4.5 text-indigo-600 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
                 </span>
-              </Link>
-              <Link
-                href="/dashboard"
-                id="cta-demo"
-                className="premium-glass-panel group flex items-center justify-center gap-2 px-9 py-4 hover:bg-white/10 dark:text-white text-slate-900 font-semibold text-sm uppercase tracking-widest rounded-full transition-all micro-hover-lift"
-                style={{ borderRadius: 999 }}
-              >
-                <Play className="w-3.5 h-3.5 dark:text-indigo-400 text-indigo-700 fill-indigo-400" />
-                Explore Demo
               </Link>
             </motion.div>
           </motion.div>
@@ -210,7 +201,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
             transition={{ duration: 1.1, delay: 0.5, type: "spring", stiffness: 55, damping: 18 }}
             style={{ perspective: 1400 }}
-            className="w-full max-w-5xl relative z-20"
+            className="w-full max-w-5xl relative z-20 hidden md:block"
           >
             <div className="premium-glass-panel p-4 md:p-5 shadow-2xl shadow-black/70 hover:scale-[1.01] transition-transform duration-700">
               {/* Window chrome */}

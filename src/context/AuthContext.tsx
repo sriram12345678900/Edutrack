@@ -114,11 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.warn("Failed to load database profile:", dbErr);
       }
 
-      if (!localStorage.getItem("edutrack_class")) {
-        router.push("/setup");
-      } else {
-        router.push("/dashboard");
-      }
+      router.push("/dashboard");
     } catch (err: any) {
       console.warn("Firebase login failed, checking sandbox database:", err);
       
@@ -129,11 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const mockUser = JSON.parse(storedMockUserRaw);
         if (mockUser.email === email && storedMockPassword === password) {
           setUser(mockUser as any);
-          if (!localStorage.getItem("edutrack_class")) {
-            router.push("/setup");
-          } else {
-            router.push("/dashboard");
-          }
+          router.push("/dashboard");
           return;
         }
       }
@@ -194,11 +186,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const provider = new GoogleAuthProvider();
       const cred = await signInWithPopup(auth, provider);
       
+      let isNewUser = false;
+      
       // Create database profile if it doesn't exist, otherwise load preferences
       try {
         const { createUserProfile, getUserProfile } = await import("@/lib/db");
         const profile = await getUserProfile(cred.user.uid);
         if (!profile) {
+          isNewUser = true;
           await createUserProfile(cred.user.uid, cred.user.email, cred.user.displayName);
         } else {
           if (profile.className) localStorage.setItem("edutrack_class", profile.className);
@@ -215,7 +210,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem("edutrack_mock_user");
       localStorage.removeItem("edutrack_mock_password");
       
-      if (!localStorage.getItem("edutrack_class")) {
+      if (isNewUser) {
         router.push("/setup");
       } else {
         router.push("/dashboard");
@@ -232,11 +227,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("edutrack_mock_user", JSON.stringify(mockGoogleUser));
       setUser(mockGoogleUser as any);
       
-      if (!localStorage.getItem("edutrack_class")) {
-        router.push("/setup");
-      } else {
-        router.push("/dashboard");
-      }
+      router.push("/dashboard");
     }
   };
 

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -227,7 +227,7 @@ export default function FlashcardsHub() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search decks..."
-              className="w-full pl-10 pr-4 py-3 bg-white dark:bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50"
+              className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 text-slate-900 dark:text-white"
             />
           </div>
           <div className="flex gap-2">
@@ -236,7 +236,7 @@ export default function FlashcardsHub() {
                 className={`px-4 py-2 rounded-xl text-sm font-bold capitalize transition-all ${
                   sortBy === s
                     ? "bg-fuchsia-600 text-white shadow-md"
-                    : "bg-white dark:bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-fuchsia-400"
+                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-fuchsia-400"
                 }`}>
                 {s === "recent" ? "⏱ Recent" : s === "mastery" ? " Mastery" : " A–Z"}
               </button>
@@ -248,7 +248,7 @@ export default function FlashcardsHub() {
       {/* ── DECK GRID ── */}
       {decks.length === 0 ? (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-white dark:bg-slate-100 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-200 dark:border-slate-700 rounded-[2rem] p-16 text-center flex flex-col items-center justify-center min-h-[380px]">
+          className="bg-white dark:bg-slate-100 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-[2rem] p-16 text-center flex flex-col items-center justify-center min-h-[380px]">
           <div className="w-20 h-20 bg-fuchsia-100 dark:bg-fuchsia-900/30 rounded-3xl flex items-center justify-center mb-6 rotate-6 shadow-inner">
             <Brain className="w-10 h-10 text-fuchsia-500" />
           </div>
@@ -280,14 +280,14 @@ export default function FlashcardsHub() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
                   whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                  className="group relative bg-white dark:bg-slate-50 dark:bg-slate-900 bg-slate-100 rounded-3xl border border-slate-200 dark:border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-fuchsia-300 dark:hover:border-fuchsia-700/50 transition-all overflow-hidden h-full flex flex-col"
+                  className="group relative bg-white dark:bg-slate-50 dark:bg-slate-900 bg-slate-100 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-fuchsia-300 dark:hover:border-fuchsia-700/50 transition-all overflow-hidden h-full flex flex-col"
                 >
                   {/* Color accent top bar */}
                   <div className={`h-1.5 w-full bg-gradient-to-r ${gradient}`} />
 
                   {/* Delete button */}
                   <button onClick={(e) => handleDelete(e, deck.id)}
-                    className="absolute top-5 right-4 p-1.5 bg-slate-100 dark:bg-white dark:bg-slate-800 rounded-full text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all z-10">
+                    className="absolute top-5 right-4 p-1.5 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all z-10">
                     <X className="w-3.5 h-3.5" />
                   </button>
 
@@ -351,9 +351,9 @@ export default function FlashcardsHub() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: filtered.length * 0.05 }}
             onClick={() => setIsModalOpen(true)}
-            className="group border-2 border-dashed border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-fuchsia-400 dark:hover:border-fuchsia-600 rounded-3xl p-8 flex flex-col items-center justify-center gap-3 text-slate-500 dark:text-slate-400 hover:text-fuchsia-500 transition-all min-h-[200px] bg-white/50 dark:bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50"
+            className="group border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-fuchsia-400 dark:hover:border-fuchsia-600 rounded-3xl p-8 flex flex-col items-center justify-center gap-3 text-slate-500 dark:text-slate-400 hover:text-fuchsia-500 transition-all min-h-[200px] bg-white/50 dark:bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50"
           >
-            <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-white dark:bg-slate-800 group-hover:bg-fuchsia-50 dark:group-hover:bg-fuchsia-900/20 flex items-center justify-center transition-colors">
+            <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 group-hover:bg-fuchsia-50 dark:group-hover:bg-fuchsia-900/20 flex items-center justify-center transition-colors">
               <Sparkles className="w-7 h-7 group-hover:scale-110 transition-transform" />
             </div>
             <p className="font-bold text-sm">Generate New Deck</p>
@@ -384,14 +384,14 @@ export default function FlashcardsHub() {
                   <input
                     autoFocus required value={topic} onChange={e => setTopic(e.target.value)}
                     placeholder="e.g. Life Processes, Acids & Bases, Quadratic Equations"
-                    className="w-full px-4 py-3 bg-slate-50 dark:bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 font-medium text-sm"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 font-medium text-sm text-slate-900 dark:text-white"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-sm font-bold text-slate-700 dark:text-slate-600 dark:text-slate-300">Subject</label>
                     <select required value={subject} onChange={e => setSubject(e.target.value)}
-                      className="w-full px-4 py-3 bg-slate-50 dark:bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 font-medium text-sm appearance-none">
+                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 font-medium text-sm text-slate-900 dark:text-white appearance-none">
                       <option value="" disabled>Select</option>
                       <option value="Science">Science</option>
                       <option value="Mathematics">Mathematics</option>
@@ -403,7 +403,7 @@ export default function FlashcardsHub() {
                   <div className="space-y-1.5">
                     <label className="text-sm font-bold text-slate-700 dark:text-slate-600 dark:text-slate-300">Class</label>
                     <select required value={classLevel} onChange={e => setClassLevel(e.target.value)}
-                      className="w-full px-4 py-3 bg-slate-50 dark:bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 font-medium text-sm appearance-none">
+                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 font-medium text-sm text-slate-900 dark:text-white appearance-none">
                       {["6","7","8","9","10"].map(c => <option key={c} value={c}>Class {c}</option>)}
                     </select>
                   </div>

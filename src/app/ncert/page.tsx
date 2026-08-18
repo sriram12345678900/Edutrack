@@ -731,7 +731,7 @@ export default function NcertViewer() {
           placeholder="Search books by name or subject..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full pl-14 pr-6 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border-2 border-slate-200/60 dark:border-slate-700/60 rounded-2xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 shadow-sm text-lg font-medium placeholder:dark:text-slate-400 text-slate-600"
+          className="text-slate-900 dark:text-white w-full pl-14 pr-6 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border-2 border-slate-200/60 dark:border-slate-700/60 rounded-2xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 shadow-sm text-lg font-medium placeholder:dark:text-slate-400 text-slate-600"
         />
       </div>
 
@@ -1341,7 +1341,7 @@ export default function NcertViewer() {
                         onChange={(e) => setChatInput(e.target.value)}
                         onPaste={handlePaste}
                         placeholder="Ask or paste an image (Ctrl+V)..."
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full pl-4 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-slate-200 placeholder:dark:text-slate-400 text-slate-600"
+                        className="text-slate-900 dark:text-white w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full pl-4 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-slate-200 placeholder:dark:text-slate-400 text-slate-600"
                       />
                       <button
                         type="submit"

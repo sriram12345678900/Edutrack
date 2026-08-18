@@ -298,7 +298,7 @@ export default function Dashboard() {
             <span>{streak} Day Streak</span>
           </div>
           <Link href="/setup">
-            <button className="text-xs font-extrabold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-200/60 dark:border-white/5 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.04] px-4.5 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95">
+            <button className="text-xs font-extrabold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-200/60 dark:border-white/5 bg-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.04] px-4.5 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95">
               Settings & Setup
             </button>
           </Link>
@@ -771,7 +771,7 @@ export default function Dashboard() {
                     </button>
                   </Link>
                   <Link href="/ncert">
-                    <button className="bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-300 font-extrabold text-xs uppercase tracking-wider px-6 py-3 rounded-2xl border border-slate-200 dark:border-slate-200/60 dark:border-white/5 transition-all">
+                    <button className="bg-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-300 font-extrabold text-xs uppercase tracking-wider px-6 py-3 rounded-2xl border border-slate-200 dark:border-slate-200/60 dark:border-white/5 transition-all">
                       Browse NCERT Books
                     </button>
                   </Link>
@@ -814,7 +814,7 @@ export default function Dashboard() {
                     className={`w-5.5 h-5.5 rounded-xl border flex items-center justify-center shrink-0 transition-all ${
                       mission.completed
                         ? 'bg-emerald-500 border-emerald-500 text-white scale-[1.05] shadow-[0_0_8px_rgba(16,185,129,0.4)]'
-                        : 'border-slate-300 dark:border-white/10 bg-white dark:bg-white/5 group-hover:border-indigo-500/50'
+                        : 'border-slate-300 dark:border-white/10 bg-white/5 group-hover:border-indigo-500/50'
                     }`}
                   >
                     {mission.completed && (
@@ -917,7 +917,7 @@ export default function Dashboard() {
                     {!buddy.isSelf && (
                       <button
                         onClick={() => router.push("/groups")}
-                        className="p-2 bg-white dark:bg-white/5 hover:bg-indigo-500/10 dark:hover:bg-indigo-500/15 border border-slate-200 dark:border-slate-200/60 dark:border-white/5 hover:border-indigo-500/25 rounded-xl text-slate-500 hover:text-indigo-650 dark:text-slate-400 dark:hover:text-indigo-400 shadow-sm transition-all"
+                        className="p-2 bg-white/5 hover:bg-indigo-500/10 dark:hover:bg-indigo-500/15 border border-slate-200 dark:border-slate-200/60 dark:border-white/5 hover:border-indigo-500/25 rounded-xl text-slate-500 hover:text-indigo-650 dark:text-slate-400 dark:hover:text-indigo-400 shadow-sm transition-all"
                         title={`Message ${buddy.name}`}
                       >
                         <MessageCircle className="w-3.5 h-3.5" />
@@ -959,7 +959,7 @@ export default function Dashboard() {
                       </p>
                     </div>
                     <Link href="/tutor" className="shrink-0">
-                      <button className="text-[10px] font-black uppercase tracking-wider bg-white dark:bg-white/5 text-indigo-650 dark:text-indigo-400 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-200/60 dark:border-white/5 shadow-sm hover:shadow-md hover:scale-105 transition-all">
+                      <button className="text-[10px] font-black uppercase tracking-wider bg-white/5 text-indigo-650 dark:text-indigo-400 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-200/60 dark:border-white/5 shadow-sm hover:shadow-md hover:scale-105 transition-all">
                         Train
                       </button>
                     </Link>

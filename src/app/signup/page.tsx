@@ -5,9 +5,18 @@ import Link from "next/link";
 import { Brain, User as UserIcon, Mail, Lock, ArrowRight, AlertCircle, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Signup() {
-  const { signup, loginWithGoogle } = useAuth();
+  const { user, loading: authLoading, signup, loginWithGoogle } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push("/dashboard");
+    }
+  }, [user, authLoading, router]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +34,7 @@ export default function Signup() {
       await signup(email, password, name);
     } catch (err: any) {
       const msg = err.code === "auth/email-already-in-use"
-        ? "This email is already registered. Try logging in."
+        ? "This email is already registered. Please log in instead."
         : err.code === "auth/weak-password"
         ? "Password must be at least 6 characters."
         : "Something went wrong. Please try again.";
@@ -126,7 +135,7 @@ export default function Signup() {
                 type="button"
                 onClick={handleGoogle}
                 disabled={googleLoading}
-                className="w-full flex items-center justify-center gap-3.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-3.5 px-5 hover:bg-slate-50 dark:hover:bg-white/10 transition-all shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgb(0,0,0,0.08)] font-black text-xs uppercase tracking-widest text-slate-800 dark:text-slate-200 disabled:opacity-60 hover:-translate-y-0.5"
+                className="w-full flex items-center justify-center gap-3.5 bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-3.5 px-5 hover:bg-slate-50 dark:hover:bg-white/10 transition-all shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgb(0,0,0,0.08)] font-black text-xs uppercase tracking-widest text-slate-800 dark:text-slate-200 disabled:opacity-60 hover:-translate-y-0.5"
               >
                 {googleLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin text-indigo-500" />
@@ -161,7 +170,7 @@ export default function Signup() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Enter your name"
-                    className="w-full pl-12 pr-4 py-3.5 bg-white/70 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-500/20 transition-all text-xs font-bold text-slate-800 dark:text-white shadow-inner"
+                    className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 dark:border-white/10 rounded-2xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-500/20 transition-all text-xs font-bold text-slate-800 dark:text-white shadow-inner"
                   />
                 </div>
               </motion.div>
@@ -176,7 +185,7 @@ export default function Signup() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@example.com"
-                    className="w-full pl-12 pr-4 py-3.5 bg-white/70 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-500/20 transition-all text-xs font-bold text-slate-800 dark:text-white shadow-inner"
+                    className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 dark:border-white/10 rounded-2xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-500/20 transition-all text-xs font-bold text-slate-800 dark:text-white shadow-inner"
                   />
                 </div>
               </motion.div>
@@ -191,7 +200,7 @@ export default function Signup() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Min. 6 characters"
-                    className="w-full pl-12 pr-12 py-3.5 bg-white/70 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-500/20 transition-all text-xs font-bold text-slate-800 dark:text-white shadow-inner"
+                    className="w-full pl-12 pr-12 py-3.5 bg-white border border-slate-200 dark:border-white/10 rounded-2xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-500/20 transition-all text-xs font-bold text-slate-800 dark:text-white shadow-inner"
                   />
                   <button
                     type="button"

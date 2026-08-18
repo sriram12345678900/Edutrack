@@ -406,7 +406,7 @@ export default function PomodoroPage() {
                 <button
                   onClick={() => setTickEnabled(!tickEnabled)}
                   className={`w-10 h-6 rounded-full transition-all relative ${
-                    tickEnabled ? "bg-indigo-650" : "bg-slate-200 dark:bg-white dark:bg-slate-800"
+                    tickEnabled ? "bg-indigo-650" : "bg-slate-200 dark:bg-slate-800"
                   }`}
                 >
                   <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${

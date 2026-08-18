@@ -88,7 +88,7 @@ export default function SubjectHubPage() {
                     animate={{ opacity: 1, height: 'auto' }} 
                     className="bg-white dark:bg-slate-50 dark:bg-slate-900 bg-slate-100 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-lg"
                   >
-                    <div className="p-4 bg-slate-50 dark:bg-white dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+                    <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                       <h4 className="font-bold text-slate-700 dark:text-slate-600 dark:text-slate-300 text-sm uppercase tracking-wider flex items-center gap-2">
                         <Book className="w-4 h-4" /> Select Chapter
                       </h4>

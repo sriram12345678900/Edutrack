@@ -172,7 +172,7 @@ export default function SignupWizard() {
                       placeholder="Enter a unique nickname..."
                       maxLength={15}
                       enterKeyHint="go"
-                      className="w-full px-5 py-4 bg-slate-50 dark:bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 font-bold text-lg text-slate-850 dark:text-white transition-all placeholder:font-normal"
+                      className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 font-bold text-lg text-slate-850 dark:text-white transition-all placeholder:font-normal"
                     />
                   </form>
                   {generatedCode && (
@@ -213,7 +213,7 @@ export default function SignupWizard() {
                       className={`p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
                         selectedClass === cls 
                           ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 scale-[1.02]' 
-                          : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 bg-white dark:bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:shadow-md'
+                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:shadow-md'
                       }`}
                     >
                       <span className="text-3xl font-black">{cls}</span>
@@ -244,7 +244,7 @@ export default function SignupWizard() {
                     <button
                       onClick={() => setEnglishCurr("Language & Literature")}
                       className={`p-4 rounded-2xl border-2 text-left transition-all duration-200 ${
-                        englishCurr === "Language & Literature" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-indigo-300'
+                        englishCurr === "Language & Literature" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300'
                       }`}
                     >
                       <div className="font-bold text-slate-900 dark:text-white mb-1">Language & Literature</div>
@@ -253,7 +253,7 @@ export default function SignupWizard() {
                     <button
                       onClick={() => setEnglishCurr("Communicative")}
                       className={`p-4 rounded-2xl border-2 text-left transition-all duration-200 ${
-                        englishCurr === "Communicative" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-indigo-300'
+                        englishCurr === "Communicative" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300'
                       }`}
                     >
                       <div className="font-bold text-slate-900 dark:text-white mb-1">Communicative</div>
@@ -270,7 +270,7 @@ export default function SignupWizard() {
                     <button
                       onClick={() => setSanskritCurr("Regular")}
                       className={`p-4 rounded-2xl border-2 text-left transition-all duration-200 ${
-                        sanskritCurr === "Regular" ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/10' : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-amber-300'
+                        sanskritCurr === "Regular" ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-amber-300'
                       }`}
                     >
                       <div className="font-bold text-slate-900 dark:text-white mb-1">Regular (Shemushi)</div>
@@ -279,7 +279,7 @@ export default function SignupWizard() {
                     <button
                       onClick={() => setSanskritCurr("Communicative")}
                       className={`p-4 rounded-2xl border-2 text-left transition-all duration-200 ${
-                        sanskritCurr === "Communicative" ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/10' : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-amber-300'
+                        sanskritCurr === "Communicative" ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-amber-300'
                       }`}
                     >
                       <div className="font-bold text-slate-900 dark:text-white mb-1">Communicative (Manika)</div>
@@ -326,7 +326,7 @@ export default function SignupWizard() {
                       className={`p-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-1.5 ${
                         language === lang.code 
                           ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 scale-[1.02]' 
-                          : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 bg-white dark:bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:shadow-md'
+                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:shadow-md'
                       }`}
                     >
                       <span className="text-2xl">{lang.flag}</span>
@@ -356,7 +356,7 @@ export default function SignupWizard() {
                   <button
                     onClick={() => setTheme("light")}
                     className={`p-6 rounded-2xl border-2 flex flex-col items-center gap-3 transition-all duration-200 ${
-                      theme === "light" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-indigo-300'
+                      theme === "light" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300'
                     }`}
                   >
                     <Sun className="w-8 h-8 text-amber-500" />
@@ -365,7 +365,7 @@ export default function SignupWizard() {
                   <button
                     onClick={() => setTheme("dark")}
                     className={`p-6 rounded-2xl border-2 flex flex-col items-center gap-3 transition-all duration-200 ${
-                      theme === "dark" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-indigo-300'
+                      theme === "dark" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300'
                     }`}
                   >
                     <Moon className="w-8 h-8 dark:text-indigo-400 text-indigo-700" />
@@ -374,7 +374,7 @@ export default function SignupWizard() {
                   <button
                     onClick={() => setTheme("system")}
                     className={`p-6 rounded-2xl border-2 flex flex-col items-center gap-3 transition-all duration-200 ${
-                      theme === "system" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-200 dark:border-slate-700 hover:border-indigo-300'
+                      theme === "system" ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300'
                     }`}
                   >
                     <Monitor className="w-8 h-8 text-slate-500" />

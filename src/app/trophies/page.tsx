@@ -66,7 +66,7 @@ export default function TrophiesPage() {
                 <p className={`text-sm font-medium ${item.unlocked ? 'text-slate-900 dark:text-white/80' : 'text-slate-600'}`} style={{ transform: 'translateZ(30px)' }}>{item.desc}</p>
                 
                 {!item.unlocked && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-slate-100 dark:bg-white/60 dark:bg-slate-950/60 backdrop-blur-[2px] rounded-[22px]">
+                  <div className="absolute inset-0 flex items-center justify-center bg-slate-100 dark:bg-slate-950/60 backdrop-blur-[2px] rounded-[22px]">
                     <div className="bg-slate-50 dark:bg-slate-800 px-4 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-500 dark:text-slate-400">Locked</div>
                   </div>
                 )}

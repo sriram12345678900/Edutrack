@@ -279,7 +279,7 @@ export default function StudyPlanner() {
         {activePlan && (
           <button 
             onClick={createNewPlan}
-            className="relative z-10 flex items-center gap-2 bg-white dark:bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-5 py-3 rounded-xl transition-all border border-slate-200 dark:border-slate-200 dark:border-slate-700 shadow-sm font-bold w-fit"
+            className="relative z-10 flex items-center gap-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-5 py-3 rounded-xl transition-all border border-slate-200 dark:border-slate-700 shadow-sm font-bold w-fit"
           >
             <Plus className="w-5 h-5" /> New Plan
           </button>
@@ -310,7 +310,7 @@ export default function StudyPlanner() {
                   required
                   value={subject}
                   onChange={e => setSubject(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-slate-50 dark:bg-white/60 dark:bg-slate-900/50 bg-slate-200/50 border border-slate-200 dark:border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-medium appearance-none"
+                  className="text-slate-900 dark:text-white w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-medium appearance-none"
                 >
                   <option value="" disabled>Select Subject</option>
                   <option value="Science">Science</option>
@@ -329,7 +329,7 @@ export default function StudyPlanner() {
                   required
                   value={days}
                   onChange={e => setDays(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-slate-50 dark:bg-white/60 dark:bg-slate-900/50 bg-slate-200/50 border border-slate-200 dark:border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-medium"
+                  className="text-slate-900 dark:text-white w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-medium"
                 />
               </div>
             </div>
@@ -340,7 +340,7 @@ export default function StudyPlanner() {
                 placeholder="e.g. Light reflection, Trigonometry formulas"
                 value={weakAreas}
                 onChange={e => setWeakAreas(e.target.value)}
-                className="w-full px-4 py-3.5 bg-slate-50 dark:bg-white/60 dark:bg-slate-900/50 bg-slate-200/50 border border-slate-200 dark:border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-medium"
+                className="text-slate-900 dark:text-white w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-medium"
               />
             </div>
 
@@ -383,7 +383,7 @@ export default function StudyPlanner() {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 dark:border-slate-200 dark:border-slate-700/60 flex items-center justify-between">
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
                 <span className="text-slate-500 text-xs font-bold">Total Exp Earned</span>
                 <span className="text-slate-800 dark:text-white font-extrabold text-sm">{gamification.totalXP} XP</span>
               </div>
@@ -423,7 +423,7 @@ export default function StudyPlanner() {
                       }`}
                     >
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 ${
-                        isUnlocked ? 'bg-indigo-100 dark:bg-indigo-900/40 ring-1 ring-indigo-300/30' : 'bg-slate-100 dark:bg-white dark:bg-slate-800'
+                        isUnlocked ? 'bg-indigo-100 dark:bg-indigo-900/40 ring-1 ring-indigo-300/30' : 'bg-slate-100 dark:bg-slate-800'
                       }`}>
                         {isUnlocked ? ach.icon : <Lock className="w-4 h-4 text-slate-500 dark:text-slate-400" />}
                       </div>
@@ -488,7 +488,7 @@ export default function StudyPlanner() {
                   className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active"
                 >
                   {/* Timeline Node */}
-                  <div className="flex items-center justify-center w-14 h-14 rounded-full border-4 border-white dark:border-slate-950 bg-emerald-100 dark:bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 cursor-pointer hover:scale-110 transition-transform z-10"
+                  <div className="flex items-center justify-center w-14 h-14 rounded-full border-4 border-white dark:border-slate-950 bg-emerald-100 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 cursor-pointer hover:scale-110 transition-transform z-10"
                        onClick={(e) => toggleDayStatus(idx, e)}>
                     {day.completed ? (
                       <CheckCircle2 className="w-7 h-7 text-emerald-500" />
