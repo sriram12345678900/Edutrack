@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     if (geminiKey && !geminiKey.startsWith("AQ.")) {
       try {
         const genAI = new GoogleGenerativeAI(geminiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const base64Data = image.split(",")[1];
         const mimeType = image.split(";")[0].split(":")[1] || "image/png";

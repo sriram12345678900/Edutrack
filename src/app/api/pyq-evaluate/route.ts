@@ -64,7 +64,7 @@ Ensure the response is ONLY valid JSON, without any markdown formatting like \`\
     }
 
     const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       contents: contents,
       config: {
         temperature: 0.2, // Low temperature for consistent grading
