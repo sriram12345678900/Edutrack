@@ -1,9 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { 
   Play, Pause, RotateCcw, Timer, Award, CheckCircle, 
-  Sparkles, Volume2, VolumeX, Flame, Heart, Lightbulb 
+  Sparkles, Volume2, VolumeX, Flame, Heart, Lightbulb, TreePine 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -18,6 +18,8 @@ const quotes = [
   { text: "There are no shortcuts to any place worth going.", author: "Beverly Sills" }
 ];
 
+const treeTypes = ['🌲', '🌳', '🌴', '🪴', '🌵', '🎄'];
+
 export default function PomodoroPage() {
   const [mode, setMode] = useState<TimerMode>("study");
   const [timeLeft, setTimeLeft] = useState(25 * 60);
@@ -29,6 +31,7 @@ export default function PomodoroPage() {
   const [sessionsCompleted, setSessionsCompleted] = useState(0);
   const [breaksCompleted, setBreaksCompleted] = useState(0);
   const [totalFocusMinutes, setTotalFocusMinutes] = useState(0);
+  const [forest, setForest] = useState<string[]>([]);
 
   // Quote index
   const [quoteIdx, setQuoteIdx] = useState(0);
@@ -41,9 +44,19 @@ export default function PomodoroPage() {
       const storedSessions = localStorage.getItem("edutrack_pomo_sessions") || "0";
       const storedBreaks = localStorage.getItem("edutrack_pomo_breaks") || "0";
       const storedMinutes = localStorage.getItem("edutrack_pomo_minutes") || "0";
-      setSessionsCompleted(parseInt(storedSessions, 10));
+      const sessions = parseInt(storedSessions, 10);
+      setSessionsCompleted(sessions);
       setBreaksCompleted(parseInt(storedBreaks, 10));
       setTotalFocusMinutes(parseInt(storedMinutes, 10));
+
+      const storedForest = localStorage.getItem("edutrack_pomo_forest");
+      if (storedForest) {
+        setForest(JSON.parse(storedForest));
+      } else if (sessions > 0) {
+        const newForest = Array.from({length: sessions}).map(() => treeTypes[Math.floor(Math.random() * treeTypes.length)]);
+        setForest(newForest);
+        localStorage.setItem("edutrack_pomo_forest", JSON.stringify(newForest));
+      }
     }
   }, []);
 
@@ -133,9 +146,16 @@ export default function PomodoroPage() {
     if (mode === "study") {
       const nextSessions = sessionsCompleted + 1;
       const nextMinutes = totalFocusMinutes + 25;
+      
+      const newTree = treeTypes[Math.floor(Math.random() * treeTypes.length)];
+      const newForest = [...forest, newTree];
+
       setSessionsCompleted(nextSessions);
       setTotalFocusMinutes(nextMinutes);
+      setForest(newForest);
+      
       saveStats(nextSessions, breaksCompleted, nextMinutes);
+      localStorage.setItem("edutrack_pomo_forest", JSON.stringify(newForest));
       
       // Auto transition to short break
       setMode("shortBreak");
@@ -418,6 +438,37 @@ export default function PomodoroPage() {
           </div>
         </div>
 
+      </div>
+
+      {/* POMODORO FOREST SECTION */}
+      <div className="bg-white dark:bg-slate-50 dark:bg-slate-900/60 bg-slate-200/60 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 p-8 rounded-[2rem] shadow-sm mt-8">
+        <h3 className="text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2 mb-6">
+          <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl">
+            <TreePine className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          Your Pomodoro Forest
+        </h3>
+        
+        {forest.length === 0 ? (
+           <p className="text-slate-500 text-center py-10 font-medium">Complete your first focus session to plant a tree! 🌱</p>
+        ) : (
+           <div className="flex flex-wrap gap-4 items-end min-h-[80px]">
+             <AnimatePresence>
+               {forest.map((tree, idx) => (
+                 <motion.div 
+                   key={idx}
+                   initial={{ opacity: 0, scale: 0, y: 20 }}
+                   animate={{ opacity: 1, scale: 1, y: 0 }}
+                   transition={{ type: 'spring', damping: 12, stiffness: 100 }}
+                   className="text-4xl hover:scale-125 transition-transform cursor-pointer"
+                   title={`Focus Session ${idx + 1}`}
+                 >
+                   {tree}
+                 </motion.div>
+               ))}
+             </AnimatePresence>
+           </div>
+        )}
       </div>
     </div>
   );
