@@ -11,8 +11,11 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 
 import AppTour from "./AppTour";
+import MobileHeader from "./MobileHeader";
+import MobileBottomNav from "./MobileBottomNav";
+import MobileDrawer from "./MobileDrawer";
 
-// Categorized premium sidebar links
+// Categorized premium sidebar links for desktop
 const categories = [
   {
     title: "Core Space",
@@ -48,7 +51,7 @@ const categories = [
 
 export default function SidebarLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "";
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
   const [userXp, setUserXp] = useState<number>(0);
@@ -68,6 +71,11 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       }
     }
   }, [user, loading, router]);
+
+  // Close mobile drawer on route change
+  useEffect(() => {
+    setIsDrawerOpen(false);
+  }, [pathname]);
 
   // Load XP stats and permanent nickname
   useEffect(() => {
@@ -118,29 +126,14 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     });
   }, [router]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#eef1f9] dark:bg-[#06080f]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(99,102,241,0.5)]" />
-          <p className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest animate-pulse">Initializing Neural Workspace...</p>
-        </div>
-      </div>
-    );
-  }
+  const effectiveUser = user || {
+    uid: "scholar-guest",
+    email: "scholar@edutrack.space",
+    displayName: nickname || "Scholar",
+    emailVerified: true
+  };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#eef1f9] dark:bg-[#06080f]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(99,102,241,0.5)]" />
-          <p className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest animate-pulse">Initializing Neural Workspace...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const displayName = nickname || user.displayName || user.email?.split("@")[0] || "Scholar";
+  const displayName = nickname || effectiveUser.displayName || effectiveUser.email?.split("@")[0] || "Scholar";
   const initials = displayName.charAt(0).toUpperCase();
   const isExpanded = isPinned || isHovered;
 
@@ -150,27 +143,24 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     }
   };
 
+  const isFullHeightPage = 
+    pathname === "/groups" || pathname.startsWith("/groups/") ||
+    pathname === "/whiteboard" || pathname.startsWith("/whiteboard/") ||
+    pathname === "/tutor" || pathname.startsWith("/tutor/") ||
+    pathname === "/lens" || pathname.startsWith("/lens/");
+
   return (
-    <div className="h-screen max-h-screen bg-slate-50 dark:bg-[#06080f] bg-[#eef1f9] text-slate-900 dark:text-slate-100 flex overflow-hidden grid-bg-overlay selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div className="min-h-screen h-screen max-h-screen bg-slate-50 dark:bg-[#06080f] bg-[#eef1f9] text-slate-900 dark:text-slate-100 flex flex-col md:flex-row overflow-hidden grid-bg-overlay selection:bg-indigo-500/30 selection:text-indigo-200">
       {/* Global Interactive App Tour */}
       <AppTour />
 
-      {/* Mobile Sidebar Overlay */}
-      {isMobileOpen && (
-        <div
-          className="fixed inset-0 bg-black/70 z-40 md:hidden backdrop-blur-md transition-opacity"
-          onClick={() => setIsMobileOpen(false)}
-        />
-      )}
-
-      {/* Interactive Unveiling Sidebar */}
+      {/* ── DESKTOP UNVEILING SIDEBAR ── */}
       <aside 
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={cn(
-          "fixed md:sticky top-0 h-screen border-r border-slate-200/50 dark:border-white/10 bg-white/95 dark:bg-[#040614] bg-[#eef1f9] backdrop-blur-3xl flex flex-col z-50 transition-all duration-300 ease-out shadow-2xl",
-          isExpanded ? "w-68 shadow-[0_0_40px_rgba(99,102,241,0.2)]" : "w-20 shadow-none",
-          isMobileOpen ? "translate-x-0 w-68" : "-translate-x-full md:translate-x-0"
+          "hidden md:flex sticky top-0 h-screen border-r border-slate-200/50 dark:border-white/10 bg-white/95 dark:bg-[#040614] bg-[#eef1f9] backdrop-blur-3xl flex-col z-50 transition-all duration-300 ease-out shadow-2xl shrink-0",
+          isExpanded ? "w-68 shadow-[0_0_40px_rgba(99,102,241,0.2)]" : "w-20 shadow-none"
         )}
       >
         {/* Ambient Top Beam Glow */}
@@ -185,7 +175,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         <div className="p-4 border-b border-slate-200/40 dark:border-white/5 flex justify-between items-center shrink-0">
           <Link href="/dashboard" className="flex items-center gap-3 group overflow-hidden">
             <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-500 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)] border border-white/10 group-hover:scale-105 transition-transform shrink-0">
-              <Brain className="w-5.5 h-5.5 dark:text-white text-slate-900" />
+              <Brain className="w-5.5 h-5.5 text-white" />
             </div>
             <div className={cn(
               "flex flex-col transition-all duration-300",
@@ -203,15 +193,11 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
             <button 
               onClick={togglePin}
               title={isPinned ? "Unpin sidebar (Auto-unveil on hover)" : "Pin sidebar"}
-              className="hidden md:flex p-1.5 rounded-lg bg-white/5 hover:bg-white/10 dark:text-slate-400 text-slate-600 hover:dark:text-indigo-400 text-indigo-700 transition-all text-[10px] font-bold uppercase tracking-wider"
+              className="hidden md:flex p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all text-[10px] font-bold uppercase tracking-wider"
             >
               {isPinned ? "Pinned" : "Hover"}
             </button>
           )}
-
-          <button className="md:hidden p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl dark:text-slate-400 text-slate-600" onClick={() => setIsMobileOpen(false)}>
-            <X className="w-5 h-5" />
-          </button>
         </div>
 
         {/* User Profile Card & Theme Toggle */}
@@ -220,7 +206,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           !isExpanded && "justify-center"
         )}>
           <div className="relative shrink-0">
-            {user.photoURL ? (
+            {user?.photoURL ? (
               <img src={user.photoURL} alt={displayName} className="w-9 h-9 rounded-full object-cover border-2 border-indigo-500/40 shadow-sm" />
             ) : (
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white font-black text-xs flex-shrink-0 shadow-lg shadow-indigo-500/20 border border-white/20">
@@ -238,7 +224,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           )}>
             <p className="font-black text-xs text-slate-900 dark:text-white truncate" title={displayName}>{displayName}</p>
             <p className="text-[8px] text-indigo-500 dark:text-indigo-400 font-mono font-bold truncate leading-none mt-0.5 uppercase tracking-wider">
-              {friendCode || (user.email ? user.email.split("@")[0] : "Student")}
+              {friendCode || (effectiveUser.email ? effectiveUser.email.split("@")[0] : "Student")}
             </p>
           </div>
           
@@ -254,10 +240,10 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                   localStorage.setItem('edutrack_theme', 'dark');
                 }
               }}
-              className="p-1.5 rounded-xl bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-indigo-500 dark:hover:dark:text-indigo-400 text-indigo-700 hover:scale-105 active:scale-95 transition-all shrink-0 shadow-sm"
+              className="p-1.5 rounded-xl bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-indigo-500 dark:hover:text-indigo-400 hover:scale-105 active:scale-95 transition-all shrink-0 shadow-sm"
               title="Toggle Light/Dark Theme"
             >
-              <Moon className="w-3.5 h-3.5 hidden dark:block dark:text-indigo-400 text-indigo-700" />
+              <Moon className="w-3.5 h-3.5 hidden dark:block text-indigo-400" />
               <Sun className="w-3.5 h-3.5 block dark:hidden text-amber-500" />
             </button>
           )}
@@ -268,7 +254,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           {categories.map((category, catIdx) => (
             <div key={catIdx} className="space-y-1">
               <span className={cn(
-                "text-[9px] font-black uppercase tracking-widest text-slate-450 dark:text-slate-500 px-3 block transition-all duration-300",
+                "text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 px-3 block transition-all duration-300",
                 isExpanded ? "opacity-100" : "opacity-0 hidden"
               )}>
                 {category.title}
@@ -282,7 +268,6 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                       key={link.href}
                       href={link.href}
                       prefetch={true}
-                      onClick={() => setIsMobileOpen(false)}
                       title={!isExpanded ? link.label : undefined}
                       className={cn(
                         "flex items-center justify-between px-3 py-2.5 rounded-xl font-extrabold text-xs transition-all relative group",
@@ -325,14 +310,10 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
         {/* Settings & Logout Footer */}
         <div className="p-3 border-t border-slate-200/40 dark:border-white/5 shrink-0 space-y-1">
-          {/* App Tour Trigger Button */}
           <button
             type="button"
-            onClick={() => {
-              setIsMobileOpen(false);
-              openAppTour();
-            }}
-            title={!isExpanded ? "App Tour & Nickname Setup" : undefined}
+            onClick={openAppTour}
+            title={!isExpanded ? "App Tour & Setup" : undefined}
             className="flex items-center justify-between px-3 py-2.5 rounded-xl font-bold text-xs bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border border-indigo-500/25 transition-all w-full text-left group"
           >
             <div className="flex items-center gap-3">
@@ -354,11 +335,10 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           <Link 
             href="/setup" 
             prefetch={true}
-            onClick={() => setIsMobileOpen(false)}
             title={!isExpanded ? "Account Settings" : undefined}
-            className="flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-xs hover:bg-slate-100 dark:hover:bg-white/[0.03] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:dark:text-slate-200 text-slate-800 transition-all"
+            className="flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-xs hover:bg-slate-100 dark:hover:bg-white/[0.03] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-all"
           >
-            <Settings className="w-4.5 h-4.5 dark:text-slate-400 text-slate-600 shrink-0" /> 
+            <Settings className="w-4.5 h-4.5 text-slate-500 shrink-0" /> 
             <span className={cn(
               "transition-all duration-300 whitespace-nowrap",
               isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden"
@@ -366,6 +346,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               Account Settings
             </span>
           </Link>
+
           <button
             onClick={logout}
             title={!isExpanded ? "Log Out" : undefined}
@@ -382,42 +363,60 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         </div>
       </aside>
 
-        {/* Mobile Navbar Header */}
-        <header className="md:hidden flex items-center justify-between p-4 border-b border-slate-200/40 dark:border-white/5 bg-white/90 dark:bg-[#040612] bg-[#eef1f9] backdrop-blur-xl sticky top-0 z-30 shrink-0">
-          <button onClick={() => setIsMobileOpen(true)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl dark:text-slate-400 text-slate-600">
-            <Menu className="w-5 h-5" />
-          </button>
-          <div className="flex items-center gap-2">
-            <Brain className="w-5 h-5 text-indigo-500" />
-            <span className="text-base font-black text-slate-900 dark:text-white tracking-tight">EduTrack</span>
-          </div>
-          <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-xs font-black text-indigo-500 border border-indigo-500/20 uppercase">
-            {initials}
-          </div>
-        </header>
+      {/* ── MOBILE CONTAINER & VIEWPORT WRAPPER ── */}
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative">
+        {/* Mobile Header Bar */}
+        <MobileHeader
+          displayName={displayName}
+          initials={initials}
+          userLevel={userLevel}
+          userXp={userXp}
+          photoURL={user?.photoURL || undefined}
+          friendCode={friendCode}
+          onOpenDrawer={() => setIsDrawerOpen(true)}
+          onOpenTour={openAppTour}
+        />
 
-        {(() => {
-          const isFullHeightPage = 
-            pathname === "/groups" || pathname.startsWith("/groups/") ||
-            pathname === "/whiteboard" || pathname.startsWith("/whiteboard/") ||
-            pathname === "/tutor" || pathname.startsWith("/tutor/") ||
-            pathname === "/lens" || pathname.startsWith("/lens/");
+        {/* Dynamic Page Content */}
+        <main
+          className={cn(
+            "flex-1 relative flex flex-col min-h-0 transition-colors duration-300",
+            isFullHeightPage 
+              ? "overflow-hidden pb-16 md:pb-0" 
+              : "overflow-y-auto pb-24 md:pb-0"
+          )}
+          style={{ backgroundColor: 'var(--background)' }}
+        >
+          <div className={cn(
+            isFullHeightPage
+              ? "w-full flex-1 min-h-0 overflow-hidden relative flex flex-col"
+              : "p-4 sm:p-6 md:p-10 max-w-7xl mx-auto w-full"
+          )}>
+            {children}
+          </div>
+        </main>
 
-          return (
-            <main className={cn(
-              "flex-1 relative flex flex-col min-h-0 transition-colors duration-300",
-              isFullHeightPage ? "overflow-hidden" : "overflow-y-auto"
-            )} style={{ backgroundColor: 'var(--background)' }}>
-              <div className={cn(
-                isFullHeightPage
-                  ? "w-full flex-1 min-h-0 overflow-hidden relative flex flex-col"
-                  : "p-6 md:p-10 max-w-7xl mx-auto w-full"
-              )}>
-                {children}
-              </div>
-            </main>
-          );
-        })()}
+        {/* Mobile Bottom Navigation Dock */}
+        <MobileBottomNav
+          onOpenDrawer={() => setIsDrawerOpen(prev => !prev)}
+          isDrawerOpen={isDrawerOpen}
+        />
+
+        {/* Mobile Slide-Up Explore Drawer */}
+        <MobileDrawer
+          isOpen={isDrawerOpen}
+          onClose={() => setIsDrawerOpen(false)}
+          displayName={displayName}
+          initials={initials}
+          userLevel={userLevel}
+          userXp={userXp}
+          photoURL={user?.photoURL || undefined}
+          friendCode={friendCode}
+          email={effectiveUser.email || undefined}
+          onOpenTour={openAppTour}
+          onLogout={logout}
+        />
+      </div>
     </div>
   );
 }

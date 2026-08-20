@@ -420,3 +420,35 @@ body {
   outline-offset: 3px;
   border-radius: 4px;
 }
+
+/* =====================================
+   MOBILE OPTIMIZATIONS & UTILITIES
+====================================== */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.touch-pan-x {
+  touch-action: pan-x;
+}
+
+.touch-pan-y {
+  touch-action: pan-y;
+}
+
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom), 16px);
+}
+
+.pt-safe {
+  padding-top: max(env(safe-area-inset-top), 12px);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+

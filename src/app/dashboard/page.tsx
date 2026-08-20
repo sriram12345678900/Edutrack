@@ -341,6 +341,50 @@ export default function Dashboard() {
         </div>
       </motion.header>
 
+      {/* ── MOBILE QUICK ACTION RIBBON (Touch-First Horizontal Stories) ── */}
+      <motion.div variants={item} className="md:hidden space-y-2">
+        <div className="flex items-center justify-between px-1">
+          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-indigo-500 animate-pulse" />
+            Quick AI Study Tools
+          </span>
+          <span className="text-[9px] font-bold text-slate-400">Swipe →</span>
+        </div>
+        <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1.5 pt-0.5 px-0.5 touch-pan-x">
+          {[
+            { href: "/lens", label: "Doubt Lens", icon: Camera, color: "from-emerald-500 to-teal-600", badge: "Live" },
+            { href: "/tutor", label: "AI Tutor", icon: MessageCircle, color: "from-cyan-500 to-blue-600", badge: "AI" },
+            { href: "/pomodoro", label: "Focus Timer", icon: Timer, color: "from-rose-500 to-red-600" },
+            { href: "/formulas", label: "Formulas", icon: Compass, color: "from-amber-500 to-orange-600" },
+            { href: "/whiteboard", label: "Whiteboard", icon: Palette, color: "from-purple-500 to-violet-600" },
+            { href: "/flashcards", label: "Flashcards", icon: Sparkles, color: "from-fuchsia-500 to-pink-600" },
+            { href: "/pyq", label: "PYQ Vault", icon: Award, color: "from-indigo-500 to-purple-600" },
+            { href: "/sandbox", label: "Sim Sandbox", icon: Zap, color: "from-yellow-500 to-amber-600" },
+          ].map((action, i) => {
+            const Icon = action.icon;
+            return (
+              <button
+                key={i}
+                onClick={() => router.push(action.href)}
+                className="flex flex-col items-center justify-center shrink-0 w-[76px] p-2.5 rounded-2xl bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/10 shadow-sm active:scale-95 transition-all text-center group"
+              >
+                <div className={cn("w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center text-white shadow-md mb-1.5 relative", action.color)}>
+                  <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  {action.badge && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[7px] font-black px-1 rounded-full border border-white dark:border-black">
+                      {action.badge}
+                    </span>
+                  )}
+                </div>
+                <span className="text-[10px] font-extrabold text-slate-800 dark:text-slate-200 truncate w-full leading-tight">
+                  {action.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </motion.div>
+
       {/* ── TWO-COLUMN MAIN LAYOUT ── */}
       <div className="grid lg:grid-cols-3 gap-8 items-start">
         
@@ -744,22 +788,46 @@ export default function Dashboard() {
 
             <div className="relative flex flex-col items-center justify-center min-h-[220px] bg-slate-950/40 dark:bg-black/35 rounded-2xl border border-slate-200/20 dark:border-slate-200/60 dark:border-white/5 p-6 overflow-hidden">
               {swiperIndex < swiperCards.length ? (
-                <div className="relative w-full max-w-sm h-40 flex items-center justify-center">
-                  {swiperCards.map((card, idx) => (
-                    <SwiperCard
-                      key={card.id}
-                      card={card}
-                      index={idx}
-                      activeIndex={swiperIndex}
-                      totalCards={swiperCards.length}
-                      onSwipeLeft={() => setSwiperIndex(prev => prev + 1)}
-                      onSwipeRight={() => {
+                <div className="relative w-full max-w-sm flex flex-col items-center">
+                  <div className="relative w-full h-40 flex items-center justify-center">
+                    {swiperCards.map((card, idx) => (
+                      <SwiperCard
+                        key={card.id}
+                        card={card}
+                        index={idx}
+                        activeIndex={swiperIndex}
+                        totalCards={swiperCards.length}
+                        onSwipeLeft={() => setSwiperIndex(prev => prev + 1)}
+                        onSwipeRight={() => {
+                          awardXP(50);
+                          setConfettiActive(true);
+                          setSwiperIndex(prev => prev + 1);
+                        }}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Touch-Friendly Action Buttons */}
+                  <div className="flex items-center justify-between gap-3 w-full mt-4 z-20">
+                    <button
+                      type="button"
+                      onClick={() => setSwiperIndex(prev => prev + 1)}
+                      className="flex-1 py-2 px-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/25 rounded-xl font-extrabold text-[11px] uppercase tracking-wider active:scale-95 transition-all text-center"
+                    >
+                      ← Study Later
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
                         awardXP(50);
                         setConfettiActive(true);
                         setSwiperIndex(prev => prev + 1);
                       }}
-                    />
-                  ))}
+                      className="flex-1 py-2 px-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 border border-emerald-500/25 rounded-xl font-extrabold text-[11px] uppercase tracking-wider active:scale-95 transition-all text-center"
+                    >
+                      Mastered (+50 XP) →
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <motion.div 
