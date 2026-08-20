@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import OpenAI from "openai";
+import { queryPythonServer } from "@/lib/python-ai";
 
 export async function POST(req: Request) {
   let subject = "Science";
@@ -10,6 +11,18 @@ export async function POST(req: Request) {
     subject = body.subject || "Science";
     chapter = body.chapter || "NCERT Topic";
     const language = body.language || "Hinglish";
+
+    // 1. Try Python Developed Local AI Server First (http://localhost:5000)
+    const pythonResult = await queryPythonServer({
+      task: "quiz",
+      subject,
+      chapter,
+      language
+    });
+
+    if (pythonResult && Array.isArray(pythonResult.questions) && pythonResult.questions.length > 0) {
+      return NextResponse.json(pythonResult);
+    }
 
     const isIshLanguage = (language || "Hinglish").endsWith("ish") && language !== "English";
     const langInstruction = isIshLanguage
@@ -36,7 +49,7 @@ export async function POST(req: Request) {
 
     let dataText = "";
 
-    // 1. Try Gemini first
+    // 2. Try Gemini
     try {
       const apiKey = process.env.GEMINI_API_KEY_QUIZ || process.env.GEMINI_API_KEY;
       if (!apiKey) {

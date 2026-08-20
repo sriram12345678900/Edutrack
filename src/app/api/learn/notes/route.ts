@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import OpenAI from "openai";
+import { queryPythonServer } from "@/lib/python-ai";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,18 @@ export async function POST(req: Request) {
     subject = body.subject || "Science";
     chapter = body.chapter || "NCERT Topic";
     const language = body.language || "Hinglish";
+
+    // 1. Try Python Developed Local AI Server First (http://localhost:5000)
+    const pythonResult = await queryPythonServer({
+      task: "notes",
+      subject,
+      chapter,
+      language
+    });
+
+    if (pythonResult && Array.isArray(pythonResult.topics) && pythonResult.topics.length > 0) {
+      return NextResponse.json(pythonResult);
+    }
 
     const isIshLanguage = (language || "Hinglish").endsWith("ish") && language !== "English";
     const langInstruction = isIshLanguage
@@ -40,7 +53,7 @@ Generate exactly 4 topics covering the key concepts of this chapter.`;
 
     let dataText = "";
 
-    // 1. Try Gemini first
+    // 2. Try Gemini
     try {
       const apiKey = process.env.GEMINI_API_KEY_NOTES || process.env.GEMINI_API_KEY;
       if (!apiKey) {

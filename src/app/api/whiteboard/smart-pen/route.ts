@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { queryPythonServer } from "@/lib/python-ai";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +10,17 @@ export async function POST(req: Request) {
     
     if (!image) {
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
+    }
+
+    // 1. Try Python Developed Local AI Server First (http://localhost:5000)
+    const pythonResult = await queryPythonServer({
+      task: "solve",
+      prompt: "Identify this whiteboard hand-drawn object or shape",
+      image
+    });
+
+    if (pythonResult && pythonResult.type) {
+      return NextResponse.json(pythonResult);
     }
 
     const geminiKey = process.env.GEMINI_API_KEY;

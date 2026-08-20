@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import OpenAI from "openai";
+import { queryPythonServer } from "@/lib/python-ai";
 
 export async function POST(req: Request) {
   let subject = "Science";
@@ -148,13 +149,30 @@ export async function POST(req: Request) {
       );
     }
 
+    // 1. Try Python Developed Local AI Server first for complete theory
+    const pythonTheory = await queryPythonServer({
+      task: "theory",
+      subject,
+      chapter,
+      language
+    });
+    if (pythonTheory && pythonTheory.content) {
+      return NextResponse.json({ content: pythonTheory.content });
+    }
+
     // Now, we execute the parts concurrently using the best available API (Gemini with fallback to Groq)
     try {
       const theoryParts = await Promise.all(
         partsPrompts.map(async (partPrompt, idx) => {
           let partText = "";
 
-          // 1. Try Gemini first
+          // Try Python AI for individual parts if available
+          const partPy = await queryPythonServer({ task: "chat", prompt: partPrompt });
+          if (partPy && partPy.reply) {
+            return partPy.reply;
+          }
+
+          // 2. Try Gemini first
           try {
             const apiKey = process.env.GEMINI_API_KEY_SUMMARY || process.env.GEMINI_API_KEY;
             if (!apiKey) {

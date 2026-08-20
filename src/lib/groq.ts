@@ -1,6 +1,6 @@
 import Groq from "groq-sdk";
-
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { queryPythonServer } from "./python-ai";
 
 export interface ChatMessage {
   role: string;
@@ -13,6 +13,18 @@ export interface ChatMessage {
 }
 
 export async function getChatResponse(messages: ChatMessage[], languagePreference: string, bookInfo: string = "") {
+  const lastMessage = messages[messages.length - 1]?.content || "";
+
+  // 1. Try Python Developed Local AI Server First (http://localhost:5000)
+  const pythonRes = await queryPythonServer({
+    task: "chat",
+    prompt: lastMessage,
+    language: languagePreference,
+    chapter: bookInfo
+  });
+  if (pythonRes && pythonRes.reply) {
+    return pythonRes.reply;
+  }
   const isIshLanguage = languagePreference.endsWith("ish") && languagePreference !== "English";
   
   const languageInstruction = isIshLanguage
@@ -186,6 +198,15 @@ Use simple analogies, real-world examples, and be encouraging!`;
 
 export async function generateContent(prompt: string) {
   try {
+    // 1. Try Python Developed Local AI Server First (http://localhost:5000)
+    const pythonRes = await queryPythonServer({
+      task: "chat",
+      prompt
+    });
+    if (pythonRes && pythonRes.reply) {
+      return pythonRes.reply;
+    }
+
     const geminiKey = process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY_SUMMARY;
     if (geminiKey) {
       try {

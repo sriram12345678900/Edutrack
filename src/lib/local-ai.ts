@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { findOfflineKnowledge } from "./offline-knowledge";
 import { analyzeHomeworkImage } from "./vision-engine";
+import { queryPythonServer } from "./python-ai";
 
 export interface LocalAIQuery {
   prompt?: string;
@@ -88,29 +89,18 @@ export async function queryLocalAI(query: LocalAIQuery): Promise<LocalAIResponse
     }
   }
 
-  // 3. Check local Python inference server at http://localhost:5000 (with quick 1.5s timeout)
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1500);
-    const pythonRes = await fetch("http://localhost:5000", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: cleanPrompt, language }),
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
-    if (pythonRes.ok) {
-      const pythonData = await pythonRes.json();
-      if (pythonData.reply) {
-        return {
-          reply: pythonData.reply,
-          engine: "Local Python PyTorch Model (localhost:5000)",
-          matched: true
-        };
-      }
-    }
-  } catch (_err) {
-    // Local python server not running or timed out
+  // 3. Check local Python inference server at http://localhost:5000
+  const pythonData = await queryPythonServer({
+    task: "chat",
+    prompt: cleanPrompt,
+    language
+  });
+  if (pythonData && pythonData.reply) {
+    return {
+      reply: pythonData.reply,
+      engine: pythonData.engine || "Local Python PyTorch Model (localhost:5000)",
+      matched: true
+    };
   }
 
   // 4. Search Local Grounded Dataset (edutrack_gemini_dataset.json)

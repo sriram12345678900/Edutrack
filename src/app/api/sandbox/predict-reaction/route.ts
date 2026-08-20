@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { solveReaction } from "@/lib/chemistry-reactions-engine";
+import { queryPythonServer } from "@/lib/python-ai";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ result: localResult, source: "canonical_engine" });
     }
 
-    // 2. Fallback to Gemini AI prediction if API key exists
+    // 2. Try Python Developed Local AI Server (http://localhost:5000)
+    const pythonReaction = await queryPythonServer({
+      task: "solve",
+      prompt: `Predict chemical reaction for reactants: ${reactants.join(", ")} under conditions: ${JSON.stringify(conditions || {})}`
+    });
+
+    if (pythonReaction && pythonReaction.equation) {
+      return NextResponse.json({ result: pythonReaction, source: "python_ai_server" });
+    }
+
+    // 3. Fallback to Gemini AI prediction if API key exists
     const apiKey = process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY_SUMMARY || "";
     if (apiKey) {
       try {

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI } from '@google/genai';
+import { queryPythonServer } from "@/lib/python-ai";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +10,16 @@ export async function POST(req: Request) {
 
     if (!question || (!imageBase64 && !textAnswer)) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    // 1. Try Python Developed Local AI Server First (http://localhost:5000)
+    const pythonEval = await queryPythonServer({
+      task: "solve",
+      prompt: `Evaluate this answer for question: ${question}. Student answer: ${textAnswer || "handwritten image"}. Max marks: ${maxMarks}. Official answer: ${officialAnswer || "NCERT standard"}`
+    });
+
+    if (pythonEval && typeof pythonEval.marksGained === "number") {
+      return NextResponse.json(pythonEval);
     }
 
     const apiKey = process.env.GEMINI_API_KEY_EVALUATE || process.env.GEMINI_API_KEY;
