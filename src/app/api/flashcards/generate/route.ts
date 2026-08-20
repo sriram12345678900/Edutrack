@@ -13,15 +13,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Topic is required" }, { status: 400 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY_FLASHCARDS || process.env.GEMINI_API_KEY || "";
+    const requestedCount = Number(count) || 10;
 
-    // 1. If no API key or local AI mode, use local offline flashcard engine
-    if (!apiKey || process.env.USE_LOCAL_AI === "true") {
-      const localFlashcards = generateLocalFlashcards(topic, subject, Number(count));
-      return NextResponse.json({ flashcards: localFlashcards, engine: "EduTrack Self-Hosted Engine" });
+    // 1. Prioritize EduTrack's Local Curated NCERT Flashcard Engine First
+    const localFlashcards = generateLocalFlashcards(topic, subject, requestedCount);
+    // If local flashcards found a high-quality curated match
+    const cleanTopic = topic.toLowerCase();
+    const isCuratedTopic = ["water", "resource", "agriculture", "light", "electric", "chem", "life", "acid"].some(k => cleanTopic.includes(k));
+
+    if (isCuratedTopic && localFlashcards.length >= Math.min(requestedCount, 5)) {
+      return NextResponse.json({ flashcards: localFlashcards.slice(0, requestedCount), engine: "EduTrack Curated NCERT Flashcard Engine" });
     }
 
-    // 2. Try Gemini API if key is present
+    const apiKey = process.env.GEMINI_API_KEY_FLASHCARDS || process.env.GEMINI_API_KEY || "";
+
+    // If no API key or local AI mode, return local flashcards
+    if (!apiKey || process.env.USE_LOCAL_AI === "true") {
+      return NextResponse.json({ flashcards: localFlashcards.slice(0, requestedCount), engine: "EduTrack Self-Hosted Engine" });
+    }
+
+    // 2. Try Gemini API for custom/un-indexed topics
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({
@@ -29,7 +40,7 @@ export async function POST(req: Request) {
         generationConfig: { responseMimeType: "application/json" }
       });
 
-      const prompt = `You are an expert AI tutor for Indian students. Create exactly ${count} highly effective flashcards for a Class ${classLevel} student studying ${subject}, focusing on the topic: "${topic}".
+      const prompt = `You are an expert AI tutor for Indian students. Create exactly ${requestedCount} highly effective flashcards for a Class ${classLevel} student studying ${subject}, focusing on the topic: "${topic}".
       
 You MUST generate the flashcards strictly in English.
 Keep the "front" concise (short question under 15 words).
@@ -52,8 +63,7 @@ Example format:
       return NextResponse.json({ flashcards: parsed.flashcards || [] });
     } catch (apiErr: any) {
       console.warn("External Flashcard API failed, using Local Engine fallback:", apiErr.message);
-      const fallbackCards = generateLocalFlashcards(topic, subject, Number(count));
-      return NextResponse.json({ flashcards: fallbackCards, engine: "EduTrack Self-Hosted Engine" });
+      return NextResponse.json({ flashcards: localFlashcards.slice(0, requestedCount), engine: "EduTrack Self-Hosted Engine" });
     }
 
   } catch (error: any) {

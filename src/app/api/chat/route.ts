@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getChatResponse } from "@/lib/groq";
+import { queryLocalAI } from "@/lib/local-ai";
 
 export const dynamic = "force-dynamic";
 
@@ -42,45 +43,48 @@ export async function POST(req: Request) {
     const lastMsg = lastMsgObj?.content || "";
     const imageAttachment = lastMsgObj?.attachments?.find((att: any) => att.type?.startsWith("image") || (typeof att.data === "string" && att.data.startsWith("data:image/")))?.data || image;
 
-    const useLocalAI = process.env.USE_LOCAL_AI === "true" || (!process.env.GEMINI_API_KEY && !process.env.GROQ_API_KEY);
+    // 1. Prioritize EduTrack / User's Local AI Engine First (Offline Knowledge, Vision OCR, Fine-tuned Dataset, Local Python Server)
+    const localMatch = await queryLocalAI({
+      prompt: lastMsg,
+      language: language || "Hinglish",
+      image: imageAttachment,
+      bookInfo,
+      allowFallbackSynthesis: false
+    });
 
-    if (useLocalAI) {
-      const origin = req.headers.get("origin") || "http://localhost:3000";
-      try {
-        const localRes = await fetch(`${origin}/api/local-ai`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: lastMsg, language, image: imageAttachment })
-        });
-        if (localRes.ok) {
-          const localData = await localRes.json();
-          return NextResponse.json({ reply: localData.reply });
-        }
-      } catch (e) {
-        console.warn("Local AI fallback failed:", e);
-      }
+    if (localMatch && localMatch.matched) {
+      return NextResponse.json({ reply: localMatch.reply });
     }
 
+    // If strictly forced to local AI via environment
+    if (process.env.USE_LOCAL_AI === "true" || (!process.env.GEMINI_API_KEY && !process.env.GROQ_API_KEY)) {
+      const localSynthesized = await queryLocalAI({
+        prompt: lastMsg,
+        language: language || "Hinglish",
+        image: imageAttachment,
+        bookInfo,
+        allowFallbackSynthesis: true
+      });
+      return NextResponse.json({ reply: localSynthesized?.reply || "EduTrack Offline AI active." });
+    }
+
+    // 2. Fallback to Cloud LLMs (Gemini / Groq) for open-ended un-indexed questions
     try {
       const reply = await getChatResponse(messages, language || "Hinglish", bookInfo);
       return NextResponse.json({ reply });
     } catch (apiError: any) {
-      console.warn("External AI API failed, routing to EduTrack Local Model...", apiError);
-      const origin = req.headers.get("origin") || "http://localhost:3000";
-      try {
-        const localRes = await fetch(`${origin}/api/local-ai`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: lastMsg, language, image: imageAttachment })
-        });
-        if (localRes.ok) {
-          const localData = await localRes.json();
-          return NextResponse.json({ reply: localData.reply });
-        }
-      } catch (_e) {}
+      console.warn("External AI API failed, falling back to EduTrack Local Model...", apiError.message || apiError);
+      
+      const localFallback = await queryLocalAI({
+        prompt: lastMsg,
+        language: language || "Hinglish",
+        image: imageAttachment,
+        bookInfo,
+        allowFallbackSynthesis: true
+      });
 
       return NextResponse.json({ 
-        reply: `[EduTrack Local AI]: ${apiError.message || "Offline local model active."}` 
+        reply: localFallback?.reply || `[EduTrack Local AI]: ${apiError.message || "Offline local model active."}` 
       });
     }
   } catch (error: any) {
