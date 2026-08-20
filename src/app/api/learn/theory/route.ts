@@ -181,7 +181,7 @@ export async function POST(req: Request) {
             });
 
             const completion = await groq.chat.completions.create({
-              model: "llama-3.3-70b-versatile",
+              model: "openai/gpt-oss-120b",
               messages: [
                 { role: "system", content: "You are an elite NCERT textbook author who writes textbooks strictly in clean, engaging, highly-detailed Markdown within the Class 6-10 CBSE syllabus scope." },
                 { role: "user", content: partPrompt }

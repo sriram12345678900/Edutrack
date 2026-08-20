@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -486,6 +486,12 @@ export default function StudyCirclesDMs() {
       
       setNickname(storedNick);
       setFriendCode(storedCode);
+
+      const handleProfileUpdate = (e: any) => {
+        if (e.detail?.nickname) setNickname(e.detail.nickname);
+        if (e.detail?.friendCode) setFriendCode(e.detail.friendCode);
+      };
+      window.addEventListener("edutrack_profile_updated", handleProfileUpdate);
 
       // Load or initialize Friends List
       const storedFriends = localStorage.getItem("edutrack_friends");

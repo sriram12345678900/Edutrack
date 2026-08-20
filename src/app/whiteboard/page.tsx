@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -560,7 +560,7 @@ export default function WhiteboardPage() {
   const [history, setHistory] = useState<string[]>([]);
   const [historyStep, setHistoryStep] = useState(-1);
 
-  const nickname = user?.displayName?.split(" ")[0] || user?.email?.split("@")[0] || "User";
+  const nickname = (typeof window !== "undefined" ? localStorage.getItem("edutrack_nickname") : null) || user?.displayName?.split(" ")[0] || user?.email?.split("@")[0] || "Scholar";
 
   // Dynamic Window / Container Sizing Listener
   useEffect(() => {

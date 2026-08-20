@@ -73,7 +73,7 @@ export async function POST(req: Request) {
       });
 
       const completion = await groq.chat.completions.create({
-        model: "llama-3.3-70b-versatile",
+        model: "openai/gpt-oss-120b",
         messages: [
           { role: "system", content: "You are a world-class CBSE board exam expert who replies strictly in valid JSON containing Class 6-10 NCERT data only." },
           { role: "user", content: prompt }

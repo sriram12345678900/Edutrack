@@ -67,6 +67,17 @@ const config: Config = {
         'float-slow': 'float 8s ease-in-out infinite',
         'float-delayed': 'float 8s ease-in-out 4s infinite',
       },
+      gridTemplateColumns: {
+        '18': 'repeat(18, minmax(0, 1fr))',
+      },
+      gridColumn: {
+        'span-13': 'span 13 / span 13',
+        'span-14': 'span 14 / span 14',
+        'span-15': 'span 15 / span 15',
+        'span-16': 'span 16 / span 16',
+        'span-17': 'span 17 / span 17',
+        'span-18': 'span 18 / span 18',
+      },
       keyframes: {
         float: {
           '0%, 100%': { transform: 'translateY(0) scale(1)' },

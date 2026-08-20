@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -212,9 +212,12 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
     }
   }
 
-  // localStorage key for persisting flashcards
-  const flashcardKey = `flashcards__${params.subject}__${params.chapter}`;
-  const theoryKey = `theory__${params.subject}__${params.chapter}`;
+  // localStorage keys for persisting per-chapter data
+  const flashcardKey = `flashcards__${params.subject.toLowerCase()}__${params.chapter.toLowerCase()}`;
+  const theoryKey = `theory__${params.subject.toLowerCase()}__${params.chapter.toLowerCase()}`;
+  const summaryKey = `summary__${params.subject.toLowerCase()}__${params.chapter.toLowerCase()}`;
+  const quizKey = `quiz__${params.subject.toLowerCase()}__${params.chapter.toLowerCase()}`;
+  const lineByLineKey = `linebyline__${params.subject.toLowerCase()}__${params.chapter.toLowerCase()}`;
 
   const fetchTheory = async (force: boolean = false) => {
     if (theory && !force) return;
@@ -266,6 +269,9 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
     try {
       localStorage.removeItem(theoryKey);
       localStorage.removeItem(flashcardKey);
+      localStorage.removeItem(summaryKey);
+      localStorage.removeItem(quizKey);
+      localStorage.removeItem(lineByLineKey);
     } catch (e) {}
     
     setTheory("");
@@ -280,14 +286,27 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
     if (activeTab === "revise") {
       await fetchNotes();
     } else if (activeTab === "notes") {
-      await fetchSummary();
+      await fetchSummary(true);
     } else if (activeTab === "practice") {
-      await fetchQuiz();
+      await fetchQuiz(true);
     }
   };
 
-  const fetchSummary = async () => {
-    if (summary) return;
+  const fetchSummary = async (force: boolean = false) => {
+    if (summary && !force) return;
+    if (!force) {
+      try {
+        const cached = localStorage.getItem(summaryKey);
+        if (cached) {
+          setSummary(JSON.parse(cached));
+          completeDailyMission("notes");
+          return;
+        }
+      } catch {}
+    } else {
+      try { localStorage.removeItem(summaryKey); } catch {}
+    }
+
     setIsLoading(true);
     try {
       const res = await fetch("/api/learn/summarize", {
@@ -298,6 +317,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
       const data = await res.json();
       if (data.keyTerms || data.equations || data.mnemonics) {
         setSummary(data);
+        try { localStorage.setItem(summaryKey, JSON.stringify(data)); } catch {}
         completeDailyMission("notes");
       } else {
         setSummary({ error: "Failed to generate board-exam cheat sheet." });
@@ -307,11 +327,21 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
     } finally { setIsLoading(false); }
   };
 
-  const fetchLineByLine = async () => {
-    if (lineByLineData) {
-      setShowLineByLineModal(true);
-      return;
+  const fetchLineByLine = async (force: boolean = false) => {
+    if (!force) {
+      try {
+        const cached = localStorage.getItem(lineByLineKey);
+        if (cached) {
+          setLineByLineData(JSON.parse(cached));
+          setShowLineByLineModal(true);
+          return;
+        }
+      } catch {}
+    } else {
+      try { localStorage.removeItem(lineByLineKey); } catch {}
+      setLineByLineData(null);
     }
+
     setLineByLineLoading(true);
     try {
       const res = await fetch("/api/learn/line-by-line", {
@@ -322,6 +352,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
       const data = await res.json();
       if (data.lines) {
         setLineByLineData(data);
+        try { localStorage.setItem(lineByLineKey, JSON.stringify(data)); } catch {}
         setShowLineByLineModal(true);
       } else {
         alert("Failed to load Line-by-Line Guide: " + (data.error || "Unknown error"));
@@ -491,33 +522,48 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
     } finally { setIsLoading(false); }
   };
 
-  const fetchQuiz = async () => {
-    if (quiz) return;
+  const fetchQuiz = async (force: boolean = false) => {
+    if (quiz && !force) return;
+    if (!force) {
+      try {
+        const cached = localStorage.getItem(quizKey);
+        if (cached) {
+          setQuiz(JSON.parse(cached));
+          return;
+        }
+      } catch {}
+    } else {
+      try { localStorage.removeItem(quizKey); } catch {}
+    }
+
     setIsLoading(true);
     try {
       const res = await fetch("/api/learn/quiz", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subject: subjectName, chapter: chapterName, language: userLanguage })
       });
       const data = await res.json();
       setQuiz(data);
+      try { localStorage.setItem(quizKey, JSON.stringify(data)); } catch {}
     } catch (e) {
       console.error(e);
     } finally { setIsLoading(false); }
   };
 
   useEffect(() => {
+    setTheory("");
+    setSummary(null);
+    setQuiz(null);
+    setLineByLineData(null);
+    setDecks([]);
+    setSelectedDeckId(null);
+
     if (activeTab === "learn") fetchTheory();
     if (activeTab === "revise") fetchNotes();
     if (activeTab === "notes") fetchSummary();
     if (activeTab === "practice") fetchQuiz();
-  }, [activeTab]);
-
-  // Auto-load if deep-linked with ?tab=revise or tab=learn
-  useEffect(() => {
-    if (initialTab === "revise") fetchNotes();
-    if (initialTab === "learn") fetchTheory();
-  }, []);
+  }, [params.subject, params.chapter, activeTab]);
 
   // Keyboard binding to exit fullscreen on Escape key
   useEffect(() => {
@@ -1214,7 +1260,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                     </div>
                     
                     <button
-                      onClick={fetchLineByLine}
+                      onClick={() => fetchLineByLine()}
                       disabled={lineByLineLoading}
                       className="px-5 py-2.5 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 active:scale-95 disabled:opacity-50"
                     >

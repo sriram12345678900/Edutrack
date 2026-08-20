@@ -123,22 +123,37 @@ export default function Dashboard() {
   const [showQuestCelebration, setShowQuestCelebration] = useState<boolean>(false);
   const [selectedNode, setSelectedNode] = useState<any>(null);
   const [swiperIndex, setSwiperIndex] = useState<number>(0);
+  const [nickname, setNickname] = useState<string>("");
   
   // Strict Quest Guide modal state
   const [activeMissionGuide, setActiveMissionGuide] = useState<string | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("edutrack_class");
-    if (!stored) {
-      router.push("/setup");
-    } else {
+    if (stored) {
       setUserClass(parseInt(stored, 10));
+    } else {
+      setUserClass(10);
+      localStorage.setItem("edutrack_class", "10");
     }
 
     const storedLang = localStorage.getItem("edutrack_language");
     if (storedLang) {
       setUserLanguage(storedLang);
     }
+
+    const storedNick = localStorage.getItem("edutrack_nickname");
+    if (storedNick) {
+      setNickname(storedNick);
+    }
+
+    const handleProfileUpdate = (e: any) => {
+      if (e.detail?.nickname) setNickname(e.detail.nickname);
+      if (e.detail?.className) setUserClass(Number(e.detail.className));
+      if (e.detail?.language) setUserLanguage(e.detail.language);
+    };
+
+    window.addEventListener("edutrack_profile_updated", handleProfileUpdate);
 
     // Load Gamification stats from localStorage
     const loadStats = () => {
@@ -169,9 +184,18 @@ export default function Dashboard() {
 
     loadStats();
 
-    window.addEventListener("edutrack_xp_updated", loadStats);
-    return () => window.removeEventListener("edutrack_xp_updated", loadStats);
-  }, [router]);
+    const handleXpUpdate = (e: any) => {
+      if (e.detail?.xp !== undefined) {
+        setXp(e.detail.xp);
+      }
+    };
+    window.addEventListener("edutrack_xp_updated", handleXpUpdate);
+
+    return () => {
+      window.removeEventListener("edutrack_profile_updated", handleProfileUpdate);
+      window.removeEventListener("edutrack_xp_updated", handleXpUpdate);
+    };
+  }, []);
 
   const awardXP = (amount: number) => {
     const { newXp, newLevel, leveledUp } = awardUserXP(amount);
@@ -204,8 +228,8 @@ export default function Dashboard() {
     );
   }
 
-  const firstName = user?.displayName?.split(" ")[0] || "Student";
-  const initials = (user?.displayName || user?.email || "S").charAt(0).toUpperCase();
+  const firstName = nickname || user?.displayName?.split(" ")[0] || "Scholar";
+  const initials = (nickname || user?.displayName || user?.email || "S").charAt(0).toUpperCase();
   const weakSubjects = profile?.weakSubjects || [];
 
   // Gamified Leaderboard & Buddies sorting
@@ -297,9 +321,21 @@ export default function Dashboard() {
             <Flame className="w-5 h-5 text-orange-500 animate-flame-glow" /> 
             <span>{streak} Day Streak</span>
           </div>
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                window.dispatchEvent(new CustomEvent("edutrack_open_tour", { detail: { initialStep: 0 } }));
+              }
+            }}
+            className="text-xs font-black text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 px-4.5 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-2"
+          >
+            <Sparkles className="w-4 h-4 text-indigo-500" />
+            <span>App Tour</span>
+          </button>
           <Link href="/setup">
             <button className="text-xs font-extrabold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-200/60 dark:border-white/5 bg-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.04] px-4.5 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95">
-              Settings & Setup
+              Settings
             </button>
           </Link>
         </div>

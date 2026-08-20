@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { BookOpen, ExternalLink, Search, GraduationCap, X, FileText, ChevronRight, ArrowLeft, Download, Loader2, Home, Brain, Send, Bot, User, Camera, Crop, Image as ImageIcon, ZoomIn, ZoomOut, ChevronLeft, Moon, Sun, Pen, Eraser, Highlighter, Pencil, Trash2, Sparkles, Trophy, Volume2, Play, Pause, Activity, Eye, EyeOff } from "lucide-react";
@@ -275,27 +275,59 @@ export default function NcertViewer() {
   const [showLineByLineModal, setShowLineByLineModal] = useState<boolean>(false);
   const [lineByLineLoading, setLineByLineLoading] = useState<boolean>(false);
 
-  const fetchLineByLine = async () => {
+  const getActiveChapterTitle = () => {
+    if (!openBook || !openChapter) return "";
+    return chapterNamesMap[openBook.code]?.[openChapter.num - 1] || (openBook.singleFileName || openBook.directUrl ? openBook.title : `${openBook.title} - Chapter ${openChapter.num}`);
+  };
+
+  const getChapterTheoryKey = (chapterTitle: string) => {
+    if (!openBook) return "";
+    return `theory__${(openBook.subject || "science").toLowerCase()}__${chapterTitle.replace(/\s+/g, '-').toLowerCase()}`;
+  };
+
+  const getChapterLineByLineKey = (chapterTitle: string) => {
+    if (!openBook) return "";
+    return `linebyline__${(openBook.subject || "science").toLowerCase()}__${chapterTitle.replace(/\s+/g, '-').toLowerCase()}`;
+  };
+
+  const fetchLineByLine = async (force: boolean = false) => {
     if (!openBook || !openChapter) return;
-    if (lineByLineData) {
-      setShowLineByLineModal(true);
-      return;
+    const chapterTitle = getActiveChapterTitle();
+    const lineKey = getChapterLineByLineKey(chapterTitle);
+
+    if (!force) {
+      try {
+        const cached = localStorage.getItem(lineKey);
+        if (cached) {
+          setLineByLineData(JSON.parse(cached));
+          setShowLineByLineModal(true);
+          return;
+        }
+      } catch {}
+    } else {
+      try {
+        localStorage.removeItem(lineKey);
+      } catch {}
+      setLineByLineData(null);
     }
+
     setLineByLineLoading(true);
     try {
-      const bookSubject = openBook.subject || "Science";
-      const bookChapter = openBook.singleFileName || openBook.directUrl 
-        ? openBook.title 
-        : `${openBook.title} - Chapter ${openChapter.num}`;
-      
       const res = await fetch("/api/learn/line-by-line", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject: bookSubject, chapter: bookChapter, language: userLanguage })
+        body: JSON.stringify({ 
+          subject: openBook.subject || "Science", 
+          chapter: chapterTitle, 
+          language: userLanguage 
+        })
       });
       const data = await res.json();
       if (data.lines) {
         setLineByLineData(data);
+        try {
+          localStorage.setItem(lineKey, JSON.stringify(data));
+        } catch {}
         setShowLineByLineModal(true);
       } else {
         alert("Failed to load Line-by-Line Guide: " + (data.error || "Unknown error"));
@@ -316,14 +348,9 @@ export default function NcertViewer() {
   const fetchTheory = async (force: boolean = false) => {
     if (!openBook || !openChapter) return;
     
-    const chapterTitle = chapterNamesMap[openBook.code]?.[openChapter.num - 1] || `${openBook.title} - Chapter ${openChapter.num}`;
-    const theoryKey = `theory__${openBook.subject.toLowerCase()}__${chapterTitle.replace(/\s+/g, '-').toLowerCase()}`;
+    const chapterTitle = getActiveChapterTitle();
+    const theoryKey = getChapterTheoryKey(chapterTitle);
 
-    if (theory && !force) {
-      setShowSideTheory(true);
-      return;
-    }
-    
     if (!force) {
       try {
         const cached = localStorage.getItem(theoryKey);
@@ -451,12 +478,29 @@ export default function NcertViewer() {
   const handleOpenChapter = (ch: { num: number; pdfUrl: string }, book: BookWithClass) => {
     setPdfLoading(true);
     setOpenChapter(ch);
-    setLineByLineData(null);
+    
+    const chapterTitle = chapterNamesMap[book.code]?.[ch.num - 1] || (book.singleFileName || book.directUrl ? book.title : `${book.title} - Chapter ${ch.num}`);
+    const theoryKey = `theory__${(book.subject || "science").toLowerCase()}__${chapterTitle.replace(/\s+/g, '-').toLowerCase()}`;
+    const lineKey = `linebyline__${(book.subject || "science").toLowerCase()}__${chapterTitle.replace(/\s+/g, '-').toLowerCase()}`;
+    
+    try {
+      const cachedTheory = localStorage.getItem(theoryKey);
+      setTheory(cachedTheory || "");
+    } catch {
+      setTheory("");
+    }
+
+    try {
+      const cachedLine = localStorage.getItem(lineKey);
+      setLineByLineData(cachedLine ? JSON.parse(cachedLine) : null);
+    } catch {
+      setLineByLineData(null);
+    }
+
     setShowLineByLineModal(false);
-    setTheory("");
     setShowSideTheory(false);
     setChatMessages([
-      { role: "assistant", content: `Hi! I see you're reading **${book.title} - ${book.singleFileName || book.directUrl ? "Full Book" : "Chapter " + ch.num}**. How can I help you? Would you like me to generate a chapter summary, key concepts, or practice questions?` }
+      { role: "assistant", content: `Hi! I see you're reading **${book.title} - ${book.singleFileName || book.directUrl ? "Full Book" : "Chapter " + ch.num} (${chapterTitle})**. How can I help you? Would you like me to generate a chapter summary, key concepts, or practice questions?` }
     ]);
     setIsAiChatOpen(false);
 
@@ -547,13 +591,13 @@ export default function NcertViewer() {
     // Attach to last user message or create a new one
     if (updatedMessages.length > 0 && updatedMessages[updatedMessages.length - 1].role === "user") {
       const lastMsg = updatedMessages[updatedMessages.length - 1];
-      const newAttachments = [...(lastMsg.attachments || []), { type: "image", data: dataUrl, name: `Page_${pageNumber}.png` }];
+      const newAttachments = [...(lastMsg.attachments || []), { type: "image/png", data: dataUrl, name: `Page_${pageNumber}.png` }];
       updatedMessages[updatedMessages.length - 1] = { ...lastMsg, attachments: newAttachments };
       setChatMessages(updatedMessages);
     } else {
       setChatMessages([
         ...updatedMessages,
-        { role: "user", content: "I have a question about this page.", attachments: [{ type: "image", data: dataUrl, name: `Page_${pageNumber}.png` }] }
+        { role: "user", content: "I have a question about this page.", attachments: [{ type: "image/png", data: dataUrl, name: `Page_${pageNumber}.png` }] }
       ]);
       setChatLoading(true);
       setTimeout(() => {
@@ -1083,7 +1127,7 @@ export default function NcertViewer() {
             {/* Custom PDF Controls (Floating Bottom) */}
             <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800/90 backdrop-blur-md px-4 py-2 rounded-full shadow-2xl shadow-black/50 border border-slate-700 flex items-center gap-4 z-[110]">
               <div className="flex items-center gap-1">
-                <button onClick={fetchLineByLine} disabled={lineByLineLoading} className="p-2 rounded-full hover:bg-slate-700 dark:text-amber-400 text-amber-700 hover:dark:text-amber-300 text-amber-700 transition-colors flex items-center gap-1" title="Generate Side-by-Side Line-by-Line Study Guide (PDF)">
+                <button onClick={() => fetchLineByLine()} disabled={lineByLineLoading} className="p-2 rounded-full hover:bg-slate-700 dark:text-amber-400 text-amber-700 hover:dark:text-amber-300 text-amber-700 transition-colors flex items-center gap-1" title="Generate Side-by-Side Line-by-Line Study Guide (PDF)">
                   {lineByLineLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 text-amber-450" />}
                   <span className="text-[10px] font-extrabold pr-1 hidden md:inline dark:text-amber-300 text-amber-700">NCERT Guide</span>
                 </button>

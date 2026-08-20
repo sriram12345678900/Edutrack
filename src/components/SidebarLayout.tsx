@@ -10,6 +10,8 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 
+import AppTour from "./AppTour";
+
 // Categorized premium sidebar links
 const categories = [
   {
@@ -51,6 +53,8 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   const [isPinned, setIsPinned] = useState(false);
   const [userXp, setUserXp] = useState<number>(0);
   const [userLevel, setUserLevel] = useState<number>(1);
+  const [nickname, setNickname] = useState<string>("");
+  const [friendCode, setFriendCode] = useState<string>("");
   const { user, loading, logout } = useAuth();
   const router = useRouter();
 
@@ -65,15 +69,37 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     }
   }, [user, loading, router]);
 
-  // Load XP stats
+  // Load XP stats and permanent nickname
   useEffect(() => {
     if (typeof window !== "undefined") {
       const xpVal = localStorage.getItem("edutrack_xp");
       const lvlVal = localStorage.getItem("edutrack_level");
       const pinnedState = localStorage.getItem("edutrack_sidebar_pinned");
+      const storedNick = localStorage.getItem("edutrack_nickname");
+      const storedCode = localStorage.getItem("edutrack_friend_code");
+      
       if (xpVal) setUserXp(parseInt(xpVal, 10));
       if (lvlVal) setUserLevel(parseInt(lvlVal, 10));
       if (pinnedState) setIsPinned(pinnedState === "true");
+      if (storedNick) setNickname(storedNick);
+      if (storedCode) setFriendCode(storedCode);
+
+      // Listen for profile updates from Tour or Settings
+      const handleProfileUpdate = (e: any) => {
+        if (e.detail?.nickname) setNickname(e.detail.nickname);
+        if (e.detail?.friendCode) setFriendCode(e.detail.friendCode);
+      };
+
+      const handleXpUpdate = (e: any) => {
+        if (e.detail?.xp !== undefined) setUserXp(e.detail.xp);
+      };
+
+      window.addEventListener("edutrack_profile_updated", handleProfileUpdate);
+      window.addEventListener("edutrack_xp_updated", handleXpUpdate);
+      return () => {
+        window.removeEventListener("edutrack_profile_updated", handleProfileUpdate);
+        window.removeEventListener("edutrack_xp_updated", handleXpUpdate);
+      };
     }
   }, []);
 
@@ -90,7 +116,6 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         router.prefetch(item.href);
       });
     });
-    router.prefetch("/setup");
   }, [router]);
 
   if (loading) {
@@ -115,12 +140,21 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     );
   }
 
-  const firstName = user.displayName?.split(" ")[0] || user.email?.split("@")[0] || "Student";
-  const initials = (user.displayName || user.email || "S").charAt(0).toUpperCase();
+  const displayName = nickname || user.displayName || user.email?.split("@")[0] || "Scholar";
+  const initials = displayName.charAt(0).toUpperCase();
   const isExpanded = isPinned || isHovered;
+
+  const openAppTour = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("edutrack_open_tour", { detail: { initialStep: 0 } }));
+    }
+  };
 
   return (
     <div className="h-screen max-h-screen bg-slate-50 dark:bg-[#06080f] bg-[#eef1f9] text-slate-900 dark:text-slate-100 flex overflow-hidden grid-bg-overlay selection:bg-indigo-500/30 selection:text-indigo-200">
+      {/* Global Interactive App Tour */}
+      <AppTour />
+
       {/* Mobile Sidebar Overlay */}
       {isMobileOpen && (
         <div
@@ -187,7 +221,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         )}>
           <div className="relative shrink-0">
             {user.photoURL ? (
-              <img src={user.photoURL} alt={firstName} className="w-9 h-9 rounded-full object-cover border-2 border-indigo-500/40 shadow-sm" />
+              <img src={user.photoURL} alt={displayName} className="w-9 h-9 rounded-full object-cover border-2 border-indigo-500/40 shadow-sm" />
             ) : (
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white font-black text-xs flex-shrink-0 shadow-lg shadow-indigo-500/20 border border-white/20">
                 {initials}
@@ -202,8 +236,10 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
             "overflow-hidden transition-all duration-300 flex-1",
             isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden"
           )}>
-            <p className="font-black text-xs text-slate-900 dark:text-white truncate">{user.displayName || firstName}</p>
-            <p className="text-[8px] text-slate-500 dark:text-slate-400 font-bold truncate leading-none mt-0.5 uppercase tracking-wider">{user.email?.split("@")[0]}</p>
+            <p className="font-black text-xs text-slate-900 dark:text-white truncate" title={displayName}>{displayName}</p>
+            <p className="text-[8px] text-indigo-500 dark:text-indigo-400 font-mono font-bold truncate leading-none mt-0.5 uppercase tracking-wider">
+              {friendCode || (user.email ? user.email.split("@")[0] : "Student")}
+            </p>
           </div>
           
           {isExpanded && (
@@ -289,25 +325,51 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
         {/* Settings & Logout Footer */}
         <div className="p-3 border-t border-slate-200/40 dark:border-white/5 shrink-0 space-y-1">
+          {/* App Tour Trigger Button */}
+          <button
+            type="button"
+            onClick={() => {
+              setIsMobileOpen(false);
+              openAppTour();
+            }}
+            title={!isExpanded ? "App Tour & Nickname Setup" : undefined}
+            className="flex items-center justify-between px-3 py-2.5 rounded-xl font-bold text-xs bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border border-indigo-500/25 transition-all w-full text-left group"
+          >
+            <div className="flex items-center gap-3">
+              <Sparkles className="w-4.5 h-4.5 text-indigo-500 dark:text-indigo-400 group-hover:rotate-12 transition-transform shrink-0" />
+              <span className={cn(
+                "transition-all duration-300 whitespace-nowrap",
+                isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden"
+              )}>
+                App Tour & Setup
+              </span>
+            </div>
+            {isExpanded && (
+              <span className="text-[8px] font-black uppercase bg-indigo-500/25 text-indigo-600 dark:text-indigo-300 px-1.5 py-0.5 rounded-full">
+                Tour
+              </span>
+            )}
+          </button>
+
           <Link 
             href="/setup" 
             prefetch={true}
             onClick={() => setIsMobileOpen(false)}
-            title={!isExpanded ? "Account Setup" : undefined}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-100 dark:hover:bg-white/[0.03] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:dark:text-slate-200 text-slate-800 transition-all"
+            title={!isExpanded ? "Account Settings" : undefined}
+            className="flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-xs hover:bg-slate-100 dark:hover:bg-white/[0.03] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:dark:text-slate-200 text-slate-800 transition-all"
           >
             <Settings className="w-4.5 h-4.5 dark:text-slate-400 text-slate-600 shrink-0" /> 
             <span className={cn(
               "transition-all duration-300 whitespace-nowrap",
               isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden"
             )}>
-              Account Setup
+              Account Settings
             </span>
           </Link>
           <button
             onClick={logout}
             title={!isExpanded ? "Log Out" : undefined}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs hover:bg-red-500/10 hover:text-red-500 dark:hover:bg-red-500/10 dark:hover:text-red-400 text-slate-500 dark:text-slate-400 transition-all w-full text-left"
+            className="flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-xs hover:bg-red-500/10 hover:text-red-500 dark:hover:bg-red-500/10 dark:hover:text-red-400 text-slate-500 dark:text-slate-400 transition-all w-full text-left"
           >
             <LogOut className="w-4.5 h-4.5 text-red-400/80 shrink-0" /> 
             <span className={cn(

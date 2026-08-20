@@ -21,6 +21,7 @@ interface AuthContextType {
   signup: (email: string, password: string, name: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
+  updateNickname: (nickname: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -49,10 +50,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         } else {
           // Automatic Sandbox Guest fallback user for seamless preview & testing
+          const storedNick = localStorage.getItem("edutrack_nickname") || "Scholar";
           const defaultSandboxUser = {
             uid: "sandbox-student-101",
             email: "student@edutrack.space",
-            displayName: "Pillaraja Srirama Rameshu",
+            displayName: storedNick,
             emailVerified: true
           };
           localStorage.setItem("edutrack_mock_user", JSON.stringify(defaultSandboxUser));
@@ -74,10 +76,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUser(null);
           }
         } else {
+          const storedNick = localStorage.getItem("edutrack_nickname") || "Scholar";
           const defaultSandboxUser = {
             uid: "sandbox-student-101",
             email: "student@edutrack.space",
-            displayName: "Pillaraja Srirama Rameshu",
+            displayName: storedNick,
             emailVerified: true
           };
           localStorage.setItem("edutrack_mock_user", JSON.stringify(defaultSandboxUser));
@@ -92,6 +95,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearTimeout(timeoutId);
     };
   }, []);
+
+  const updateNickname = async (nickname: string) => {
+    const finalNick = nickname.trim();
+    if (!finalNick) return;
+
+    localStorage.setItem("edutrack_nickname", finalNick);
+
+    if (user && "providerData" in user && (user as any).updateProfile) {
+      try {
+        await (user as any).updateProfile({ displayName: finalNick });
+      } catch (err) {
+        console.warn("Firebase updateProfile error:", err);
+      }
+    }
+
+    // Update state and mock storage
+    setUser((prev: any) => (prev ? { ...prev, displayName: finalNick } : prev));
+    const storedMock = localStorage.getItem("edutrack_mock_user");
+    if (storedMock) {
+      try {
+        const parsed = JSON.parse(storedMock);
+        parsed.displayName = finalNick;
+        localStorage.setItem("edutrack_mock_user", JSON.stringify(parsed));
+      } catch (e) {}
+    }
+
+    if (user) {
+      try {
+        const { updateUserProfile } = await import("@/lib/db");
+        await updateUserProfile(user.uid, {
+          nickname: finalNick,
+          displayName: finalNick
+        });
+      } catch (dbErr) {
+        console.warn("Firestore updateUserProfile error:", dbErr);
+      }
+    }
+
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("edutrack_profile_updated", { detail: { nickname: finalNick } }));
+    }
+  };
 
   const login = async (email: string, password: string) => {
     try {
@@ -139,6 +184,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(cred.user, { displayName: name });
+      if (name) {
+        localStorage.setItem("edutrack_nickname", name);
+      }
       
       // Create database profile
       try {
@@ -159,7 +207,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem("edutrack_mock_user");
       localStorage.removeItem("edutrack_mock_password");
       
-      router.push("/setup");
+      router.push("/dashboard");
     } catch (err: any) {
       console.warn("Firebase signup failed, activating sandbox fallback:", err);
       
@@ -171,10 +219,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           displayName: name,
           emailVerified: true
         };
+        if (name) {
+          localStorage.setItem("edutrack_nickname", name);
+        }
         localStorage.setItem("edutrack_mock_user", JSON.stringify(mockUser));
         localStorage.setItem("edutrack_mock_password", password);
         setUser(mockUser as any);
-        router.push("/setup");
+        router.push("/dashboard");
         return;
       }
       throw err;
@@ -186,15 +237,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const provider = new GoogleAuthProvider();
       const cred = await signInWithPopup(auth, provider);
       
-      let isNewUser = false;
-      
       // Create database profile if it doesn't exist, otherwise load preferences
       try {
         const { createUserProfile, getUserProfile } = await import("@/lib/db");
         const profile = await getUserProfile(cred.user.uid);
         if (!profile) {
-          isNewUser = true;
           await createUserProfile(cred.user.uid, cred.user.email, cred.user.displayName);
+          if (cred.user.displayName) {
+            localStorage.setItem("edutrack_nickname", cred.user.displayName);
+          }
         } else {
           if (profile.className) localStorage.setItem("edutrack_class", profile.className);
           if (profile.nickname) localStorage.setItem("edutrack_nickname", profile.nickname);
@@ -210,11 +261,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem("edutrack_mock_user");
       localStorage.removeItem("edutrack_mock_password");
       
-      if (isNewUser) {
-        router.push("/setup");
-      } else {
-        router.push("/dashboard");
-      }
+      router.push("/dashboard");
     } catch (err: any) {
       console.warn("Google Sign-In failed, fallback to local sandbox session:", err);
       
@@ -244,7 +291,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, loginWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, loginWithGoogle, logout, updateNickname }}>
       {children}
     </AuthContext.Provider>
   );

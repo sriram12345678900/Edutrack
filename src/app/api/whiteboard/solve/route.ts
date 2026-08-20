@@ -12,13 +12,13 @@ export async function POST(req: Request) {
     const geminiKey = process.env.GEMINI_API_KEY;
 
     // 1. Try Gemini Vision API if a valid live key is present
-    if (geminiKey && !geminiKey.startsWith("AQ.")) {
+    if (geminiKey) {
       try {
         const genAI = new GoogleGenerativeAI(geminiKey);
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-        const base64Data = image.split(",")[1];
-        const mimeType = image.split(";")[0].split(":")[1] || "image/png";
+        const base64Data = image.includes(",") ? image.split(",")[1] : image;
+        const mimeType = image.includes(";") ? (image.split(";")[0].split(":")[1] || "image/png") : "image/png";
 
         const response = await model.generateContent({
           contents: [

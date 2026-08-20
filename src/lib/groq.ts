@@ -46,28 +46,45 @@ Use simple analogies, real-world examples, and be encouraging!`;
 
   const geminiKey = process.env.GEMINI_API_KEY || "";
 
+  // Helper to extract clean image data and mime-type
+  const parseImageData = (att: any) => {
+    let mimeType = att.type || "image/png";
+    let data = att.data || "";
+    if (typeof data === "string" && data.startsWith("data:")) {
+      const match = data.match(/^data:([^;]+);base64,(.*)$/);
+      if (match) {
+        mimeType = match[1];
+        data = match[2];
+      }
+    }
+    if (!mimeType.includes("/")) {
+      mimeType = "image/png";
+    }
+    return { mimeType, data };
+  };
+
   // 1. Try Gemini first if we have an API key configured
   if (geminiKey) {
     try {
       const genAI = new GoogleGenerativeAI(geminiKey);
       const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
+        model: "gemini-2.5-flash",
         systemInstruction: systemContent
       });
       
       const formattedMessages = messages.map(m => {
         const parts: any[] = [];
         if (m.content) parts.push({ text: m.content });
-        if (!m.content && m.attachments?.length) parts.push({ text: "Here are some files." });
+        if (!m.content && m.attachments?.length) parts.push({ text: "Please analyze the attached image and solve the NCERT question step-by-step." });
         
         if (m.attachments) {
           m.attachments.forEach(att => {
-            if (att.type.startsWith("image/")) {
-              const base64Data = att.data.includes(",") ? att.data.split(",")[1] : att.data;
+            if (att.type?.startsWith("image") || (typeof att.data === "string" && att.data.startsWith("data:image/"))) {
+              const { mimeType, data } = parseImageData(att);
               parts.push({
                 inlineData: {
-                  mimeType: att.type,
-                  data: base64Data
+                  mimeType,
+                  data
                 }
               });
             } else {
@@ -99,18 +116,17 @@ Use simple analogies, real-world examples, and be encouraging!`;
     apiKey: groqKey,
   });
 
-  const hasImage = messages.some(m => m.attachments?.some(att => att.type.startsWith("image/")));
-  const modelToUse = hasImage ? "llama-3.2-11b-vision-preview" : "llama-3.3-70b-versatile";
+  const modelToUse = "openai/gpt-oss-120b";
 
   const formattedMessages = messages.map(m => {
-    const containsImage = m.attachments?.some(att => att.type.startsWith("image/"));
+    const containsImage = m.attachments?.some(att => att.type?.startsWith("image") || (typeof att.data === "string" && att.data.startsWith("data:image/")));
     
     if (m.role === "user" && containsImage) {
       const contentParts: any[] = [];
       let textInjections = "";
       
       m.attachments?.forEach(att => {
-        if (!att.type.startsWith("image/")) {
+        if (!att.type?.startsWith("image") && !(typeof att.data === "string" && att.data.startsWith("data:image/"))) {
           textInjections += `\n\n[Attached File: ${att.name}]\n--- FILE CONTENT ---\n${att.data}\n--- END FILE CONTENT ---`;
         }
       });
@@ -121,14 +137,12 @@ Use simple analogies, real-world examples, and be encouraging!`;
       });
 
       m.attachments?.forEach(att => {
-        if (att.type.startsWith("image/")) {
-          const imageUrl = att.data.startsWith("data:") 
-            ? att.data 
-            : `data:${att.type};base64,${att.data}`;
+        if (att.type?.startsWith("image") || (typeof att.data === "string" && att.data.startsWith("data:image/"))) {
+          const { mimeType, data } = parseImageData(att);
           contentParts.push({
             type: "image_url",
             image_url: {
-              url: imageUrl
+              url: `data:${mimeType};base64,${data}`
             }
           });
         }
@@ -142,7 +156,7 @@ Use simple analogies, real-world examples, and be encouraging!`;
       let textInjections = "";
       if (m.attachments) {
         m.attachments.forEach(att => {
-          if (!att.type.startsWith("image/")) {
+          if (!att.type?.startsWith("image") && !(typeof att.data === "string" && att.data.startsWith("data:image/"))) {
             textInjections += `\n\n[Attached File: ${att.name}]\n--- FILE CONTENT ---\n${att.data}\n--- END FILE CONTENT ---`;
           }
         });
@@ -166,11 +180,25 @@ Use simple analogies, real-world examples, and be encouraging!`;
     max_tokens: 1024,
   });
 
-  return response.choices[0].message.content || "";
+  const rawReply = response.choices[0].message.content || "";
+  return rawReply.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
 }
 
 export async function generateContent(prompt: string) {
   try {
+    const geminiKey = process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY_SUMMARY;
+    if (geminiKey) {
+      try {
+        const genAI = new GoogleGenerativeAI(geminiKey);
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const res = await model.generateContent(prompt);
+        const txt = res.response.text();
+        if (txt) return txt;
+      } catch (gemErr) {
+        console.warn("Gemini generateContent fallback to Groq:", gemErr);
+      }
+    }
+
     const groqKey = process.env.GROQ_API_KEY;
     if (!groqKey) {
       throw new Error("No Groq API key configured.");
@@ -180,12 +208,13 @@ export async function generateContent(prompt: string) {
     });
 
     const response = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: "openai/gpt-oss-120b",
       messages: [{ role: "user", content: prompt }],
       max_tokens: 1500,
     });
 
-    return response.choices[0].message.content || "";
+    const out = response.choices[0].message.content || "";
+    return out.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
   } catch (e) {
     return "AI content is currently unavailable.";
   }

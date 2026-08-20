@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -16,11 +16,7 @@ export default function VerifyEmail() {
     if (!loading && !user) {
       router.push("/login");
     } else if (user?.emailVerified) {
-      if (!localStorage.getItem("edutrack_class")) {
-        router.push("/setup");
-      } else {
-        router.push("/dashboard");
-      }
+      router.push("/dashboard");
     }
   }, [user, loading, router]);
 
@@ -46,11 +42,7 @@ export default function VerifyEmail() {
     if (user) {
       await user.reload();
       if (user.emailVerified) {
-        if (!localStorage.getItem("edutrack_class")) {
-          router.push("/setup");
-        } else {
-          router.push("/dashboard");
-        }
+        router.push("/dashboard");
       } else {
         setMessage("Your email is not verified yet. Please check your inbox and click the link.");
       }

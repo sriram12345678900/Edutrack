@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -91,11 +91,23 @@ export default function SignupWizard() {
           theme: theme,
           language: language,
           nickname: nickname || undefined,
+          displayName: nickname || undefined,
           friendCode: finalFriendCode || undefined,
         });
       } catch (e) {
         console.error("Failed to save profile to database", e);
       }
+    }
+
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("edutrack_profile_updated", {
+        detail: {
+          nickname: nickname || undefined,
+          friendCode: finalFriendCode || undefined,
+          className: selectedClass,
+          language: language
+        }
+      }));
     }
 
     router.push("/dashboard");

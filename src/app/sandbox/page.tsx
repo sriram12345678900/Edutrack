@@ -1,192 +1,54 @@
-﻿"use client";
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   Home, Beaker, Atom, Flame, RefreshCw, AlertTriangle, 
   CheckCircle2, Compass, Eye, Sparkles, Zap, Layers, 
-  Sliders, Info, HelpCircle, ArrowRight, Activity
+  Sliders, Info, HelpCircle, ArrowRight, Activity, Search,
+  Sun, BatteryCharging, TestTube, Thermometer, Volume2,
+  VolumeX, Droplet, BookOpen, ChevronRight, X, ExternalLink,
+  Check, Filter, Play, FlaskConical, ShieldAlert
 } from 'lucide-react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+
+import { 
+  ALL_ELEMENTS, 
+  ChemicalElement, 
+  ElementCategory, 
+  CATEGORY_DETAILS, 
+  getElement 
+} from '@/lib/chemistry-elements-data';
+
+import { 
+  ALL_COMPOUNDS, 
+  ChemicalCompound, 
+  CompoundCategory, 
+  COMPOUND_CATEGORIES, 
+  getCompound 
+} from '@/lib/chemistry-compounds-data';
+
+import { 
+  CANONICAL_REACTIONS, 
+  ReactionDefinition, 
+  ReactionTypeCategory, 
+  solveReaction,
+  playPopSound,
+  playBubblingSound,
+  playFlameSound,
+  playChimeSound,
+  playClinkSound
+} from '@/lib/chemistry-reactions-engine';
 
 // ==========================================
-//  CHEMISTRY SIMULATOR TYPES & DATA
+// ️ OPTICS SIMULATOR TYPES & ENGINE
 // ==========================================
-
-type Reagent = {
-  id: string;
-  symbol: string;
-  name: string;
-  category: 'element' | 'acid_base' | 'salt';
-  color: string; // Tailwind color class
-  pH: number;
-  state: 'solid' | 'liquid' | 'gas';
-};
-
-const REAGENTS: Reagent[] = [
-  // Elements
-  { id: 'H', symbol: 'H', name: 'Hydrogen', category: 'element', color: 'bg-blue-400', pH: 7, state: 'gas' },
-  { id: 'O', symbol: 'O', name: 'Oxygen', category: 'element', color: 'bg-red-500', pH: 7, state: 'gas' },
-  { id: 'Na', symbol: 'Na', name: 'Sodium', category: 'element', color: 'bg-purple-500', pH: 7, state: 'solid' },
-  { id: 'Cl', symbol: 'Cl', name: 'Chlorine', category: 'element', color: 'bg-emerald-500', pH: 7, state: 'gas' },
-  { id: 'C', symbol: 'C', name: 'Carbon', category: 'element', color: 'bg-slate-600', pH: 7, state: 'solid' },
-  { id: 'N', symbol: 'N', name: 'Nitrogen', category: 'element', color: 'bg-indigo-400', pH: 7, state: 'gas' },
-  { id: 'Fe', symbol: 'Fe', name: 'Iron (Nails)', category: 'element', color: 'bg-amber-600', pH: 7, state: 'solid' },
-  { id: 'S', symbol: 'S', name: 'Sulfur Powder', category: 'element', color: 'bg-yellow-400', pH: 7, state: 'solid' },
-  { id: 'Mg', symbol: 'Mg', name: 'Magnesium Ribbon', category: 'element', color: 'bg-slate-300', pH: 7, state: 'solid' },
-
-  // Acids & Bases
-  { id: 'HCl', symbol: 'HCl', name: 'Hydrochloric Acid', category: 'acid_base', color: 'bg-rose-500', pH: 1.0, state: 'liquid' },
-  { id: 'NaOH', symbol: 'NaOH', name: 'Sodium Hydroxide', category: 'acid_base', color: 'bg-blue-600', pH: 13.5, state: 'liquid' },
-  { id: 'H2SO4', symbol: 'H₂SO₄', name: 'Sulfuric Acid', category: 'acid_base', color: 'bg-red-600', pH: 0.5, state: 'liquid' },
-
-  // Salts & Compounds
-  { id: 'CuSO4', symbol: 'CuSO₄', name: 'Copper Sulfate', category: 'salt', color: 'bg-cyan-500', pH: 5.5, state: 'solid' },
-  { id: 'CaCO3', symbol: 'CaCO₃', name: 'Calcium Carbonate', category: 'salt', color: 'bg-stone-300', pH: 9.0, state: 'solid' },
-  { id: 'Ind', symbol: 'Ind', name: 'Universal Indicator', category: 'salt', color: 'bg-emerald-400', pH: 7.0, state: 'liquid' },
-];
-
-type ReactionResult = {
-  equation: string;
-  product: string;
-  name: string;
-  type: string;
-  desc: string;
-  finalPH: number;
-  liquidColor: string;
-  effect: 'gas' | 'precipitate' | 'heat' | 'neutral' | 'color_change';
-  tempChange: string;
-};
-
-const CHEMISTRY_REACTIONS: Record<string, ReactionResult> = {
-  // Neutralization
-  'HCl-NaOH': {
-    equation: 'HCl + NaOH  NaCl + H₂O',
-    product: 'NaCl + H₂O',
-    name: 'Sodium Chloride & Water',
-    type: 'Neutralization (Acid + Base)',
-    desc: 'Acid and base react to form salt and neutral water. Universal indicator turns green.',
-    finalPH: 7.0,
-    liquidColor: 'from-emerald-500/40 to-teal-600/30',
-    effect: 'neutral',
-    tempChange: '+4.5°C (Exothermic)',
-  },
-  'H2SO4-NaOH': {
-    equation: 'H₂SO₄ + 2NaOH  Na₂SO₄ + 2H₂O',
-    product: 'Na₂SO₄ + 2H₂O',
-    name: 'Sodium Sulfate & Water',
-    type: 'Neutralization',
-    desc: 'Exothermic neutralization producing neutral sodium sulfate salt.',
-    finalPH: 7.0,
-    liquidColor: 'from-teal-500/40 to-emerald-500/30',
-    effect: 'heat',
-    tempChange: '+8.2°C (Exothermic)',
-  },
-
-  // Single Displacement
-  'CuSO4-Fe': {
-    equation: 'Fe + CuSO₄  FeSO₄ + Cu↓',
-    product: 'FeSO₄ + Cu (Reddish-brown ppt)',
-    name: 'Iron(II) Sulfate & Copper Deposit',
-    type: 'Single Displacement Reaction',
-    desc: 'More reactive Iron displaces Copper from copper sulfate. Blue solution turns pale light green, and brown copper deposits on iron nails!',
-    finalPH: 5.5,
-    liquidColor: 'from-emerald-600/60 to-green-800/40',
-    effect: 'precipitate',
-    tempChange: '+3.0°C',
-  },
-  'HCl-Mg': {
-    equation: 'Mg + 2HCl  MgCl₂ + H₂↑',
-    product: 'MgCl₂ + H₂ Gas',
-    name: 'Magnesium Chloride & Hydrogen Gas',
-    type: 'Displacement & Gas Evolution',
-    desc: 'Vigorous reaction releasing Hydrogen gas bubbles which burn with a pop sound when tested with a matchstick.',
-    finalPH: 4.0,
-    liquidColor: 'from-slate-400/30 to-blue-500/20',
-    effect: 'gas',
-    tempChange: '+12.0°C (Vigorous Heat)',
-  },
-
-  // Combination / Synthesis
-  'H-H-O': {
-    equation: '2H₂ + O₂  2H₂O',
-    product: 'H₂O',
-    name: 'Water Synthesis',
-    type: 'Combination (Exothermic)',
-    desc: 'Hydrogen combusts with Oxygen to synthesize pure water with release of heat.',
-    finalPH: 7.0,
-    liquidColor: 'from-cyan-400/40 to-blue-500/30',
-    effect: 'heat',
-    tempChange: '+15.0°C',
-  },
-  'Cl-Na': {
-    equation: '2Na + Cl₂  2NaCl',
-    product: 'NaCl',
-    name: 'Sodium Chloride (Table Salt)',
-    type: 'Ionic Combination',
-    desc: 'Sodium metal burns in chlorine gas with an intense yellow flame to form table salt.',
-    finalPH: 7.0,
-    liquidColor: 'from-purple-500/30 to-indigo-500/30',
-    effect: 'heat',
-    tempChange: '+20.0°C',
-  },
-  'C-O-O': {
-    equation: 'C + O₂  CO₂↑',
-    product: 'CO₂ Gas',
-    name: 'Carbon Dioxide',
-    type: 'Combustion',
-    desc: 'Carbon burns completely in excess oxygen to produce carbon dioxide gas.',
-    finalPH: 6.0,
-    liquidColor: 'from-slate-500/40 to-gray-700/30',
-    effect: 'gas',
-    tempChange: '+18.0°C',
-  },
-  'Fe-S': {
-    equation: 'Fe + S  FeS',
-    product: 'FeS',
-    name: 'Iron(II) Sulfide',
-    type: 'Direct Combination',
-    desc: 'Heating iron filings and sulfur powder produces a dark black non-magnetic compound.',
-    finalPH: 7.0,
-    liquidColor: 'from-yellow-700/50 to-amber-900/40',
-    effect: 'precipitate',
-    tempChange: '+6.0°C',
-  },
-
-  // Decomposition
-  'CaCO3': {
-    equation: 'CaCO₃ + Heat  CaO + CO₂↑',
-    product: 'CaO + CO₂ Gas',
-    name: 'Quicklime & Carbon Dioxide',
-    type: 'Thermal Decomposition',
-    desc: 'Heating limestone (calcium carbonate) decomposes it into quicklime (calcium oxide) and carbon dioxide gas.',
-    finalPH: 11.5,
-    liquidColor: 'from-stone-300/40 to-amber-100/30',
-    effect: 'gas',
-    tempChange: '-2.0°C (Endothermic)',
-  },
-  'CaCO3-HCl': {
-    equation: 'CaCO₃ + 2HCl  CaCl₂ + H₂O + CO₂↑',
-    product: 'CaCl₂ + H₂O + CO₂ Gas',
-    name: 'Calcium Chloride, Water & Carbon Dioxide',
-    type: 'Double Displacement & Decomposition',
-    desc: 'Effervescence observed as brisk bubbles of Carbon Dioxide gas are evolved, turning lime water milky.',
-    finalPH: 6.0,
-    liquidColor: 'from-amber-200/30 to-slate-400/20',
-    effect: 'gas',
-    tempChange: '+5.0°C',
-  }
-};
-
-// ==========================================
-// ️ OPTICS SIMULATOR TYPES & PHYSICS ENGINE
-// ==========================================
-
 type OpticElementType = 'convex_lens' | 'concave_lens' | 'concave_mirror' | 'convex_mirror' | 'plane_mirror';
 
 type OpticResult = {
-  v: number; // Image distance (cm) - sign convention: right = +ve, left = -ve
-  m: number; // Magnification
-  hi: number; // Image height (cm)
+  v: number;
+  m: number;
+  hi: number;
   isReal: boolean;
   isInverted: boolean;
   isMagnified: boolean;
@@ -195,12 +57,11 @@ type OpticResult = {
 };
 
 function calculateOptics(type: OpticElementType, fMag: number, uMag: number, ho: number): OpticResult {
-  // u is always to the left of element in standard ray diagrams: u = -uMag
   const u = -uMag;
 
   if (type === 'plane_mirror') {
     return {
-      v: uMag, // Behind mirror (+ve)
+      v: uMag,
       m: 1.0,
       hi: ho,
       isReal: false,
@@ -216,35 +77,31 @@ function calculateOptics(type: OpticElementType, fMag: number, uMag: number, ho:
   let m = 0;
 
   if (type === 'convex_lens') {
-    // Convex Lens: f > 0
     f = fMag;
     if (Math.abs(uMag - f) < 0.1) {
       v = Infinity;
       m = Infinity;
     } else {
       v = (f * uMag) / (uMag - f);
-      m = v / u; // Lens magnification m = v / u = v / (-uMag)
+      m = v / u;
     }
   } else if (type === 'concave_lens') {
-    // Concave Lens: f < 0 (-fMag)
     f = -fMag;
     v = -(fMag * uMag) / (uMag + fMag);
-    m = v / u; // Lens m = v / u
+    m = v / u;
   } else if (type === 'concave_mirror') {
-    // Concave Mirror: f < 0 (-fMag)
     f = -fMag;
     if (Math.abs(uMag - fMag) < 0.1) {
       v = Infinity;
       m = Infinity;
     } else {
       v = -(fMag * uMag) / (uMag - fMag);
-      m = -(v / u); // Mirror m = -v / u = -v / (-uMag) = v / uMag
+      m = -(v / u);
     }
   } else if (type === 'convex_mirror') {
-    // Convex Mirror: f > 0 (+fMag)
     f = fMag;
     v = (fMag * uMag) / (uMag + fMag);
-    m = -(v / u); // Mirror m = -v / (-uMag) = v / uMag
+    m = -(v / u);
   }
 
   const hi = m === Infinity ? Infinity : m * ho;
@@ -253,7 +110,6 @@ function calculateOptics(type: OpticElementType, fMag: number, uMag: number, ho:
   const absM = Math.abs(m);
   const isMagnified = absM > 1.0;
 
-  // Position Description
   let posText = '';
   if (v === Infinity) {
     posText = 'At Infinity (Parallel rays)';
@@ -279,200 +135,370 @@ function calculateOptics(type: OpticElementType, fMag: number, uMag: number, ho:
     ? 'Real, Highly Enlarged at Infinity' 
     : `${isReal ? 'Real' : 'Virtual'} & ${isInverted ? 'Inverted' : 'Erect'} (${absM > 1.05 ? 'Magnified' : absM < 0.95 ? 'Diminished' : 'Same Size'})`;
 
-  return {
-    v,
-    m,
-    hi,
-    isReal,
-    isInverted,
-    isMagnified,
-    natureText,
-    positionText: posText
-  };
+  return { v, m, hi, isReal, isInverted, isMagnified, natureText, positionText: posText };
 }
 
 // ==========================================
-//  MAIN SANDBOX PAGE COMPONENT
+//  MAIN VIRTUAL SCIENCE SANDBOX PAGE
 // ==========================================
-
 export default function SandboxPage() {
-  const [activeTab, setActiveTab] = useState<'chemistry' | 'optics'>('chemistry');
+  const [activeTab, setActiveTab] = useState<'chemistry' | 'periodictable' | 'compendium' | 'optics'>('chemistry');
+  const [soundEnabled, setSoundEnabled] = useState(true);
 
   // ------------------------------------------
-  // Chemistry Workbench States
+  // Virtual Chemistry Lab States
   // ------------------------------------------
-  const [chemCategory, setChemCategory] = useState<'all' | 'element' | 'acid_base' | 'salt'>('all');
-  const [workspace, setWorkspace] = useState<Reagent[]>([]);
-  const [result, setResult] = useState<ReactionResult | null>(null);
+  const [shelfTab, setShelfTab] = useState<'all' | 'elements' | 'acids' | 'bases' | 'salts' | 'oxides' | 'organics' | 'indicators'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [beakerReagents, setBeakerReagents] = useState<{ id: string; name: string; symbol: string; color: string; pH: number; isElement?: boolean }[]>([]);
+  
+  // Apparatus Conditions
+  const [heatApplied, setHeatApplied] = useState(false);
+  const [sunlightApplied, setSunlightApplied] = useState(false);
+  const [electricityApplied, setElectricityApplied] = useState(false);
+  const [selectedCatalyst, setSelectedCatalyst] = useState<string | null>(null);
+
+  // Lab Reaction Evaluation States
+  const [reactionResult, setReactionResult] = useState<ReactionDefinition | null>(null);
   const [isReacting, setIsReacting] = useState(false);
 
-  const addReagent = (r: Reagent) => {
-    if (workspace.length >= 4) return;
-    setWorkspace([...workspace, r]);
-    setResult(null);
-  };
+  // Diagnostic Test Tools
+  const [splintTestActive, setSplintTestActive] = useState(false);
+  const [splintResult, setSplintResult] = useState<string | null>(null);
+  const [pHStripDipped, setPHStripDipped] = useState(false);
+  const [limewaterBubblerActive, setLimewaterBubblerActive] = useState(false);
+  const [limewaterMilky, setLimewaterMilky] = useState(false);
 
-  const handleReact = () => {
-    if (workspace.length === 0) return;
-    setIsReacting(true);
+  // Periodic Table Modal Inspector State
+  const [selectedElement, setSelectedElement] = useState<ChemicalElement | null>(null);
+  const [ptCategoryFilter, setPtCategoryFilter] = useState<string>('all');
+  const [ptBlockFilter, setPtBlockFilter] = useState<string>('all');
+  const [ptSearchQuery, setPtSearchQuery] = useState<string>('');
 
-    setTimeout(() => {
-      // Sort symbols for matching keys
-      const ids = workspace.map(r => r.id).sort().join('-');
-      let matched = CHEMISTRY_REACTIONS[ids];
-
-      if (!matched) {
-        // Try fallback matches
-        const concat = workspace.map(r => r.id).sort().join('');
-        if (concat.includes('HCl') && concat.includes('NaOH')) matched = CHEMISTRY_REACTIONS['HCl-NaOH'];
-        else if (concat.includes('CuSO4') && concat.includes('Fe')) matched = CHEMISTRY_REACTIONS['CuSO4-Fe'];
-        else if (concat.includes('HCl') && concat.includes('Mg')) matched = CHEMISTRY_REACTIONS['HCl-Mg'];
-        else if (concat.includes('CaCO3') && concat.includes('HCl')) matched = CHEMISTRY_REACTIONS['CaCO3-HCl'];
-        else if (concat.includes('H2SO4') && concat.includes('NaOH')) matched = CHEMISTRY_REACTIONS['H2SO4-NaOH'];
-        else if (concat === 'HHO' || concat === 'HH' + 'O') matched = CHEMISTRY_REACTIONS['H-H-O'];
-        else if (concat === 'ClNa' || concat === 'NaCl') matched = CHEMISTRY_REACTIONS['Cl-Na'];
-        else if (concat === 'COO') matched = CHEMISTRY_REACTIONS['C-O-O'];
-        else if (concat === 'FeS') matched = CHEMISTRY_REACTIONS['Fe-S'];
-        else if (concat === 'CaCO3') matched = CHEMISTRY_REACTIONS['CaCO3'];
-      }
-
-      if (matched) {
-        setResult(matched);
-      } else {
-        // Compute average pH for mixed unreacted liquid
-        const avgPH = workspace.reduce((acc, r) => acc + r.pH, 0) / workspace.length;
-        setResult({
-          equation: 'No Chemical Reaction',
-          product: 'Mixture / Solution',
-          name: 'Physical Mixture',
-          type: 'No Reaction Observed',
-          desc: 'These reagents do not undergo a common NCERT chemical reaction under room temperature.',
-          finalPH: avgPH,
-          liquidColor: avgPH < 6 ? 'from-rose-500/30 to-amber-500/20' : avgPH > 8 ? 'from-blue-600/30 to-indigo-600/20' : 'from-emerald-500/30 to-teal-500/20',
-          effect: 'neutral',
-          tempChange: '0°C'
-        });
-      }
-      setIsReacting(false);
-    }, 1000);
-  };
-
-  const clearWorkspace = () => {
-    setWorkspace([]);
-    setResult(null);
-  };
-
-  // Compute Current Beaker Liquid pH
-  const currentPH = result 
-    ? result.finalPH 
-    : workspace.length > 0 
-    ? workspace.reduce((acc, r) => acc + r.pH, 0) / workspace.length 
-    : 7.0;
+  // Reaction Compendium Search & Filter State
+  const [compendiumCategory, setCompendiumCategory] = useState<string>('all');
+  const [compendiumSearch, setCompendiumSearch] = useState<string>('');
 
   // ------------------------------------------
-  // Optics Physics States & Calculations
+  // Optics Lab States
   // ------------------------------------------
   const [opticsMode, setOpticsMode] = useState<'ray_optics' | 'snell_refraction'>('ray_optics');
   const [elementType, setElementType] = useState<OpticElementType>('convex_lens');
-  const [focalLength, setFocalLength] = useState<number>(30); // cm
-  const [objectDistance, setObjectDistance] = useState<number>(50); // cm
-  const [objectHeight, setObjectHeight] = useState<number>(30); // cm
-
-  // Refraction mode states (Snell's Law)
+  const [focalLength, setFocalLength] = useState<number>(30);
+  const [objectDistance, setObjectDistance] = useState<number>(50);
+  const [objectHeight, setObjectHeight] = useState<number>(30);
   const [incidentAngle, setIncidentAngle] = useState<number>(45);
   const [refractiveIndex, setRefractiveIndex] = useState<number>(1.52);
   const [mediumName, setMediumName] = useState<string>("Crown Glass");
 
-  // Perform Ray Optics Math
   const opticsRes = calculateOptics(elementType, focalLength, objectDistance, objectHeight);
-
-  // Snell's Law Math
   const radI = (incidentAngle * Math.PI) / 180;
   const sinR = Math.sin(radI) / refractiveIndex;
   const radR = Math.asin(Math.min(1, Math.max(-1, sinR)));
   const refractedAngle = (radR * 180) / Math.PI;
 
-  const filteredReagents = REAGENTS.filter(r => chemCategory === 'all' || r.category === chemCategory);
+  // Add reagent to beaker
+  const handleAddReagent = (item: { id: string; name: string; symbol: string; color: string; pH: number; isElement?: boolean }) => {
+    if (beakerReagents.length >= 6) return;
+    setBeakerReagents(prev => [...prev, item]);
+    setReactionResult(null);
+    setSplintResult(null);
+    setPHStripDipped(false);
+    setLimewaterMilky(false);
+    if (soundEnabled) playClinkSound();
+  };
+
+  const handleRemoveReagent = (idx: number) => {
+    setBeakerReagents(prev => prev.filter((_, i) => i !== idx));
+    setReactionResult(null);
+    setSplintResult(null);
+    setPHStripDipped(false);
+    setLimewaterMilky(false);
+  };
+
+  const handleClearBeaker = () => {
+    setBeakerReagents([]);
+    setReactionResult(null);
+    setSplintResult(null);
+    setPHStripDipped(false);
+    setLimewaterMilky(false);
+    setHeatApplied(false);
+    setSunlightApplied(false);
+    setElectricityApplied(false);
+    setSelectedCatalyst(null);
+  };
+
+  // Trigger Reaction Evaluation
+  const handleSynthesizeReaction = () => {
+    if (beakerReagents.length === 0) return;
+    setIsReacting(true);
+
+    setTimeout(() => {
+      const reactantIds = beakerReagents.map(r => r.id);
+      const res = solveReaction(reactantIds, {
+        heat: heatApplied,
+        sunlight: sunlightApplied,
+        electricity: electricityApplied,
+        catalyst: selectedCatalyst || undefined
+      });
+
+      setReactionResult(res);
+      setIsReacting(false);
+
+      // Play appropriate sound effect based on reaction effect
+      if (soundEnabled) {
+        if (res.visualEffect === 'flame' || res.category === 'combustion' || res.category === 'thermite') {
+          playFlameSound();
+        } else if (res.visualEffect === 'gas' || res.gasEvolved) {
+          playBubblingSound(2);
+        } else if (res.visualEffect === 'precipitate' || res.precipitate) {
+          playChimeSound();
+        }
+      }
+    }, 600);
+  };
+
+  // Run Splint Test
+  const handleRunSplintTest = () => {
+    setSplintTestActive(true);
+    if (!reactionResult || !reactionResult.splintTest || reactionResult.splintTest === 'none') {
+      setSplintResult("No distinctive flammable or oxidizing gas detected (Flame unaffected).");
+    } else if (reactionResult.splintTest === 'pop') {
+      if (soundEnabled) playPopSound();
+      setSplintResult("🔥💥 LOUD 'POP' SOUND! Burning splint ignited hydrogen gas ($H_2$) with characteristic pop sound!");
+    } else if (reactionResult.splintTest === 'rekindle') {
+      if (soundEnabled) playFlameSound();
+      setSplintResult("✨ Glowing wooden splint bursts vigorously back into flame! Confirms pure Oxygen gas ($O_2$).");
+    } else if (reactionResult.splintTest === 'extinguish') {
+      setSplintResult("💨 Flame instantly extinguished! Confirms Carbon Dioxide ($CO_2$) / Nitrogen ($N_2$) suffocating gas.");
+    }
+  };
+
+  // Run Limewater Test
+  const handleRunLimewaterTest = () => {
+    setLimewaterBubblerActive(true);
+    if (reactionResult?.limewaterTest || reactionResult?.gasEvolved?.includes('CO₂')) {
+      if (soundEnabled) playBubblingSound(1.5);
+      setLimewaterMilky(true);
+    } else {
+      setLimewaterMilky(false);
+    }
+  };
+
+  // Load a Reaction directly from the compendium into the beaker
+  const handleLoadReaction = (rxn: ReactionDefinition) => {
+    handleClearBeaker();
+    const newReagents: { id: string; name: string; symbol: string; color: string; pH: number; isElement?: boolean }[] = [];
+
+    rxn.reactants.forEach(rId => {
+      const el = getElement(rId);
+      if (el) {
+        newReagents.push({ id: el.symbol, name: el.name, symbol: el.symbol, color: el.color, pH: el.pH, isElement: true });
+        return;
+      }
+      const comp = getCompound(rId);
+      if (comp) {
+        newReagents.push({ id: comp.id, name: comp.name, symbol: comp.formula, color: comp.color, pH: comp.pH, isElement: false });
+        return;
+      }
+      newReagents.push({ id: rId, name: rId, symbol: rId, color: 'bg-indigo-500', pH: 7.0 });
+    });
+
+    setBeakerReagents(newReagents);
+    if (rxn.requiredConditions?.heat) setHeatApplied(true);
+    if (rxn.requiredConditions?.sunlight) setSunlightApplied(true);
+    if (rxn.requiredConditions?.electricity) setElectricityApplied(true);
+    if (rxn.requiredConditions?.catalyst) setSelectedCatalyst(rxn.requiredConditions.catalyst);
+
+    setReactionResult(rxn);
+    setActiveTab('chemistry');
+  };
+
+  // Compute Current Liquid pH
+  const currentPH = reactionResult
+    ? reactionResult.finalPH
+    : beakerReagents.length > 0
+    ? beakerReagents.reduce((acc, r) => acc + r.pH, 0) / beakerReagents.length
+    : 7.0;
+
+  // Filter shelf items
+  const filteredElements = useMemo(() => {
+    return ALL_ELEMENTS.filter(el => {
+      const matchesSearch = !searchQuery || el.name.toLowerCase().includes(searchQuery.toLowerCase()) || el.symbol.toLowerCase().includes(searchQuery.toLowerCase()) || el.number.toString() === searchQuery;
+      return matchesSearch;
+    });
+  }, [searchQuery]);
+
+  const filteredCompounds = useMemo(() => {
+    return ALL_COMPOUNDS.filter(cp => {
+      const matchesSearch = !searchQuery || cp.name.toLowerCase().includes(searchQuery.toLowerCase()) || cp.formula.toLowerCase().includes(searchQuery.toLowerCase()) || (cp.commonName && cp.commonName.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesTab = shelfTab === 'all' || 
+        (shelfTab === 'acids' && cp.category === 'acid') ||
+        (shelfTab === 'bases' && cp.category === 'base') ||
+        (shelfTab === 'salts' && cp.category === 'salt') ||
+        (shelfTab === 'oxides' && cp.category === 'oxide') ||
+        (shelfTab === 'organics' && cp.category === 'organic') ||
+        (shelfTab === 'indicators' && cp.category === 'indicator');
+      return matchesSearch && matchesTab;
+    });
+  }, [searchQuery, shelfTab]);
+
+  // Filter Periodic Table view
+  const periodicTableElements = useMemo(() => {
+    return ALL_ELEMENTS.filter(el => {
+      const matchesCat = ptCategoryFilter === 'all' || el.category === ptCategoryFilter;
+      const matchesBlock = ptBlockFilter === 'all' || el.block === ptBlockFilter;
+      const matchesSearch = !ptSearchQuery || el.name.toLowerCase().includes(ptSearchQuery.toLowerCase()) || el.symbol.toLowerCase().includes(ptSearchQuery.toLowerCase()) || el.number.toString() === ptSearchQuery;
+      return matchesCat && matchesBlock && matchesSearch;
+    });
+  }, [ptCategoryFilter, ptBlockFilter, ptSearchQuery]);
+
+  // Filter Compendium
+  const filteredCompendium = useMemo(() => {
+    return CANONICAL_REACTIONS.filter(rxn => {
+      const matchesCat = compendiumCategory === 'all' || rxn.category === compendiumCategory;
+      const matchesSearch = !compendiumSearch || 
+        rxn.name.toLowerCase().includes(compendiumSearch.toLowerCase()) || 
+        rxn.equation.toLowerCase().includes(compendiumSearch.toLowerCase()) ||
+        rxn.type.toLowerCase().includes(compendiumSearch.toLowerCase()) ||
+        (rxn.ncertActivity && rxn.ncertActivity.toLowerCase().includes(compendiumSearch.toLowerCase()));
+      return matchesCat && matchesSearch;
+    });
+  }, [compendiumCategory, compendiumSearch]);
 
   return (
     <div className="min-h-screen dark:bg-[#03050d] bg-[#eef1f9] text-slate-100 font-sans p-3 sm:p-6 lg:p-8 relative selection:bg-indigo-500/30">
       
-      {/* Background Orbs */}
-      <div className="fixed top-0 left-1/3 w-[50vw] h-[50vw] bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="fixed bottom-0 right-1/3 w-[50vw] h-[50vw] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none" />
+      {/* Dynamic Background Glows */}
+      <div className="fixed top-0 left-1/4 w-[50vw] h-[50vw] bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="fixed bottom-0 right-1/4 w-[50vw] h-[50vw] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none" />
 
-      {/* Header Bar */}
-      <header className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 relative z-10">
+      {/* Top Header Bar */}
+      <header className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 mb-6 relative z-10">
         <div className="flex items-center gap-3.5">
-          <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-3 rounded-2xl border border-white/10 shadow-lg shadow-indigo-500/30">
-            <Beaker className="w-6 h-6 sm:w-7 sm:h-7 dark:text-white text-slate-900" />
+          <div className="bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 p-3 rounded-2xl border border-white/10 shadow-lg shadow-indigo-500/30">
+            <FlaskConical className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-300">
-              Interactive Sim Sandbox
-            </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-semibold">NCERT Virtual Physics & Chemistry Simulator</p>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-300">
+                Interactive Science Sim Sandbox
+              </h1>
+              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                118 Elements & 150+ Rxns
+              </span>
+            </div>
+            <p className="text-slate-400 text-xs sm:text-sm font-semibold">
+              Complete Virtual Chemistry Laboratory, All 118 Elements, Real-time Reaction Engine & Optics Physics
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-          {/* Main Mode Switcher */}
-          <div className="flex p-1 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md">
+        <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
+          {/* Main Mode Navigation Bar */}
+          <div className="flex p-1 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md overflow-x-auto max-w-full">
             <button
               onClick={() => setActiveTab('chemistry')}
-              className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
-                activeTab === 'chemistry' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-500 dark:text-slate-400 hover:text-white'
+              className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${
+                activeTab === 'chemistry' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Beaker className="w-4 h-4" /> Molecular Chemistry Lab
+              <Beaker className="w-3.5 h-3.5 text-orange-400" /> Virtual Lab
+            </button>
+            <button
+              onClick={() => setActiveTab('periodictable')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${
+                activeTab === 'periodictable' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Atom className="w-3.5 h-3.5 text-cyan-400" /> Periodic Table 118
+            </button>
+            <button
+              onClick={() => setActiveTab('compendium')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${
+                activeTab === 'compendium' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5 text-emerald-400" /> Reactions Compendium
             </button>
             <button
               onClick={() => setActiveTab('optics')}
-              className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
-                activeTab === 'optics' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-500 dark:text-slate-400 hover:text-white'
+              className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${
+                activeTab === 'optics' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Eye className="w-4 h-4" /> Light Optics & Ray Lab
+              <Eye className="w-3.5 h-3.5 text-pink-400" /> Optics Ray Lab
             </button>
           </div>
 
-          <Link href="/dashboard" className="hidden lg:flex items-center gap-2 bg-white/5 hover:bg-white/10 px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all border border-white/10 text-slate-600 dark:text-slate-300">
-            <Home className="w-4 h-4" /> Exit Sandbox
+          {/* Sound Toggle */}
+          <button
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 transition-all"
+            title={soundEnabled ? "Mute Lab Sound FX" : "Unmute Lab Sound FX"}
+          >
+            {soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-400" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
+          </button>
+
+          <Link href="/dashboard" className="hidden xl:flex items-center gap-2 bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl text-xs font-extrabold transition-all border border-white/10 text-slate-300">
+            <Home className="w-4 h-4" /> Exit
           </Link>
         </div>
       </header>
 
       {/* ───────────────────────────────────────────────────────────── */}
-      {/*  TAB 1: ENHANCED CHEMISTRY MOLECULAR LABORATORY             */}
+      {/*  TAB 1: VIRTUAL CHEMISTRY LAB & MOLECULAR REACTION WORKBENCH  */}
       {/* ───────────────────────────────────────────────────────────── */}
       {activeTab === 'chemistry' && (
         <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
           
-          {/* Left Panel: Categorized Shelf (4 Cols) */}
-          <div className="lg:col-span-4 dark:bg-[#070916] bg-[#eef1f9] border border-white/10 rounded-3xl p-5 shadow-2xl backdrop-blur-xl flex flex-col h-[580px]">
+          {/* Left Column: Comprehensive Reagent & Element Shelf (5 Cols) */}
+          <div className="lg:col-span-5 dark:bg-[#070916] bg-white dark:border-white/10 border-slate-200 rounded-3xl p-5 shadow-2xl backdrop-blur-xl flex flex-col h-[700px]">
             
+            {/* Shelf Header */}
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-sm font-black dark:text-white text-slate-900 flex items-center gap-2 uppercase tracking-wider">
-                <Atom className="w-4 h-4 dark:text-indigo-400 text-indigo-700" /> Reagent & Element Shelf
+                <Atom className="w-4 h-4 text-indigo-400" /> Reagent & Element Shelf
               </h2>
-              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg border border-white/10">
-                {filteredReagents.length} Available
+              <span className="text-[11px] font-bold text-slate-400 bg-white/5 px-2.5 py-0.5 rounded-lg border border-white/10">
+                118 Elements • 60+ Compounds
               </span>
             </div>
 
-            {/* Shelf Category Tabs */}
-            <div className="flex gap-1.5 p-1 bg-black/40 border border-white/5 rounded-xl mb-3">
+            {/* Shelf Search Input */}
+            <div className="relative mb-3">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400" />
+              <input 
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search symbol (Na, Fe, HCl, CuSO4) or name..."
+                className="w-full pl-9 pr-3 py-2 bg-black/30 border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all font-mono"
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} className="absolute right-2.5 top-2.5 text-slate-400 hover:text-white">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Category Filter Pills */}
+            <div className="flex gap-1.5 p-1 bg-black/40 border border-white/5 rounded-xl mb-3 overflow-x-auto shrink-0">
               {[
                 { id: 'all', label: 'All' },
-                { id: 'element', label: 'Elements' },
-                { id: 'acid_base', label: 'Acids/Bases' },
-                { id: 'salt', label: 'Compounds' },
+                { id: 'elements', label: '118 Elements' },
+                { id: 'acids', label: 'Acids' },
+                { id: 'bases', label: 'Bases' },
+                { id: 'salts', label: 'Salts' },
+                { id: 'oxides', label: 'Oxides' },
+                { id: 'organics', label: 'Organics' },
+                { id: 'indicators', label: 'Indicators' },
               ].map(cat => (
                 <button
                   key={cat.id}
-                  onClick={() => setChemCategory(cat.id as any)}
-                  className={`flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
-                    chemCategory === cat.id ? 'bg-indigo-500 text-white font-extrabold shadow' : 'text-slate-500 dark:text-slate-400 hover:text-white'
+                  onClick={() => setShelfTab(cat.id as any)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${
+                    shelfTab === cat.id ? 'bg-indigo-500 text-white font-extrabold shadow' : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   {cat.label}
@@ -480,106 +506,196 @@ export default function SandboxPage() {
               ))}
             </div>
 
-            {/* Grid of Reagent Cards */}
-            <div className="grid grid-cols-2 gap-2.5 flex-1 overflow-y-auto pr-1">
-              {filteredReagents.map((r) => (
-                <button 
-                  key={r.id}
-                  onClick={() => addReagent(r)}
-                  className={`p-3 rounded-2xl border border-white/10 flex flex-col items-center justify-center gap-1.5 transition-all hover:scale-105 active:scale-95 ${r.color} bg-opacity-15 hover:bg-opacity-30 text-left relative group`}
+            {/* Reagents Card Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 flex-1 overflow-y-auto pr-1">
+              
+              {/* Render 118 Elements if on 'all' or 'elements' tab */}
+              {(shelfTab === 'all' || shelfTab === 'elements') && filteredElements.map(el => (
+                <button
+                  key={`el_${el.number}`}
+                  onClick={() => handleAddReagent({ id: el.symbol, name: el.name, symbol: el.symbol, color: el.color, pH: el.pH, isElement: true })}
+                  className="p-2.5 rounded-xl border border-white/10 dark:bg-black/50 bg-slate-900 flex flex-col items-center justify-center gap-1.5 transition-all hover:scale-105 active:scale-95 hover:border-indigo-500/50 hover:bg-white/10 text-left relative group shadow-sm"
                 >
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-md ${r.color}`}>
-                    {r.symbol}
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-black text-xs shadow-md ${el.color}`}>
+                    {el.symbol}
                   </div>
-                  <span className="text-[11px] font-bold dark:text-slate-200 text-slate-800 text-center line-clamp-1">{r.name}</span>
-                  <span className="text-[9px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-tighter">
-                    {r.state} • pH {r.pH}
+                  <span className="text-[11px] font-bold text-white text-center line-clamp-1 group-hover:text-indigo-300 transition-colors">
+                    {el.name}
+                  </span>
+                  <span className="text-[9px] font-mono font-semibold text-slate-300 uppercase">
+                    Z={el.number} • {el.state}
                   </span>
                 </button>
               ))}
+
+              {/* Render Compounds */}
+              {(shelfTab !== 'elements') && filteredCompounds.map(comp => (
+                <button
+                  key={`comp_${comp.id}`}
+                  onClick={() => handleAddReagent({ id: comp.id, name: comp.name, symbol: comp.formula, color: comp.color, pH: comp.pH, isElement: false })}
+                  className="p-2.5 rounded-xl border border-white/10 dark:bg-black/50 bg-slate-900 flex flex-col items-center justify-center gap-1.5 transition-all hover:scale-105 active:scale-95 hover:border-indigo-500/50 hover:bg-white/10 text-left relative group shadow-sm"
+                >
+                  <div className={`px-2.5 py-1 rounded-md flex items-center justify-center text-white font-black text-[11px] font-mono shadow-md ${comp.color}`}>
+                    {comp.formula}
+                  </div>
+                  <span className="text-[11px] font-bold text-white text-center line-clamp-1 group-hover:text-indigo-300 transition-colors">
+                    {comp.name}
+                  </span>
+                  <span className="text-[9px] font-mono font-semibold text-slate-300 uppercase">
+                    pH {comp.pH} • {comp.category}
+                  </span>
+                </button>
+              ))}
+
             </div>
 
-            {/* Quick NCERT Mixing Hints */}
-            <div className="mt-3 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl">
-              <p className="text-[11px] dark:text-indigo-300 text-indigo-700 font-semibold leading-relaxed">
-                 <strong>Try mixing:</strong><br />
-                • <strong className="dark:text-white text-slate-900">Fe + CuSO₄</strong> (Displacement & color change)<br />
-                • <strong className="dark:text-white text-slate-900">HCl + NaOH</strong> (Neutralization to pH 7.0)<br />
-                • <strong className="dark:text-white text-slate-900">Mg + HCl</strong> (Effervescence H₂ gas)
+            {/* Quick NCERT Mixing Cheatsheet */}
+            <div className="mt-3 p-3 bg-indigo-500/15 border border-indigo-500/30 rounded-2xl shrink-0">
+              <p className="text-[11px] text-slate-200 font-medium leading-relaxed">
+                💡 <strong className="text-indigo-300">Try famous reactions:</strong><br />
+                • <span className="text-cyan-300 font-bold">Fe + CuSO₄</span> (Displacement) • <span className="text-emerald-300 font-bold">Na₂SO₄ + BaCl₂</span> (White ppt)<br />
+                • <span className="text-yellow-300 font-bold">Zn + HCl</span> (H₂ Pop Test) • <span className="text-pink-300 font-bold">CaCO₃ + HCl</span> (CO₂ limewater)<br />
+                • <span className="text-orange-300 font-bold">Pb(NO₃)₂ + Heat</span> (Brown NO₂ fumes + Bunsen 🔥)
               </p>
             </div>
+
           </div>
 
-          {/* Right Panel: Beaker Visualizer & Workbench (8 Cols) */}
-          <div className="lg:col-span-8 dark:bg-[#070916] bg-[#eef1f9] border border-white/10 rounded-3xl p-6 shadow-2xl backdrop-blur-xl flex flex-col relative overflow-hidden min-h-[580px]">
+          {/* Right Column: Interactive Apparatus, Animated Beaker & Results (7 Cols) */}
+          <div className="lg:col-span-7 dark:bg-[#070916] bg-white dark:border-white/10 border-slate-200 rounded-3xl p-6 shadow-2xl backdrop-blur-xl flex flex-col h-[700px] overflow-y-auto">
             
             {/* Top Toolbar */}
-            <div className="flex items-center justify-between mb-4 relative z-10 border-b border-white/5 pb-3">
-              <h2 className="text-sm font-black dark:text-white text-slate-900 flex items-center gap-2 uppercase tracking-wider">
-                <Flame className="w-4 h-4 text-orange-400" /> Reaction Deck & Animated Beaker
-              </h2>
+            <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
+              <div className="flex items-center gap-2">
+                <Flame className="w-4 h-4 text-orange-400" />
+                <h2 className="text-sm font-black dark:text-white text-slate-900 uppercase tracking-wider">
+                  Reaction Deck & Virtual Apparatus
+                </h2>
+              </div>
               <button 
-                onClick={clearWorkspace}
-                className="flex items-center gap-1.5 text-xs font-black uppercase text-slate-500 dark:text-slate-400 hover:dark:text-white text-slate-900 transition-colors px-3 py-1.5 bg-white/5 rounded-xl border border-white/10"
+                onClick={handleClearBeaker}
+                className="flex items-center gap-1.5 text-xs font-black uppercase text-slate-400 hover:text-white transition-colors px-3 py-1.5 bg-white/5 rounded-xl border border-white/10"
               >
-                <RefreshCw className="w-3.5 h-3.5" /> Clear Beaker
+                <RefreshCw className="w-3.5 h-3.5" /> Clear Deck
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 flex-1 items-center relative z-10">
+            {/* Apparatus Controls Bar (Bunsen Heat, Electricity, Sunlight, Catalysts) */}
+            <div className="p-3 bg-black/40 border border-white/10 rounded-2xl mb-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
               
-              {/* Added Reagents Pills (5 Cols) */}
-              <div className="md:col-span-5 flex flex-col justify-between h-full space-y-4">
+              {/* Bunsen Burner Heat Toggle */}
+              <button
+                onClick={() => setHeatApplied(!heatApplied)}
+                className={`p-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all ${
+                  heatApplied 
+                    ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-500/30 ring-2 ring-orange-400' 
+                    : 'bg-white/5 border border-white/5 text-slate-400 hover:text-white'
+                }`}
+              >
+                <Flame className={`w-4 h-4 ${heatApplied ? 'animate-bounce text-yellow-300' : 'text-orange-400'}`} />
+                {heatApplied ? '🔥 Heat ON (Δ)' : 'Heat (Δ)'}
+              </button>
+
+              {/* Electrolysis Current Toggle */}
+              <button
+                onClick={() => setElectricityApplied(!electricityApplied)}
+                className={`p-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all ${
+                  electricityApplied 
+                    ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 ring-2 ring-cyan-400' 
+                    : 'bg-white/5 border border-white/5 text-slate-400 hover:text-white'
+                }`}
+              >
+                <BatteryCharging className={`w-4 h-4 ${electricityApplied ? 'animate-pulse text-cyan-300' : 'text-blue-400'}`} />
+                {electricityApplied ? '⚡ Current ON' : 'Electrolysis'}
+              </button>
+
+              {/* Sunlight / UV Toggle */}
+              <button
+                onClick={() => setSunlightApplied(!sunlightApplied)}
+                className={`p-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all ${
+                  sunlightApplied 
+                    ? 'bg-gradient-to-r from-yellow-500 to-amber-600 text-white shadow-lg shadow-yellow-500/30 ring-2 ring-yellow-400' 
+                    : 'bg-white/5 border border-white/5 text-slate-400 hover:text-white'
+                }`}
+              >
+                <Sun className={`w-4 h-4 ${sunlightApplied ? 'animate-spin text-yellow-200' : 'text-amber-400'}`} />
+                {sunlightApplied ? '☀️ Sunlight (hν)' : 'Sunlight (hν)'}
+              </button>
+
+              {/* Catalyst Selector */}
+              <select
+                value={selectedCatalyst || ''}
+                onChange={(e) => setSelectedCatalyst(e.target.value || null)}
+                className="bg-black/50 border border-white/10 text-xs text-slate-200 rounded-xl px-2 py-1 font-mono focus:outline-none focus:border-indigo-500"
+              >
+                <option value="">🧪 No Catalyst</option>
+                <option value="MnO₂">MnO₂ (Oxidant / Peroxide)</option>
+                <option value="Pt">Pt (Platinum)</option>
+                <option value="Ni">Ni (Nickel Hydrogenation)</option>
+                <option value="Conc. H₂SO₄">Conc. H₂SO₄ (Ester)</option>
+                <option value="Fe / Mo">Fe / Mo (Haber)</option>
+              </select>
+
+            </div>
+
+            {/* Workbench Middle Row: Reagents Added & Animated SVG Flask Visualizer */}
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center mb-4">
+              
+              {/* Added Reagents in Vessel (5 Cols) */}
+              <div className="sm:col-span-5 flex flex-col justify-between space-y-3">
                 <div>
-                  <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Reagents in Beaker:</h3>
-                  {workspace.length === 0 ? (
-                    <div className="p-6 border border-dashed border-white/10 rounded-2xl text-center text-slate-500">
-                      <Atom className="w-8 h-8 mx-auto mb-2 opacity-40 dark:text-indigo-400 text-indigo-700" />
-                      <p className="text-xs font-semibold">Click elements on the left shelf to place them in the reaction beaker.</p>
+                  <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-2">
+                    Reagents in Flask ({beakerReagents.length}/6):
+                  </h3>
+
+                  {beakerReagents.length === 0 ? (
+                    <div className="p-4 border border-dashed border-white/10 rounded-2xl text-center text-slate-500">
+                      <Atom className="w-6 h-6 mx-auto mb-1 opacity-40 text-indigo-400" />
+                      <p className="text-[11px] font-semibold">Click elements or compounds from the left shelf to add them.</p>
                     </div>
                   ) : (
-                    <div className="space-y-2">
-                      {workspace.map((r, idx) => (
-                        <div key={idx} className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between animate-in zoom-in duration-200">
-                          <div className="flex items-center gap-2.5">
-                            <span className={`w-7 h-7 rounded-lg text-xs font-black flex items-center justify-center text-white ${r.color}`}>
+                    <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-1">
+                      {beakerReagents.map((r, idx) => (
+                        <div key={idx} className="p-2 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between animate-in zoom-in-50 duration-150">
+                          <div className="flex items-center gap-2">
+                            <span className={`min-w-[1.75rem] h-6 px-1.5 rounded-md text-[10px] font-black flex items-center justify-center text-white shadow-sm ${r.color}`}>
                               {r.symbol}
                             </span>
-                            <div>
-                              <div className="text-xs font-bold dark:text-white text-slate-900">{r.name}</div>
-                              <div className="text-[10px] text-slate-500 dark:text-slate-400">pH {r.pH} • {r.category}</div>
-                            </div>
+                            <span className="text-xs font-bold text-white line-clamp-1">{r.name}</span>
                           </div>
+                          <button onClick={() => handleRemoveReagent(idx)} className="text-slate-400 hover:text-red-400 p-1 transition-colors">
+                            <X className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
 
-                {/* pH Meter Bar */}
-                <div className="p-3.5 bg-black/50 border border-white/10 rounded-2xl space-y-2">
+                {/* Live pH Meter */}
+                <div className="p-3 bg-black/50 border border-white/10 rounded-xl space-y-1.5">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="font-bold text-slate-600 dark:text-slate-300">pH Indicator Level:</span>
+                    <span className="font-bold text-slate-300">Fluid pH:</span>
                     <span className={`font-mono font-black text-xs px-2 py-0.5 rounded ${
                       currentPH < 6 ? 'bg-rose-500/20 text-rose-400' : currentPH > 8 ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'
                     }`}>
                       pH {currentPH.toFixed(1)} ({currentPH < 6 ? 'Acidic' : currentPH > 8 ? 'Basic' : 'Neutral'})
                     </span>
                   </div>
-                  <div className="h-2.5 w-full rounded-full bg-gradient-to-r from-red-500 via-amber-400 via-emerald-400 via-blue-500 to-purple-600 p-0.5 relative">
+                  <div className="h-2 w-full rounded-full bg-gradient-to-r from-red-500 via-amber-400 via-emerald-400 via-blue-500 to-purple-600 p-0.5 relative">
                     <div 
-                      className="w-2.5 h-3.5 bg-white rounded-full border border-black shadow-lg absolute -top-0.5 transition-all duration-500"
+                      className="w-2.5 h-3 bg-white rounded-full border border-black shadow-lg absolute -top-0.5 transition-all duration-500"
                       style={{ left: `${Math.min(95, Math.max(2, (currentPH / 14) * 100))}%` }}
                     />
                   </div>
                 </div>
 
-                {/* Trigger Reaction Button */}
+                {/* Synthesize Reaction Trigger Button */}
                 <button
-                  onClick={handleReact}
-                  disabled={workspace.length === 0 || isReacting}
-                  className={`w-full py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-xl ${
-                    workspace.length > 0 && !isReacting 
+                  onClick={handleSynthesizeReaction}
+                  disabled={beakerReagents.length === 0 || isReacting}
+                  className={`w-full py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-xl ${
+                    beakerReagents.length > 0 && !isReacting 
                       ? 'bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white hover:scale-[1.02] active:scale-95 border border-white/20' 
                       : 'bg-white/5 text-slate-500 border border-white/5 cursor-not-allowed'
                   }`}
@@ -590,98 +706,174 @@ export default function SandboxPage() {
                     <><Sparkles className="w-4 h-4" /> Trigger Chemical Reaction</>
                   )}
                 </button>
+
               </div>
 
-              {/* Animated Beaker SVG Visualizer (7 Cols) */}
-              <div className="md:col-span-7 flex flex-col items-center justify-center relative min-h-[300px] bg-black/40 rounded-2xl border border-white/10 p-4">
+              {/* Animated SVG Flask & Thermal Apparatus Visualizer (7 Cols) */}
+              <div className="sm:col-span-7 flex flex-col items-center justify-center relative min-h-[260px] bg-black/50 rounded-2xl border border-white/10 p-4 overflow-hidden">
                 
-                {/* SVG Beaker */}
-                <div className="relative w-48 h-56">
+                {/* SVG Chemistry Flask */}
+                <div className="relative w-44 h-52">
                   <svg className="w-full h-full" viewBox="0 0 100 120">
-                    {/* Beaker Glass Outline */}
-                    <path d="M 20 10 L 20 110 Q 20 115 25 115 L 75 115 Q 80 115 80 110 L 80 10 M 15 10 L 85 10" 
-                      fill="none" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" />
+                    
+                    {/* Bunsen Burner Flame below Flask if Heat is Active */}
+                    {heatApplied && (
+                      <g className="animate-pulse">
+                        <polygon points="45,118 50,105 55,118" fill="#f97316" opacity="0.9" />
+                        <polygon points="47,118 50,110 53,118" fill="#38bdf8" opacity="0.95" />
+                        <rect x="42" y="118" width="16" height="4" fill="#64748b" rx="1" />
+                      </g>
+                    )}
 
-                    {/* Graduation Marks */}
-                    <line x1="20" y1="35" x2="30" y2="35" stroke="#475569" strokeWidth="1" />
-                    <line x1="20" y1="55" x2="35" y2="55" stroke="#475569" strokeWidth="1.5" />
-                    <line x1="20" y1="75" x2="30" y2="75" stroke="#475569" strokeWidth="1" />
-                    <line x1="20" y1="95" x2="35" y2="95" stroke="#475569" strokeWidth="1.5" />
-                    <text x="38" y="58" fill="#475569" className="text-[5px] font-mono">100ml</text>
+                    {/* Flask Outline (Erlenmeyer shape) */}
+                    <path 
+                      d="M 40 10 L 40 35 L 18 100 Q 15 106 22 106 L 78 106 Q 85 106 82 100 L 60 35 L 60 10 M 35 10 L 65 10" 
+                      fill="none" 
+                      stroke="#94a3b8" 
+                      strokeWidth="2.5" 
+                      strokeLinecap="round" 
+                    />
 
-                    {/* Liquid Fill */}
-                    {workspace.length > 0 && (
+                    {/* Liquid Fill in Flask */}
+                    {beakerReagents.length > 0 && (
                       <g className="transition-all duration-700">
                         <path 
-                          d={`M 22 ${110 - Math.min(75, workspace.length * 20)} L 22 110 Q 22 113 25 113 L 75 113 Q 78 113 78 110 L 78 ${110 - Math.min(75, workspace.length * 20)} Z`}
-                          fill={result ? (
-                            result.liquidColor.includes('emerald') ? '#10b981' :
-                            result.liquidColor.includes('blue') || result.liquidColor.includes('cyan') ? '#06b6d4' :
-                            result.liquidColor.includes('rose') || result.liquidColor.includes('red') ? '#f43f5e' :
-                            result.liquidColor.includes('stone') ? '#d6d3d1' : '#3b82f6'
+                          d={`M ${30 - Math.min(10, beakerReagents.length * 2)} ${105 - Math.min(55, beakerReagents.length * 10)} L 22 104 Q 24 105 28 105 L 72 105 Q 76 105 78 104 L ${70 + Math.min(10, beakerReagents.length * 2)} ${105 - Math.min(55, beakerReagents.length * 10)} Z`}
+                          fill={reactionResult ? (
+                            reactionResult.liquidColor.includes('emerald') || reactionResult.liquidColor.includes('green') ? '#10b981' :
+                            reactionResult.liquidColor.includes('cyan') || reactionResult.liquidColor.includes('blue') ? '#06b6d4' :
+                            reactionResult.liquidColor.includes('rose') || reactionResult.liquidColor.includes('red') ? '#f43f5e' :
+                            reactionResult.liquidColor.includes('yellow') || reactionResult.liquidColor.includes('amber') ? '#eab308' :
+                            reactionResult.liquidColor.includes('purple') ? '#a855f7' : '#3b82f6'
                           ) : '#3b82f6'}
-                          fillOpacity={0.45}
+                          fillOpacity={0.5}
                         />
 
-                        {/* Animated Liquid Waves */}
+                        {/* Liquid Wave Ripple */}
                         <path 
-                          d={`M 22 ${110 - Math.min(75, workspace.length * 20)} Q 50 ${107 - Math.min(75, workspace.length * 20)} 78 ${110 - Math.min(75, workspace.length * 20)}`} 
-                          stroke="#ffffff" strokeWidth="1" fill="none" opacity="0.6" className="animate-pulse" />
+                          d={`M 25 ${105 - Math.min(55, beakerReagents.length * 10)} Q 50 ${102 - Math.min(55, beakerReagents.length * 10)} 75 ${105 - Math.min(55, beakerReagents.length * 10)}`} 
+                          stroke="#ffffff" 
+                          strokeWidth="1" 
+                          fill="none" 
+                          opacity="0.6" 
+                          className="animate-pulse" 
+                        />
                       </g>
                     )}
 
-                    {/* Animated Gas Bubbles (if gas effect) */}
-                    {result?.effect === 'gas' && (
-                      <g className="animate-in fade-in duration-300">
-                        <circle cx="35" cy="70" r="2.5" fill="#ffffff" opacity="0.8" className="animate-bounce" />
-                        <circle cx="50" cy="50" r="3" fill="#ffffff" opacity="0.9" className="animate-ping" />
-                        <circle cx="65" cy="65" r="2" fill="#ffffff" opacity="0.7" className="animate-bounce" />
-                        <circle cx="42" cy="30" r="3.5" fill="#ffffff" opacity="0.6" />
-                        {/* Fumes / Gas cloud */}
-                        <path d="M 35 15 Q 40 5 50 12 Q 60 5 65 15" stroke="#ffffff" strokeWidth="1.5" strokeDasharray="2,2" fill="none" opacity="0.6" />
-                      </g>
-                    )}
-
-                    {/* Animated Precipitate Particles (if precipitate effect) */}
-                    {result?.effect === 'precipitate' && (
+                    {/* Gas Bubbles Animation */}
+                    {(reactionResult?.visualEffect === 'gas' || reactionResult?.gasEvolved) && (
                       <g>
-                        <circle cx="30" cy="108" r="2" fill="#b45309" />
-                        <circle cx="45" cy="109" r="2.5" fill="#b45309" />
-                        <circle cx="60" cy="107" r="3" fill="#b45309" />
-                        <circle cx="68" cy="109" r="2" fill="#b45309" />
+                        <circle cx="35" cy="80" r="2.5" fill="#ffffff" opacity="0.8" className="animate-bounce" />
+                        <circle cx="50" cy="65" r="3" fill="#ffffff" opacity="0.9" className="animate-ping" />
+                        <circle cx="62" cy="75" r="2" fill="#ffffff" opacity="0.7" className="animate-bounce" />
+                        <circle cx="45" cy="40" r="3" fill="#ffffff" opacity="0.6" />
+                        {/* Vapor stream exiting flask mouth */}
+                        <path d="M 45 8 Q 50 -5 55 5 Q 60 -5 65 8" stroke="#ffffff" strokeWidth="1.5" strokeDasharray="2,2" fill="none" opacity="0.7" />
                       </g>
                     )}
+
+                    {/* Precipitate Crystals Layer at Bottom */}
+                    {reactionResult?.precipitate && (
+                      <g>
+                        <ellipse cx="50" cy="103" rx="24" ry="3" fill={reactionResult.precipitate.hex} opacity="0.9" />
+                        <circle cx="38" cy="102" r="2" fill={reactionResult.precipitate.hex} />
+                        <circle cx="48" cy="101" r="2.5" fill={reactionResult.precipitate.hex} />
+                        <circle cx="58" cy="102" r="2" fill={reactionResult.precipitate.hex} />
+                      </g>
+                    )}
+
+                    {/* Violent Flame Burst inside Flask */}
+                    {reactionResult?.visualEffect === 'flame' && (
+                      <g className="animate-pulse">
+                        <polygon points="40,85 50,45 60,85" fill="#f97316" opacity="0.85" />
+                        <polygon points="45,85 50,55 55,85" fill="#facc15" opacity="0.95" />
+                      </g>
+                    )}
+
                   </svg>
                 </div>
 
-                <div className="mt-2 text-center">
-                  <span className="text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                    {result ? result.name : workspace.length > 0 ? 'Beaker Ready for Reaction' : 'Empty Reaction Flask'}
+                <div className="text-center mt-1">
+                  <span className="text-[11px] font-mono font-bold text-slate-300">
+                    {reactionResult ? reactionResult.name : beakerReagents.length > 0 ? 'Reagents Mixed in Vessel' : 'Empty Vessel'}
                   </span>
                 </div>
+
               </div>
 
             </div>
 
+            {/* Diagnostic Lab Tests Action Bar (Splint Test & Limewater Bubbler) */}
+            <div className="p-3 bg-white/5 border border-white/10 rounded-2xl mb-4 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleRunSplintTest}
+                  disabled={!reactionResult}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
+                    reactionResult ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30' : 'bg-white/5 text-slate-500 cursor-not-allowed'
+                  }`}
+                >
+                  🪵 Wooden Splint Test
+                </button>
+                <button
+                  onClick={handleRunLimewaterTest}
+                  disabled={!reactionResult}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
+                    reactionResult ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30 hover:bg-sky-500/30' : 'bg-white/5 text-slate-500 cursor-not-allowed'
+                  }`}
+                >
+                  🥛 Limewater Bubbler (CO₂)
+                </button>
+              </div>
+
+              {/* Limewater Status Indicator */}
+              {limewaterBubblerActive && (
+                <span className={`text-[11px] font-mono font-bold px-2.5 py-1 rounded-lg ${
+                  limewaterMilky ? 'bg-white text-slate-900 border border-slate-300' : 'bg-slate-800 text-slate-400'
+                }`}>
+                  Limewater: {limewaterMilky ? '🥛 Turned Milky White (CO₂ Present)' : 'Clear (No CO₂)'}
+                </span>
+              )}
+            </div>
+
+            {/* Splint Test Output Alert */}
+            {splintResult && (
+              <div className="mb-4 p-3 bg-amber-950/40 border border-amber-500/30 rounded-2xl animate-in slide-in-from-top-2 text-xs font-mono font-bold text-amber-200">
+                {splintResult}
+              </div>
+            )}
+
             {/* Reaction Result Banner */}
-            {result && (
-              <div className="mt-4 p-4 dark:bg-[#080b1e] bg-[#eef1f9] backdrop-blur-2xl border border-white/10 rounded-2xl animate-in slide-in-from-bottom-4 duration-300">
+            {reactionResult && (
+              <div className="p-4 bg-slate-900/90 border border-indigo-500/30 rounded-2xl animate-in slide-in-from-bottom-4 duration-300 space-y-2.5 shadow-xl">
                 <div className="flex items-start gap-3">
-                  <div className={`p-2.5 rounded-xl shrink-0 ${result.type.includes('No Reaction') ? 'bg-slate-500/20 text-slate-600 dark:text-slate-300' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
-                    {result.type.includes('No Reaction') ? <Info className="w-5 h-5" /> : <CheckCircle2 className="w-5 h-5" />}
+                  <div className={`p-2.5 rounded-xl shrink-0 ${reactionResult.category === 'no_reaction' ? 'bg-slate-500/20 text-slate-300' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
+                    {reactionResult.category === 'no_reaction' ? <Info className="w-5 h-5" /> : <CheckCircle2 className="w-5 h-5" />}
                   </div>
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <h3 className="text-base font-black dark:text-white text-slate-900 font-mono">{result.equation}</h3>
+                      <h3 className="text-base sm:text-lg font-black text-white font-mono tracking-wide">
+                        {reactionResult.equation}
+                      </h3>
                       <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                        {result.type}
+                        {reactionResult.type}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed mt-1">{result.desc}</p>
-                    <div className="flex items-center gap-4 mt-2 text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 border-t border-white/5 pt-2">
-                      <span>Temp Change: <strong className="text-orange-400">{result.tempChange}</strong></span>
-                      <span>Final pH: <strong className="dark:text-emerald-400 text-emerald-700">{result.finalPH.toFixed(1)}</strong></span>
-                      <span>Result State: <strong className="dark:text-indigo-300 text-indigo-700">{result.product}</strong></span>
+
+                    <p className="text-xs text-slate-200 font-medium leading-relaxed mt-1.5">{reactionResult.desc}</p>
+                    
+                    {reactionResult.ncertActivity && (
+                      <div className="mt-2 text-[11px] font-bold text-indigo-300 bg-indigo-500/10 px-2.5 py-1 rounded-lg border border-indigo-500/20 inline-block">
+                        📚 {reactionResult.ncertActivity}
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap items-center gap-4 mt-2.5 text-[11px] font-mono font-bold text-slate-300 border-t border-white/10 pt-2">
+                      <span>Temp: <strong className="text-orange-400">{reactionResult.tempChange}</strong></span>
+                      <span>Final pH: <strong className="text-emerald-400">{reactionResult.finalPH.toFixed(1)}</strong></span>
+                      {reactionResult.gasEvolved && <span>Gas: <strong className="text-cyan-300">{reactionResult.gasEvolved}</strong></span>}
+                      {reactionResult.precipitate && <span>Ppt: <strong className="text-yellow-300">{reactionResult.precipitate.name}</strong></span>}
                     </div>
                   </div>
                 </div>
@@ -689,44 +881,413 @@ export default function SandboxPage() {
             )}
 
           </div>
+
         </main>
       )}
 
       {/* ───────────────────────────────────────────────────────────── */}
-      {/* ️ TAB 2: LIGHT OPTICS (LENSES & MIRRORS RAY SIMULATOR)      */}
+      {/* ⚛️ TAB 2: INTERACTIVE 118-ELEMENT PERIODIC TABLE EXPLORER     */}
+      {/* ───────────────────────────────────────────────────────────── */}
+      {activeTab === 'periodictable' && (
+        <main className="max-w-7xl mx-auto space-y-6 relative z-10">
+          
+          {/* Controls & Filter Bar */}
+          <div className="dark:bg-[#070916] bg-white dark:border-white/10 border-slate-200 rounded-3xl p-5 shadow-2xl backdrop-blur-xl flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <div className="relative flex-1 md:w-72">
+                <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                <input 
+                  type="text"
+                  value={ptSearchQuery}
+                  onChange={(e) => setPtSearchQuery(e.target.value)}
+                  placeholder="Search 118 elements (Name, Symbol, Z)..."
+                  className="w-full pl-9 pr-3 py-2 bg-black/30 border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-mono"
+                />
+              </div>
+            </div>
+
+            {/* Category Filter Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto max-w-full p-1 bg-black/30 rounded-xl border border-white/5">
+              <button
+                onClick={() => setPtCategoryFilter('all')}
+                className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${
+                  ptCategoryFilter === 'all' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                All 118
+              </button>
+              {Object.entries(CATEGORY_DETAILS).map(([catKey, details]) => (
+                <button
+                  key={catKey}
+                  onClick={() => setPtCategoryFilter(catKey)}
+                  className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                    ptCategoryFilter === catKey ? `${details.bg} ${details.text} font-black ring-1 ring-white/20 shadow` : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: details.color }} />
+                  {details.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Periodic Table 18-Column Interactive Grid Canvas */}
+          <div className="dark:bg-[#070916] bg-white dark:border-white/10 border-slate-200 rounded-3xl p-5 shadow-2xl backdrop-blur-xl overflow-x-auto">
+            <div 
+              className="min-w-[1020px] grid gap-1.5"
+              style={{ gridTemplateColumns: 'repeat(18, minmax(0, 1fr))' }}
+            >
+              {/* Group Numbers 1-18 */}
+              {Array.from({ length: 18 }).map((_, i) => (
+                <div key={`group_header_${i + 1}`} className="text-center text-[10px] font-mono font-bold text-slate-500 py-0.5 select-none">
+                  {i + 1}
+                </div>
+              ))}
+
+              {/* Periods 1-10 (Rows 1-7 Main Table, Row 8 Spacer, Rows 9-10 Lanthanides & Actinides) */}
+              {Array.from({ length: 10 }).map((_, rowIdx) => {
+                const row = rowIdx + 1;
+                return Array.from({ length: 18 }).map((_, colIdx) => {
+                  const col = colIdx + 1;
+
+                  // Row 8 is a visual gap between main table and f-block
+                  if (row === 8) {
+                    return <div key={`empty_${row}_${col}`} className="h-3 pointer-events-none" />;
+                  }
+
+                  const el = ALL_ELEMENTS.find(e => e.gridRow === row && e.gridCol === col);
+
+                  if (!el) {
+                    // Row 6, Col 3: Lanthanide anchor in main table
+                    if (row === 6 && col === 3) {
+                      return (
+                        <div key={`empty_${row}_${col}`} className="h-14 p-1 rounded-xl border border-dashed border-yellow-500/40 bg-yellow-500/10 flex flex-col items-center justify-center text-[9px] font-bold text-yellow-400 text-center leading-tight">
+                          <span>★ 57-71</span>
+                          <span className="text-[8px] opacity-80 font-normal">La–Lu</span>
+                        </div>
+                      );
+                    }
+                    // Row 7, Col 3: Actinide anchor in main table
+                    if (row === 7 && col === 3) {
+                      return (
+                        <div key={`empty_${row}_${col}`} className="h-14 p-1 rounded-xl border border-dashed border-teal-500/40 bg-teal-500/10 flex flex-col items-center justify-center text-[9px] font-bold text-teal-400 text-center leading-tight">
+                          <span>★★ 89-103</span>
+                          <span className="text-[8px] opacity-80 font-normal">Ac–Lr</span>
+                        </div>
+                      );
+                    }
+                    // Row 9, Col 3: Lanthanide series label row
+                    if (row === 9 && col === 3) {
+                      return (
+                        <div key={`empty_${row}_${col}`} className="h-14 p-1 rounded-xl border border-yellow-500/40 bg-yellow-500/15 flex flex-col items-center justify-center text-[10px] font-black text-yellow-400 text-center leading-tight">
+                          <span>★ 4f</span>
+                          <span className="text-[8px] font-semibold opacity-90">Lanthanides</span>
+                        </div>
+                      );
+                    }
+                    // Row 10, Col 3: Actinide series label row
+                    if (row === 10 && col === 3) {
+                      return (
+                        <div key={`empty_${row}_${col}`} className="h-14 p-1 rounded-xl border border-teal-500/40 bg-teal-500/15 flex flex-col items-center justify-center text-[10px] font-black text-teal-400 text-center leading-tight">
+                          <span>★★ 5f</span>
+                          <span className="text-[8px] font-semibold opacity-90">Actinides</span>
+                        </div>
+                      );
+                    }
+                    return <div key={`empty_${row}_${col}`} className="h-14" />;
+                  }
+
+                  const catDetail = CATEGORY_DETAILS[el.category] || CATEGORY_DETAILS.unknown;
+                  const isMatch = periodicTableElements.some(m => m.number === el.number);
+
+                  return (
+                    <button
+                      key={`el_grid_${el.number}`}
+                      onClick={() => setSelectedElement(el)}
+                      style={{ 
+                        opacity: isMatch ? 1 : 0.22,
+                        filter: isMatch ? 'none' : 'grayscale(60%)',
+                      }}
+                      className={`h-14 p-1 rounded-xl border flex flex-col justify-between items-center transition-all hover:scale-110 hover:z-20 hover:shadow-xl relative group ${catDetail.bg} ${catDetail.border}`}
+                      title={`${el.number}. ${el.name} (${el.symbol}) - ${catDetail.name}`}
+                    >
+                      <div className="w-full flex justify-between items-center text-[9px] font-mono text-slate-400">
+                        <span>{el.number}</span>
+                        <span className="text-[8px] opacity-80">{el.state === 'gas' ? '💨' : el.state === 'liquid' ? '💧' : ''}</span>
+                      </div>
+                      <div className="text-sm font-black text-white drop-shadow-sm">{el.symbol}</div>
+                      <div className="text-[8px] font-semibold text-slate-300 truncate w-full text-center">{el.name}</div>
+                    </button>
+                  );
+                });
+              })}
+            </div>
+          </div>
+
+          {/* Element Inspector Drawer / Modal */}
+          {selectedElement && (
+            <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+              <div className="dark:bg-[#070916] bg-slate-900 border border-white/20 rounded-3xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative animate-in zoom-in-95">
+                
+                {/* Close Button */}
+                <button 
+                  onClick={() => setSelectedElement(null)}
+                  className="absolute right-4 top-4 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+
+                <div className="flex flex-col sm:flex-row items-center gap-6 mb-6">
+                  {/* Element Atomic Card Display */}
+                  <div className={`w-28 h-32 rounded-2xl flex flex-col justify-between p-3 shrink-0 ${CATEGORY_DETAILS[selectedElement.category]?.bg} ${CATEGORY_DETAILS[selectedElement.category]?.border} border-2`}>
+                    <div className="text-xs font-mono font-bold text-slate-400">{selectedElement.number}</div>
+                    <div className="text-4xl font-black text-white text-center">{selectedElement.symbol}</div>
+                    <div className="text-[10px] font-mono text-center text-slate-300">{selectedElement.atomicMass}</div>
+                  </div>
+
+                  <div className="flex-1 text-center sm:text-left">
+                    <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
+                      <h3 className="text-2xl font-black text-white">{selectedElement.name}</h3>
+                      <span className={`text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full ${CATEGORY_DETAILS[selectedElement.category]?.bg} ${CATEGORY_DETAILS[selectedElement.category]?.text}`}>
+                        {CATEGORY_DETAILS[selectedElement.category]?.name}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">{selectedElement.summary}</p>
+                    
+                    <div className="mt-3 flex items-center gap-3 justify-center sm:justify-start">
+                      <button
+                        onClick={() => {
+                          handleAddReagent({
+                            id: selectedElement.symbol,
+                            name: selectedElement.name,
+                            symbol: selectedElement.symbol,
+                            color: selectedElement.color,
+                            pH: selectedElement.pH,
+                            isElement: true
+                          });
+                          setSelectedElement(null);
+                          setActiveTab('chemistry');
+                        }}
+                        className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-indigo-600/30 transition-all"
+                      >
+                        <Beaker className="w-3.5 h-3.5" /> Place in Reaction Beaker
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bohr Atom Concentric Electron Shell Visualization */}
+                <div className="p-4 bg-black/50 border border-white/10 rounded-2xl mb-4 flex flex-col sm:flex-row items-center gap-6">
+                  
+                  {/* Concentric Orbits SVG */}
+                  <div className="w-36 h-36 relative shrink-0">
+                    <svg className="w-full h-full" viewBox="0 0 160 160">
+                      {/* Nucleus */}
+                      <circle cx="80" cy="80" r="12" fill="#818cf8" />
+                      <text x="80" y="84" textAnchor="middle" fill="#ffffff" className="text-[8px] font-black font-mono">
+                        {selectedElement.number}+
+                      </text>
+
+                      {/* Concentric Electron Shells */}
+                      {selectedElement.shells.map((electrons, sIdx) => {
+                        const radius = 22 + sIdx * 9;
+                        return (
+                          <g key={`shell_${sIdx}`}>
+                            <circle cx="80" cy="80" r={radius} fill="none" stroke="#475569" strokeWidth="1" strokeDasharray="2,2" />
+                            {/* Electrons on orbit */}
+                            {Array.from({ length: Math.min(electrons, 12) }).map((_, eIdx) => {
+                              const angle = (eIdx / Math.min(electrons, 12)) * 2 * Math.PI;
+                              const ex = 80 + radius * Math.cos(angle);
+                              const ey = 80 + radius * Math.sin(angle);
+                              return (
+                                <circle key={`e_${sIdx}_${eIdx}`} cx={ex} cy={ey} r="2" fill="#38bdf8" />
+                              );
+                            })}
+                          </g>
+                        );
+                      })}
+                    </svg>
+                  </div>
+
+                  <div className="flex-1 space-y-1.5 text-xs font-mono">
+                    <div className="text-[10px] font-black uppercase text-indigo-400">Bohr Electron Shell Distribution:</div>
+                    <div className="text-white font-bold">
+                      Config: <strong className="text-cyan-300">{selectedElement.electronConfig}</strong>
+                    </div>
+                    <div className="text-slate-300">
+                      Shells [K, L, M, N, ...]: <strong className="text-emerald-400">{selectedElement.shells.join(', ')}</strong>
+                    </div>
+                    <div className="text-slate-300">
+                      Electronegativity (Pauling): <strong className="text-amber-400">{selectedElement.electronegativity ?? 'N/A'}</strong>
+                    </div>
+                    <div className="text-slate-300">
+                      Common Oxidation States: <strong className="text-purple-300">{selectedElement.oxidationStates}</strong>
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Element Specifications Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono mb-4">
+                  <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
+                    <div className="text-[10px] text-slate-400 uppercase">Melting Point</div>
+                    <div className="font-bold text-white">{selectedElement.meltingPoint !== null ? `${selectedElement.meltingPoint}°C` : 'N/A'}</div>
+                  </div>
+                  <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
+                    <div className="text-[10px] text-slate-400 uppercase">Boiling Point</div>
+                    <div className="font-bold text-white">{selectedElement.boilingPoint !== null ? `${selectedElement.boilingPoint}°C` : 'N/A'}</div>
+                  </div>
+                  <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
+                    <div className="text-[10px] text-slate-400 uppercase">Density</div>
+                    <div className="font-bold text-white">{selectedElement.density}</div>
+                  </div>
+                  <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
+                    <div className="text-[10px] text-slate-400 uppercase">Discovered In</div>
+                    <div className="font-bold text-white">{selectedElement.year}</div>
+                  </div>
+                </div>
+
+                {/* Real-World Applications */}
+                <div>
+                  <div className="text-[10px] font-black uppercase text-slate-400 mb-1.5">Key Real-World Applications:</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedElement.applications.map((app, aIdx) => (
+                      <span key={aIdx} className="text-xs bg-indigo-500/15 border border-indigo-500/30 text-indigo-200 px-2.5 py-1 rounded-lg">
+                        {app}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+        </main>
+      )}
+
+      {/* ───────────────────────────────────────────────────────────── */}
+      {/* 📖 TAB 3: COMPREHENSIVE REACTIONS COMPENDIUM & NCERT LABS     */}
+      {/* ───────────────────────────────────────────────────────────── */}
+      {activeTab === 'compendium' && (
+        <main className="max-w-7xl mx-auto space-y-6 relative z-10">
+          
+          {/* Compendium Filter Bar */}
+          <div className="dark:bg-[#070916] bg-white dark:border-white/10 border-slate-200 rounded-3xl p-5 shadow-2xl backdrop-blur-xl flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="relative flex-1 w-full md:w-72">
+              <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+              <input 
+                type="text"
+                value={compendiumSearch}
+                onChange={(e) => setCompendiumSearch(e.target.value)}
+                placeholder="Search reactions (e.g. Activity 1.1, thermite, ester)..."
+                className="w-full pl-9 pr-3 py-2 bg-black/30 border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-mono"
+              />
+            </div>
+
+            {/* Reaction Type Filters */}
+            <div className="flex items-center gap-1.5 overflow-x-auto max-w-full p-1 bg-black/30 rounded-xl border border-white/5">
+              {[
+                { id: 'all', label: 'All Reactions' },
+                { id: 'combination', label: 'Combination' },
+                { id: 'decomposition', label: 'Decomposition' },
+                { id: 'displacement', label: 'Displacement' },
+                { id: 'double_displacement', label: 'Double Displacement' },
+                { id: 'neutralization', label: 'Neutralization' },
+                { id: 'acid_carbonate', label: 'Acid + Carbonate' },
+                { id: 'redox', label: 'Redox' },
+                { id: 'organic', label: 'Organic' },
+                { id: 'thermite', label: 'Thermite' },
+              ].map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => setCompendiumCategory(cat.id)}
+                  className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${
+                    compendiumCategory === cat.id ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Reactions Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filteredCompendium.map(rxn => (
+              <div 
+                key={rxn.id}
+                className="dark:bg-[#070916] bg-white dark:border-white/10 border-slate-200 rounded-2xl p-5 shadow-xl flex flex-col justify-between transition-all hover:border-indigo-500/40 group"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                      {rxn.type}
+                    </span>
+                    {rxn.ncertActivity && (
+                      <span className="text-[10px] font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                        {rxn.ncertActivity}
+                      </span>
+                    )}
+                  </div>
+
+                  <h3 className="text-base font-black dark:text-white text-slate-900 font-mono mb-1">{rxn.equation}</h3>
+                  <h4 className="text-xs font-bold text-indigo-400 mb-2">{rxn.name}</h4>
+                  <p className="text-xs text-slate-400 leading-relaxed">{rxn.desc}</p>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+                  <div className="text-[11px] font-mono text-slate-400">
+                    Temp: <strong className="text-orange-400">{rxn.tempChange}</strong> • pH: <strong className="text-emerald-400">{rxn.finalPH}</strong>
+                  </div>
+
+                  <button
+                    onClick={() => handleLoadReaction(rxn)}
+                    className="px-3 py-1.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600 border border-indigo-500/40 text-white text-xs font-bold transition-all flex items-center gap-1.5 group-hover:shadow-lg group-hover:shadow-indigo-600/30"
+                  >
+                    <Zap className="w-3.5 h-3.5 text-yellow-300" /> Load into Lab
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </main>
+      )}
+
+      {/* ───────────────────────────────────────────────────────────── */}
+      {/* 🔍 TAB 4: LIGHT OPTICS & RAY DIAGRAM SIMULATOR               */}
       {/* ───────────────────────────────────────────────────────────── */}
       {activeTab === 'optics' && (
         <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
           
           {/* Controls Panel (4 Cols) */}
-          <div className="lg:col-span-4 dark:bg-[#070916] bg-[#eef1f9] border border-white/10 rounded-3xl p-5 shadow-2xl backdrop-blur-xl flex flex-col space-y-5">
+          <div className="lg:col-span-4 dark:bg-[#070916] bg-white dark:border-white/10 border-slate-200 rounded-3xl p-5 shadow-2xl backdrop-blur-xl flex flex-col space-y-5">
             
-            {/* Mode Switcher inside Optics */}
             <div className="flex p-1 bg-black/40 border border-white/5 rounded-xl">
               <button
                 onClick={() => setOpticsMode('ray_optics')}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${
-                  opticsMode === 'ray_optics' ? 'bg-indigo-600 text-white shadow' : 'text-slate-500 dark:text-slate-400 hover:text-white'
+                  opticsMode === 'ray_optics' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                 Lenses & Mirrors
+                Lenses & Mirrors
               </button>
               <button
                 onClick={() => setOpticsMode('snell_refraction')}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${
-                  opticsMode === 'snell_refraction' ? 'bg-indigo-600 text-white shadow' : 'text-slate-500 dark:text-slate-400 hover:text-white'
+                  opticsMode === 'snell_refraction' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 Snell's Refraction
               </button>
             </div>
 
-            {/* ── SUBMODE 1: RAY OPTICS LENSES & MIRRORS ── */}
+            {/* Submode 1: Ray Optics */}
             {opticsMode === 'ray_optics' && (
               <>
-                {/* Optical Element Choice */}
                 <div>
-                  <label className="text-xs font-extrabold text-slate-600 dark:text-slate-300 block mb-2">Select Optical Element:</label>
+                  <label className="text-xs font-extrabold dark:text-slate-300 text-slate-800 block mb-2">Select Optical Element:</label>
                   <div className="grid grid-cols-1 gap-1.5">
                     {[
                       { id: 'convex_lens', label: 'Convex Lens (Converging)', desc: 'f > 0' },
@@ -741,99 +1302,83 @@ export default function SandboxPage() {
                         className={`p-2.5 rounded-xl border text-left flex justify-between items-center transition-all ${
                           elementType === item.id 
                             ? 'bg-indigo-600/30 border-indigo-500 text-white font-extrabold shadow-md' 
-                            : 'bg-white/5 border-white/5 text-slate-500 dark:text-slate-400 hover:bg-white/10'
+                            : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10'
                         }`}
                       >
                         <span className="text-xs">{item.label}</span>
-                        <span className="text-[10px] font-mono dark:text-indigo-400 text-indigo-700 font-bold">{item.desc}</span>
+                        <span className="text-[10px] font-mono text-indigo-400 font-bold">{item.desc}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Focal Length Slider */}
                 {elementType !== 'plane_mirror' && (
                   <div>
                     <div className="flex justify-between items-center mb-1">
-                      <label className="text-xs font-bold text-slate-600 dark:text-slate-300">Focal Length magnitude (|f|):</label>
-                      <span className="text-xs font-mono font-black dark:text-indigo-400 text-indigo-700">{focalLength} cm</span>
+                      <label className="text-xs font-bold dark:text-slate-300 text-slate-800">Focal Length magnitude (|f|):</label>
+                      <span className="text-xs font-mono font-black text-indigo-400">{focalLength} cm</span>
                     </div>
                     <input 
-                      type="range"
-                      min="15"
-                      max="60"
-                      value={focalLength}
+                      type="range" min="15" max="60" value={focalLength}
                       onChange={(e) => setFocalLength(parseInt(e.target.value, 10))}
                       className="w-full accent-indigo-500 bg-white/10 rounded-lg cursor-pointer h-2"
                     />
                   </div>
                 )}
 
-                {/* Object Distance Slider */}
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300">Object Distance (|u|):</label>
-                    <span className="text-xs font-mono font-black dark:text-indigo-400 text-indigo-700">{objectDistance} cm</span>
+                    <label className="text-xs font-bold dark:text-slate-300 text-slate-800">Object Distance (|u|):</label>
+                    <span className="text-xs font-mono font-black text-indigo-400">{objectDistance} cm</span>
                   </div>
                   <input 
-                    type="range"
-                    min="10"
-                    max="140"
-                    value={objectDistance}
+                    type="range" min="10" max="140" value={objectDistance}
                     onChange={(e) => setObjectDistance(parseInt(e.target.value, 10))}
                     className="w-full accent-indigo-500 bg-white/10 rounded-lg cursor-pointer h-2"
                   />
                 </div>
 
-                {/* Object Height Slider */}
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300">Object Height (hₒ):</label>
-                    <span className="text-xs font-mono font-black dark:text-indigo-400 text-indigo-700">{objectHeight} cm</span>
+                    <label className="text-xs font-bold dark:text-slate-300 text-slate-800">Object Height (hₒ):</label>
+                    <span className="text-xs font-mono font-black text-indigo-400">{objectHeight} cm</span>
                   </div>
                   <input 
-                    type="range"
-                    min="10"
-                    max="45"
-                    value={objectHeight}
+                    type="range" min="10" max="45" value={objectHeight}
                     onChange={(e) => setObjectHeight(parseInt(e.target.value, 10))}
                     className="w-full accent-indigo-500 bg-white/10 rounded-lg cursor-pointer h-2"
                   />
                 </div>
 
-                {/* Live Formula Badge */}
                 <div className="p-3 bg-indigo-950/40 border border-indigo-500/20 rounded-xl space-y-1 text-xs font-mono">
-                  <div className="text-[10px] font-black uppercase dark:text-indigo-300 text-indigo-700">NCERT Sign Formula:</div>
-                  <div className="dark:text-white text-slate-900 font-bold">
+                  <div className="text-[10px] font-black uppercase text-indigo-300">NCERT Sign Formula:</div>
+                  <div className="text-white font-bold">
                     {elementType.includes('lens') ? '1/f = 1/v - 1/u (Lens)' : '1/f = 1/v + 1/u (Mirror)'}
                   </div>
-                  <div className="dark:text-emerald-400 text-emerald-700 font-bold">
+                  <div className="text-emerald-400 font-bold">
                     Image v = {opticsRes.v === Infinity ? '∞' : `${opticsRes.v.toFixed(1)} cm`}
                   </div>
                 </div>
               </>
             )}
 
-            {/* ── SUBMODE 2: SNELL'S LAW REFRACTION ── */}
+            {/* Submode 2: Snell's Law Refraction */}
             {opticsMode === 'snell_refraction' && (
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300">Angle of Incidence (i):</label>
-                    <span className="text-xs font-mono font-black dark:text-indigo-400 text-indigo-700">{incidentAngle}°</span>
+                    <label className="text-xs font-bold dark:text-slate-300 text-slate-800">Angle of Incidence (i):</label>
+                    <span className="text-xs font-mono font-black text-indigo-400">{incidentAngle}°</span>
                   </div>
                   <input 
-                    type="range"
-                    min="0"
-                    max="80"
-                    value={incidentAngle}
+                    type="range" min="0" max="80" value={incidentAngle}
                     onChange={(e) => setIncidentAngle(parseInt(e.target.value, 10))}
                     className="w-full accent-indigo-500 bg-white/10 rounded-lg cursor-pointer h-2"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-600 dark:text-slate-300 block mb-2">Select Refractive Medium (n₂):</label>
+                  <label className="text-xs font-bold dark:text-slate-300 text-slate-800 block mb-2">Select Refractive Medium (n₂):</label>
                   <div className="space-y-1.5">
                     {[
                       { name: "Water", n: 1.33 },
@@ -845,20 +1390,20 @@ export default function SandboxPage() {
                         key={m.name}
                         onClick={() => { setRefractiveIndex(m.n); setMediumName(m.name); }}
                         className={`w-full p-2.5 rounded-xl border text-left flex justify-between items-center transition-all ${
-                          refractiveIndex === m.n ? 'bg-indigo-600/30 border-indigo-500 text-white font-extrabold' : 'bg-white/5 border-white/5 text-slate-500 dark:text-slate-400'
+                          refractiveIndex === m.n ? 'bg-indigo-600/30 border-indigo-500 text-white font-extrabold' : 'bg-white/5 border-white/5 text-slate-400'
                         }`}
                       >
                         <span className="text-xs">{m.name}</span>
-                        <span className="text-xs font-mono font-bold dark:text-indigo-400 text-indigo-700">n = {m.n}</span>
+                        <span className="text-xs font-mono font-bold text-indigo-400">n = {m.n}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div className="p-3 bg-indigo-950/40 border border-indigo-500/20 rounded-xl space-y-1 text-xs font-mono">
-                  <div className="text-[10px] font-black uppercase dark:text-indigo-300 text-indigo-700">Snell's Law:</div>
-                  <div className="dark:text-white text-slate-900 font-bold">n₂₁ = sin(i) / sin(r) = {refractiveIndex}</div>
-                  <div className="dark:text-emerald-400 text-emerald-700 font-bold">Refracted Angle (r) = {refractedAngle.toFixed(2)}°</div>
+                  <div className="text-[10px] font-black uppercase text-indigo-300">Snell's Law:</div>
+                  <div className="text-white font-bold">n₂₁ = sin(i) / sin(r) = {refractiveIndex}</div>
+                  <div className="text-emerald-400 font-bold">Refracted Angle (r) = {refractedAngle.toFixed(2)}°</div>
                 </div>
               </div>
             )}
@@ -866,11 +1411,10 @@ export default function SandboxPage() {
           </div>
 
           {/* Canvas SVG Panel (8 Cols) */}
-          <div className="lg:col-span-8 dark:bg-[#070916] bg-[#eef1f9] border border-white/10 rounded-3xl p-6 shadow-2xl backdrop-blur-xl flex flex-col justify-between relative overflow-hidden min-h-[580px]">
+          <div className="lg:col-span-8 dark:bg-[#070916] bg-white dark:border-white/10 border-slate-200 rounded-3xl p-6 shadow-2xl backdrop-blur-xl flex flex-col justify-between relative overflow-hidden min-h-[580px]">
             
-            {/* Top Canvas Header */}
             <div className="flex justify-between items-center border-b border-white/5 pb-3">
-              <span className="text-xs font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">
+              <span className="text-xs font-black uppercase text-slate-400 tracking-wider">
                 {opticsMode === 'ray_optics' ? `Ray Diagram (${elementType.replace('_', ' ').toUpperCase()})` : `Refraction: Air  ${mediumName}`}
               </span>
               {opticsMode === 'ray_optics' && (
@@ -880,156 +1424,57 @@ export default function SandboxPage() {
               )}
             </div>
 
-            {/* ── SVG RAY CANVAS FOR LENSES & MIRRORS ── */}
+            {/* SVG Ray Canvas */}
             {opticsMode === 'ray_optics' && (
               <div className="my-auto w-full h-[360px] bg-black/60 rounded-2xl border border-white/10 overflow-hidden relative flex items-center justify-center">
                 <svg className="w-full h-full" viewBox="0 0 500 320">
-                  {/* Grid Lines */}
                   <line x1="0" y1="160" x2="500" y2="160" stroke="#475569" strokeWidth="1.5" strokeDasharray="4,4" />
                   <line x1="250" y1="20" x2="250" y2="300" stroke="#334155" strokeWidth="1" strokeDasharray="2,2" />
-
-                  {/* Optical Center / Pole Marker (250, 160) */}
                   <circle cx="250" cy="160" r="3" fill="#818cf8" />
                   <text x="254" y="174" fill="#818cf8" className="text-[9px] font-mono font-bold">O / P</text>
 
-                  {/* Focal & Curvature Markers */}
-                  {(() => {
-                    const scale = 1.8; // Scale factor for cm to pixels
-                    const fPx = focalLength * scale;
-                    const f1X = 250 - fPx;
-                    const f2X = 250 + fPx;
-                    const c1X = 250 - 2 * fPx;
-                    const c2X = 250 + 2 * fPx;
-
-                    return (
-                      <g className="text-[8px] font-mono fill-slate-400">
-                        {/* F1 & 2F1 (Left side) */}
-                        {f1X > 20 && (
-                          <>
-                            <circle cx={f1X} cy="160" r="2.5" fill="#f43f5e" />
-                            <text x={f1X - 6} y="174">F₁</text>
-                          </>
-                        )}
-                        {c1X > 20 && (
-                          <>
-                            <circle cx={c1X} cy="160" r="2.5" fill="#f43f5e" />
-                            <text x={c1X - 8} y="174">2F₁ / C</text>
-                          </>
-                        )}
-
-                        {/* F2 & 2F2 (Right side) */}
-                        {f2X < 480 && (
-                          <>
-                            <circle cx={f2X} cy="160" r="2.5" fill="#3b82f6" />
-                            <text x={f2X - 6} y="174">F₂</text>
-                          </>
-                        )}
-                        {c2X < 480 && (
-                          <>
-                            <circle cx={c2X} cy="160" r="2.5" fill="#3b82f6" />
-                            <text x={c2X - 8} y="174">2F₂</text>
-                          </>
-                        )}
-                      </g>
-                    );
-                  })()}
-
-                  {/* Optical Element Shape Drawing */}
+                  {/* Optical Element Shape */}
                   {(() => {
                     if (elementType === 'convex_lens') {
                       return <path d="M 250 40 Q 270 160 250 280 Q 230 160 250 40 Z" fill="rgba(99, 102, 241, 0.2)" stroke="#818cf8" strokeWidth="2" />;
                     } else if (elementType === 'concave_lens') {
                       return <path d="M 240 40 L 260 40 Q 248 160 260 280 L 240 280 Q 252 160 240 40 Z" fill="rgba(99, 102, 241, 0.2)" stroke="#818cf8" strokeWidth="2" />;
                     } else if (elementType === 'concave_mirror') {
-                      return (
-                        <g>
-                          <path d="M 250 40 Q 230 160 250 280" fill="none" stroke="#c084fc" strokeWidth="3" />
-                          <line x1="250" y1="40" x2="258" y2="45" stroke="#64748b" strokeWidth="1" />
-                          <line x1="250" y1="160" x2="258" y2="160" stroke="#64748b" strokeWidth="1" />
-                          <line x1="250" y1="280" x2="258" y2="275" stroke="#64748b" strokeWidth="1" />
-                        </g>
-                      );
+                      return <path d="M 250 40 Q 230 160 250 280" fill="none" stroke="#c084fc" strokeWidth="3" />;
                     } else if (elementType === 'convex_mirror') {
-                      return (
-                        <g>
-                          <path d="M 250 40 Q 270 160 250 280" fill="none" stroke="#c084fc" strokeWidth="3" />
-                          <line x1="250" y1="40" x2="242" y2="45" stroke="#64748b" strokeWidth="1" />
-                          <line x1="250" y1="160" x2="242" y2="160" stroke="#64748b" strokeWidth="1" />
-                          <line x1="250" y1="280" x2="242" y2="275" stroke="#64748b" strokeWidth="1" />
-                        </g>
-                      );
+                      return <path d="M 250 40 Q 270 160 250 280" fill="none" stroke="#c084fc" strokeWidth="3" />;
                     } else {
-                      // Plane Mirror
-                      return (
-                        <g>
-                          <line x1="250" y1="40" x2="250" y2="280" stroke="#cbd5e1" strokeWidth="3" />
-                          <line x1="250" y1="50" x2="258" y2="55" stroke="#64748b" strokeWidth="1" />
-                          <line x1="250" y1="160" x2="258" y2="165" stroke="#64748b" strokeWidth="1" />
-                          <line x1="250" y1="270" x2="258" y2="275" stroke="#64748b" strokeWidth="1" />
-                        </g>
-                      );
+                      return <line x1="250" y1="40" x2="250" y2="280" stroke="#cbd5e1" strokeWidth="3" />;
                     }
                   })()}
 
-                  {/* OBJECT ARROW (Left of element: X_obj = 250 - u * scale) */}
+                  {/* Object Arrow */}
                   {(() => {
                     const scale = 1.8;
                     const objX = Math.max(30, 250 - objectDistance * scale);
                     const objH = objectHeight * scale;
                     const topY = 160 - objH;
-
                     return (
                       <g filter="drop-shadow(0 0 6px rgba(251, 191, 36, 0.8))">
-                        {/* Vertical Candle / Arrow body */}
                         <line x1={objX} y1="160" x2={objX} y2={topY} stroke="#fbbf24" strokeWidth="3.5" strokeLinecap="round" />
-                        {/* Arrowhead */}
                         <polygon points={`${objX},${topY - 6} ${objX - 5},${topY + 2} ${objX + 5},${topY + 2}`} fill="#fbbf24" />
                         <text x={objX - 12} y={topY - 8} fill="#fbbf24" className="text-[9px] font-mono font-bold">Object</text>
                       </g>
                     );
                   })()}
 
-                  {/* IMAGE ARROW (Position X_img = 250 + v * scale) */}
+                  {/* Image Arrow */}
                   {opticsRes.v !== Infinity && (() => {
                     const scale = 1.8;
                     const imgX = 250 + opticsRes.v * scale;
                     const imgH = opticsRes.hi * scale;
                     const imgTopY = 160 - imgH;
-
-                    if (imgX < 10 || imgX > 490) return null; // Outside SVG bounds
-
+                    if (imgX < 10 || imgX > 490) return null;
                     return (
                       <g filter="drop-shadow(0 0 6px rgba(16, 185, 129, 0.8))">
-                        {/* Vertical Image Arrow */}
                         <line x1={imgX} y1="160" x2={imgX} y2={imgTopY} stroke="#10b981" strokeWidth="3" strokeDasharray={opticsRes.isReal ? "none" : "3,3"} />
-                        {/* Arrowhead */}
                         <polygon points={`${imgX},${imgTopY + (opticsRes.isInverted ? 6 : -6)} ${imgX - 4},${imgTopY + (opticsRes.isInverted ? -2 : 2)} ${imgX + 4},${imgTopY + (opticsRes.isInverted ? -2 : 2)}`} fill="#10b981" />
                         <text x={imgX - 12} y={imgTopY + (opticsRes.isInverted ? 16 : -8)} fill="#10b981" className="text-[9px] font-mono font-bold">Image</text>
-                      </g>
-                    );
-                  })()}
-
-                  {/* LIGHT RAYS (Principal Rays) */}
-                  {(() => {
-                    const scale = 1.8;
-                    const objX = Math.max(30, 250 - objectDistance * scale);
-                    const objH = objectHeight * scale;
-                    const topY = 160 - objH;
-                    const imgX = 250 + opticsRes.v * scale;
-                    const imgTopY = 160 - opticsRes.hi * scale;
-
-                    return (
-                      <g opacity="0.85">
-                        {/* Ray 1: Parallel to Principal Axis */}
-                        <line x1={objX} y1={topY} x2="250" y2={topY} stroke="#f43f5e" strokeWidth="1.5" />
-                        {opticsRes.v !== Infinity && (
-                          <line x1="250" y1={topY} x2={imgX} y2={imgTopY} stroke="#f43f5e" strokeWidth="1.5" />
-                        )}
-
-                        {/* Ray 2: Through Optical Center / Pole */}
-                        {opticsRes.v !== Infinity && (
-                          <line x1={objX} y1={topY} x2={imgX} y2={imgTopY} stroke="#3b82f6" strokeWidth="1.5" />
-                        )}
                       </g>
                     );
                   })()}
@@ -1037,22 +1482,15 @@ export default function SandboxPage() {
               </div>
             )}
 
-            {/* ── SVG RAY CANVAS FOR SNELL'S LAW REFRACTION ── */}
+            {/* Snell's Law Canvas */}
             {opticsMode === 'snell_refraction' && (
               <div className="my-auto w-full h-[360px] bg-black/60 rounded-2xl border border-white/10 overflow-hidden relative flex items-center justify-center">
                 <svg className="w-full h-full" viewBox="0 0 400 300">
-                  {/* Air upper medium */}
                   <rect x="0" y="0" width="400" height="150" fill="rgba(99, 102, 241, 0.05)" />
                   <text x="20" y="30" fill="#818cf8" className="text-xs font-mono font-bold">Air (n₁ = 1.0)</text>
-
-                  {/* Glass / Water lower medium */}
                   <rect x="0" y="150" width="400" height="150" fill="rgba(168, 85, 247, 0.15)" />
                   <text x="20" y="180" fill="#c084fc" className="text-xs font-mono font-bold">{mediumName} (n₂ = {refractiveIndex})</text>
-
-                  {/* Interface Line */}
                   <line x1="0" y1="150" x2="400" y2="150" stroke="#a855f7" strokeWidth="2.5" strokeDasharray="6,4" />
-
-                  {/* Normal Line */}
                   <line x1="200" y1="20" x2="200" y2="280" stroke="#64748b" strokeWidth="1.5" strokeDasharray="4,4" />
 
                   {/* Incident Ray */}
@@ -1080,7 +1518,6 @@ export default function SandboxPage() {
                       </g>
                     );
                   })()}
-
                   <circle cx="200" cy="150" r="4" fill="#ffffff" />
                 </svg>
               </div>
@@ -1090,26 +1527,26 @@ export default function SandboxPage() {
             {opticsMode === 'ray_optics' && (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-white/5 pt-3">
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
-                  <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Image Distance (v)</div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase">Image Distance (v)</div>
                   <div className="text-xs font-mono font-black dark:text-white text-slate-900">
                     {opticsRes.v === Infinity ? '∞' : `${opticsRes.v.toFixed(1)} cm`}
                   </div>
                 </div>
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
-                  <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Magnification (m)</div>
-                  <div className="text-xs font-mono font-black dark:text-indigo-400 text-indigo-700">
+                  <div className="text-[10px] font-bold text-slate-400 uppercase">Magnification (m)</div>
+                  <div className="text-xs font-mono font-black text-indigo-400">
                     {opticsRes.m === Infinity ? '∞' : `${opticsRes.m.toFixed(2)}x`}
                   </div>
                 </div>
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
-                  <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Image Height (hᵢ)</div>
-                  <div className="text-xs font-mono font-black dark:text-emerald-400 text-emerald-700">
+                  <div className="text-[10px] font-bold text-slate-400 uppercase">Image Height (hᵢ)</div>
+                  <div className="text-xs font-mono font-black text-emerald-400">
                     {opticsRes.hi === Infinity ? '∞' : `${opticsRes.hi.toFixed(1)} cm`}
                   </div>
                 </div>
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
-                  <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Image Location</div>
-                  <div className="text-[10px] font-bold dark:text-amber-300 text-amber-700 line-clamp-1">
+                  <div className="text-[10px] font-bold text-slate-400 uppercase">Image Location</div>
+                  <div className="text-[10px] font-bold text-amber-300 line-clamp-1">
                     {opticsRes.positionText}
                   </div>
                 </div>
