@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import "katex/dist/katex.min.css";
 import { AuthProvider } from "@/context/AuthContext";
 
 const outfit = Outfit({ 
@@ -44,9 +45,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${outfit.variable} ${plusJakarta.variable} ${jetbrainsMono.variable}`}>
-      <head>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossOrigin="anonymous" />
-      </head>
       <body className={`${outfit.className} antialiased min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200`}>
         <script
           dangerouslySetInnerHTML={{

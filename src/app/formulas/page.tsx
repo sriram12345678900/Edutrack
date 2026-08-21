@@ -1,12 +1,13 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
 import { 
   BookOpen, Search, Copy, Check, Sparkles, Brain, ArrowLeft,
-  Zap, Compass, Layers, ShieldCheck, Flame, Calculator, Eye, EyeOff, X, Play
+  Zap, Compass, Layers, ShieldCheck, Flame, Calculator, Eye, EyeOff, X, Play, Printer
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { openPrintableCheatSheet } from "@/lib/cheat-sheet-generator";
 
 interface FormulaItem {
   id: string;
@@ -394,17 +395,27 @@ export default function FormulasPage() {
             </div>
           </div>
 
-          <button
-            onClick={() => setPracticeMode(!practiceMode)}
-            className={`flex items-center gap-2 px-4.5 py-2.5 rounded-2xl border text-xs font-black uppercase tracking-wider transition-all ${
-              practiceMode 
-                ? "bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.3)]" 
-                : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-600 dark:text-slate-300 border-slate-200/70 dark:border-white/10 hover:bg-white/10"
-            }`}
-          >
-            {practiceMode ? <EyeOff className="w-4 h-4 dark:text-amber-400 text-amber-700" /> : <Eye className="w-4 h-4 dark:text-indigo-400 text-indigo-700" />}
-            <span>{practiceMode ? "Recall Test Mode ON" : "Recall Practice Mode"}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => openPrintableCheatSheet(selectedSubject === "Chemistry" ? "chemical-reactions" : selectedSubject === "Physics" ? "light" : "electricity")}
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-wider transition-all shadow-md"
+            >
+              <Printer className="w-4 h-4" />
+              <span className="hidden sm:inline">Print Cheat-Sheet</span>
+            </button>
+
+            <button
+              onClick={() => setPracticeMode(!practiceMode)}
+              className={`flex items-center gap-2 px-4.5 py-2.5 rounded-2xl border text-xs font-black uppercase tracking-wider transition-all ${
+                practiceMode 
+                  ? "bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.3)]" 
+                  : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-slate-200/70 dark:border-white/10 hover:bg-white/10"
+              }`}
+            >
+              {practiceMode ? <EyeOff className="w-4 h-4 dark:text-amber-400 text-amber-700" /> : <Eye className="w-4 h-4 dark:text-indigo-400 text-indigo-700" />}
+              <span>{practiceMode ? "Recall Test Mode ON" : "Recall Practice Mode"}</span>
+            </button>
+          </div>
         </div>
       </header>
 

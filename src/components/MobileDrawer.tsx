@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Home, BookOpen, GraduationCap, Compass, MessageSquare, Camera, Calendar, 
   Sparkles, Palette, Timer, Zap, Users, Award, Target, Trophy, Settings, 
-  LogOut, X, Search, ChevronRight, Shield, Moon, Sun, CheckCircle2, User
+  LogOut, X, Search, ChevronRight, Shield, Moon, Sun, CheckCircle2, User, Video
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +21,7 @@ interface MobileDrawerProps {
   photoURL?: string | null;
   friendCode?: string;
   email?: string | null;
+  userRole?: string;
   onOpenTour: () => void;
   onLogout: () => void;
 }
@@ -32,10 +33,16 @@ interface NavItem {
   icon: any;
   badge?: string;
   color: string;
-  category: "Core Space" | "AI Study Lab" | "Testing & Analytics";
+  category: "Virtual School" | "Core Space" | "AI Study Lab" | "Testing & Analytics";
 }
 
 const ALL_TOOLS: NavItem[] = [
+  // Virtual School & Bridge
+  { href: "/classroom", label: "Student Classroom", description: "Enrolled classes, stream & homework", icon: GraduationCap, badge: "School", color: "from-blue-600 to-indigo-700", category: "Virtual School" },
+  { href: "/teacher", label: "Teacher Command", description: "Manage classes, live host & grading", icon: Video, badge: "Portal", color: "from-purple-600 to-pink-600", category: "Virtual School" },
+  { href: "/admin", label: "Super Admin", description: "Platform management & credentials", icon: Shield, badge: "Portal", color: "from-purple-600 to-pink-600", category: "Virtual School" },
+  { href: "/bridge", label: "Home Study Bridge", description: "Daily homework digest & parent portal", icon: Shield, badge: "Parent", color: "from-teal-600 to-emerald-700", category: "Virtual School" },
+
   // Core Space
   { href: "/dashboard", label: "Dashboard", description: "Missions, Streaks, Recall", icon: Home, badge: "Main", color: "from-blue-500 to-indigo-600", category: "Core Space" },
   { href: "/learn", label: "Subjects Hub", description: "CBSE Curriculum & Notes", icon: BookOpen, color: "from-indigo-500 to-purple-600", category: "Core Space" },
@@ -68,6 +75,7 @@ export default function MobileDrawer({
   photoURL,
   friendCode,
   email,
+  userRole,
   onOpenTour,
   onLogout,
 }: MobileDrawerProps) {
@@ -75,12 +83,20 @@ export default function MobileDrawer({
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredTools = useMemo(() => {
-    if (!searchQuery.trim()) return ALL_TOOLS;
+    let tools = ALL_TOOLS.filter(item => {
+      if (item.href === "/teacher" && userRole !== "teacher") return false;
+      if (item.href === "/classroom" && userRole === "teacher") return false;
+      if (item.href === "/admin" && userRole !== "admin") return false;
+      if (userRole === "admin" && item.href !== "/admin") return false;
+      return true;
+    });
+
+    if (!searchQuery.trim()) return tools;
     const q = searchQuery.toLowerCase();
-    return ALL_TOOLS.filter(
+    return tools.filter(
       t => t.label.toLowerCase().includes(q) || t.description.toLowerCase().includes(q) || t.category.toLowerCase().includes(q)
     );
-  }, [searchQuery]);
+  }, [searchQuery, userRole]);
 
   const categories: ("Core Space" | "AI Study Lab" | "Testing & Analytics")[] = [
     "Core Space",

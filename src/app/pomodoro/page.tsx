@@ -3,9 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   Play, Pause, RotateCcw, Timer, Award, CheckCircle, 
-  Sparkles, Volume2, VolumeX, Flame, Heart, Lightbulb, TreePine 
+  Sparkles, Volume2, VolumeX, Flame, Heart, Lightbulb, TreePine, Radio
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import AmbientSoundGenerator from "@/components/pomodoro/AmbientSoundGenerator";
 
 type TimerMode = "study" | "shortBreak" | "longBreak";
 
@@ -438,6 +439,11 @@ export default function PomodoroPage() {
           </div>
         </div>
 
+      </div>
+
+      {/* AMBIENT SOUND SYNTHESIZER & STUDY ROOM */}
+      <div className="mt-8">
+        <AmbientSoundGenerator />
       </div>
 
       {/* POMODORO FOREST SECTION */}

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { 
   Home, BookOpen, MessageSquare, Target, Settings, LogOut, Menu, X, 
-  GraduationCap, Moon, Sun, Calendar, Sparkles, Users, Award, Palette, Timer, Brain, Camera, Zap, Trophy, Shield, Compass
+  GraduationCap, Moon, Sun, Calendar, Sparkles, Users, Award, Palette, Timer, Brain, Camera, Zap, Trophy, Shield, Compass, Video
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,14 @@ import MobileDrawer from "./MobileDrawer";
 
 // Categorized premium sidebar links for desktop
 const categories = [
+  {
+    title: "Virtual School & Bridge",
+    items: [
+      { href: "/classroom", label: "Student Classroom", icon: GraduationCap, badge: "School" },
+      { href: "/teacher", label: "Teacher Command", icon: Video, badge: "Portal" },
+      { href: "/bridge", label: "Home Study Bridge", icon: Shield, badge: "Parent" },
+    ]
+  },
   {
     title: "Core Space",
     items: [
@@ -61,12 +69,12 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   const { user, loading, logout } = useAuth();
   const router = useRouter();
 
-  // Route guard — redirect to login if not authenticated, or verify-email if not verified
+  // Route guard — redirect to login if not authenticated
   useEffect(() => {
     if (!loading) {
       if (!user) {
         router.push("/login");
-      } else if (!user.emailVerified) {
+      } else if (!user.isOrg && !user.emailVerified) {
         router.push("/verify-email");
       }
     }
@@ -202,65 +210,102 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
         {/* User Profile Card & Theme Toggle */}
         <div className={cn(
-          "p-2.5 mx-2.5 mt-3 bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent border border-indigo-500/20 dark:border-white/10 rounded-2xl flex items-center gap-2.5 shrink-0 relative overflow-hidden transition-all duration-300",
-          !isExpanded && "justify-center"
+          "p-2.5 mx-2.5 mt-3 bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent border border-indigo-500/20 dark:border-white/10 rounded-2xl flex flex-col gap-2 shrink-0 relative overflow-hidden transition-all duration-300",
+          !isExpanded && "items-center"
         )}>
-          <div className="relative shrink-0">
-            {user?.photoURL ? (
-              <img src={user.photoURL} alt={displayName} className="w-9 h-9 rounded-full object-cover border-2 border-indigo-500/40 shadow-sm" />
-            ) : (
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white font-black text-xs flex-shrink-0 shadow-lg shadow-indigo-500/20 border border-white/20">
-                {initials}
+          <div className="flex items-center gap-2.5 w-full">
+            <div className="relative shrink-0">
+              {user?.photoURL ? (
+                <img src={user.photoURL} alt={displayName} className="w-9 h-9 rounded-full object-cover border-2 border-indigo-500/40 shadow-sm" />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white font-black text-xs flex-shrink-0 shadow-lg shadow-indigo-500/20 border border-white/20">
+                  {initials}
+                </div>
+              )}
+              <div className="absolute -bottom-1 -right-1 bg-indigo-600 text-white text-[7px] font-black px-1 rounded-full border border-black" title={`Level ${userLevel}`}>
+                L{userLevel}
               </div>
-            )}
-            <div className="absolute -bottom-1 -right-1 bg-indigo-600 text-white text-[7px] font-black px-1 rounded-full border border-black" title={`Level ${userLevel}`}>
-              L{userLevel}
             </div>
+
+            <div className={cn(
+              "overflow-hidden transition-all duration-300 flex-1",
+              isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden"
+            )}>
+              <p className="font-black text-xs text-slate-900 dark:text-white truncate" title={displayName}>{displayName}</p>
+              <p className="text-[8px] text-indigo-500 dark:text-indigo-400 font-mono font-bold truncate leading-none mt-0.5 uppercase tracking-wider">
+                {friendCode || (effectiveUser.email ? effectiveUser.email.split("@")[0] : "Student")}
+              </p>
+            </div>
+            
+            {isExpanded && (
+              <button 
+                onClick={() => {
+                  const isDark = document.documentElement.classList.contains('dark');
+                  if (isDark) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('edutrack_theme', 'light');
+                  } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('edutrack_theme', 'dark');
+                  }
+                }}
+                className="p-1.5 rounded-xl bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-indigo-500 dark:hover:text-indigo-400 hover:scale-105 active:scale-95 transition-all shrink-0 shadow-sm"
+                title="Toggle Light/Dark Theme"
+              >
+                <Moon className="w-3.5 h-3.5 hidden dark:block text-indigo-400" />
+                <Sun className="w-3.5 h-3.5 block dark:hidden text-amber-500" />
+              </button>
+            )}
           </div>
 
-          <div className={cn(
-            "overflow-hidden transition-all duration-300 flex-1",
-            isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden"
-          )}>
-            <p className="font-black text-xs text-slate-900 dark:text-white truncate" title={displayName}>{displayName}</p>
-            <p className="text-[8px] text-indigo-500 dark:text-indigo-400 font-mono font-bold truncate leading-none mt-0.5 uppercase tracking-wider">
-              {friendCode || (effectiveUser.email ? effectiveUser.email.split("@")[0] : "Student")}
-            </p>
-          </div>
-          
           {isExpanded && (
-            <button 
-              onClick={() => {
-                const isDark = document.documentElement.classList.contains('dark');
-                if (isDark) {
-                  document.documentElement.classList.remove('dark');
-                  localStorage.setItem('edutrack_theme', 'light');
-                } else {
-                  document.documentElement.classList.add('dark');
-                  localStorage.setItem('edutrack_theme', 'dark');
-                }
-              }}
-              className="p-1.5 rounded-xl bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-indigo-500 dark:hover:text-indigo-400 hover:scale-105 active:scale-95 transition-all shrink-0 shadow-sm"
-              title="Toggle Light/Dark Theme"
-            >
-              <Moon className="w-3.5 h-3.5 hidden dark:block text-indigo-400" />
-              <Sun className="w-3.5 h-3.5 block dark:hidden text-amber-500" />
-            </button>
+            <div className="pt-2 w-full flex justify-center">
+               <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest ${
+                 user?.role === 'admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400' :
+                 user?.role === 'teacher' ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400' :
+                 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
+               }`}>
+                 {user?.role || 'student'}
+               </span>
+            </div>
           )}
         </div>
 
         {/* Scrollable Navigation Groups */}
         <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-4 custom-scrollbar overflow-x-hidden">
-          {categories.map((category, catIdx) => (
-            <div key={catIdx} className="space-y-1">
+          {user?.role === "admin" && (
+            <div className="space-y-1">
               <span className={cn(
                 "text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 px-3 block transition-all duration-300",
                 isExpanded ? "opacity-100" : "opacity-0 hidden"
               )}>
-                {category.title}
+                Platform Management
               </span>
-              <div className="space-y-1">
-                {category.items.map((link) => {
+              <Link href="/admin" className={cn("flex items-center justify-between px-3 py-2.5 rounded-xl font-extrabold text-xs transition-all relative group", pathname === "/admin" ? "bg-indigo-500/15 text-indigo-650" : "hover:bg-slate-100")}>
+                <div className="flex items-center gap-3"><Shield className="w-4 h-4" /><span className={cn("whitespace-nowrap transition-all duration-300", isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden")}>Super Admin</span></div>
+              </Link>
+            </div>
+          )}
+          
+          {categories.map((category, catIdx) => {
+            const filteredItems = category.items.filter(item => {
+              if (item.href === "/teacher" && user?.role !== "teacher") return false;
+              if (item.href === "/classroom" && user?.role === "teacher") return false;
+              if (user?.role === "admin") return false; // Admin sees nothing else but Admin panel for now to keep it clean
+              return true;
+            });
+            if (filteredItems.length === 0) return null;
+
+            return (
+              <div key={catIdx} className="space-y-1">
+                <span className={cn(
+                  "text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 px-3 block transition-all duration-300",
+                  isExpanded ? "opacity-100" : "opacity-0 hidden"
+                )}>
+                  {category.title}
+                </span>
+                <div className="space-y-1">
+                  {filteredItems.map((link) => {
                   const Icon = link.icon;
                   const isActive = pathname === link.href || (link.href !== "/dashboard" && pathname.startsWith(link.href + "/"));
                   return (
@@ -305,7 +350,8 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                 })}
               </div>
             </div>
-          ))}
+            );
+          })}
         </nav>
 
         {/* Settings & Logout Footer */}
@@ -413,6 +459,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           photoURL={user?.photoURL || undefined}
           friendCode={friendCode}
           email={effectiveUser.email || undefined}
+          userRole={user?.role}
           onOpenTour={openAppTour}
           onLogout={logout}
         />

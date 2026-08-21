@@ -19,6 +19,9 @@ import {
   CATEGORY_DETAILS, 
   getElement 
 } from '@/lib/chemistry-elements-data';
+import CircuitLab from '@/components/sandbox/CircuitLab';
+import BiologyLab from '@/components/sandbox/BiologyLab';
+import { Heart } from 'lucide-react';
 
 import { 
   ALL_COMPOUNDS, 
@@ -142,7 +145,7 @@ function calculateOptics(type: OpticElementType, fMag: number, uMag: number, ho:
 //  MAIN VIRTUAL SCIENCE SANDBOX PAGE
 // ==========================================
 export default function SandboxPage() {
-  const [activeTab, setActiveTab] = useState<'chemistry' | 'periodictable' | 'compendium' | 'optics'>('chemistry');
+  const [activeTab, setActiveTab] = useState<'chemistry' | 'periodictable' | 'compendium' | 'optics' | 'circuits' | 'biology'>('chemistry');
   const [soundEnabled, setSoundEnabled] = useState(true);
 
   // ------------------------------------------
@@ -428,6 +431,22 @@ export default function SandboxPage() {
               }`}
             >
               <Eye className="w-3.5 h-3.5 text-pink-400" /> Optics Ray Lab
+            </button>
+            <button
+              onClick={() => setActiveTab('circuits')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${
+                activeTab === 'circuits' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Zap className="w-3.5 h-3.5 text-amber-400" /> Circuit Builder
+            </button>
+            <button
+              onClick={() => setActiveTab('biology')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${
+                activeTab === 'biology' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Heart className="w-3.5 h-3.5 text-emerald-400" /> Biology Explorer
             </button>
           </div>
 
@@ -1555,6 +1574,24 @@ export default function SandboxPage() {
 
           </div>
 
+        </main>
+      )}
+
+      {/* ───────────────────────────────────────────────────────────── */}
+      {/*  TAB 5: ELECTRIC CIRCUIT BUILDER LAB                          */}
+      {/* ───────────────────────────────────────────────────────────── */}
+      {activeTab === 'circuits' && (
+        <main className="max-w-7xl mx-auto">
+          <CircuitLab />
+        </main>
+      )}
+
+      {/* ───────────────────────────────────────────────────────────── */}
+      {/*  TAB 6: BIOLOGY MICROSCOPIC & ANATOMICAL EXPLORER             */}
+      {/* ───────────────────────────────────────────────────────────── */}
+      {activeTab === 'biology' && (
+        <main className="max-w-7xl mx-auto">
+          <BiologyLab />
         </main>
       )}
 

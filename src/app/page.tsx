@@ -4,6 +4,57 @@ import Link from "next/link";
 import { BookOpen, Brain, Target, ArrowRight, Shield, Rocket, Play, Users, Trophy, Sparkles, Zap, GraduationCap, ChevronRight } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import { useAuth } from "@/context/AuthContext";
+
+function AuthNavButtons() {
+  const { user, loading, logout } = useAuth();
+  
+  if (loading) {
+    return <div className="w-20 h-8 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-full" />;
+  }
+
+  if (user) {
+    return (
+      <div className="flex items-center gap-3">
+        <button
+          onClick={logout}
+          className="text-sm font-semibold dark:text-slate-400 text-slate-500 hover:dark:text-white text-slate-900 transition-colors px-3 py-2"
+        >
+          Log Out
+        </button>
+        <Link
+          href="/dashboard"
+          className="premium-glow-border relative group px-5 py-2.5 rounded-full dark:bg-[#0a0d1c] bg-[#eef1f9] micro-hover-lift"
+        >
+          <span className="relative z-10 text-sm font-bold dark:text-white text-slate-900 flex items-center gap-1.5">
+            Dashboard
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+          </span>
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Link
+        href="/login"
+        className="text-sm font-semibold dark:text-slate-300 text-slate-700 hover:dark:text-white text-slate-900 transition-colors px-3 py-2"
+      >
+        Log In
+      </Link>
+      <Link
+        href="/signup"
+        className="premium-glow-border relative group px-5 py-2.5 rounded-full dark:bg-[#0a0d1c] bg-[#eef1f9] micro-hover-lift"
+      >
+        <span className="relative z-10 text-sm font-bold dark:text-white text-slate-900 flex items-center gap-1.5">
+          Get Started
+          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+        </span>
+      </Link>
+    </>
+  );
+}
 
 const FEATURES = [
   {
@@ -103,21 +154,8 @@ export default function Home() {
             >
               Formulas Hub
             </Link>
-            <Link
-              href="/login"
-              className="text-sm font-semibold dark:text-slate-300 text-slate-700 hover:dark:text-white text-slate-900 transition-colors px-3 py-2"
-            >
-              Log In
-            </Link>
-            <Link
-              href="/signup"
-              className="premium-glow-border relative group px-5 py-2.5 rounded-full dark:bg-[#0a0d1c] bg-[#eef1f9] micro-hover-lift"
-            >
-              <span className="relative z-10 text-sm font-bold dark:text-white text-slate-900 flex items-center gap-1.5">
-                Get Started
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </span>
-            </Link>
+            
+            <AuthNavButtons />
           </div>
         </div>
       </motion.nav>

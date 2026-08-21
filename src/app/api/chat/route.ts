@@ -43,50 +43,54 @@ export async function POST(req: Request) {
     const lastMsg = lastMsgObj?.content || "";
     const imageAttachment = lastMsgObj?.attachments?.find((att: any) => att.type?.startsWith("image") || (typeof att.data === "string" && att.data.startsWith("data:image/")))?.data || image;
 
-    // 1. Prioritize EduTrack / User's Local AI Engine First (Offline Knowledge, Vision OCR, Fine-tuned Dataset, Local Python Server)
+    const hasOnlineKeys = Boolean(process.env.GEMINI_API_KEY || process.env.GROQ_API_KEY);
+    const forceLocal = process.env.USE_LOCAL_AI === "true";
+
+    // 1. Try Local LLM (Ollama / LM Studio / Python Server) First
+    const { queryLocalLLM } = await import("@/lib/local-llm");
+    const localLLMResponse = await queryLocalLLM([
+      {
+        role: "system",
+        content: `You are EduTrack AI, an expert personal tutor for Indian CBSE Class 6-10 students.${bookInfo ? `\nThe student is currently studying: ${bookInfo}. Base your answers directly on this NCERT curriculum and chapter.` : ""}\nReply in ${language || "English"} with clear step-by-step points, proper mathematical identities or chemical formulas, and key NCERT terms.`
+      },
+      ...messages.map((m: any) => ({
+        role: (m.role === "assistant" ? "assistant" : "user") as "assistant" | "user",
+        content: m.content || ""
+      }))
+    ], { timeoutMs: 15000 });
+
+    if (localLLMResponse && localLLMResponse.trim()) {
+      return NextResponse.json({ reply: localLLMResponse.trim() });
+    }
+
+    // 2. Primary Online Cloud LLM (Gemini 2.5 Flash / Groq) if configured and not in forced local mode
+    if (hasOnlineKeys && !forceLocal) {
+      try {
+        const reply = await getChatResponse(messages, language || "Hinglish", bookInfo || "");
+        if (reply && reply.trim()) {
+          return NextResponse.json({ reply });
+        }
+      } catch (apiError: any) {
+        console.warn("External AI API failed, falling back to EduTrack Local Model...", apiError.message || apiError);
+      }
+    }
+
+    // 3. Offline / Built-in Local Fallback Engine (Vision OCR, Curated Knowledge Base)
     const localMatch = await queryLocalAI({
       prompt: lastMsg,
       language: language || "Hinglish",
       image: imageAttachment,
       bookInfo,
-      allowFallbackSynthesis: false
+      allowFallbackSynthesis: true
     });
 
-    if (localMatch && localMatch.matched) {
+    if (localMatch && localMatch.reply) {
       return NextResponse.json({ reply: localMatch.reply });
     }
 
-    // If strictly forced to local AI via environment
-    if (process.env.USE_LOCAL_AI === "true" || (!process.env.GEMINI_API_KEY && !process.env.GROQ_API_KEY)) {
-      const localSynthesized = await queryLocalAI({
-        prompt: lastMsg,
-        language: language || "Hinglish",
-        image: imageAttachment,
-        bookInfo,
-        allowFallbackSynthesis: true
-      });
-      return NextResponse.json({ reply: localSynthesized?.reply || "EduTrack Offline AI active." });
-    }
-
-    // 2. Fallback to Cloud LLMs (Gemini / Groq) for open-ended un-indexed questions
-    try {
-      const reply = await getChatResponse(messages, language || "Hinglish", bookInfo);
-      return NextResponse.json({ reply });
-    } catch (apiError: any) {
-      console.warn("External AI API failed, falling back to EduTrack Local Model...", apiError.message || apiError);
-      
-      const localFallback = await queryLocalAI({
-        prompt: lastMsg,
-        language: language || "Hinglish",
-        image: imageAttachment,
-        bookInfo,
-        allowFallbackSynthesis: true
-      });
-
-      return NextResponse.json({ 
-        reply: localFallback?.reply || `[EduTrack Local AI]: ${apiError.message || "Offline local model active."}` 
-      });
-    }
+    return NextResponse.json({ 
+      reply: "I am ready to help you with your studies! Please ask any question related to this chapter." 
+    });
   } catch (error: any) {
     console.error("CHAT_ERROR:", error);
     return NextResponse.json({ error: "Failed to process chat" }, { status: 500 });

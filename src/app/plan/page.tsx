@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -24,9 +24,11 @@ export default function StudyPlanner() {
 
   // Form State
   const [subject, setSubject] = useState("");
-  const [days, setDays] = useState("7");
+  const [days, setDays] = useState("14");
+  const [targetScore, setTargetScore] = useState("95");
+  const [dailyHours, setDailyHours] = useState("3");
   const [weakAreas, setWeakAreas] = useState("");
-  const [examName, setExamName] = useState("Final Exams");
+  const [examName, setExamName] = useState("CBSE Board Exams");
 
   // Gamification State
   const [gamification, setGamification] = useState<GamificationState>({
@@ -303,53 +305,91 @@ export default function StudyPlanner() {
           </div>
 
           <form onSubmit={handleGenerate} className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 dark:text-slate-600 dark:text-slate-300">Subject</label>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Subject</label>
                 <select 
                   required
                   value={subject}
                   onChange={e => setSubject(e.target.value)}
-                  className="text-slate-900 dark:text-white w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-medium appearance-none"
+                  className="text-slate-900 dark:text-white w-full px-3.5 py-3 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-xs font-semibold"
                 >
                   <option value="" disabled>Select Subject</option>
-                  <option value="Science">Science</option>
+                  <option value="Science">Science (Physics/Chem/Bio)</option>
                   <option value="Mathematics">Mathematics</option>
-                  <option value="History">History</option>
-                  <option value="Geography">Geography</option>
-                  <option value="English">English</option>
+                  <option value="History">Social Science: History</option>
+                  <option value="Geography">Social Science: Geography</option>
+                  <option value="English">English Literature</option>
                 </select>
               </div>
               
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 dark:text-slate-600 dark:text-slate-300">Days Until Exam</label>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Target Score ({targetScore}%)</label>
                 <input 
-                  type="number" 
-                  min="1" max="30"
-                  required
-                  value={days}
-                  onChange={e => setDays(e.target.value)}
-                  className="text-slate-900 dark:text-white w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-medium"
+                  type="range" 
+                  min="75" max="100" step="1"
+                  value={targetScore}
+                  onChange={e => setTargetScore(e.target.value)}
+                  className="w-full accent-emerald-500 mt-2"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Daily Study ({dailyHours} hrs/day)</label>
+                <input 
+                  type="range" 
+                  min="1" max="8" step="0.5"
+                  value={dailyHours}
+                  onChange={e => setDailyHours(e.target.value)}
+                  className="w-full accent-emerald-500 mt-2"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700 dark:text-slate-600 dark:text-slate-300">What are you weak at? (Optional)</label>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Days Until Board Exam ({days} Days)</label>
+              <input 
+                type="range" 
+                min="3" max="60" step="1"
+                value={days}
+                onChange={e => setDays(e.target.value)}
+                className="w-full accent-emerald-500"
+              />
+            </div>
+
+            {/* Panic-to-Peace Live Gauge */}
+            <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">Pacing & Workload Gauge:</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">
+                  {((parseInt(targetScore) || 95) / 100) * 15 / ((parseInt(days) || 14) * (parseFloat(dailyHours) || 3)) < 0.35 
+                    ? "🧘 Calm & Sustainable Pace" 
+                    : ((parseInt(targetScore) || 95) / 100) * 15 / ((parseInt(days) || 14) * (parseFloat(dailyHours) || 3)) < 0.65 
+                    ? "⚡ Optimal High-Yield Sprint" 
+                    : "🔥 Intense Fast-Track Crunch"}
+                </span>
+              </div>
+              <span className="text-xs font-mono font-black text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/25">
+                ~{Math.round(((parseInt(days) || 14) * (parseFloat(dailyHours) || 3)) / 14)} hrs / chapter
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">What are you weak at? (Optional)</label>
               <input 
                 placeholder="e.g. Light reflection, Trigonometry formulas"
                 value={weakAreas}
                 onChange={e => setWeakAreas(e.target.value)}
-                className="text-slate-900 dark:text-white w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-medium"
+                className="text-slate-900 dark:text-white w-full px-4 py-3 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-xs"
               />
             </div>
 
             <button
               type="submit"
               disabled={isGenerating}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 transition-all disabled:opacity-70 text-lg mt-4"
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-3.5 rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 transition-all disabled:opacity-70 text-sm mt-4"
             >
-              {isGenerating ? <Loader2 className="w-6 h-6 animate-spin" /> : <><Sparkles className="w-6 h-6" /> Generate Smart Plan</>}
+              {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Sparkles className="w-5 h-5" /> Generate Custom Board Plan</>}
             </button>
           </form>
         </motion.div>

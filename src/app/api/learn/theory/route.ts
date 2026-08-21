@@ -11,13 +11,33 @@ export async function POST(req: Request) {
     subject = body.subject || "Science";
     chapter = body.chapter || "NCERT Topic";
     const language = body.language || "Hinglish";
+    const chemFormattingInstruction = "Please format chemical formulas using standard subscripts and superscripts in markdown where appropriate.";
+    const langInstruction = `Please write the content entirely in ${language}.`;
 
-    const isIshLanguage = (language || "Hinglish").endsWith("ish") && language !== "English";
-    const langInstruction = isIshLanguage
-      ? `Use ${language || "Hinglish"} for explanations. You MUST strictly use the English alphabet (Roman script). DO NOT use native scripts (Devanagari, Telugu, Tamil, etc.). Keep technical terms in English.`
-      : `Use ${language || "English"} for explanations. Keep technical terms in English.`;
+    const forceLocal = process.env.USE_LOCAL_AI === "true";
+    const apiKey = process.env.GEMINI_API_KEY_SUMMARY || process.env.GEMINI_API_KEY;
 
-    const chemFormattingInstruction = `️ CRITICAL CHEMICAL FORMULA FORMATTING RULE: You MUST write all chemical formulas, equations, or ionic charges using HTML <sub> and <sup> tags (or standard markdown ~sub~ and ^sup^ notations) so that they render perfectly with subscripts and superscripts in the browser. For example, write H<sub>2</sub>O or H~2~O, CO<sub>2</sub> or CO~2~, Ca(OH)<sub>2</sub> or Ca(OH)~2~, Fe<sup>3+</sup> or Fe^3+^, and SO<sub>4</sub><sup>2-</sup> or SO~4~^2-^. DO NOT write flat chemical numbers like H2O or CO2 under any circumstances.`;
+    if (forceLocal || (!apiKey && !process.env.GROQ_API_KEY)) {
+      const { queryLocalLLM } = await import("@/lib/local-llm");
+      const { getOfflineTheory } = await import("@/lib/offline-curriculum");
+
+      const localLLMText = await queryLocalLLM([
+        {
+          role: "system",
+          content: `You are an expert NCERT textbook author. Write an in-depth textbook theory chapter for "${chapter}" in ${subject} formatted in clean Markdown with proper headings and formulas.`
+        },
+        {
+          role: "user",
+          content: `Write complete NCERT theory notes for ${chapter} in ${subject}.`
+        }
+      ], { timeoutMs: 15000 });
+
+      if (localLLMText && localLLMText.length > 200) {
+        return NextResponse.json({ theory: localLLMText, isExtended: true });
+      }
+
+      return NextResponse.json({ theory: getOfflineTheory(subject, chapter), isExtended: true });
+    }
 
     // We will generate the chapter in multiple sequential parts to guarantee it is fully extended (3500-5000 words)
     // with extreme academic rigor, detailed experiments, and solved exemplars.

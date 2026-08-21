@@ -327,27 +327,42 @@ Emphasized the power of truth and non-violent resistance. Key early Satyagraha m
   }
 ];
 
-export function findOfflineKnowledge(prompt: string): string | null {
+export function findOfflineKnowledge(prompt: string, bookInfo?: string): string | null {
   const clean = prompt.toLowerCase();
   
-  // Find matching entry with highest matching keyword count
+  const isMathContext = bookInfo ? /math|ganita|algebra|geometry|calculus|trigonometry/i.test(bookInfo) : false;
+  const isScienceContext = bookInfo ? /science|chemistry|physics|biology/i.test(bookInfo) : false;
+  const isSstContext = bookInfo ? /history|geography|civics|economics|social/i.test(bookInfo) : false;
+
   let bestMatch: KnowledgeEntry | null = null;
   let maxScore = 0;
 
   for (const entry of OFFLINE_KNOWLEDGE_BASE) {
+    if (isMathContext && entry.subject !== "Mathematics") continue;
+    if (isScienceContext && entry.subject !== "Science") continue;
+    if (isSstContext && entry.subject !== "Social Science") continue;
+
+    let matchedKeywords = 0;
     let score = 0;
+
     for (const kw of entry.keywords) {
-      if (clean.includes(kw)) {
-        score += kw.length > 5 ? 2 : 1;
+      const regex = new RegExp(`\\b${kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      if (regex.test(clean)) {
+        score += kw.length > 5 ? 3 : 2;
+        matchedKeywords++;
       }
     }
-    if (score > maxScore) {
+
+    // Require either a strong multi-word keyword phrase or at least 2 distinct keywords matched
+    const isStrongMatch = (matchedKeywords >= 2 && score >= 4) || (matchedKeywords >= 1 && score >= 3 && entry.keywords.some(k => k.includes(" ") && clean.includes(k)));
+
+    if (isStrongMatch && score > maxScore) {
       maxScore = score;
       bestMatch = entry;
     }
   }
 
-  if (bestMatch && maxScore > 0) {
+  if (bestMatch && maxScore >= 3) {
     return bestMatch.reply;
   }
 

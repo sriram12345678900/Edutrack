@@ -36,6 +36,213 @@ const MIND_MAPS: Record<string, MindMapNode[]> = {
 };
 
 const chapterNamesMap: Record<string, string[]> = {
+  // Class 6
+  fegp1: [
+    "Patterns in Mathematics",
+    "Lines and Angles",
+    "Number Play",
+    "Data Handling and Presentation",
+    "Prime Time",
+    "Perimeter and Area",
+    "Fractions",
+    "Playing with Constructions",
+    "Symmetry",
+    "The Other Side of Zero"
+  ],
+  femh1: [
+    "Knowing Our Numbers",
+    "Whole Numbers",
+    "Playing with Numbers",
+    "Basic Geometrical Ideas",
+    "Understanding Elementary Shapes",
+    "Integers",
+    "Fractions",
+    "Decimals",
+    "Data Handling",
+    "Mensuration",
+    "Algebra",
+    "Ratio and Proportion",
+    "Symmetry",
+    "Practical Geometry"
+  ],
+  fecu: [
+    "The Wonderful World of Science",
+    "Diversity in the Living World",
+    "Mindful Eating: A Path to a Healthy Body",
+    "Exploring Magnets",
+    "Measurement of Length and Motion",
+    "Materials Around Us",
+    "Temperature and its Measurement",
+    "A Journey through States of Water",
+    "Methods of Separation in Everyday Life",
+    "Living Creatures: Exploring their Characteristics",
+    "Nature's Treasures",
+    "Beyond Earth"
+  ],
+  fesc1: [
+    "Components of Food",
+    "Sorting Materials into Groups",
+    "Separation of Substances",
+    "Getting to Know Plants",
+    "Body Movements",
+    "The Living Organisms — Characteristics and Habitats",
+    "Motion and Measurement of Distances",
+    "Light, Shadows and Reflections",
+    "Electricity and Circuits",
+    "Fun with Magnets",
+    "Air Around Us"
+  ],
+  // Class 7
+  gegp1: [
+    "Large Numbers Around Us",
+    "Integers",
+    "Fractions and Decimals",
+    "Data Handling",
+    "Simple Equations",
+    "Lines and Angles",
+    "Comparing Quantities",
+    "Rational Numbers",
+    "Perimeter and Area",
+    "Algebraic Expressions",
+    "Exponents and Powers",
+    "Symmetry"
+  ],
+  gemh1: [
+    "Integers",
+    "Fractions and Decimals",
+    "Data Handling",
+    "Simple Equations",
+    "Lines and Angles",
+    "The Triangle and its Properties",
+    "Comparing Quantities",
+    "Rational Numbers",
+    "Perimeter and Area",
+    "Algebraic Expressions",
+    "Exponents and Powers",
+    "Symmetry",
+    "Visualising Solid Shapes"
+  ],
+  gecu1: [
+    "Nutrition in Plants",
+    "Nutrition in Animals",
+    "Heat",
+    "Acids, Bases and Salts",
+    "Physical and Chemical Changes",
+    "Respiration in Organisms",
+    "Transportation in Animals and Plants",
+    "Reproduction in Plants",
+    "Motion and Time",
+    "Electric Current and its Effects",
+    "Light",
+    "Forests: Our Lifeline",
+    "Wastewater Story"
+  ],
+  gesc1: [
+    "Nutrition in Plants",
+    "Nutrition in Animals",
+    "Heat",
+    "Acids, Bases and Salts",
+    "Physical and Chemical Changes",
+    "Respiration in Organisms",
+    "Transportation in Animals and Plants",
+    "Reproduction in Plants",
+    "Motion and Time",
+    "Electric Current and its Effects",
+    "Light",
+    "Forests: Our Lifeline",
+    "Wastewater Story"
+  ],
+  // Class 8
+  hegp1: [
+    "Rational Numbers",
+    "Linear Equations in One Variable",
+    "Understanding Quadrilaterals",
+    "Data Handling",
+    "Squares and Square Roots",
+    "Cubes and Cube Roots",
+    "Comparing Quantities",
+    "Algebraic Expressions and Identities",
+    "Mensuration",
+    "Exponents and Powers",
+    "Direct and Inverse Proportions",
+    "Factorisation",
+    "Introduction to Graphs"
+  ],
+  hemh1: [
+    "Rational Numbers",
+    "Linear Equations in One Variable",
+    "Understanding Quadrilaterals",
+    "Data Handling",
+    "Squares and Square Roots",
+    "Cubes and Cube Roots",
+    "Comparing Quantities",
+    "Algebraic Expressions and Identities",
+    "Mensuration",
+    "Exponents and Powers",
+    "Direct and Inverse Proportions",
+    "Factorisation",
+    "Introduction to Graphs"
+  ],
+  hecu1: [
+    "Crop Production and Management",
+    "Microorganisms: Friend and Foe",
+    "Coal and Petroleum",
+    "Combustion and Flame",
+    "Conservation of Plants and Animals",
+    "Reproduction in Animals",
+    "Reaching the Age of Adolescence",
+    "Force and Pressure",
+    "Friction",
+    "Sound",
+    "Chemical Effects of Electric Current",
+    "Some Natural Phenomena",
+    "Light"
+  ],
+  hesc1: [
+    "Crop Production and Management",
+    "Microorganisms: Friend and Foe",
+    "Coal and Petroleum",
+    "Combustion and Flame",
+    "Conservation of Plants and Animals",
+    "Reproduction in Animals",
+    "Reaching the Age of Adolescence",
+    "Force and Pressure",
+    "Friction",
+    "Sound",
+    "Chemical Effects of Electric Current",
+    "Some Natural Phenomena",
+    "Light"
+  ],
+  // Class 9
+  iemh1: [
+    "Number Systems",
+    "Polynomials",
+    "Coordinate Geometry",
+    "Linear Equations in Two Variables",
+    "Introduction to Euclid's Geometry",
+    "Lines and Angles",
+    "Triangles",
+    "Quadrilaterals",
+    "Circles",
+    "Heron's Formula",
+    "Surface Areas and Volumes",
+    "Statistics"
+  ],
+  iesc1: [
+    "Matter in Our Surroundings",
+    "Is Matter Around Us Pure",
+    "Atoms and Molecules",
+    "Structure of the Atom",
+    "The Fundamental Unit of Life",
+    "Tissues",
+    "Motion",
+    "Force and Laws of Motion",
+    "Gravitation",
+    "Work and Energy",
+    "Sound",
+    "Improvement in Food Resources"
+  ],
+  // Class 10
   jesc1: [
     "Chemical Reactions and Equations",
     "Acids, Bases and Salts",
@@ -173,6 +380,64 @@ const formatMarkdown = (md: string) => {
     .replace(/&lt;sup&gt;/g, "<sup>")
     .replace(/&lt;\/sup&gt;/g, "</sup>");
 
+  // Format LaTeX Math blocks $$...$$
+  html = html.replace(/\$\$([\s\S]*?)\$\$/g, (_match, eq) => {
+    let formattedEq = eq
+      .replace(/\\rightarrow/g, " → ")
+      .replace(/\\leftarrow/g, " ← ")
+      .replace(/\\xrightarrow\[(.*?)\]\{(.*?)\}/g, " ──($2)──> ")
+      .replace(/\\xrightarrow\{(.*?)\}/g, " ──($1)──> ")
+      .replace(/\\times/g, " × ")
+      .replace(/\\div/g, " ÷ ")
+      .replace(/\\pm/g, " ± ")
+      .replace(/\\approx/g, " ≈ ")
+      .replace(/\\neq/g, " ≠ ")
+      .replace(/\\le/g, " ≤ ")
+      .replace(/\\ge/g, " ≥ ")
+      .replace(/\\pi/g, "π")
+      .replace(/\\theta/g, "θ")
+      .replace(/\\alpha/g, "α")
+      .replace(/\\beta/g, "β")
+      .replace(/\\Delta/g, "Δ")
+      .replace(/\\cdot/g, "·")
+      .replace(/\\degree/g, "°")
+      .replace(/\\text\{([^}]+)\}/g, "$1")
+      .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, "($1)/($2)")
+      .replace(/_([a-zA-Z0-9\+\-]+)/g, "<sub>$1</sub>")
+      .replace(/\^([a-zA-Z0-9\+\-]+)/g, "<sup>$1</sup>");
+
+    return `<div class='my-2.5 py-2 px-3 bg-indigo-50/50 dark:bg-indigo-950/30 rounded-xl font-mono text-center font-bold text-indigo-900 dark:text-indigo-200 border border-indigo-100 dark:border-indigo-900/40 text-xs sm:text-sm overflow-x-auto'>${formattedEq}</div>`;
+  });
+
+  // Format inline LaTeX Math $...$
+  html = html.replace(/\$([^\$\n]+?)\$/g, (_match, eq) => {
+    let formattedEq = eq
+      .replace(/\\rightarrow/g, " → ")
+      .replace(/\\leftarrow/g, " ← ")
+      .replace(/\\xrightarrow\[(.*?)\]\{(.*?)\}/g, " ──($2)──> ")
+      .replace(/\\xrightarrow\{(.*?)\}/g, " ──($1)──> ")
+      .replace(/\\times/g, " × ")
+      .replace(/\\div/g, " ÷ ")
+      .replace(/\\pm/g, " ± ")
+      .replace(/\\approx/g, " ≈ ")
+      .replace(/\\neq/g, " ≠ ")
+      .replace(/\\le/g, " ≤ ")
+      .replace(/\\ge/g, " ≥ ")
+      .replace(/\\pi/g, "π")
+      .replace(/\\theta/g, "θ")
+      .replace(/\\alpha/g, "α")
+      .replace(/\\beta/g, "β")
+      .replace(/\\Delta/g, "Δ")
+      .replace(/\\cdot/g, "·")
+      .replace(/\\degree/g, "°")
+      .replace(/\\text\{([^}]+)\}/g, "$1")
+      .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, "($1)/($2)")
+      .replace(/_([a-zA-Z0-9\+\-]+)/g, "<sub>$1</sub>")
+      .replace(/\^([a-zA-Z0-9\+\-]+)/g, "<sup>$1</sup>");
+
+    return `<span class='font-mono font-semibold px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 text-xs'>${formattedEq}</span>`;
+  });
+
   // Support standard Markdown subscript and superscript notations
   // Subscript: H~2~O -> H<sub>2</sub>O
   html = html.replace(/~([^~]+)~/g, "<sub>$1</sub>");
@@ -180,10 +445,10 @@ const formatMarkdown = (md: string) => {
   html = html.replace(/\^([^^]+)\^/g, "<sup>$1</sup>");
 
   // Headers: # Header -> <h1>Header</h1>
-  html = html.replace(/^#\s+(.+)$/gm, "<h1 class='text-3xl font-extrabold text-slate-900 dark:text-white mt-8 mb-4'>$1</h1>");
-  html = html.replace(/^##\s+(.+)$/gm, "<h2 class='text-2xl font-bold text-slate-900 dark:text-white mt-6 mb-3 border-b pb-2 border-slate-200 dark:border-slate-700'>$1</h2>");
-  html = html.replace(/^###\s+(.+)$/gm, "<h3 class='text-xl font-bold text-slate-955 dark:text-slate-200 mt-4 mb-2'>$1</h3>");
-  html = html.replace(/^####\s+(.+)$/gm, "<h4 class='text-lg font-bold text-slate-960 dark:text-slate-200 mt-3 mb-2'>$1</h4>");
+  html = html.replace(/^#\s+(.+)$/gm, "<h1 class='text-2xl font-extrabold text-slate-900 dark:text-white mt-6 mb-3'>$1</h1>");
+  html = html.replace(/^##\s+(.+)$/gm, "<h2 class='text-xl font-bold text-slate-900 dark:text-white mt-5 mb-2 border-b pb-1.5 border-slate-200 dark:border-slate-700'>$1</h2>");
+  html = html.replace(/^###\s+(.+)$/gm, "<h3 class='text-lg font-bold text-slate-955 dark:text-slate-200 mt-4 mb-2'>$1</h3>");
+  html = html.replace(/^####\s+(.+)$/gm, "<h4 class='text-base font-bold text-slate-960 dark:text-slate-200 mt-3 mb-1.5'>$1</h4>");
 
   // Bold text: **text** -> <strong>text</strong>
   html = html.replace(/\*\*(.*?)\*\*/g, "<strong class='font-bold text-slate-955 dark:text-slate-100'>$1</strong>");
@@ -193,19 +458,19 @@ const formatMarkdown = (md: string) => {
   html = html.replace(/_(.*?)_/g, "<em class='italic'>$1</em>");
 
   // Code block: ```code``` -> <pre><code>code</code></pre>
-  html = html.replace(/```([\s\S]*?)```/g, "<pre class='bg-slate-100 dark:bg-slate-900/60 bg-slate-200/60 p-4 rounded-xl my-4 overflow-x-auto'><code class='font-mono text-sm'>$1</code></pre>");
+  html = html.replace(/```([\s\S]*?)```/g, "<pre class='bg-slate-100 dark:bg-slate-900/60 p-3.5 rounded-xl my-3 overflow-x-auto'><code class='font-mono text-xs sm:text-sm'>$1</code></pre>");
 
   // Inline code: `code` -> <code>code</code>
-  html = html.replace(/`(.*?)`/g, "<code class='bg-slate-100 dark:bg-slate-900/80 bg-slate-200/80 px-1.5 py-0.5 rounded font-mono text-sm'>$1</code>");
+  html = html.replace(/`(.*?)`/g, "<code class='bg-slate-100 dark:bg-slate-900/80 px-1.5 py-0.5 rounded font-mono text-xs'>$1</code>");
 
   // Blockquotes: > quote -> <blockquote>quote</blockquote>
-  html = html.replace(/^>\s+(.+)$/gm, "<blockquote class='border-l-4 border-indigo-500 pl-4 italic text-slate-600 dark:text-slate-400 my-4'>$1</blockquote>");
+  html = html.replace(/^>\s+(.+)$/gm, "<blockquote class='border-l-4 border-indigo-500 pl-3 italic text-slate-600 dark:text-slate-400 my-2'>$1</blockquote>");
 
   // Unordered list items: - item or * item -> <li>item</li>
-  html = html.replace(/^\s*[-*+]\s+(.+)$/gm, "<li class='list-disc ml-6 mt-1 text-slate-750 dark:text-slate-300'>$1</li>");
+  html = html.replace(/^\s*[-*+]\s+(.+)$/gm, "<li class='list-disc ml-5 mt-1 text-slate-750 dark:text-slate-300'>$1</li>");
   
   // Ordered list items: 1. item -> <li>item</li>
-  html = html.replace(/^\s*\d+\.\s+(.+)$/gm, "<li class='list-decimal ml-6 mt-1 text-slate-750 dark:text-slate-300'>$1</li>");
+  html = html.replace(/^\s*\d+\.\s+(.+)$/gm, "<li class='list-decimal ml-5 mt-1 text-slate-750 dark:text-slate-300'>$1</li>");
 
   // Split into lines and wrap standalone text in paragraphs
   const lines = html.split("\n");
@@ -221,6 +486,8 @@ const formatMarkdown = (md: string) => {
         trimmed.startsWith("</pre") || 
         trimmed.startsWith("<code") || 
         trimmed.startsWith("</code") ||
+        trimmed.startsWith("<div") ||
+        trimmed.startsWith("</div") ||
         trimmed.startsWith("<ul") ||
         trimmed.startsWith("</ul") ||
         trimmed.startsWith("<ol") ||
@@ -228,7 +495,7 @@ const formatMarkdown = (md: string) => {
       return line;
     }
     
-    return `<p class='text-slate-700 dark:text-slate-300 leading-relaxed mb-4'>${line}</p>`;
+    return `<p class='text-slate-700 dark:text-slate-300 leading-relaxed mb-2.5'>${line}</p>`;
   });
   
   return processedLines.filter(l => l !== "").join("\n");
@@ -479,7 +746,8 @@ export default function NcertViewer() {
     setPdfLoading(true);
     setOpenChapter(ch);
     
-    const chapterTitle = chapterNamesMap[book.code]?.[ch.num - 1] || (book.singleFileName || book.directUrl ? book.title : `${book.title} - Chapter ${ch.num}`);
+    const chName = chapterNamesMap[book.code]?.[ch.num - 1];
+    const chapterTitle = chName || (book.singleFileName || book.directUrl ? book.title : `Chapter ${ch.num}`);
     const theoryKey = `theory__${(book.subject || "science").toLowerCase()}__${chapterTitle.replace(/\s+/g, '-').toLowerCase()}`;
     const lineKey = `linebyline__${(book.subject || "science").toLowerCase()}__${chapterTitle.replace(/\s+/g, '-').toLowerCase()}`;
     
@@ -499,8 +767,11 @@ export default function NcertViewer() {
 
     setShowLineByLineModal(false);
     setShowSideTheory(false);
+
+    const greetingTitle = chName ? `${book.title} - Chapter ${ch.num}: ${chName}` : (book.singleFileName || book.directUrl ? book.title : `${book.title} - Chapter ${ch.num}`);
+
     setChatMessages([
-      { role: "assistant", content: `Hi! I see you're reading **${book.title} - ${book.singleFileName || book.directUrl ? "Full Book" : "Chapter " + ch.num} (${chapterTitle})**. How can I help you? Would you like me to generate a chapter summary, key concepts, or practice questions?` }
+      { role: "assistant", content: `Hi! I see you're reading **${greetingTitle}**. How can I help you? Would you like me to generate a chapter summary, key concepts, or practice questions?` }
     ]);
     setIsAiChatOpen(false);
 
@@ -619,6 +890,10 @@ export default function NcertViewer() {
     setChatLoading(true);
 
     try {
+      const chName = openBook ? chapterNamesMap[openBook.code]?.[(openChapter?.num || 1) - 1] : undefined;
+      const chapterLabel = chName ? `Chapter ${openChapter?.num}: ${chName}` : (openChapter?.num !== undefined ? `Chapter ${openChapter.num}` : '');
+      const bookContext = openBook ? `Class ${openBook.class} ${openBook.subject || openBook.title} - ${openBook.title} - ${chapterLabel}` : '';
+
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -626,7 +901,7 @@ export default function NcertViewer() {
           messages: newMessages, 
           language: userLanguage,
           pdfUrl: openChapter?.pdfUrl,
-          bookInfo: openBook ? `Class ${openBook.class} ${openBook.subject || openBook.title} - Chapter ${openChapter?.num !== undefined ? openChapter.num : ''}` : ''
+          bookInfo: bookContext
         })
       });
       
@@ -1308,31 +1583,17 @@ export default function NcertViewer() {
                       }`}>
                         {msg.role === "assistant" ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
                       </div>
-                      <div className={`p-3 rounded-2xl max-w-[80%] text-sm shadow-sm ${
+                      <div className={`p-3.5 rounded-2xl max-w-[85%] text-sm shadow-sm ${
                         msg.role === "user" ? "bg-indigo-600 text-white rounded-tr-none shadow-indigo-200 dark:shadow-indigo-900/20" : "bg-white dark:bg-slate-800 rounded-tl-none border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300"
                       }`}>
-                        <p className="whitespace-pre-wrap leading-relaxed">
-                          {msg.content.split('\n').map((line: string, i: number) => {
-                            const parts = line.split(/(\*\*.*?\*\*)/g);
-                            return (
-                              <span key={i}>
-                                {parts.map((part, j) => {
-                                  if (part.startsWith('**') && part.endsWith('**')) {
-                                    return <strong key={j} className="font-bold">{part.slice(2, -2)}</strong>;
-                                  }
-                                  const subParts = part.split(/(\*.*?\*)/g);
-                                  return subParts.map((sp, k) => {
-                                    if (sp.startsWith('*') && sp.endsWith('*') && sp.length > 2) {
-                                      return <em key={k} className="italic">{sp.slice(1, -1)}</em>;
-                                    }
-                                    return sp;
-                                  });
-                                })}
-                                <br />
-                              </span>
-                            );
-                          })}
-                        </p>
+                        {msg.role === "user" ? (
+                          <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                        ) : (
+                          <div 
+                            className="space-y-1 text-sm leading-relaxed"
+                            dangerouslySetInnerHTML={{ __html: formatMarkdown(msg.content) }} 
+                          />
+                        )}
                       </div>
                     </div>
                   ))}

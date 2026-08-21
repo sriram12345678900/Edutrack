@@ -66,20 +66,33 @@ def load_model():
     except Exception as err:
         print(f"⚠️ Could not load PyTorch model weights ({err}). Falling back to local RAG & rules engine.")
 
-def match_dataset(query):
+def match_dataset(query, subject=None):
     clean_q = query.lower()
-    stop_words = {"what", "when", "where", "which", "who", "whom", "whose", "why", "how", "define", "explain", "describe", "state", "the", "a", "an", "is", "are", "in", "to", "for"}
+    stop_words = {
+        "what", "when", "where", "which", "who", "whom", "whose", "why", "how",
+        "define", "explain", "describe", "state", "the", "a", "an", "is", "are",
+        "in", "to", "for", "of", "and", "or", "name", "chapter", "book", "give",
+        "tell", "solve", "write", "me", "about", "please", "can", "you", "this"
+    }
     keywords = [w for w in re.findall(r'\w+', clean_q) if len(w) > 2 and w not in stop_words]
     
+    if not keywords:
+        return None
+
     best_score = 0
     best_match = None
     for sample in cached_dataset:
         inp = sample.get("input_text", "").lower()
         out = sample.get("output_text", "")
-        score = sum(2 for k in keywords if k in inp) + sum(1 for k in keywords if k in out.lower())
-        if score > best_score and score >= 2:
+        
+        # Calculate distinct keyword matches
+        matches = [k for k in keywords if re.search(r'\b' + re.escape(k) + r'\b', inp)]
+        score = len(matches) * 3
+        
+        if score > best_score and len(matches) >= 2:
             best_score = score
             best_match = out
+            
     return best_match
 
 class LocalAIServer(BaseHTTPRequestHandler):

@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { queryPythonServer } from "./python-ai";
 
-export async function getChatResponse(messages: { role: string; content: string }[], languagePreference: string) {
+export async function getChatResponse(messages: { role: string; content: string }[], languagePreference: string, bookInfo: string = "") {
   try {
     const lastMessage = messages[messages.length - 1]?.content || "";
 
@@ -9,7 +9,8 @@ export async function getChatResponse(messages: { role: string; content: string 
     const pythonRes = await queryPythonServer({
       task: "chat",
       prompt: lastMessage,
-      language: languagePreference
+      language: languagePreference,
+      chapter: bookInfo
     });
     if (pythonRes && pythonRes.reply) {
       return pythonRes.reply;
@@ -21,7 +22,8 @@ export async function getChatResponse(messages: { role: string; content: string 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    const prompt = `System: You are EduTrack AI tutor for Indian Class 6-10 students. Reply in ${languagePreference} naturally. 
+    const contextLine = bookInfo ? `The student is studying: ${bookInfo}. Base your answers directly on this NCERT curriculum and chapter.` : "";
+    const prompt = `System: You are EduTrack AI tutor for Indian Class 6-10 students following CBSE NCERT curriculum. ${contextLine} Reply in ${languagePreference} naturally and accurately with step-by-step clarity. 
     
     Student Question: ${lastMessage}`;
     

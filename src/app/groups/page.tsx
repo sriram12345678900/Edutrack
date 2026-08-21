@@ -16,6 +16,8 @@ import { collection, addDoc, onSnapshot, query, where, doc, updateDoc, setDoc, d
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { LiveKitRoom, VideoConference, RoomAudioRenderer } from '@livekit/components-react';
 import '@livekit/components-styles';
+import StudyFeed from '@/components/groups/StudyFeed';
+import AdvancedWhiteboard from "@/components/whiteboard/AdvancedWhiteboard";
 
 interface Friend {
   name: string;
@@ -282,6 +284,7 @@ export default function StudyCirclesDMs() {
   const [activeFriend, setActiveFriend] = useState<Friend | null>(null);
   const [activeGroup, setActiveGroup] = useState<Group | null>(null);
   const [activeChatId, setActiveChatId] = useState<string>("");
+  const [hubView, setHubView] = useState<'chats' | 'feed'>('chats');
   
   // Add Friend States
   const [searchCode, setSearchCode] = useState("");
@@ -476,15 +479,15 @@ export default function StudyCirclesDMs() {
       
       if (!storedNick) {
         storedNick = user?.displayName?.split(" ")[0] || user?.email?.split("@")[0] || "Student";
-        localStorage.setItem("edutrack_nickname", storedNick);
+        localStorage.setItem("edutrack_nickname", storedNick as string);
       }
       if (!storedCode) {
         const randomNum = Math.floor(1000 + Math.random() * 9000);
-        storedCode = `${storedNick.toUpperCase()}#${randomNum}`;
+        storedCode = `${(storedNick as string).toUpperCase()}#${randomNum}`;
         localStorage.setItem("edutrack_friend_code", storedCode);
       }
       
-      setNickname(storedNick);
+      setNickname(storedNick as string);
       setFriendCode(storedCode);
 
       const handleProfileUpdate = (e: any) => {
@@ -1569,6 +1572,26 @@ const [liveKitToken, setLiveKitToken] = useState("");
                 {copied ? <CheckCheck className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
               </button>
             </div>
+
+            {/* View Switcher: Chats vs StudyFeed */}
+            <div className="flex p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl">
+              <button
+                onClick={() => setHubView('chats')}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  hubView === 'chats' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'
+                }`}
+              >
+                💬 Study Circles
+              </button>
+              <button
+                onClick={() => setHubView('feed')}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  hubView === 'feed' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'
+                }`}
+              >
+                🌐 StudyFeed
+              </button>
+            </div>
           </div>
 
           {/* Chat List Sections (Groups and Direct Chats) */}
@@ -1724,6 +1747,11 @@ const [liveKitToken, setLiveKitToken] = useState("");
 
         {/* RIGHT PANEL: CHAT WINDOW & CONVERSATION CANVAS */}
         <main className="flex-1 flex flex-col h-full bg-slate-50/20 dark:bg-slate-950/10 backdrop-blur-md min-w-0 min-h-0 overflow-hidden">
+          {hubView === 'feed' ? (
+            <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
+              <StudyFeed />
+            </div>
+          ) : (
           <AnimatePresence mode="wait">
             
             {(!activeFriend && !activeGroup) ? (
@@ -2287,7 +2315,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                         exit={{ width: 0, opacity: 0 }}
                         className="hidden md:flex flex-col h-full shrink-0 border-l border-slate-200 dark:border-slate-800 relative z-30 bg-white dark:bg-slate-950"
                       >
-                        <WhiteboardPanel chatId={activeChatId} nickname={nickname} db={db} />
+                        <AdvancedWhiteboard roomId={activeChatId} isEmbedded={true} />
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -2295,6 +2323,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
               </motion.div>
             )}
           </AnimatePresence>
+          )}
         </main>
       </div>
 
