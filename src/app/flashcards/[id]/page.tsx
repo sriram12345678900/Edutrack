@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -205,16 +205,39 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: -50, scale: 0.95 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="w-full max-w-xl aspect-[4/3] perspective-1000"
+              className="w-full max-w-xl aspect-[4/3] perspective-1000 relative"
             >
+              {/* Swipe Hints */}
+              {isFlipped && (
+                <>
+                  <div className="absolute top-1/2 -left-16 -translate-y-1/2 text-rose-500 font-black text-sm uppercase tracking-widest hidden md:block opacity-40">
+                    &larr; Needs Review
+                  </div>
+                  <div className="absolute top-1/2 -right-16 -translate-y-1/2 text-emerald-500 font-black text-sm uppercase tracking-widest hidden md:block opacity-40">
+                    Got It &rarr;
+                  </div>
+                </>
+              )}
+
               <motion.div
-                className="w-full h-full relative preserve-3d cursor-pointer"
+                className="w-full h-full relative preserve-3d cursor-grab active:cursor-grabbing"
                 onClick={handleFlip}
+                drag={isFlipped ? "x" : false}
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.8}
+                onDragEnd={(e, info) => {
+                  if (info.offset.x > 100) {
+                    handleAnswer("mastered");
+                  } else if (info.offset.x < -100) {
+                    handleAnswer("learning");
+                  }
+                }}
+                whileDrag={{ scale: 1.05, rotateZ: isFlipped ? 2 : 0 }}
                 animate={{ rotateY: isFlipped ? 180 : 0 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
               >
                 {/* Front */}
-                <div className="absolute inset-0 backface-hidden bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center p-8 text-center">
+                <div className="absolute inset-0 backface-hidden bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center p-8 text-center pointer-events-none">
                   <span className="absolute top-6 left-6 text-xs font-extrabold uppercase tracking-widest dark:text-slate-400 text-slate-600 flex items-center gap-2">
                     Question
                     <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border normal-case tracking-normal ${
@@ -227,7 +250,7 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
                   <button 
                     onClick={(e) => playAudio(e, currentCard.front)}
                     disabled={isPlayingAudio}
-                    className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 hover:text-indigo-600 transition-colors"
+                    className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 hover:text-indigo-600 transition-colors pointer-events-auto"
                   >
                     {isPlayingAudio ? <Loader2 className="w-5 h-5 animate-spin" /> : <Volume2 className="w-5 h-5" />}
                   </button>
@@ -240,7 +263,7 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
 
                 {/* Back */}
                 <div 
-                  className="absolute inset-0 backface-hidden bg-gradient-to-br from-indigo-50 to-fuchsia-50 dark:from-indigo-900/20 dark:to-fuchsia-900/20 rounded-3xl shadow-xl border border-fuchsia-200 dark:border-fuchsia-800 flex flex-col items-center justify-center p-8 text-center"
+                  className="absolute inset-0 backface-hidden bg-gradient-to-br from-indigo-50 to-fuchsia-50 dark:from-indigo-900/20 dark:to-fuchsia-900/20 rounded-3xl shadow-2xl border border-fuchsia-200 dark:border-fuchsia-800 flex flex-col items-center justify-center p-8 text-center pointer-events-none"
                   style={{ transform: "rotateY(180deg)" }}
                 >
                   <span className="absolute top-6 left-6 text-xs font-extrabold uppercase tracking-widest text-fuchsia-500 flex items-center gap-2">
@@ -255,7 +278,7 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
                   <button 
                     onClick={(e) => playAudio(e, currentCard.back)}
                     disabled={isPlayingAudio}
-                    className="absolute top-6 right-6 p-2 rounded-full bg-white/50 dark:bg-slate-900/50 bg-slate-200/50 text-fuchsia-600 hover:text-indigo-600 transition-colors backdrop-blur-sm"
+                    className="absolute top-6 right-6 p-2 rounded-full bg-white/50 dark:bg-slate-900/50 bg-slate-200/50 text-fuchsia-600 hover:text-indigo-600 transition-colors backdrop-blur-sm pointer-events-auto"
                   >
                     {isPlayingAudio ? <Loader2 className="w-5 h-5 animate-spin" /> : <Volume2 className="w-5 h-5" />}
                   </button>
@@ -263,6 +286,7 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
                   <h2 className="text-xl md:text-2xl font-medium text-slate-800 dark:text-slate-200 leading-relaxed max-w-lg">
                     {currentCard.back}
                   </h2>
+                  <p className="absolute bottom-6 text-sm font-bold text-fuchsia-500 animate-bounce">Swipe Left or Right to Grade</p>
                 </div>
               </motion.div>
             </motion.div>

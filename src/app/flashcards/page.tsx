@@ -143,77 +143,86 @@ export default function FlashcardsHub() {
         </div>
       </header>
 
-      {/* ── STATS ROW ── */}
+          {/* ✨ BENTO BOX DASHBOARD ✨ */}
       {decks.length > 0 && (
-        <div className="grid grid-cols-3 gap-4">
-          {[
-            { label: "Total Decks", value: decks.length, icon: <Layers className="w-5 h-5 text-fuchsia-500" />, color: "bg-fuchsia-50 dark:bg-fuchsia-900/20 border-fuchsia-100 dark:border-fuchsia-900/50" },
-            { label: "Total Cards", value: totalCards, icon: <BookOpen className="w-5 h-5 text-indigo-500" />, color: "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-100 dark:border-indigo-900/50" },
-            { label: "Overall Mastery", value: `${overallMastery}%`, icon: <Trophy className="w-5 h-5 text-amber-500" />, color: "bg-amber-50 dark:bg-amber-900/20 border-amber-100 dark:border-amber-900/50" },
-          ].map(stat => (
-            <div key={stat.label} className={`${stat.color} border rounded-2xl p-4 flex items-center gap-3`}>
-              <div className="shrink-0">{stat.icon}</div>
-              <div>
-                <p className="text-2xl font-extrabold text-slate-800 dark:text-slate-200">{stat.value}</p>
-                <p className="text-xs font-semibold text-slate-500 dark:text-slate-500 dark:text-slate-400">{stat.label}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* ── LEITNER BOX DISTRIBUTION ── */}
-      {decks.length > 0 && (
-        <div className="bg-slate-50 dark:bg-slate-900/95 bg-slate-200/95 backdrop-blur-md border border-slate-800 p-6 rounded-[2rem] shadow-xl dark:text-white text-slate-900">
-          <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-indigo-400 mb-4 flex items-center gap-2">
-            <Layers className="w-5 h-5 dark:text-indigo-400 text-indigo-700" />
-            Spaced Repetition Stats Hub
-          </h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           
-          <div className="grid grid-cols-5 gap-3 h-48 items-end pt-6 border-b border-slate-800 pb-2">
-            {boxCounts.map((count, idx) => {
-              const maxCount = Math.max(...boxCounts, 1);
-              const heightPercent = Math.round((count / maxCount) * 85) + 5;
-              const configs = [
-                { label: "Box 1", desc: "Daily", color: "from-rose-500 to-red-600 shadow-rose-500/20" },
-                { label: "Box 2", desc: "2d Spacing", color: "from-orange-500 to-amber-600 shadow-orange-500/20" },
-                { label: "Box 3", desc: "5d Spacing", color: "from-amber-400 to-orange-500 shadow-amber-400/20" },
-                { label: "Box 4", desc: "9d Spacing", color: "from-indigo-500 to-purple-600 shadow-indigo-500/20" },
-                { label: "Box 5", desc: "Mastered", color: "from-emerald-400 to-teal-500 shadow-emerald-500/20" }
-              ];
-              const config = configs[idx];
-
-              return (
-                <div key={idx} className="flex flex-col items-center h-full justify-end group">
-                  <span className="text-xs font-black text-slate-600 dark:text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300 mb-2">
-                    {count} card{count !== 1 ? 's' : ''}
-                  </span>
-                  <div 
-                    className={`w-full rounded-2xl bg-gradient-to-t ${config.color} shadow-lg transition-all duration-500 hover:scale-[1.03] flex items-center justify-center text-xs font-black text-white/40 group-hover:text-white`}
-                    style={{ height: `${heightPercent}%` }}
-                  >
-                    {count > 0 && <span className="drop-shadow-md text-xs">{count}</span>}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="grid grid-cols-5 gap-2 text-center pt-3 text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400">
+          {/* Stats Column (1/4 width) */}
+          <div className="flex flex-col gap-4">
             {[
-              { label: "Box 1", desc: "Daily", badge: "bg-rose-500/10 text-rose-400 border-rose-500/20" },
-              { label: "Box 2", desc: "2d Spacing", badge: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
-              { label: "Box 3", desc: "5d Spacing", badge: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
-              { label: "Box 4", desc: "9d Spacing", badge: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" },
-              { label: "Box 5", desc: "Mastered ", badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" }
-            ].map((box, idx) => (
-              <div key={idx} className="flex flex-col items-center gap-1.5">
-                <span className={`px-2.5 py-1 rounded-full border text-[10px] font-black tracking-widest uppercase ${box.badge}`}>
-                  {box.label}
-                </span>
-                <span className="text-[10px] opacity-60 leading-none">{box.desc}</span>
+              { label: "Total Decks", value: decks.length, icon: <Layers className="w-5 h-5 text-fuchsia-500" />, color: "bg-gradient-to-br from-fuchsia-50 to-fuchsia-100/50 dark:from-fuchsia-900/20 dark:to-fuchsia-900/10 border-fuchsia-200 dark:border-fuchsia-800/50" },
+              { label: "Total Cards", value: totalCards, icon: <BookOpen className="w-5 h-5 text-indigo-500" />, color: "bg-gradient-to-br from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-900/10 border-indigo-200 dark:border-indigo-800/50" },
+              { label: "Overall Mastery", value: `${overallMastery}%`, icon: <Trophy className="w-5 h-5 text-amber-500" />, color: "bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10 border-amber-200 dark:border-amber-800/50" },
+            ].map(stat => (
+              <div key={stat.label} className={`${stat.color} border rounded-3xl p-5 flex items-center gap-4 shadow-lg backdrop-blur-xl hover:scale-[1.02] transition-transform`}>
+                <div className="p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm">{stat.icon}</div>
+                <div>
+                  <p className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 leading-tight">{stat.value}</p>
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400">{stat.label}</p>
+                </div>
               </div>
             ))}
+          </div>
+
+          {/* Leitner Box Chart (3/4 width) */}
+          <div className="md:col-span-3 bg-white/50 dark:bg-slate-900/60 backdrop-blur-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 rounded-[2rem] shadow-xl flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-500 to-indigo-500 flex items-center gap-2">
+                <div className="p-1.5 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl">
+                  <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                Spaced Repetition Algorithm
+              </h3>
+              <div className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-bold text-slate-500 dark:text-slate-400">
+                Live Stats
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-5 gap-3 h-48 items-end pt-6 border-b border-slate-200 dark:border-slate-800/50 pb-3 flex-1">
+              {boxCounts.map((count, idx) => {
+                const maxCount = Math.max(...boxCounts, 1);
+                const heightPercent = Math.round((count / maxCount) * 85) + 5;
+                const configs = [
+                  { label: "Box 1", desc: "Daily", color: "from-rose-500 to-red-600 shadow-rose-500/30" },
+                  { label: "Box 2", desc: "2d Spacing", color: "from-orange-500 to-amber-600 shadow-orange-500/30" },
+                  { label: "Box 3", desc: "5d Spacing", color: "from-amber-400 to-orange-500 shadow-amber-400/30" },
+                  { label: "Box 4", desc: "9d Spacing", color: "from-indigo-500 to-purple-600 shadow-indigo-500/30" },
+                  { label: "Box 5", desc: "Mastered", color: "from-emerald-400 to-teal-500 shadow-emerald-500/30" }
+                ];
+                const config = configs[idx];
+
+                return (
+                  <div key={idx} className="flex flex-col items-center h-full justify-end group relative">
+                    <span className="absolute -top-8 text-xs font-black bg-slate-800 text-white dark:bg-white dark:text-slate-900 px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 scale-90 group-hover:scale-100 shadow-xl z-10 pointer-events-none">
+                      {count} card{count !== 1 ? 's' : ''}
+                    </span>
+                    <div 
+                      className={`w-full max-w-[4rem] rounded-2xl bg-gradient-to-t ${config.color} shadow-xl transition-all duration-500 group-hover:scale-105 flex items-end justify-center text-xs font-black text-white/40 pb-3 group-hover:text-white`}
+                      style={{ height: `${heightPercent}%` }}
+                    >
+                      {count > 0 && <span className="drop-shadow-md text-xs">{count}</span>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="grid grid-cols-5 gap-2 text-center pt-4 text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400">
+              {[
+                { label: "Box 1", desc: "Daily", badge: "bg-rose-100 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20" },
+                { label: "Box 2", desc: "2d", badge: "bg-orange-100 text-orange-600 border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20" },
+                { label: "Box 3", desc: "5d", badge: "bg-amber-100 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20" },
+                { label: "Box 4", desc: "9d", badge: "bg-indigo-100 text-indigo-600 border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-400 dark:border-indigo-500/20" },
+                { label: "Box 5", desc: "Done", badge: "bg-emerald-100 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" }
+              ].map((box, idx) => (
+                <div key={idx} className="flex flex-col items-center gap-1.5">
+                  <span className={`px-2.5 py-1 rounded-full border text-[10px] font-black tracking-widest uppercase shadow-sm ${box.badge}`}>
+                    {box.label}
+                  </span>
+                  <span className="opacity-80">{box.desc}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}

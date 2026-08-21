@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { 
@@ -482,6 +482,17 @@ export default function LensPage() {
 
   return (
     <div className="w-full h-full min-h-screen flex flex-col dark:bg-[#03050d] bg-[#eef1f9] text-slate-100 font-sans relative overflow-hidden selection:bg-emerald-500/30">
+      <style>{`
+        @keyframes scan {
+          0% { top: 0%; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { top: 100%; opacity: 0; }
+        }
+        .animate-scan {
+          animation: scan 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+      `}</style>
       
       {/* Background Gradients */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
@@ -531,22 +542,27 @@ export default function LensPage() {
             <div className="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 border-emerald-400/80 z-20 pointer-events-none" />
             <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 border-emerald-400/80 z-20 pointer-events-none" />
 
+            {/* AR Crosshairs overlay */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+              <Crosshair className="w-48 h-48 text-emerald-400 animate-[spin_10s_linear_infinite]" />
+            </div>
+
             {lensImage ? (
               <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
                 <img src={lensImage} alt="Uploaded homework" className="w-full h-full object-cover" />
                 
                 {isScanning && (
                   <>
-                    <div className="absolute inset-0 bg-emerald-500/10" />
+                    <div className="absolute inset-0 bg-emerald-500/10 backdrop-blur-[2px]" />
                     {/* Animated Cyan/Emerald Laser Line */}
-                    <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-cyan-400 via-emerald-400 to-teal-300 shadow-[0_0_20px_#10b981] animate-scan" />
+                    <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-cyan-400 via-emerald-400 to-teal-300 shadow-[0_0_20px_#10b981] animate-scan z-10" />
                   </>
                 )}
 
                 {!isScanning && !lensChatStarted && (
                   <button 
                     onClick={triggerLensScan}
-                    className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white px-7 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-2xl hover:scale-105 active:scale-95 transition-all border border-white/20"
+                    className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white px-7 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-2xl hover:scale-105 active:scale-95 transition-all border border-white/20 z-10"
                   >
                     <Zap className="w-4.5 h-4.5 fill-current" /> Trigger OCR Scan & Solve
                   </button>
@@ -563,7 +579,7 @@ export default function LensPage() {
                   </div>
                 </div>
 
-                <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400 mb-2 relative z-10 tracking-tight">Drop Homework Photo</h3>
+                <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-br from-emerald-400 to-cyan-300 mb-2 relative z-10 tracking-tight">Drop Homework Photo</h3>
                 <p className="dark:text-slate-400 text-slate-600 text-sm font-medium mb-8 relative z-10 max-w-[280px] mx-auto leading-relaxed">
                   Scan math equations, physics diagrams, or chemistry formulas for instant step-by-step solutions.
                 </p>
@@ -586,7 +602,7 @@ export default function LensPage() {
           </div>
 
           {/* Sample NCERT Doubt Presets Deck */}
-          <div className="dark:bg-[#070918] bg-[#eef1f9] border border-white/10 rounded-3xl p-6 shadow-2xl backdrop-blur-xl shrink-0">
+          <div className="bg-white/40 dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-2xl backdrop-blur-2xl shrink-0">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xs font-black dark:text-slate-300 text-slate-700 uppercase tracking-widest flex items-center gap-2">
                 <BookOpen className="w-4 h-4 dark:text-emerald-400 text-emerald-700" /> Test Sample NCERT Doubts

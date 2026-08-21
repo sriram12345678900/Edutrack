@@ -1333,6 +1333,14 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
 
   return (
     <div className={`relative w-full h-screen overflow-hidden select-none ${canvasTheme === "dark" ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"}`}>
+      {/* Animated Dot Grid Background */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-[0.15] dark:opacity-[0.05]" 
+        style={{ 
+          backgroundImage: "radial-gradient(circle, currentColor 1.5px, transparent 1.5px)", 
+          backgroundSize: "24px 24px" 
+        }} 
+      />
       {/* Hidden File Input for Image Import */}
       <input
         ref={imageUploadInputRef}
@@ -1427,122 +1435,74 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
         )}
       </AnimatePresence>
 
-      {/* Top Floating Bar */}
-      <header className="absolute top-4 left-4 right-4 z-40 flex items-center justify-between pointer-events-none">
-        <div className="flex items-center gap-3 pointer-events-auto">
-          <div className="px-3 py-2 dark:bg-slate-900/80 bg-slate-200/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl flex items-center gap-2">
-            <div className="p-1.5 bg-gradient-to-tr from-indigo-500 to-cyan-400 rounded-xl text-white shadow-md">
+      {/* Top Floating Pill Header */}
+      <header className="absolute top-6 left-1/2 -translate-x-1/2 z-40 flex items-center justify-between pointer-events-none">
+        <div className="flex items-center gap-4 px-2 py-1.5 dark:bg-slate-900/80 bg-white/90 backdrop-blur-2xl border border-slate-700/50 shadow-2xl rounded-full pointer-events-auto transition-all">
+          
+          {/* Logo / Title */}
+          <div className="flex items-center gap-2 pl-3">
+            <div className="p-1.5 bg-gradient-to-tr from-indigo-500 to-cyan-400 rounded-full text-white shadow-md">
               <Zap className="w-4 h-4" />
             </div>
-            <div>
-              <h1 className="text-xs font-bold tracking-wide bg-gradient-to-r from-indigo-300 via-cyan-200 to-white bg-clip-text text-transparent">
-                {isEmbedded ? "Co-Op Board" : "EduTrack Pro Whiteboard"}
+            <div className="hidden sm:block">
+              <h1 className="text-xs font-bold tracking-wide bg-gradient-to-r from-indigo-500 to-cyan-500 dark:from-indigo-300 dark:to-cyan-200 bg-clip-text text-transparent">
+                {isEmbedded ? "Co-Op Board" : "Pro Whiteboard"}
               </h1>
-              <p className="text-[10px] dark:text-slate-400 text-slate-600 font-medium">{isEmbedded ? "Live Collaborative Canvas" : "Infinite Canvas & Multi-Page Deck"}</p>
             </div>
           </div>
 
-          {/* Multi-Page Slide Deck Switcher */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 dark:bg-slate-900/80 bg-slate-200/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl text-xs font-semibold">
-            <button
-              onClick={() => setActivePageIndex(prev => Math.max(0, prev - 1))}
-              disabled={activePageIndex === 0}
-              className="p-1 hover:bg-slate-800 rounded-lg dark:text-slate-300 text-slate-700 disabled:opacity-40"
-            >
-              <ChevronLeft className="w-3.5 h-3.5" />
+          <div className="w-[1px] h-6 bg-slate-300 dark:bg-slate-700/50"></div>
+
+          {/* Slide Deck Switcher */}
+          <div className="flex items-center gap-1">
+            <button onClick={() => setActivePageIndex(prev => Math.max(0, prev - 1))} disabled={activePageIndex === 0} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full dark:text-slate-300 text-slate-700 disabled:opacity-40 transition-colors">
+              <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="font-mono dark:text-indigo-300 text-indigo-700">
-              {activePageIndex + 1} / {deckPages.length}
+            <span className="font-mono text-xs font-semibold w-10 text-center dark:text-indigo-300 text-indigo-700">
+              {activePageIndex + 1}/{deckPages.length}
             </span>
-            <button
-              onClick={() => setActivePageIndex(prev => Math.min(deckPages.length - 1, prev + 1))}
-              disabled={activePageIndex === deckPages.length - 1}
-              className="p-1 hover:bg-slate-800 rounded-lg dark:text-slate-300 text-slate-700 disabled:opacity-40"
-            >
-              <ChevronRight className="w-3.5 h-3.5" />
+            <button onClick={() => setActivePageIndex(prev => Math.min(deckPages.length - 1, prev + 1))} disabled={activePageIndex === deckPages.length - 1} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full dark:text-slate-300 text-slate-700 disabled:opacity-40 transition-colors">
+              <ChevronRight className="w-4 h-4" />
             </button>
-            <button
-              onClick={addNewPage}
-              className="p-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all ml-1"
-              title="Add New Slide Page"
-            >
-              <Plus className="w-3.5 h-3.5" />
+            <button onClick={addNewPage} className="p-1.5 bg-indigo-100 dark:bg-indigo-900/50 hover:bg-indigo-200 dark:hover:bg-indigo-800 text-indigo-600 dark:text-indigo-300 rounded-full transition-all ml-1" title="Add Slide">
+              <Plus className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Theme Toggle */}
-          <button
-            onClick={() => setCanvasTheme(t => t === "dark" ? "light" : "dark")}
-            className="p-2.5 dark:bg-slate-900/80 bg-slate-200/80 hover:bg-slate-800 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl dark:text-slate-300 text-slate-700 transition-all"
-            title="Toggle Canvas Theme"
-          >
-            {canvasTheme === "dark" ? <Sun className="w-4 h-4 dark:text-amber-400 text-amber-700" /> : <Moon className="w-4 h-4 dark:text-indigo-400 text-indigo-700" />}
-          </button>
-        </div>
+          <div className="w-[1px] h-6 bg-slate-300 dark:bg-slate-700/50"></div>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-2 pointer-events-auto">
-          {/* Import Image */}
-          <button
-            onClick={() => imageUploadInputRef.current?.click()}
-            className="px-3 py-2 dark:bg-slate-900/80 bg-slate-200/80 hover:bg-slate-800 border border-slate-800 dark:text-slate-200 text-slate-800 rounded-2xl text-xs font-semibold backdrop-blur-xl shadow-lg flex items-center gap-1.5 transition-all"
-            title="Import Image to Canvas"
-          >
-            <ImageIcon className="w-4 h-4 dark:text-emerald-400 text-emerald-700" />
-            <span>Import Image</span>
-          </button>
+          {/* Actions */}
+          <div className="flex items-center gap-1">
+            <button onClick={() => imageUploadInputRef.current?.click()} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-600 dark:text-slate-300 transition-colors" title="Import Image">
+              <ImageIcon className="w-4 h-4" />
+            </button>
+            <button onClick={() => setShowRuler(!showRuler)} className={`p-2 rounded-full transition-colors ${showRuler ? "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300" : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"}`} title="Toggle Ruler">
+              <Ruler className="w-4 h-4" />
+            </button>
+            <button onClick={() => setShowPresetBank(true)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-600 dark:text-slate-300 transition-colors" title="Diagram Presets">
+              <Library className="w-4 h-4" />
+            </button>
+            <button onClick={solveWhiteboardWithAI} disabled={solvingAI} className="px-3 py-1.5 ml-1 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white rounded-full text-xs font-semibold shadow-md flex items-center gap-1.5 transition-all disabled:opacity-50">
+              {solvingAI ? <Sparkles className="w-3.5 h-3.5 animate-spin" /> : <Calculator className="w-3.5 h-3.5" />}
+              <span className="hidden sm:inline">{solvingAI ? "Solving..." : "AI Solve"}</span>
+            </button>
+          </div>
 
-          {/* Metric Ruler Toggle */}
-          <button
-            onClick={() => {
-              setShowRuler(!showRuler);
-              showToast(showRuler ? "Hidden Metric Ruler" : "Metric Ruler Active ");
-            }}
-            className={`px-3 py-2 border rounded-2xl text-xs font-semibold backdrop-blur-xl shadow-lg flex items-center gap-1.5 transition-all ${
-              showRuler ? "bg-indigo-600 border-indigo-500 text-white" : "dark:bg-slate-900/80 bg-slate-200/80 hover:bg-slate-800 border-slate-800 text-slate-200"
-            }`}
-            title="Toggle Metric Ruler"
-          >
-            <Ruler className="w-4 h-4 dark:text-amber-400 text-amber-700" />
-            <span>Ruler</span>
-          </button>
+          <div className="w-[1px] h-6 bg-slate-300 dark:bg-slate-700/50"></div>
 
-          {/* AI Math Solve */}
-          <button
-            onClick={solveWhiteboardWithAI}
-            disabled={solvingAI}
-            className="px-3 py-2 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white rounded-2xl text-xs font-semibold shadow-lg shadow-indigo-500/25 flex items-center gap-1.5 transition-all disabled:opacity-50"
-          >
-            {solvingAI ? <Sparkles className="w-4 h-4 animate-spin" /> : <Calculator className="w-4 h-4 dark:text-cyan-200 text-cyan-800" />}
-            <span>{solvingAI ? "Solving..." : "AI Math Solve"}</span>
-          </button>
-
-          {/* Preset Diagrams */}
-          <button
-            onClick={() => setShowPresetBank(true)}
-            className="px-3 py-2 dark:bg-slate-900/80 bg-slate-200/80 hover:bg-slate-800 border border-slate-800 dark:text-slate-200 text-slate-800 rounded-2xl text-xs font-semibold backdrop-blur-xl shadow-lg flex items-center gap-1.5 transition-all"
-          >
-            <Library className="w-4 h-4 dark:text-indigo-400 text-indigo-700" />
-            <span>Diagram Presets</span>
-          </button>
-
-          {/* Export PNG */}
-          <button
-            onClick={downloadCanvas}
-            className="p-2.5 dark:bg-slate-900/80 bg-slate-200/80 hover:bg-slate-800 backdrop-blur-xl border border-slate-800 rounded-2xl dark:text-slate-300 text-slate-700 hover:dark:text-white text-slate-900 transition-all shadow-lg"
-            title="Download PNG"
-          >
-            <Download className="w-4 h-4" />
-          </button>
-
-          {/* Shortcuts */}
-          <button
-            onClick={() => setShowKeyShortcuts(true)}
-            className="p-2.5 dark:bg-slate-900/80 bg-slate-200/80 hover:bg-slate-800 backdrop-blur-xl border border-slate-800 rounded-2xl dark:text-slate-300 text-slate-700 hover:dark:text-white text-slate-900 transition-all shadow-lg"
-            title="Keyboard Shortcuts"
-          >
-            <Keyboard className="w-4 h-4" />
-          </button>
+          {/* Utils */}
+          <div className="flex items-center gap-1 pr-1">
+            <button onClick={downloadCanvas} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-600 dark:text-slate-300 transition-colors" title="Download PNG">
+              <Download className="w-4 h-4" />
+            </button>
+            <button onClick={() => setCanvasTheme(t => t === "dark" ? "light" : "dark")} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-600 dark:text-slate-300 transition-colors" title="Toggle Theme">
+              {canvasTheme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+            <button onClick={() => setShowKeyShortcuts(true)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-600 dark:text-slate-300 transition-colors" title="Keyboard Shortcuts">
+              <Keyboard className="w-4 h-4" />
+            </button>
+          </div>
+          
         </div>
       </header>
 
@@ -1717,21 +1677,7 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
           
           <ToolButton active={tool === "eraser"} onClick={() => setTool("eraser")} icon={Eraser} label="Eraser (E)" />
 
-          <div className="w-[1px] h-8 bg-slate-200 dark:bg-slate-700/50 mx-1"></div>
 
-          {/* Colors */}
-          <div className="flex items-center gap-1 px-1">
-            {paletteColors.slice(0, 5).map((c) => (
-              <button
-                key={c}
-                onClick={() => { setColor(c); if (selectedStrokeIds.length > 0) recolorSelectedStrokes(c); }}
-                className={`w-6 h-6 rounded-full transition-transform ${color === c ? "scale-125 ring-2 ring-indigo-400" : "hover:scale-110 shadow-sm border border-black/10 dark:border-white/10"}`}
-                style={{ backgroundColor: c }}
-              />
-            ))}
-          </div>
-
-          <div className="w-[1px] h-8 bg-slate-200 dark:bg-slate-700/50 mx-1"></div>
 
           <button onClick={handleUndo} disabled={historyStep <= 0} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl disabled:opacity-40">
             <Undo2 className="w-5 h-5 dark:text-slate-300 text-slate-700" />
@@ -1743,6 +1689,20 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
             <Trash2 className="w-5 h-5" />
           </button>
 
+        </div>
+      </div>
+
+      {/* Left Floating Palette (Colors & Strokes) */}
+      <div className="absolute top-1/2 -translate-y-1/2 left-6 z-40 flex flex-col gap-3">
+        <div className="p-3 dark:bg-slate-900/80 bg-slate-200/80 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl flex flex-col items-center gap-3">
+          {paletteColors.map((c) => (
+            <button
+              key={c}
+              onClick={() => { setColor(c); if (selectedStrokeIds.length > 0) recolorSelectedStrokes(c); }}
+              className={`w-7 h-7 rounded-full transition-all ${color === c ? "scale-125 ring-2 ring-offset-2 dark:ring-offset-slate-900 ring-indigo-500 shadow-lg" : "hover:scale-110 shadow-sm border border-black/10 dark:border-white/10"}`}
+              style={{ backgroundColor: c }}
+            />
+          ))}
         </div>
       </div>
 

@@ -398,34 +398,36 @@ export default function StudyPlanner() {
           {/* Progress & Gamification Sidebar */}
           <div className="lg:col-span-1 space-y-6">
             
-            {/* Level Panel */}
-            <div className="bg-white/70 dark:bg-slate-900/70 bg-slate-200/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-slate-200/50 dark:border-white/10 sticky top-8 space-y-6 hover:shadow-indigo-500/10 transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl">
-                  <Trophy className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg text-slate-900 dark:text-white">Your Rank</h3>
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-0.5">{getLevelTitle(gamification.level)}</p>
+            {/* Level Panel with Glowing Circular Ring */}
+            <div className="bg-white/50 dark:bg-slate-900/40 bg-slate-200/40 backdrop-blur-2xl rounded-[2rem] p-8 shadow-2xl border border-slate-200/50 dark:border-white/10 sticky top-8 flex flex-col items-center group hover:shadow-indigo-500/20 transition-all">
+              <h3 className="font-extrabold text-lg text-slate-900 dark:text-white flex items-center gap-2 mb-1">
+                <Trophy className="w-5 h-5 text-indigo-500" /> Your Rank
+              </h3>
+              <p className="text-xs text-slate-500 font-black uppercase tracking-widest mb-6">{getLevelTitle(gamification.level)}</p>
+
+              {/* Glowing XP Ring */}
+              <div className="relative w-40 h-40 flex items-center justify-center mb-4">
+                <svg className="absolute inset-0 w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
+                  {/* Background Track */}
+                  <circle cx="50" cy="50" r="45" className="fill-none stroke-slate-200 dark:stroke-slate-800" strokeWidth="8" />
+                  {/* Progress Glow */}
+                  <circle cx="50" cy="50" r="45" className="fill-none stroke-indigo-500/30 blur-md" strokeWidth="12" strokeDasharray="283" strokeDashoffset={283 - (283 * levelProgress) / 100} strokeLinecap="round" />
+                  {/* Active Progress */}
+                  <circle cx="50" cy="50" r="45" className="fill-none stroke-indigo-500 transition-all duration-1000 ease-out" strokeWidth="8" strokeDasharray="283" strokeDashoffset={283 - (283 * levelProgress) / 100} strokeLinecap="round" />
+                </svg>
+                <div className="absolute flex flex-col items-center">
+                  <span className="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 to-fuchsia-500">
+                    {gamification.level}
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Level</span>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs font-bold">
-                  <span className="text-slate-500">Level {gamification.level} Progress</span>
-                  <span className="text-indigo-600 dark:text-indigo-400">{currentLevelXp} / 500 XP</span>
+              <div className="text-center space-y-1 w-full mt-2">
+                <div className="flex justify-between text-xs font-bold px-2">
+                  <span className="text-slate-500">XP Progress</span>
+                  <span className="text-indigo-600 dark:text-indigo-400">{currentLevelXp} / 500</span>
                 </div>
-                <div className="w-full bg-slate-100 dark:bg-slate-700 h-3 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500" 
-                    style={{ width: `${levelProgress}%` }}
-                  ></div>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
-                <span className="text-slate-500 text-xs font-bold">Total Exp Earned</span>
-                <span className="text-slate-800 dark:text-white font-extrabold text-sm">{gamification.totalXP} XP</span>
               </div>
             </div>
 
@@ -517,61 +519,69 @@ export default function StudyPlanner() {
               Your Day-by-Day Schedule
             </h2>
             
-            <div className="space-y-4 relative before:absolute before:inset-0 before:ml-[1.7rem] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-emerald-500 before:to-teal-100 dark:before:to-teal-900">
+            <div className="space-y-4 relative">
               <AnimatePresence>
               {activePlan.schedule.map((day, idx) => (
                 <motion.div 
-                  initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.1, type: "spring" }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05, type: "spring" }}
                   key={idx} 
-                  className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active"
+                  className="relative group"
                 >
-                  {/* Timeline Node */}
-                  <div className="flex items-center justify-center w-14 h-14 rounded-full border-4 border-white dark:border-slate-950 bg-emerald-100 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 cursor-pointer hover:scale-110 transition-transform z-10"
-                       onClick={(e) => toggleDayStatus(idx, e)}>
-                    {day.completed ? (
-                      <CheckCircle2 className="w-7 h-7 text-emerald-500" />
-                    ) : (
-                      <span className="font-bold text-lg">D{day.day}</span>
-                    )}
-                  </div>
-                  
-                  {/* Card */}
-                  <div className={`w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-3xl shadow-xl backdrop-blur-xl border transition-all duration-300 ${day.completed ? 'bg-slate-50/60 dark:bg-slate-900/40 bg-slate-200/40 border-emerald-200/50 dark:border-emerald-900/30 opacity-80' : 'bg-white/80 dark:bg-slate-900/70 bg-slate-200/70 border-slate-200/50 dark:border-white/10 hover:border-emerald-300/80 dark:hover:border-emerald-500/50 hover:shadow-emerald-500/10 hover:-translate-y-1 hover:scale-[1.01]'}`}>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className={`text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-full ${day.completed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400'}`}>
-                        {day.completed ? 'Completed' : 'Upcoming'}
-                      </span>
-                      <span className="flex items-center gap-1.5 text-sm font-bold text-slate-500">
-                        <Clock className="w-4 h-4" /> {day.durationMins}m
-                      </span>
+                  {/* Gantt-style Glassmorphic Card */}
+                  <div className={`relative flex flex-col md:flex-row items-stretch md:items-center p-5 rounded-3xl shadow-xl backdrop-blur-xl border transition-all duration-300 gap-5 overflow-hidden ${day.completed ? 'bg-slate-50/40 dark:bg-slate-900/40 bg-slate-200/40 border-emerald-200/50 dark:border-emerald-900/30' : 'bg-white/60 dark:bg-slate-900/60 bg-slate-200/60 border-slate-200/50 dark:border-white/10 hover:border-emerald-300/80 dark:hover:border-emerald-500/50 hover:shadow-emerald-500/10'}`}>
+                    
+                    {/* Background Progress Bar (Gantt Fill) */}
+                    <div className={`absolute top-0 left-0 h-full w-full opacity-10 ${day.completed ? 'bg-emerald-500' : 'bg-transparent'}`} style={{ width: day.completed ? '100%' : '0%' }}></div>
+                    <div className={`absolute top-0 left-0 h-1 bg-gradient-to-r from-emerald-400 to-teal-400 transition-all duration-700`} style={{ width: day.completed ? '100%' : '0%' }}></div>
+
+                    {/* Day Node */}
+                    <div 
+                      className={`flex items-center justify-center w-16 h-16 rounded-2xl shadow-inner shrink-0 cursor-pointer hover:scale-105 transition-all z-10 ${day.completed ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-300'}`}
+                      onClick={(e) => toggleDayStatus(idx, e)}
+                    >
+                      {day.completed ? (
+                        <CheckCircle2 className="w-8 h-8" />
+                      ) : (
+                        <div className="flex flex-col items-center">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Day</span>
+                          <span className="font-extrabold text-xl leading-none">{day.day}</span>
+                        </div>
+                      )}
                     </div>
                     
-                    <h3 className={`text-xl font-bold mb-4 ${day.completed ? 'text-slate-500 dark:text-slate-500 dark:text-slate-400 line-through' : 'text-slate-900 dark:text-white'}`}>
-                      {day.topic}
-                    </h3>
-                    
-                    <ul className="space-y-2">
-                      {Array.isArray(day.activities) ? day.activities.map((activity, actIdx) => (
-                        <li key={actIdx} className={`flex items-start gap-2 text-sm ${day.completed ? 'text-slate-500 dark:text-slate-400' : 'text-slate-600 dark:text-slate-600 dark:text-slate-300'}`}>
-                          <Circle className="w-2 h-2 mt-1.5 fill-current shrink-0 text-emerald-500" />
-                          <span>{activity}</span>
-                        </li>
-                      )) : typeof day.activities === 'string' ? (
-                        <li className={`flex items-start gap-2 text-sm ${day.completed ? 'text-slate-500 dark:text-slate-400' : 'text-slate-600 dark:text-slate-600 dark:text-slate-300'}`}>
-                          <Circle className="w-2 h-2 mt-1.5 fill-current shrink-0 text-emerald-500" />
-                          <span>{day.activities}</span>
-                        </li>
-                      ) : null}
-                    </ul>
+                    {/* Content */}
+                    <div className="flex-1 z-10">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className={`text-xl font-extrabold ${day.completed ? 'text-slate-500 dark:text-slate-400 line-through decoration-slate-400/50' : 'text-slate-900 dark:text-white'}`}>
+                          {day.topic}
+                        </h3>
+                        <span className="flex items-center gap-1 text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
+                          <Clock className="w-3.5 h-3.5" /> {day.durationMins}m
+                        </span>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2">
+                        {Array.isArray(day.activities) ? day.activities.map((activity, actIdx) => (
+                          <span key={actIdx} className={`text-xs px-2.5 py-1 rounded-lg border ${day.completed ? 'border-emerald-200/50 text-emerald-700/70 bg-emerald-50/50 dark:border-emerald-900/30 dark:text-emerald-400/70' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-white/50 dark:bg-slate-800/50'}`}>
+                            {activity}
+                          </span>
+                        )) : typeof day.activities === 'string' ? (
+                          <span className={`text-xs px-2.5 py-1 rounded-lg border ${day.completed ? 'border-emerald-200/50 text-emerald-700/70 bg-emerald-50/50 dark:border-emerald-900/30 dark:text-emerald-400/70' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-white/50 dark:bg-slate-800/50'}`}>
+                            {day.activities}
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
 
+                    {/* Action */}
                     {!day.completed && (
                       <button 
                         onClick={(e) => toggleDayStatus(idx, e)}
-                        className="mt-6 w-full py-2.5 rounded-xl border-2 border-emerald-100 dark:border-emerald-900/50 text-emerald-600 dark:text-emerald-400 font-bold hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                        className="shrink-0 md:ml-4 px-4 py-3 rounded-xl border border-emerald-200 dark:border-emerald-900/50 text-emerald-600 dark:text-emerald-400 font-bold hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:scale-105 transition-all text-sm z-10 bg-white/50 dark:bg-slate-900/50"
                       >
-                        Mark as Complete
+                        Complete
                       </button>
                     )}
                   </div>
