@@ -4,11 +4,12 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { 
   Home, BookOpen, MessageSquare, Target, Settings, LogOut, Menu, X, 
-  GraduationCap, Moon, Sun, Calendar, Sparkles, Users, Award, Palette, Timer, Brain, Camera, Zap, Trophy, Shield, Compass, Video
+  GraduationCap, Moon, Sun, Calendar, Sparkles, Users, Award, Palette, Timer, Brain, Camera, Zap, Trophy, Shield, Compass, Video, Gamepad2, Globe, Mic, Radio, GitFork, Sliders, FileText
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
+import { ADMIN_PORTAL_ROUTE } from "@/lib/admin";
 
 import AppTour from "./AppTour";
 import MobileHeader from "./MobileHeader";
@@ -18,37 +19,45 @@ import MobileDrawer from "./MobileDrawer";
 // Categorized premium sidebar links for desktop
 const categories = [
   {
-    title: "Virtual School & Bridge",
+    title: "Global Community & Live",
     items: [
+      { href: "/community", label: "Global Doubt Forum", icon: Globe, badge: "World" },
+      { href: "/arena", label: "Multiplayer Arena", icon: Gamepad2, badge: "Live" },
       { href: "/classroom", label: "Student Classroom", icon: GraduationCap, badge: "School" },
       { href: "/teacher", label: "Teacher Command", icon: Video, badge: "Portal" },
-      { href: "/bridge", label: "Home Study Bridge", icon: Shield, badge: "Parent" },
+      { href: "/parent", label: "Parent AI Digest", icon: Shield, badge: "Parent" },
     ]
   },
   {
-    title: "Core Space",
+    title: "Core Space & Mastery",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: Home, badge: "Main" },
+      { href: "/skill-tree", label: "Skill Trees", icon: GitFork, badge: "RPG" },
       { href: "/learn", label: "Subjects Hub", icon: BookOpen },
       { href: "/ncert", label: "NCERT Books", icon: GraduationCap },
       { href: "/formulas", label: "Formulas Hub", icon: Compass, badge: "Master" },
     ]
   },
   {
-    title: "AI Study Lab",
+    title: "AI Study Lab & Audio",
     items: [
+      { href: "/viva", label: "AI Voice Viva", icon: Mic, badge: "Voice" },
+      { href: "/feynman", label: "Feynman Lab", icon: Brain, badge: "Teach" },
+      { href: "/podcast", label: "AI Podcasts", icon: Radio, badge: "Audio" },
+      { href: "/sandbox", label: "Simulations Lab", icon: Sliders, badge: "Lab" },
       { href: "/tutor", label: "AI Tutor", icon: MessageSquare, badge: "AI" },
       { href: "/lens", label: "Doubt-Solver Lens", icon: Camera, badge: "Live" },
       { href: "/plan", label: "Study Planner", icon: Calendar },
       { href: "/flashcards", label: "AI Flashcards", icon: Sparkles },
       { href: "/whiteboard", label: "Whiteboard", icon: Palette },
       { href: "/pomodoro", label: "Pomodoro Timer", icon: Timer },
-      { href: "/sandbox", label: "Sim Sandbox", icon: Zap },
     ]
   },
   {
-    title: "Testing & Analytics",
+    title: "Testing & Examination",
     items: [
+      { href: "/exam-generator", label: "Exam Generator", icon: FileText, badge: "Print" },
+      { href: "/games", label: "EduArcade", icon: Gamepad2, badge: "XP" },
       { href: "/groups", label: "StudyCircles", icon: Users },
       { href: "/pyq", label: "PYQs Hub", icon: Award },
       { href: "/analytics", label: "Performance", icon: Target },
@@ -148,6 +157,19 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   const openAppTour = () => {
     if (typeof window !== "undefined") {
       window.dispatchEvent(new CustomEvent("edutrack_open_tour", { detail: { initialStep: 0 } }));
+    }
+  };
+
+  const openFeatureTour = () => {
+    if (typeof window !== "undefined") {
+      if (pathname !== "/dashboard") {
+        router.push("/dashboard");
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent("edutrack_open_feature_tour", { detail: { stepIndex: 0 } }));
+        }, 500);
+      } else {
+        window.dispatchEvent(new CustomEvent("edutrack_open_feature_tour", { detail: { stepIndex: 0 } }));
+      }
     }
   };
 
@@ -281,7 +303,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               )}>
                 Platform Management
               </span>
-              <Link href="/admin" className={cn("flex items-center justify-between px-3 py-2.5 rounded-xl font-extrabold text-xs transition-all relative group", pathname === "/admin" ? "bg-indigo-500/15 text-indigo-650" : "hover:bg-slate-100")}>
+              <Link href={ADMIN_PORTAL_ROUTE} className={cn("flex items-center justify-between px-3 py-2.5 rounded-xl font-extrabold text-xs transition-all relative group", pathname.startsWith("/admin-portal") ? "bg-indigo-500/15 text-indigo-650" : "hover:bg-slate-100")}>
                 <div className="flex items-center gap-3"><Shield className="w-4 h-4" /><span className={cn("whitespace-nowrap transition-all duration-300", isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden")}>Super Admin</span></div>
               </Link>
             </div>
@@ -358,9 +380,9 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         <div className="p-3 border-t border-slate-200/40 dark:border-white/5 shrink-0 space-y-1">
           <button
             type="button"
-            onClick={openAppTour}
-            title={!isExpanded ? "App Tour & Setup" : undefined}
-            className="flex items-center justify-between px-3 py-2.5 rounded-xl font-bold text-xs bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border border-indigo-500/25 transition-all w-full text-left group"
+            onClick={openFeatureTour}
+            title={!isExpanded ? "Feature Spotlights & Guide" : undefined}
+            className="flex items-center justify-between px-3 py-2 rounded-xl font-bold text-xs bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border border-indigo-500/25 transition-all w-full text-left group"
           >
             <div className="flex items-center gap-3">
               <Sparkles className="w-4.5 h-4.5 text-indigo-500 dark:text-indigo-400 group-hover:rotate-12 transition-transform shrink-0" />
@@ -368,7 +390,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                 "transition-all duration-300 whitespace-nowrap",
                 isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden"
               )}>
-                App Tour & Setup
+                Feature Spotlights
               </span>
             </div>
             {isExpanded && (

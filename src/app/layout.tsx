@@ -63,6 +63,24 @@ export default function RootLayout({
         <AuthProvider>
           {children}
         </AuthProvider>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').then(
+                    function(registration) {
+                      console.log('EduTrack ServiceWorker registered with scope: ', registration.scope);
+                    },
+                    function(err) {
+                      console.warn('EduTrack ServiceWorker registration failed: ', err);
+                    }
+                  );
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );

@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Brain, Mail, Lock, ArrowRight, AlertCircle, Loader2, Building, GraduationCap, Users } from "lucide-react";
+import { Brain, Mail, Lock, ArrowRight, AlertCircle, Loader2, Building, GraduationCap, Users, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { ADMIN_PORTAL_ROUTE } from "@/lib/admin";
 
 export default function Login() {
   const { user, loading: authLoading, login, loginWithGoogle, loginWithOrg } = useAuth();
@@ -20,6 +21,7 @@ export default function Login() {
   
   const [orgUsername, setOrgUsername] = useState("");
   const [orgPassword, setOrgPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +29,7 @@ export default function Login() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      if (user.role === "admin") router.push("/admin");
+      if (user.role === "admin") router.push(ADMIN_PORTAL_ROUTE);
       else if (user.role === "teacher") router.push("/teacher");
       else router.push("/dashboard");
     }
@@ -168,7 +170,12 @@ export default function Login() {
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Password</label>
-                      <input type="password" value={orgPassword} onChange={e => setOrgPassword(e.target.value)} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none" required />
+                      <div className="relative">
+                        <input type={showPassword ? "text" : "password"} value={orgPassword} onChange={e => setOrgPassword(e.target.value)} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 pr-12 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none" required />
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 focus:outline-none">
+                          {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
+                        </button>
+                      </div>
                     </div>
                     <button type="submit" disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl transition-all mt-4">
                       {loading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Sign In to Organization"}
@@ -182,7 +189,12 @@ export default function Login() {
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Password</label>
-                      <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none" required />
+                      <div className="relative">
+                        <input type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 pr-12 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none" required />
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 focus:outline-none">
+                          {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
+                        </button>
+                      </div>
                     </div>
                     <button type="submit" disabled={loading} className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-3.5 rounded-xl transition-all mt-4">
                       {loading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Sign In"}

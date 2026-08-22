@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Brain, Flame, Trophy, Moon, Sun, Sparkles, Menu, Compass } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useGamificationStore } from "@/store/useGamificationStore";
 
 interface MobileHeaderProps {
   displayName: string;
@@ -27,24 +28,14 @@ export default function MobileHeader({
   onOpenTour,
 }: MobileHeaderProps) {
   const [userClass, setUserClass] = useState<string>("10");
-  const [streakDays, setStreakDays] = useState<number>(1);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+  
+  const streakDays = useGamificationStore(state => state.streak);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedClass = localStorage.getItem("edutrack_class");
       if (storedClass) setUserClass(storedClass);
-
-      const storedStreak = localStorage.getItem("edutrack_streak");
-      if (storedStreak) {
-        try {
-          const parsed = JSON.parse(storedStreak);
-          if (parsed && typeof parsed.count === "number") setStreakDays(parsed.count);
-        } catch {
-          const num = parseInt(storedStreak, 10);
-          if (!isNaN(num)) setStreakDays(num);
-        }
-      }
 
       setIsDarkMode(document.documentElement.classList.contains("dark"));
     }

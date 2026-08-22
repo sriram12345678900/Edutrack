@@ -22,7 +22,7 @@ export function DashboardHeader({ firstName, userClass, userLanguage, streak, it
         </p>
       </div>
       <div className="flex items-center gap-3 shrink-0">
-        <div className="inline-flex items-center gap-2 bg-orange-500/5 dark:bg-orange-500/5 text-orange-600 dark:text-orange-400 px-4.5 py-3 rounded-2xl border border-orange-500/15 font-black text-sm shadow-sm relative overflow-hidden group">
+        <div id="tour-streak-header" className="inline-flex items-center gap-2 bg-orange-500/5 dark:bg-orange-500/5 text-orange-600 dark:text-orange-400 px-4.5 py-3 rounded-2xl border border-orange-500/15 font-black text-sm shadow-sm relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-orange-500/10 to-orange-500/0 -translate-x-full group-hover:animate-shimmer" />
           <Flame className="w-5 h-5 text-orange-500 animate-flame-glow" /> 
           <span>{streak} Day Streak</span>
@@ -31,13 +31,14 @@ export function DashboardHeader({ firstName, userClass, userLanguage, streak, it
           type="button"
           onClick={() => {
             if (typeof window !== "undefined") {
-              window.dispatchEvent(new CustomEvent("edutrack_open_tour", { detail: { initialStep: 0 } }));
+              window.dispatchEvent(new CustomEvent("edutrack_open_feature_tour", { detail: { stepIndex: 0 } }));
             }
           }}
           className="text-xs font-black text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 px-4.5 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-2"
+          title="Explore interactive feature callouts"
         >
           <Sparkles className="w-4 h-4 text-indigo-500" />
-          <span>App Tour</span>
+          <span>Feature Tour</span>
         </button>
         <Link href="/setup">
           <button className="text-xs font-extrabold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-200/60 dark:border-white/5 bg-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.04] px-4.5 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95">

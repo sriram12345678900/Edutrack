@@ -17,6 +17,8 @@ export default function FlashcardsHub() {
   const [topic, setTopic] = useState("");
   const [subject, setSubject] = useState("");
   const [classLevel, setClassLevel] = useState("10");
+  const [generateMode, setGenerateMode] = useState<"topic" | "text">("topic");
+  const [sourceText, setSourceText] = useState("");
 
   const [boxCounts, setBoxCounts] = useState<number[]>([0, 0, 0, 0, 0]);
 
@@ -30,9 +32,14 @@ export default function FlashcardsHub() {
     const counts = [0, 0, 0, 0, 0];
     decks.forEach(deck => {
       deck.cards.forEach(card => {
-        const cardId = card.id || `card_${card.front}`;
-        const stored = localStorage.getItem(`edutrack_leitner_${deck.id}_${cardId}`);
-        const box = stored ? parseInt(stored, 10) : 1;
+        let box = 1;
+        if (card.interval) {
+          if (card.interval <= 1) box = 1;
+          else if (card.interval <= 3) box = 2;
+          else if (card.interval <= 7) box = 3;
+          else if (card.interval <= 14) box = 4;
+          else box = 5;
+        }
         const index = Math.max(1, Math.min(5, box)) - 1;
         counts[index]++;
       });
@@ -42,19 +49,25 @@ export default function FlashcardsHub() {
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!topic || !subject) return;
+    if (generateMode === "topic" && (!topic || !subject)) return;
+    if (generateMode === "text" && (!sourceText || !subject)) return;
+    
     setLoading(true);
     try {
+      const bodyPayload = generateMode === "text" 
+        ? { sourceText, subject, classLevel, count: 10 }
+        : { topic, subject, classLevel, count: 10 };
+
       const res = await fetch("/api/flashcards/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, subject, classLevel, count: 10 })
+        body: JSON.stringify(bodyPayload)
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       const newDeck: FlashcardDeck = {
         id: Date.now().toString(),
-        title: topic,
+        title: generateMode === "topic" ? topic : "From Text Extract",
         subject,
         createdAt: Date.now(),
         cards: data.flashcards.map((c: any, i: number) => ({
@@ -388,14 +401,39 @@ export default function FlashcardsHub() {
                 </button>
               </div>
               <form onSubmit={handleGenerate} className="p-6 space-y-5">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-slate-700 dark:text-slate-600 dark:text-slate-300">Topic / Chapter</label>
-                  <input
-                    autoFocus required value={topic} onChange={e => setTopic(e.target.value)}
-                    placeholder="e.g. Life Processes, Acids & Bases, Quadratic Equations"
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 font-medium text-sm text-slate-900 dark:text-white"
-                  />
+                
+                {/* Mode Toggle */}
+                <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+                  <button type="button" onClick={() => setGenerateMode("topic")}
+                    className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${generateMode === "topic" ? "bg-white dark:bg-slate-700 shadow text-fuchsia-600 dark:text-fuchsia-400" : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"}`}>
+                    By Topic
+                  </button>
+                  <button type="button" onClick={() => setGenerateMode("text")}
+                    className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${generateMode === "text" ? "bg-white dark:bg-slate-700 shadow text-indigo-600 dark:text-indigo-400" : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"}`}>
+                    From Text
+                  </button>
                 </div>
+
+                {generateMode === "topic" ? (
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-slate-700 dark:text-slate-600 dark:text-slate-300">Topic / Chapter</label>
+                    <input
+                      autoFocus required value={topic} onChange={e => setTopic(e.target.value)}
+                      placeholder="e.g. Life Processes, Acids & Bases, Quadratic Equations"
+                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 font-medium text-sm text-slate-900 dark:text-white"
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-slate-700 dark:text-slate-600 dark:text-slate-300">Paste Source Text</label>
+                    <textarea
+                      autoFocus required value={sourceText} onChange={e => setSourceText(e.target.value)}
+                      placeholder="Paste your notes or textbook content here..."
+                      rows={4}
+                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-medium text-sm text-slate-900 dark:text-white resize-none"
+                    />
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-sm font-bold text-slate-700 dark:text-slate-600 dark:text-slate-300">Subject</label>

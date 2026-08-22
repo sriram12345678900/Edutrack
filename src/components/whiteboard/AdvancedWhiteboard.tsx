@@ -11,9 +11,10 @@ import {
   PenTool, Highlighter, ChevronDown, FileText, X, Hand, Move, LassoSelect, 
   Triangle, ArrowRight, ZoomIn, ZoomOut, RotateCcw, Keyboard,
   Zap, Sun, Moon, Layers, Crosshair, Calculator, Library, Compass,
-  Maximize2, Minimize2, Sliders, Image as ImageIcon, Ruler, Mic, Volume2, Plus, ChevronLeft
+  Maximize2, Minimize2, Sliders, Image as ImageIcon, Ruler, Mic, Volume2, Plus, ChevronLeft, Menu, Upload, FileUp, Link, Minus
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import jsPDF from "jspdf";
 
 type DrawTool = 
   | "pen" 
@@ -483,6 +484,8 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
   ];
 
   // Primary Tool States
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const pdfUploadInputRef = useRef<HTMLInputElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [tool, setTool] = useState<DrawTool>("pen");
   const [color, setColor] = useState("#6366f1");
@@ -644,6 +647,78 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
         img.src = base64;
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePdfImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    showToast("Processing PDF... Please wait.");
+    
+    if (!(window as any).pdfjsLib) {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js';
+      script.async = true;
+      await new Promise((resolve, reject) => {
+        script.onload = resolve;
+        script.onerror = reject;
+        document.body.appendChild(script);
+      });
+      const pdfjsLib = (window as any).pdfjsLib;
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+    }
+
+    const pdfjsLib = (window as any).pdfjsLib;
+    
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const numPages = pdf.numPages;
+      
+      const newPages: WhiteboardPageData[] = [];
+
+      for (let i = 1; i <= numPages; i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: 1.5 });
+        const tempCanvas = document.createElement('canvas');
+        const context = tempCanvas.getContext('2d');
+        if (!context) continue;
+
+        tempCanvas.width = viewport.width;
+        tempCanvas.height = viewport.height;
+
+        await page.render({ canvasContext: context, viewport }).promise;
+        const base64 = tempCanvas.toDataURL('image/jpeg', 0.8);
+
+        const imgWidth = viewport.width;
+        const imgHeight = viewport.height;
+        const cx = 1000;
+        const cy = 800;
+
+        const imgStroke: Stroke = {
+          id: Date.now().toString() + "_" + i,
+          tool: "image",
+          color: "#ffffff",
+          brushSize: 1,
+          points: [{ x: cx - imgWidth/2, y: cy - imgHeight/2 }, { x: cx + imgWidth/2, y: cy + imgHeight/2 }],
+          text: base64
+        };
+
+        newPages.push({
+          id: `page_pdf_${Date.now()}_${i}`,
+          title: `PDF P${i}`,
+          strokes: [imgStroke],
+          stickyNotes: []
+        });
+      }
+
+      setDeckPages(prev => [...prev, ...newPages]);
+      setActivePageIndex(deckPages.length); 
+      showToast(`Imported ${numPages} PDF pages successfully!`);
+    } catch (err) {
+      console.error("PDF Import Error:", err);
+      showToast("Error processing PDF");
     }
   };
 
@@ -825,6 +900,38 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
     link.href = canvas.toDataURL("image/png");
     link.click();
     showToast("Downloaded PNG Export ");
+  };
+
+  const exportToPdf = async () => {
+    showToast("Generating PDF... Please wait.");
+    try {
+      const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [canvasSize.width, canvasSize.height] });
+      
+      for (let i = 0; i < deckPages.length; i++) {
+        if (i > 0) pdf.addPage([canvasSize.width, canvasSize.height], "landscape");
+        
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = canvasSize.width;
+        tempCanvas.height = canvasSize.height;
+        
+        const ctx = tempCanvas.getContext("2d");
+        if (ctx) {
+          ctx.fillStyle = canvasTheme === "dark" ? "#020617" : "#f8fafc";
+          ctx.fillRect(0, 0, canvasSize.width, canvasSize.height);
+          
+          redrawCanvas(tempCanvas, deckPages[i].strokes, [], false, { x: 0, y: 0, angle: 0 });
+          
+          const imgData = tempCanvas.toDataURL("image/jpeg", 0.85);
+          pdf.addImage(imgData, "JPEG", 0, 0, canvasSize.width, canvasSize.height);
+        }
+      }
+      
+      pdf.save(`edutrack-whiteboard-${roomId}.pdf`);
+      showToast("Downloaded PDF Export ");
+    } catch (err) {
+      console.error("PDF Export Error:", err);
+      showToast("Error generating PDF");
+    }
   };
 
   const solveWhiteboardWithAI = async () => {
@@ -1317,6 +1424,12 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const copyShareLink = () => {
+    const url = `${window.location.origin}/whiteboard?roomId=${roomId}`;
+    navigator.clipboard.writeText(url);
+    showToast("Shareable Link Copied! ");
+  };
+
   const joinRoom = () => {
     if (roomInput.trim()) {
       setRoomId(roomInput.toUpperCase());
@@ -1517,8 +1630,10 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
             ? `linear-gradient(to right, ${canvasTheme === "dark" ? "#1e293b" : "#e2e8f0"} 1px, transparent 1px), linear-gradient(to bottom, ${canvasTheme === "dark" ? "#1e293b" : "#e2e8f0"} 1px, transparent 1px)`
             : pattern === "ruled"
             ? `linear-gradient(to bottom, ${canvasTheme === "dark" ? "#1e293b" : "#e2e8f0"} 1px, transparent 1px)`
+            : pattern === "isometric"
+            ? `linear-gradient(30deg, ${canvasTheme === "dark" ? "#1e293b" : "#e2e8f0"} 1px, transparent 1px), linear-gradient(150deg, ${canvasTheme === "dark" ? "#1e293b" : "#e2e8f0"} 1px, transparent 1px), linear-gradient(to bottom, ${canvasTheme === "dark" ? "#1e293b" : "#e2e8f0"} 1px, transparent 1px)`
             : "none",
-          backgroundSize: pattern === "dots" ? "24px 24px" : pattern === "grid" ? "32px 32px" : pattern === "ruled" ? "32px 32px" : "auto"
+          backgroundSize: pattern === "dots" ? "24px 24px" : pattern === "grid" ? "32px 32px" : pattern === "ruled" ? "100% 32px" : pattern === "isometric" ? "34.64px 60px, 34.64px 60px, 17.32px 30px" : "auto"
         }}
       >
         <div
@@ -1581,16 +1696,26 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
                 className={`absolute z-20 w-44 h-44 p-3 rounded-2xl border shadow-xl backdrop-blur-md flex flex-col justify-between ${theme.bg}`}
                 style={{ left: note.x, top: note.y }}
               >
-                <textarea
-                  value={note.text}
-                  onChange={(e) => {
-                    const text = e.target.value;
-                    setStickyNotes(prev => prev.map(n => n.id === note.id ? { ...n, text } : n));
-                  }}
-                  placeholder="Write sticky note..."
-                  className="w-full h-full bg-transparent resize-none focus:outline-none text-xs font-semibold leading-relaxed"
-                />
-                <div className="flex items-center justify-between border-t border-black/10 dark:border-white/10 pt-2 mt-1">
+                <div className="flex-1 overflow-hidden flex flex-col gap-1">
+                  <textarea
+                    value={note.text}
+                    onChange={(e) => {
+                      const text = e.target.value;
+                      setStickyNotes(prev => prev.map(n => n.id === note.id ? { ...n, text } : n));
+                    }}
+                    placeholder="Write sticky note..."
+                    className="w-full h-full bg-transparent resize-none focus:outline-none text-xs font-semibold leading-relaxed"
+                  />
+                  {note.audioUrl && (
+                    <div className="flex items-center gap-2 p-1.5 bg-black/5 dark:bg-white/10 rounded-lg shrink-0">
+                      <Volume2 className="w-3.5 h-3.5 opacity-70" />
+                      <div className="h-1 flex-1 bg-black/10 dark:bg-white/20 rounded-full overflow-hidden">
+                        <div className="w-1/3 h-full bg-indigo-500 rounded-full" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center justify-between border-t border-black/10 dark:border-white/10 pt-2 mt-1 shrink-0">
                   <div className="flex items-center gap-1">
                     {stickyColors.map(c => (
                       <button
@@ -1600,12 +1725,25 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
                       />
                     ))}
                   </div>
-                  <button
-                    onClick={() => setStickyNotes(prev => prev.filter(n => n.id !== note.id))}
-                    className="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-all"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => {
+                        const hasAudio = !!note.audioUrl;
+                        setStickyNotes(prev => prev.map(n => n.id === note.id ? { ...n, audioUrl: hasAudio ? undefined : "blob:mock-audio" } : n));
+                        showToast(hasAudio ? "Audio removed" : "Voice note recorded ");
+                      }}
+                      className={`p-1 rounded-lg transition-all ${note.audioUrl ? "bg-rose-500/20 text-rose-600 dark:text-rose-400" : "hover:bg-black/10 dark:hover:bg-white/10"}`}
+                      title="Toggle Voice Note"
+                    >
+                      <Mic className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => setStickyNotes(prev => prev.filter(n => n.id !== note.id))}
+                      className="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-all"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -1626,49 +1764,13 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
           
           <div className="w-[1px] h-8 bg-slate-200 dark:bg-slate-700/50 mx-1"></div>
 
-          {/* Thickness Control */}
-          <div className="relative">
-            <ToolButton active={showThicknessMenu} onClick={() => setShowThicknessMenu(!showThicknessMenu)} icon={Sliders} label="Thickness" />
-            
-            <AnimatePresence>
-              {showThicknessMenu && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute bottom-16 left-1/2 -translate-x-1/2 z-50 p-3.5 dark:bg-slate-900/95 bg-white/95 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl backdrop-blur-xl w-52 dark:text-slate-200 text-slate-800"
-                >
-                  <div className="flex items-center justify-between text-[11px] font-bold dark:text-slate-400 text-slate-600 mb-2">
-                    <span>Brush Thickness</span>
-                    <span className="font-mono dark:text-indigo-400 text-indigo-700">{brushSize}px</span>
-                  </div>
-                  <input
-                    type="range" min="1" max="40" value={brushSize}
-                    onChange={(e) => setBrushSize(Number(e.target.value))}
-                    className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500 mb-3"
-                  />
-                  <div className="flex items-center justify-between gap-1">
-                    {[2, 4, 8, 14, 24].map(sz => (
-                      <button
-                        key={sz}
-                        onClick={() => { setBrushSize(sz); setShowThicknessMenu(false); }}
-                        className={`p-1.5 rounded-xl border text-[10px] font-mono transition-all flex flex-col items-center gap-1 ${brushSize === sz ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300" : "border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400"}`}
-                      >
-                        <div className="rounded-full bg-current" style={{ width: `${Math.min(10, Math.max(2, sz / 2))}px`, height: `${Math.min(10, Math.max(2, sz / 2))}px` }} />
-                        <span>{sz}p</span>
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
 
-          <div className="w-[1px] h-8 bg-slate-200 dark:bg-slate-700/50 mx-1"></div>
           
           <ToolButton active={tool === "rect"} onClick={() => setTool("rect")} icon={Square} label="Rectangle (R)" />
           <ToolButton active={tool === "circle"} onClick={() => setTool("circle")} icon={Circle} label="Circle (C)" />
+          <ToolButton active={tool === "triangle"} onClick={() => setTool("triangle")} icon={Triangle} label="Triangle" />
           <ToolButton active={tool === "arrow"} onClick={() => setTool("arrow")} icon={ArrowRight} label="Arrow" />
+          <ToolButton active={tool === "line"} onClick={() => setTool("line")} icon={Minus} label="Line" />
           <ToolButton active={tool === "text"} onClick={() => setTool("text")} icon={Type} label="Text (T)" />
           <ToolButton active={tool === "sticky"} onClick={() => setTool("sticky")} icon={FileText} label="Sticky" />
           <ToolButton active={tool === "lasso"} onClick={() => setTool("lasso")} icon={LassoSelect} label="Lasso (L)" />
@@ -1692,19 +1794,146 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
         </div>
       </div>
 
-      {/* Left Floating Palette (Colors & Strokes) */}
-      <div className="absolute top-1/2 -translate-y-1/2 left-6 z-40 flex flex-col gap-3">
-        <div className="p-3 dark:bg-slate-900/80 bg-slate-200/80 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl flex flex-col items-center gap-3">
-          {paletteColors.map((c) => (
-            <button
-              key={c}
-              onClick={() => { setColor(c); if (selectedStrokeIds.length > 0) recolorSelectedStrokes(c); }}
-              className={`w-7 h-7 rounded-full transition-all ${color === c ? "scale-125 ring-2 ring-offset-2 dark:ring-offset-slate-900 ring-indigo-500 shadow-lg" : "hover:scale-110 shadow-sm border border-black/10 dark:border-white/10"}`}
-              style={{ backgroundColor: c }}
-            />
-          ))}
-        </div>
-      </div>
+      {/* Hidden File Input for PDF Import */}
+      <input
+        ref={pdfUploadInputRef}
+        type="file"
+        accept="application/pdf"
+        onChange={handlePdfImport}
+        className="hidden"
+      />
+
+      {/* Animated Sidebar */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div
+            initial={{ x: -300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -300, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="absolute top-0 left-0 h-full w-72 z-50 dark:bg-slate-900/95 bg-white/95 backdrop-blur-3xl border-r border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col"
+          >
+            <div className="p-5 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
+              <h2 className="text-lg font-black bg-gradient-to-r from-indigo-500 to-cyan-400 bg-clip-text text-transparent flex items-center gap-2">
+                <Palette className="w-5 h-5 text-indigo-500" /> 
+                Studio Tools
+              </h2>
+              <button onClick={() => setIsSidebarOpen(false)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors">
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-5 space-y-8 custom-scrollbar">
+              
+              {/* Colors */}
+              <div>
+                <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Colors</h3>
+                <div className="flex flex-wrap gap-3 mb-4">
+                  {paletteColors.map((c) => (
+                    <button
+                      key={c}
+                      onClick={() => { setColor(c); if (selectedStrokeIds.length > 0) recolorSelectedStrokes(c); }}
+                      className={`w-8 h-8 rounded-full transition-all ${color === c ? "scale-125 ring-2 ring-offset-2 dark:ring-offset-slate-900 ring-indigo-500 shadow-lg" : "hover:scale-110 shadow-sm border border-black/10 dark:border-white/10"}`}
+                      style={{ backgroundColor: c }}
+                    />
+                  ))}
+                </div>
+                
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <div className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors border ${fillShapes ? "bg-indigo-500 border-indigo-500" : "bg-transparent border-slate-300 dark:border-slate-700"}`}>
+                    {fillShapes && <Check className="w-3.5 h-3.5 text-white" />}
+                  </div>
+                  <input type="checkbox" className="hidden" checked={fillShapes} onChange={(e) => setFillShapes(e.target.checked)} />
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Fill Shapes</span>
+                </label>
+              </div>
+
+              {/* Thickness */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Thickness</h3>
+                  <span className="font-mono text-xs dark:text-indigo-400 text-indigo-600 font-bold">{brushSize}px</span>
+                </div>
+                <input
+                  type="range" min="1" max="40" value={brushSize}
+                  onChange={(e) => setBrushSize(Number(e.target.value))}
+                  className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500 mb-4"
+                />
+                <div className="flex justify-between items-end px-1">
+                  {[2, 4, 8, 14, 24].map(sz => (
+                    <button
+                      key={sz}
+                      onClick={() => setBrushSize(sz)}
+                      className={`flex flex-col items-center gap-1.5 transition-all ${brushSize === sz ? "scale-110" : "opacity-50 hover:opacity-100"}`}
+                    >
+                      <div className="bg-slate-800 dark:bg-slate-200 rounded-full" style={{ width: `${Math.min(14, Math.max(4, sz / 1.5))}px`, height: `${Math.min(14, Math.max(4, sz / 1.5))}px` }} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Background Patterns */}
+              <div>
+                <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Background</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {(["blank", "dots", "grid", "ruled", "isometric"] as BackgroundPattern[]).map(p => (
+                    <button
+                      key={p}
+                      onClick={() => setPattern(p)}
+                      className={`p-2 rounded-xl text-xs font-semibold capitalize border transition-all ${pattern === p ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 shadow-sm" : "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400"}`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div>
+                <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">File & Share</h3>
+                <div className="space-y-2">
+                  <button onClick={copyShareLink} className="w-full p-3 rounded-xl flex items-center justify-between bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 transition-all font-semibold text-sm border border-indigo-200 dark:border-indigo-500/30">
+                    <div className="flex items-center gap-2">
+                      <Link className="w-4 h-4" /> Share Link
+                    </div>
+                    <ChevronRight className="w-4 h-4 opacity-50" />
+                  </button>
+                  
+                  <button onClick={() => pdfUploadInputRef.current?.click()} className="w-full p-3 rounded-xl flex items-center justify-between hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all font-semibold text-sm border border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center gap-2">
+                      <FileUp className="w-4 h-4" /> Upload PDF
+                    </div>
+                    <Upload className="w-4 h-4 opacity-50" />
+                  </button>
+
+                  <button onClick={exportToPdf} className="w-full p-3 rounded-xl flex items-center justify-between hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all font-semibold text-sm border border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center gap-2">
+                      <Download className="w-4 h-4" /> Export as PDF
+                    </div>
+                    <ChevronRight className="w-4 h-4 opacity-50" />
+                  </button>
+                </div>
+              </div>
+              
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar Toggle Button (when closed) */}
+      <AnimatePresence>
+        {!isSidebarOpen && (
+          <motion.button
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            onClick={() => setIsSidebarOpen(true)}
+            className="absolute top-1/2 -translate-y-1/2 left-4 z-40 p-3 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 hover:scale-110 transition-transform"
+          >
+            <Menu className="w-6 h-6" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* AI Solution Side Panel */}
       <AnimatePresence>

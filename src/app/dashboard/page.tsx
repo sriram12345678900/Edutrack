@@ -4,7 +4,7 @@ import {
   Brain, Flame, Target, Book, BookOpen, ChevronRight, Loader2, Trophy, 
   Sparkles, Compass, ArrowUpRight, Users, Award, MessageCircle, 
   Copy, CheckCheck, Camera, Activity, Palette, Timer, Star, Zap, Lock, RefreshCw,
-  GraduationCap, Video, Shield
+  GraduationCap, Video, Shield, Globe, Mic, Radio, GitFork, Sliders, FileText, Gamepad2
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
@@ -14,7 +14,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Confetti from "@/components/Confetti";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { DailyQuestionWidget } from "@/components/dashboard/DailyQuestionWidget";
 import { ClassroomLauncher } from "@/components/dashboard/ClassroomLauncher";
+import FeatureSpotlightTour from "@/components/FeatureSpotlightTour";
 import { cn } from "@/lib/utils";
 import { useGamificationStore } from "@/store/useGamificationStore";
 import { useProfileStore } from "@/store/useProfileStore";
@@ -269,6 +271,7 @@ export default function Dashboard() {
             { href: "/lens", label: "Doubt Lens", icon: Camera, color: "from-emerald-500 to-teal-600", badge: "Live" },
             { href: "/tutor", label: "AI Tutor", icon: MessageCircle, color: "from-cyan-500 to-blue-600", badge: "AI" },
             { href: "/pomodoro", label: "Focus Timer", icon: Timer, color: "from-rose-500 to-red-600" },
+            { href: "/study-room", label: "Study Rooms", icon: Users, color: "from-blue-500 to-indigo-600", badge: "Co-op" },
             { href: "/formulas", label: "Formulas", icon: Compass, color: "from-amber-500 to-orange-600" },
             { href: "/whiteboard", label: "Whiteboard", icon: Palette, color: "from-purple-500 to-violet-600" },
             { href: "/flashcards", label: "Flashcards", icon: Sparkles, color: "from-fuchsia-500 to-pink-600" },
@@ -307,7 +310,7 @@ export default function Dashboard() {
           
           {/* QUICK PREMIUM UTILITY ROW */}
           <motion.section variants={item} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5">
-            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/lens')} className="premium-glass-panel micro-hover-lift p-5 flex flex-col items-center justify-center text-center cursor-pointer group">
+            <motion.div id="tour-quick-lens" whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/lens')} className="premium-glass-panel micro-hover-lift p-5 flex flex-col items-center justify-center text-center cursor-pointer group">
               <Camera className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-500 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(16,185,129,0.35)]" />
               <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">AI Lens</span>
             </motion.div>
@@ -331,6 +334,7 @@ export default function Dashboard() {
           
           {/* STATS & PROGRESS HUD (Glassmorphic Command Deck) */}
           <motion.section 
+            id="tour-stats-hud"
             variants={item}
             className="premium-glass-panel premium-glow-border p-6.5 select-none"
           >
@@ -413,6 +417,74 @@ export default function Dashboard() {
             </div>
           </motion.section>
 
+          {/* DAILY CHALLENGE */}
+          <DailyQuestionWidget />
+
+          {/* GLOBAL DOUBTS & NEXT-GEN AI INNOVATION SUITE */}
+          <motion.section variants={item} className="space-y-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Globe className="w-5 h-5 text-indigo-500 animate-spin" />
+                  Global Community & Next-Gen AI
+                </h2>
+                <p className="text-xs text-slate-500 font-bold">Worldwide Q&A exchange, voice oral viva, live battles & science simulations</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* Global Doubt Forum */}
+              <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/community')} className="group cursor-pointer">
+                <div className="premium-glass-panel p-5 flex flex-col justify-between h-44 bg-gradient-to-br from-blue-950/20 to-indigo-950/20 border-indigo-500/30">
+                  <div className="flex justify-between items-start">
+                    <div className="p-3 bg-indigo-500/10 rounded-2xl w-fit text-indigo-400 group-hover:scale-110 transition-transform">
+                      <Globe className="w-5 h-5" />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full">Global</span>
+                  </div>
+                  <div>
+                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-indigo-400 transition-colors text-xs uppercase tracking-wider">Global Doubt Forum</h4>
+                    <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1 font-bold">Ask questions worldwide & get peer + AI answers.</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* AI Voice Viva */}
+              <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/viva')} className="group cursor-pointer">
+                <div className="premium-glass-panel p-5 flex flex-col justify-between h-44 bg-gradient-to-br from-purple-950/20 to-indigo-950/20 border-purple-500/30">
+                  <div className="flex justify-between items-start">
+                    <div className="p-3 bg-purple-500/10 rounded-2xl w-fit text-purple-400 group-hover:scale-110 transition-transform">
+                      <Mic className="w-5 h-5" />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-wider text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full">Voice</span>
+                  </div>
+                  <div>
+                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-purple-400 transition-colors text-xs uppercase tracking-wider">AI Voice Viva</h4>
+                    <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1 font-bold">Conversational oral board practical examiner.</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Live Quiz Arena */}
+              <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/arena')} className="group cursor-pointer">
+                <div className="premium-glass-panel p-5 flex flex-col justify-between h-44 bg-gradient-to-br from-amber-950/20 to-red-950/20 border-amber-500/30">
+                  <div className="flex justify-between items-start">
+                    <div className="p-3 bg-amber-500/10 rounded-2xl w-fit text-amber-400 group-hover:scale-110 transition-transform">
+                      <Gamepad2 className="w-5 h-5" />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-wider text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full">Battle</span>
+                  </div>
+                  <div>
+                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-amber-400 transition-colors text-xs uppercase tracking-wider">Quiz Battle Arena</h4>
+                    <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1 font-bold">Multiplayer real-time speed battle with power-ups.</p>
+                  </div>
+                </div>
+              </motion.div>
+
+
+            </div>
+          </motion.section>
+
           {/* AI & INTERACTIVE STUDY LAB ROW */}
           <motion.section variants={item} className="space-y-4">
             <div className="flex justify-between items-center">
@@ -421,10 +493,10 @@ export default function Dashboard() {
                 Study Tools Hub
               </h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               
               {/* AI Bot Card */}
-              <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/tutor')} className="group cursor-pointer">
+              <motion.div id="tour-tools-aibot" whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/tutor')} className="group cursor-pointer">
                 <div className="premium-glass-panel micro-hover-lift p-5 flex flex-col justify-between h-44 group">
                   <div className="p-3 bg-indigo-500/10 rounded-2xl w-fit text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
                     <Sparkles className="w-5 h-5 drop-shadow-[0_0_8px_rgba(99,102,241,0.4)]" />
@@ -458,6 +530,19 @@ export default function Dashboard() {
                   <div>
                     <h4 className="font-black text-slate-900 dark:text-white group-hover:text-pink-650 dark:group-hover:dark:text-pink-400 text-pink-700 transition-colors text-xs uppercase tracking-wider">Whiteboard</h4>
                     <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1.5 font-bold">Collaborative sketching & notes canvas.</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Study Rooms Card */}
+              <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/study-room')} className="group cursor-pointer">
+                <div className="premium-glass-panel micro-hover-lift p-5 flex flex-col justify-between h-44 group">
+                  <div className="p-3 bg-blue-500/10 rounded-2xl w-fit text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+                    <Users className="w-5 h-5 drop-shadow-[0_0_8px_rgba(59,130,246,0.4)]" />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:dark:text-blue-400 text-blue-700 transition-colors text-xs uppercase tracking-wider">Study Rooms</h4>
+                    <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1.5 font-bold">Sync timers & chat with friends.</p>
                   </div>
                 </div>
               </motion.div>
@@ -681,6 +766,7 @@ export default function Dashboard() {
 
           {/* ACTIVE MEMORY STUDY SWIPER */}
           <motion.section 
+            id="tour-flashcards-deck"
             variants={item}
             className="premium-glass-panel p-8 relative"
           >
@@ -876,13 +962,14 @@ export default function Dashboard() {
 
           {/* CLASSMATES LEADERBOARD & STUDY BUDDIES */}
           <motion.section 
+            id="tour-leaderboard-section"
             variants={item} 
             className="premium-glass-panel p-8"
           >
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-extrabold flex items-center gap-3 text-slate-900 dark:text-white">
                 <div className="p-2 bg-indigo-500/10 rounded-xl">
-                  <Users className="w-5 h-5 text-indigo-650 dark:text-indigo-400" /> 
+                  <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /> 
                 </div>
                 Classmates
               </h3>
@@ -1133,6 +1220,9 @@ export default function Dashboard() {
       </AnimatePresence>
 
       <Confetti active={confettiActive} onComplete={() => setConfettiActive(false)} />
+      
+      {/* Interactive Feature Callout & Coach Marks Spotlight Tour */}
+      <FeatureSpotlightTour />
     </motion.div>
   );
 }

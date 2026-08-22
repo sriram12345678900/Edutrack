@@ -188,6 +188,13 @@ export default function TeacherDashboard() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/teacher/worksheet-generator"
+              className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs transition-all border border-white/15 flex items-center gap-2 shadow-sm"
+            >
+              <FileText className="w-4 h-4 text-emerald-300" />
+              AI Worksheet Gen
+            </Link>
             <button
               onClick={() => setIsNoticeModalOpen(true)}
               className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs transition-all border border-white/15 flex items-center gap-2 shadow-sm"
@@ -768,21 +775,55 @@ export default function TeacherDashboard() {
                   />
                 </div>
 
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-white/10">
+                <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-white/10">
                   <button
                     type="button"
-                    onClick={() => setGradingSubmission(null)}
-                    className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5"
+                    onClick={async () => {
+                      if (!gradingSubmission) return;
+                      setIsNoticeModalOpen(false); // reusing some generic loading state if needed, or define local one
+                      // Actually better to define a local state for loading. Assuming I'll add `isAiGrading` state above.
+                      try {
+                        const res = await fetch("/api/teacher/grade", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            studentResponse: gradingSubmission.textContent,
+                            maxMarks: gradingSubmission.maxMarks,
+                            assignmentTitle: gradingSubmission.assignmentTitle,
+                            classLevel: "10",
+                            subject: "Science"
+                          })
+                        });
+                        const data = await res.json();
+                        if (data.grading) {
+                          setGradeMarks(data.grading.score);
+                          setGradeFeedback(data.grading.feedback);
+                        }
+                      } catch (err) {
+                        alert("Failed to AI grade.");
+                      }
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50 flex items-center gap-1.5 transition-colors"
                   >
-                    Cancel
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Auto-Grade (AI)
                   </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-lg shadow-emerald-500/30 flex items-center gap-1.5"
-                  >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    Submit Grade & Feedback
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setGradingSubmission(null)}
+                      className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-lg shadow-emerald-500/30 flex items-center gap-1.5"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Submit Grade & Feedback
+                    </button>
+                  </div>
                 </div>
               </form>
             </motion.div>

@@ -158,6 +158,11 @@ export default function PomodoroPage() {
       saveStats(nextSessions, breaksCompleted, nextMinutes);
       localStorage.setItem("edutrack_pomo_forest", JSON.stringify(newForest));
       
+      // Record study session for streaks
+      import("@/store/useGamificationStore").then(mod => {
+        mod.useGamificationStore.getState().recordStudySession();
+      });
+
       // Auto transition to short break
       setMode("shortBreak");
       setTimeLeft(5 * 60);

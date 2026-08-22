@@ -655,7 +655,7 @@ export default function StudyCirclesDMs() {
         localStorage.setItem("edutrack_messages_" + activeChatId, lastStoredJSON);
         setMessages(merged);
         setLoadingMessages(false);
-      }, (err) => {
+      }, (err: any) => {
         console.warn("Firebase snapshot error (using local fallback):", err);
       });
     } catch (e) {

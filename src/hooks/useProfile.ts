@@ -26,7 +26,7 @@ export function useProfile() {
 
     const unsub = onSnapshot(
       doc(db, "users", user.uid),
-      (docSnap) => {
+      (docSnap: any) => {
         if (docSnap.exists()) {
           setProfile(docSnap.data() as UserProfile);
         } else {

@@ -12,7 +12,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
-import { OrgUser, verifyOrgCredentials } from "@/lib/admin";
+import { OrgUser, verifyOrgCredentials, ADMIN_PORTAL_ROUTE } from "@/lib/admin";
 
 export type CombinedUser = any;
 
@@ -75,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("edutrack_org_user", JSON.stringify(orgUser));
     setUser({ ...orgUser, isOrg: true, displayName: orgUser.name, email: orgUser.username + "@org.local", uid: orgUser.username });
     
-    if (orgUser.role === "admin") router.push("/admin");
+    if (orgUser.role === "admin") router.push(ADMIN_PORTAL_ROUTE);
     else if (orgUser.role === "teacher") router.push("/teacher");
     else router.push("/classroom");
   };

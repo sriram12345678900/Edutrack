@@ -1,0 +1,133 @@
+
+> edutrack@0.1.0 dev
+> next dev
+
+  ??? Next.js 14.2.3
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ??? Starting...
+ ??? Ready in 12s
+ ??? Compiling /dashboard ...
+ ??? Compiled /dashboard in 35s (1587 modules)
+ ??? Compiling /_not-found ...
+ ??? Compiled /_not-found in 21.5s (1576 modules)
+node.exe :  ??? Error: Cannot find module 
+'C:\Users\Admin\.gemini\antigravity\scratch\edutrack\.next\server\middleware-manifest.json'
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( ??? Error: Can...-manifest.json':String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Require stack:
+- C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\next-server.js
+- C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\dev\next-dev-server.js
+- C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\next.js
+- C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1476:15)
+    at C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\require-hook.js:55:36
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1073:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+    at Module._load (node:internal/modules/cjs/loader:1262:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1576:12)
+    at mod.require 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:153:16)
+    at DevServer.getMiddlewareManifest 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\next-server.js:933:26)
+    at DevServer.getEdgeFunctionsPages 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\next-server.js:949:31)
+    at DevServer.renderErrorToResponseImpl 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\next-server.js:908:22)
+    at async DevServer.pipeImpl 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\base-server.js:920:25)
+    at async NextNodeServer.handleCatchallRenderRequest 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\next-server.js:231:21)
+    at async DevServer.handleRequestImpl 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\base-server.js:816:17)
+    at async 
+C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\lib\router-server.js:174:21)
+    at async handleRequest 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\lib\router-server.js:353:24)
+    at async requestHandlerImpl 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\lib\router-server.js:377:13)
+    at async Server.requestListener 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\Admin\\.gemini\\antigravity\\scratch\\edutrack\\node_modules\\next\\dist\\server\\next-server.js',
+    
+'C:\\Users\\Admin\\.gemini\\antigravity\\scratch\\edutrack\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js',
+    'C:\\Users\\Admin\\.gemini\\antigravity\\scratch\\edutrack\\node_modules\\next\\dist\\server\\next.js',
+    'C:\\Users\\Admin\\.gemini\\antigravity\\scratch\\edutrack\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+ ??? Error: Cannot find module 
+'C:\Users\Admin\.gemini\antigravity\scratch\edutrack\.next\server\middleware-manifest.json'
+Require stack:
+- C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\next-server.js
+- C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\dev\next-dev-server.js
+- C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\next.js
+- C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1476:15)
+    at C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\require-hook.js:55:36
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1073:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+    at Module._load (node:internal/modules/cjs/loader:1262:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1576:12)
+    at mod.require 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:153:16)
+    at DevServer.getMiddlewareManifest 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\next-server.js:933:26)
+    at DevServer.getEdgeFunctionsPages 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\next-server.js:949:31)
+    at DevServer.renderPageComponent 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\next-server.js:658:41)
+    at DevServer.renderToResponseImpl 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\base-server.js:1962:43)
+    at async DevServer.pipeImpl 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\base-server.js:920:25)
+    at async NextNodeServer.handleCatchallRenderRequest 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\next-server.js:231:21)
+    at async DevServer.handleRequestImpl 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\base-server.js:816:17)
+    at async 
+C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\lib\router-server.js:174:21)
+    at async handleRequest 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\lib\router-server.js:353:24)
+    at async requestHandlerImpl 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\lib\router-server.js:377:13)
+    at async Server.requestListener 
+(C:\Users\Admin\.gemini\antigravity\scratch\edutrack\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\Admin\\.gemini\\antigravity\\scratch\\edutrack\\node_modules\\next\\dist\\server\\next-server.js',
+    
+'C:\\Users\\Admin\\.gemini\\antigravity\\scratch\\edutrack\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js',
+    'C:\\Users\\Admin\\.gemini\\antigravity\\scratch\\edutrack\\node_modules\\next\\dist\\server\\next.js',
+    'C:\\Users\\Admin\\.gemini\\antigravity\\scratch\\edutrack\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/dashboard'
+}
+ ??? Compiling /_error ...
+ ??? Compiled /_error in 4.3s (1799 modules)
+ GET /dashboard 500 in 66723ms
+ GET /dashboard 500 in 19661ms

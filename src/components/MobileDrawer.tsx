@@ -7,9 +7,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Home, BookOpen, GraduationCap, Compass, MessageSquare, Camera, Calendar, 
   Sparkles, Palette, Timer, Zap, Users, Award, Target, Trophy, Settings, 
-  LogOut, X, Search, ChevronRight, Shield, Moon, Sun, CheckCircle2, User, Video
+  LogOut, X, Search, ChevronRight, Shield, Moon, Sun, CheckCircle2, User, Video, Gamepad2,
+  Globe, Mic, Radio, GitFork, Sliders, FileText, Brain
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ADMIN_PORTAL_ROUTE } from "@/lib/admin";
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -38,27 +40,34 @@ interface NavItem {
 
 const ALL_TOOLS: NavItem[] = [
   // Virtual School & Bridge
+  { href: "/community", label: "Global Doubts Forum", description: "Worldwide academic query exchange", icon: Globe, badge: "World", color: "from-blue-600 to-indigo-700", category: "Virtual School" },
+  { href: "/arena", label: "Live Quiz Arena", description: "Multiplayer battle royale with powerups", icon: Gamepad2, badge: "Live", color: "from-amber-600 to-red-600", category: "Virtual School" },
   { href: "/classroom", label: "Student Classroom", description: "Enrolled classes, stream & homework", icon: GraduationCap, badge: "School", color: "from-blue-600 to-indigo-700", category: "Virtual School" },
   { href: "/teacher", label: "Teacher Command", description: "Manage classes, live host & grading", icon: Video, badge: "Portal", color: "from-purple-600 to-pink-600", category: "Virtual School" },
-  { href: "/admin", label: "Super Admin", description: "Platform management & credentials", icon: Shield, badge: "Portal", color: "from-purple-600 to-pink-600", category: "Virtual School" },
-  { href: "/bridge", label: "Home Study Bridge", description: "Daily homework digest & parent portal", icon: Shield, badge: "Parent", color: "from-teal-600 to-emerald-700", category: "Virtual School" },
+  { href: "/parent", label: "Parent AI Digest", description: "Weekly progress report & WhatsApp alerts", icon: Shield, badge: "Parent", color: "from-teal-600 to-emerald-700", category: "Virtual School" },
 
   // Core Space
   { href: "/dashboard", label: "Dashboard", description: "Missions, Streaks, Recall", icon: Home, badge: "Main", color: "from-blue-500 to-indigo-600", category: "Core Space" },
+  { href: "/skill-tree", label: "Skill Trees", description: "RPG Topic & Prerequisite mastery", icon: GitFork, badge: "RPG", color: "from-indigo-600 to-purple-600", category: "Core Space" },
   { href: "/learn", label: "Subjects Hub", description: "CBSE Curriculum & Notes", icon: BookOpen, color: "from-indigo-500 to-purple-600", category: "Core Space" },
   { href: "/ncert", label: "NCERT Books", description: "PDF Reader & Smart AI", icon: GraduationCap, color: "from-purple-500 to-pink-600", category: "Core Space" },
   { href: "/formulas", label: "Formulas Hub", description: "Quick formulas & cheat sheets", icon: Compass, badge: "Master", color: "from-amber-500 to-orange-600", category: "Core Space" },
 
   // AI Study Lab
+  { href: "/viva", label: "AI Voice Viva", description: "Conversational oral examination simulator", icon: Mic, badge: "Voice", color: "from-purple-600 to-indigo-600", category: "AI Study Lab" },
+  { href: "/feynman", label: "Feynman Lab", description: "Teach concepts to an AI novice student", icon: Brain, badge: "Teach", color: "from-emerald-500 to-teal-600", category: "AI Study Lab" },
+  { href: "/podcast", label: "AI Podcasts", description: "2-host audio discussion generator", icon: Radio, badge: "Audio", color: "from-pink-500 to-purple-600", category: "AI Study Lab" },
+  { href: "/sandbox", label: "Simulations Lab", description: "Interactive physics & optics experiments", icon: Sliders, badge: "Lab", color: "from-cyan-500 to-blue-600", category: "AI Study Lab" },
   { href: "/tutor", label: "AI Tutor", description: "NCERT & Socratic AI Mentor", icon: MessageSquare, badge: "AI", color: "from-cyan-500 to-blue-600", category: "AI Study Lab" },
   { href: "/lens", label: "Doubt Lens", description: "Instant Camera Scanner", icon: Camera, badge: "Live", color: "from-emerald-500 to-teal-600", category: "AI Study Lab" },
   { href: "/plan", label: "Study Planner", description: "AI Timetable & Exam Prep", icon: Calendar, color: "from-blue-600 to-indigo-700", category: "AI Study Lab" },
   { href: "/flashcards", label: "AI Flashcards", description: "Active recall Leitner boxes", icon: Sparkles, color: "from-fuchsia-500 to-pink-600", category: "AI Study Lab" },
   { href: "/whiteboard", label: "Whiteboard", description: "Smart Pen & AI Solver Canvas", icon: Palette, color: "from-violet-500 to-purple-700", category: "AI Study Lab" },
   { href: "/pomodoro", label: "Pomodoro Timer", description: "Focus sessions & Forest growth", icon: Timer, color: "from-rose-500 to-red-600", category: "AI Study Lab" },
-  { href: "/sandbox", label: "Sim Sandbox", description: "Interactive physics/chem lab", icon: Zap, color: "from-amber-500 to-yellow-600", category: "AI Study Lab" },
 
   // Testing & Analytics
+  { href: "/exam-generator", label: "Exam Generator", description: "1-Click CBSE Question Paper & Rubric", icon: FileText, badge: "Print", color: "from-emerald-600 to-teal-600", category: "Testing & Analytics" },
+  { href: "/games", label: "EduArcade", description: "Periodic blitz, formula rush & speed math", icon: Gamepad2, badge: "XP", color: "from-pink-500 to-rose-600", category: "Testing & Analytics" },
   { href: "/groups", label: "StudyCircles", description: "Multiplayer audio & live duels", icon: Users, color: "from-emerald-600 to-cyan-600", category: "Testing & Analytics" },
   { href: "/pyq", label: "PYQs Hub", description: "Previous Year Questions vault", icon: Award, color: "from-indigo-500 to-blue-600", category: "Testing & Analytics" },
   { href: "/analytics", label: "Performance", description: "Detailed mastery & radar analytics", icon: Target, color: "from-purple-600 to-indigo-600", category: "Testing & Analytics" },
@@ -86,8 +95,8 @@ export default function MobileDrawer({
     let tools = ALL_TOOLS.filter(item => {
       if (item.href === "/teacher" && userRole !== "teacher") return false;
       if (item.href === "/classroom" && userRole === "teacher") return false;
-      if (item.href === "/admin" && userRole !== "admin") return false;
-      if (userRole === "admin" && item.href !== "/admin") return false;
+      if (item.href === ADMIN_PORTAL_ROUTE && userRole !== "admin") return false;
+      if (userRole === "admin" && item.href !== ADMIN_PORTAL_ROUTE) return false;
       return true;
     });
 

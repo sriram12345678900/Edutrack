@@ -14,12 +14,13 @@ interface GamificationState {
   xp: number;
   level: number;
   streak: number;
+  lastStudyDate: string | null;
   missions: Mission[];
   questsCelebratedToday: string | null;
   awardXP: (amount: number) => { newXp: number, newLevel: number, leveledUp: boolean };
   completeMission: (id: string) => void;
   setQuestsCelebratedToday: (dateStr: string) => void;
-  incrementStreak: () => void;
+  recordStudySession: () => void;
   initializeMissions: () => void;
 }
 
@@ -28,7 +29,8 @@ export const useGamificationStore = create<GamificationState>()(
     (set, get) => ({
       xp: 0,
       level: 1,
-      streak: 7,
+      streak: 0,
+      lastStudyDate: null,
       missions: [],
       questsCelebratedToday: null,
       
@@ -70,8 +72,19 @@ export const useGamificationStore = create<GamificationState>()(
         set({ questsCelebratedToday: dateStr });
       },
 
-      incrementStreak: () => {
-        set((state) => ({ streak: state.streak + 1 }));
+      recordStudySession: () => {
+        const today = new Date().toISOString().split('T')[0];
+        const { lastStudyDate, streak } = get();
+        
+        if (lastStudyDate === today) return; // Already recorded today
+        
+        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+        
+        if (lastStudyDate === yesterday) {
+          set({ streak: streak + 1, lastStudyDate: today });
+        } else {
+          set({ streak: 1, lastStudyDate: today });
+        }
       }
     }),
     {

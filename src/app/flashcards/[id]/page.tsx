@@ -4,20 +4,23 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Check, X, RotateCcw, Award, Volume2, Loader2 } from "lucide-react";
-import { FlashcardDeck, getDeck, saveDeck, Flashcard } from "@/lib/flashcards";
+import { FlashcardDeck, getDeck, saveDeck, Flashcard, calculateSM2 } from "@/lib/flashcards";
 
-const getLeitnerBox = (deckId: string, cardId: string): number => {
-  if (typeof window === "undefined") return 1;
-  const stored = localStorage.getItem(`edutrack_leitner_${deckId}_${cardId}`);
-  return stored ? parseInt(stored, 10) : 1;
+const getLeitnerBox = (card: Flashcard): number => {
+  if (!card.interval) return 1;
+  if (card.interval <= 1) return 1;
+  if (card.interval <= 3) return 2;
+  if (card.interval <= 7) return 3;
+  if (card.interval <= 14) return 4;
+  return 5;
 };
 
 const getBoxConfig = (box: number) => {
   switch(box) {
     case 5: return { label: "Box 5: Mastered ", color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" };
-    case 4: return { label: "Box 4: Spaced Review (9d)", color: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30" };
-    case 3: return { label: "Box 3: Mid Spacing (5d)", color: "bg-amber-500/20 text-amber-400 border-amber-500/30" };
-    case 2: return { label: "Box 2: Short Spacing (2d)", color: "bg-orange-500/20 text-orange-400 border-orange-500/30" };
+    case 4: return { label: "Box 4: Spaced Review", color: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30" };
+    case 3: return { label: "Box 3: Mid Spacing", color: "bg-amber-500/20 text-amber-400 border-amber-500/30" };
+    case 2: return { label: "Box 2: Short Spacing", color: "bg-orange-500/20 text-orange-400 border-orange-500/30" };
     default: return { label: "Box 1: Daily Review ⏱", color: "bg-rose-500/20 text-rose-400 border-rose-500/30" };
   }
 };
@@ -80,8 +83,20 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
   useEffect(() => {
     const loaded = getDeck(params.id);
     if (loaded) {
-      // Update lastStudied
-      const updated = { ...loaded, lastStudied: Date.now() };
+      // Sort cards: due cards and new cards first, future review cards later
+      const sortedCards = [...loaded.cards].sort((a, b) => {
+        const now = Date.now();
+        const aDue = !a.nextReviewDate || a.nextReviewDate <= now;
+        const bDue = !b.nextReviewDate || b.nextReviewDate <= now;
+        
+        if (aDue && !bDue) return -1;
+        if (!aDue && bDue) return 1;
+        
+        // If both due or both not due, sort by nextReviewDate (ascending)
+        return (a.nextReviewDate || 0) - (b.nextReviewDate || 0);
+      });
+
+      const updated = { ...loaded, cards: sortedCards, lastStudied: Date.now() };
       saveDeck(updated);
       setDeck(updated);
     }
@@ -95,25 +110,28 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
   const handleFlip = () => setIsFlipped(!isFlipped);
 
   const handleAnswer = (status: "mastered" | "learning") => {
-    const cardId = currentCard.id || `card_${currentIndex}`;
-    const currentBox = getLeitnerBox(deck.id, cardId);
-    
-    let newBox = 1;
+    // Quality: 4 for mastered (good), 1 for learning (blackout)
+    const quality = status === "mastered" ? 4 : 1;
+    const sm2Result = calculateSM2(
+      quality, 
+      currentCard.easeFactor, 
+      currentCard.interval, 
+      currentCard.repetition
+    );
+
+    const nextReviewDate = Date.now() + (sm2Result.interval * 24 * 60 * 60 * 1000);
+    const newBox = getLeitnerBox({ ...currentCard, interval: sm2Result.interval });
+    const currentBox = getLeitnerBox(currentCard);
+
     let earnedXp = 0;
-    
     if (status === "mastered") {
-      newBox = Math.min(5, currentBox + 1);
       earnedXp = 15;
       if (newBox === 5 && currentBox < 5) {
         earnedXp = 100;
       }
-    } else {
-      newBox = 1;
     }
 
     try {
-      localStorage.setItem(`edutrack_leitner_${deck.id}_${cardId}`, newBox.toString());
-      
       // Award XP globally in localStorage
       if (earnedXp > 0) {
         const storedXp = localStorage.getItem("edutrack_xp") || "0";
@@ -144,13 +162,20 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
       }
     } catch (err) {}
 
-    // Update card status
+    // Update card status with SM-2 results
     const updatedCards = [...deck.cards];
     updatedCards[currentIndex] = {
       ...updatedCards[currentIndex],
-      status,
-      lastReviewed: Date.now()
+      status: sm2Result.interval > 14 ? "mastered" : (status === "learning" ? "learning" : "learning"), // Override status string for visuals if needed
+      lastReviewed: Date.now(),
+      interval: sm2Result.interval,
+      repetition: sm2Result.repetition,
+      easeFactor: sm2Result.easeFactor,
+      nextReviewDate: nextReviewDate
     };
+    if (updatedCards[currentIndex].interval! > 14) {
+        updatedCards[currentIndex].status = "mastered";
+    }
     
     const updatedDeck = { ...deck, cards: updatedCards };
     saveDeck(updatedDeck);
@@ -162,6 +187,10 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
       setTimeout(() => setCurrentIndex(currentIndex + 1), 150); // slight delay for smooth exit
     } else {
       setSessionCompleted(true);
+      // Record study session for streak
+      import("@/store/useGamificationStore").then(mod => {
+        mod.useGamificationStore.getState().recordStudySession();
+      });
     }
   };
 
@@ -241,9 +270,9 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
                   <span className="absolute top-6 left-6 text-xs font-extrabold uppercase tracking-widest dark:text-slate-400 text-slate-600 flex items-center gap-2">
                     Question
                     <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border normal-case tracking-normal ${
-                      getBoxConfig(getLeitnerBox(deck.id, currentCard.id || `card_${currentIndex}`)).color
+                      getBoxConfig(getLeitnerBox(currentCard)).color
                     }`}>
-                      {getBoxConfig(getLeitnerBox(deck.id, currentCard.id || `card_${currentIndex}`)).label}
+                      {getBoxConfig(getLeitnerBox(currentCard)).label}
                     </span>
                   </span>
                   
@@ -269,9 +298,9 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
                   <span className="absolute top-6 left-6 text-xs font-extrabold uppercase tracking-widest text-fuchsia-500 flex items-center gap-2">
                     Answer
                     <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border normal-case tracking-normal ${
-                      getBoxConfig(getLeitnerBox(deck.id, currentCard.id || `card_${currentIndex}`)).color
+                      getBoxConfig(getLeitnerBox(currentCard)).color
                     }`}>
-                      {getBoxConfig(getLeitnerBox(deck.id, currentCard.id || `card_${currentIndex}`)).label}
+                      {getBoxConfig(getLeitnerBox(currentCard)).label}
                     </span>
                   </span>
                   

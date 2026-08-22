@@ -10,6 +10,7 @@ export interface UserProfile {
   friendCode?: string;
   language?: string;
   theme?: string;
+  parentPin?: string;
   weakSubjects: string[];
   createdAt: number;
 }

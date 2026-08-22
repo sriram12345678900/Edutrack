@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar as CalendarIcon, Sparkles, CheckCircle2, Circle, Clock, Loader2, Target, Plus, Flame, Trophy, Award, Lock } from "lucide-react";
+import { Calendar as CalendarIcon, Sparkles, CheckCircle2, Circle, Clock, Loader2, Target, Plus, Flame, Trophy, Award, Lock, Printer } from "lucide-react";
 import { 
   StudyPlan, 
   StudyDay, 
@@ -279,12 +279,20 @@ export default function StudyPlanner() {
         </div>
         
         {activePlan && (
-          <button 
-            onClick={createNewPlan}
-            className="relative z-10 flex items-center gap-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-5 py-3 rounded-xl transition-all border border-slate-200 dark:border-slate-700 shadow-sm font-bold w-fit"
-          >
-            <Plus className="w-5 h-5" /> New Plan
-          </button>
+          <div className="relative z-10 flex items-center gap-3 print:hidden">
+            <button 
+              onClick={() => window.print()}
+              className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 px-5 py-3 rounded-xl transition-all border border-indigo-200 dark:border-indigo-800 shadow-sm font-bold w-fit"
+            >
+              <Printer className="w-5 h-5" /> Export PDF
+            </button>
+            <button 
+              onClick={createNewPlan}
+              className="flex items-center gap-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-5 py-3 rounded-xl transition-all border border-slate-200 dark:border-slate-700 shadow-sm font-bold w-fit"
+            >
+              <Plus className="w-5 h-5" /> New Plan
+            </button>
+          </div>
         )}
       </header>
 
@@ -394,9 +402,9 @@ export default function StudyPlanner() {
           </form>
         </motion.div>
       ) : (
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-8 print:block">
           {/* Progress & Gamification Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-6 print:hidden">
             
             {/* Level Panel with Glowing Circular Ring */}
             <div className="bg-white/50 dark:bg-slate-900/40 bg-slate-200/40 backdrop-blur-2xl rounded-[2rem] p-8 shadow-2xl border border-slate-200/50 dark:border-white/10 sticky top-8 flex flex-col items-center group hover:shadow-indigo-500/20 transition-all">

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { 
   Home, Trophy, Medal, Star, Flame, Crown, 
-  Sparkles, Gift, Users, ShieldCheck, ArrowRight, Check, ShoppingBag
+  Sparkles, Gift, Users, ShieldCheck, ArrowRight, Check, ShoppingBag, Gamepad2
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -119,6 +119,12 @@ export default function TrophiesPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            <Link
+              href="/games"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-xs font-black shadow-lg shadow-indigo-500/20 transition-all"
+            >
+              <Gamepad2 className="w-4 h-4" /> Play EduArcade
+            </Link>
             <Link
               href="/shop"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition-all"

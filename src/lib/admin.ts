@@ -18,6 +18,54 @@ export interface OrgUser {
 
 const ORG_KEY = "edutrack_organizations";
 const ORG_USERS_KEY = "edutrack_org_users";
+const MASTER_ADMIN_KEY = "edutrack_master_admin";
+
+// Master Super Admin Configuration
+export const DEFAULT_MASTER_ADMIN = {
+  id: "super-admin-001",
+  orgId: "org-master-edutrack",
+  role: "admin" as const,
+  username: "ADMIN_MASTER_2026",
+  password: "EduTrack@Master#2026!",
+  name: "Main Platform Administrator",
+  createdAt: 1700000000000
+};
+
+export const ADMIN_PORTAL_SECRET_SLUG = "vault-7890x";
+export const ADMIN_PORTAL_ROUTE = `/admin-portal-${ADMIN_PORTAL_SECRET_SLUG}`;
+
+export function getMasterAdminCredentials(): { username: string; password: string } {
+  if (typeof window === "undefined") {
+    return {
+      username: DEFAULT_MASTER_ADMIN.username,
+      password: DEFAULT_MASTER_ADMIN.password
+    };
+  }
+  try {
+    const custom = localStorage.getItem(MASTER_ADMIN_KEY);
+    if (custom) {
+      const parsed = JSON.parse(custom);
+      return {
+        username: parsed.username || DEFAULT_MASTER_ADMIN.username,
+        password: parsed.password || DEFAULT_MASTER_ADMIN.password
+      };
+    }
+  } catch (e) {}
+  return {
+    username: DEFAULT_MASTER_ADMIN.username,
+    password: DEFAULT_MASTER_ADMIN.password
+  };
+}
+
+export function updateMasterAdminPassword(newPassword: string, newUsername?: string): void {
+  if (typeof window === "undefined") return;
+  const current = getMasterAdminCredentials();
+  const updated = {
+    username: newUsername || current.username,
+    password: newPassword
+  };
+  localStorage.setItem(MASTER_ADMIN_KEY, JSON.stringify(updated));
+}
 
 // --- Organizations ---
 
@@ -92,6 +140,17 @@ export function generateOrgUser(orgId: string, role: "teacher" | "student" | "ad
 }
 
 export function verifyOrgCredentials(username: string, password: string): OrgUser | null {
+  // 1. Check Master Super Admin Credentials
+  const masterCreds = getMasterAdminCredentials();
+  if (username === masterCreds.username && password === masterCreds.password) {
+    return {
+      ...DEFAULT_MASTER_ADMIN,
+      username: masterCreds.username,
+      password: masterCreds.password
+    };
+  }
+
+  // 2. Check Standard Organization Users
   const users = getStoredOrgUsers();
   const user = users.find(u => u.username === username && u.password === password);
   return user || null;

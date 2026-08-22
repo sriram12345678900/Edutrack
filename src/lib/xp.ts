@@ -84,6 +84,13 @@ export function awardUserXP(amount: number): { newXp: number; newLevel: number; 
 }
 
 /**
+ * Convenient helper to award XP with a label.
+ */
+export function awardXp(amount: number, reason?: string) {
+  return awardUserXP(amount);
+}
+
+/**
  * Completes a daily mission, awards its corresponding XP, and saves to localStorage.
  */
 export function completeDailyMission(missionId: string): boolean {

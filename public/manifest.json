@@ -1,16 +1,51 @@
 {
-  "name": "EduTrack App",
+  "name": "EduTrack - Next-Gen AI Learning OS",
   "short_name": "EduTrack",
-  "description": "Collaborative Study Application",
-  "start_url": "/",
+  "description": "Collaborative Study Application & AI Learning OS for Students Worldwide",
+  "start_url": "/dashboard",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#020617",
   "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "/favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
+    },
+    {
+      "src": "/ai_lens_scanner.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/ai_tutor_avatar.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Global Doubts",
+      "url": "/community",
+      "description": "Ask questions to global community and AI"
+    },
+    {
+      "name": "AI Oral Viva",
+      "url": "/viva",
+      "description": "Practice conversational voice viva exams"
+    },
+    {
+      "name": "Live Quiz Arena",
+      "url": "/arena",
+      "description": "Compete in multiplayer quiz battles"
+    },
+    {
+      "name": "Simulations Lab",
+      "url": "/simulations",
+      "description": "Interactive Physics & Science labs"
     }
   ]
 }

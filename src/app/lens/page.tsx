@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { 
   Home, Camera, Upload, Sparkles, MessageSquare, ArrowRight, 
   Zap, Bot, User, Check, Loader2, Mic, Volume2, 
-  VolumeX, FileText, Copy, X, Eye, HelpCircle, BookOpen, Compass
+  VolumeX, FileText, Copy, X, Eye, HelpCircle, BookOpen, Compass, Crosshair
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

@@ -21,6 +21,7 @@ export default function SignupWizard() {
   const [sanskritCurr, setSanskritCurr] = useState<string>("");
   const [language, setLanguage] = useState<string>("English");
   const [theme, setTheme] = useState<string>("system");
+  const [parentPin, setParentPin] = useState<string>("");
 
   const isClass9or10 = selectedClass === 9 || selectedClass === 10;
 
@@ -44,13 +45,17 @@ export default function SignupWizard() {
       setCurrentStep(3); // Go to Language
     } else if (currentStep === 3) {
       setCurrentStep(4); // Go to Theme
+    } else if (currentStep === 4) {
+      setCurrentStep(5); // Go to Parent PIN
     } else {
       finishSetup();
     }
   };
 
   const prevStep = () => {
-    if (currentStep === 4) {
+    if (currentStep === 5) {
+      setCurrentStep(4); // Go to Theme
+    } else if (currentStep === 4) {
       setCurrentStep(3); // Go to Language
     } else if (currentStep === 3 && !isClass9or10) {
       setCurrentStep(1); // Go to Class
@@ -76,6 +81,7 @@ export default function SignupWizard() {
     }
     if (englishCurr) localStorage.setItem("edutrack_english_curr", englishCurr);
     if (sanskritCurr) localStorage.setItem("edutrack_sanskrit_curr", sanskritCurr);
+    if (parentPin) localStorage.setItem("edutrack_parent_pin", parentPin);
     
     if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
@@ -93,6 +99,7 @@ export default function SignupWizard() {
           nickname: nickname || undefined,
           displayName: nickname || undefined,
           friendCode: finalFriendCode || undefined,
+          parentPin: parentPin || undefined,
         });
       } catch (e) {
         console.error("Failed to save profile to database", e);
@@ -396,10 +403,38 @@ export default function SignupWizard() {
               </motion.div>
             )}
 
+            {/* STEP 5: PARENT PIN */}
+            {currentStep === 5 && (
+              <motion.div
+                key="step5"
+                custom={1}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="w-full space-y-6"
+              >
+                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+                  <Monitor className="w-5 h-5 text-indigo-500" /> Optional: Set Parent PIN
+                </h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Set a 4-digit PIN so your parents can view your progress on the Parent Portal.
+                </p>
+                <input
+                  type="password"
+                  value={parentPin}
+                  onChange={(e) => setParentPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                  placeholder="e.g. 1234"
+                  maxLength={4}
+                  className="w-full max-w-[150px] px-5 py-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 font-black text-2xl text-center text-slate-850 dark:text-white tracking-[0.5em] transition-all"
+                />
+              </motion.div>
+            )}
+
           </AnimatePresence>
         </div>
 
-        {/* Footer Navigation */}
         <div className="mt-12 flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-6">
           <button
             onClick={prevStep}
@@ -418,7 +453,7 @@ export default function SignupWizard() {
               ((currentStep === 0 && !nickname.trim()) || (currentStep === 1 && !selectedClass)) ? 'bg-slate-300 dark:bg-slate-700 cursor-not-allowed shadow-none' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:scale-105 shadow-indigo-500/30'
             }`}
           >
-            {currentStep === 4 ? (
+            {currentStep === 5 ? (
               <>Finish Setup <CheckCircle2 className="w-5 h-5" /></>
             ) : (
               <>Continue <ArrowRight className="w-5 h-5" /></>
