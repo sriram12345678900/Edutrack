@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import jsPDF from "jspdf";
+import katex from "katex";
 
 type DrawTool = 
   | "pen" 
@@ -33,7 +34,8 @@ type DrawTool =
   | "lasso" 
   | "laser"
   | "image"
-  | "ruler";
+  | "ruler"
+  | "latex";
 
 type BackgroundPattern = "dots" | "grid" | "ruled" | "isometric" | "blank";
 type CanvasTheme = "dark" | "light";
@@ -59,6 +61,7 @@ interface Stroke {
   brushSize: number;
   tool: DrawTool;
   fill?: boolean;
+  opacity?: number; // 0.0 - 1.0
   text?: string; // Stores text content or base64 image data
 }
 
@@ -67,6 +70,7 @@ interface LaserParticle {
   y: number;
   alpha: number;
   color: string;
+  size?: number; // particle radius
 }
 
 interface WhiteboardPageData {
@@ -208,8 +212,30 @@ function detectShapeOrLetter(points: Point[]): DetectedShape {
     return { type: "rectangle", x: minX, y: minY, w, h };
   }
 
+  // Triangle detection: find sharp directional changes (corners)
+  if (points.length >= 12 && w > 30 && h > 30) {
+    const corners: Point[] = [];
+    const step = Math.max(3, Math.floor(points.length / 20));
+    for (let i = step; i < points.length - step; i += 2) {
+      const prev = points[i - step];
+      const curr = points[i];
+      const next = points[i + step];
+      const v1x = curr.x - prev.x, v1y = curr.y - prev.y;
+      const v2x = next.x - curr.x, v2y = next.y - curr.y;
+      const dot = v1x * v2x + v1y * v2y;
+      const mag1 = Math.sqrt(v1x * v1x + v1y * v1y) || 1;
+      const mag2 = Math.sqrt(v2x * v2x + v2y * v2y) || 1;
+      const cosAngle = dot / (mag1 * mag2);
+      if (cosAngle < 0.2) corners.push(curr); // sharp turn detected
+    }
+    if (corners.length >= 2 && corners.length <= 6) {
+      return { type: "triangle", start: { x: minX, y: minY }, end: { x: maxX, y: maxY } };
+    }
+  }
+
   return null;
 }
+
 
 // Continuous Smooth Path Renderer (Quad-Midpoint Interpolation)
 function renderSmoothPath(ctx: CanvasRenderingContext2D, points: Point[]) {
@@ -269,7 +295,8 @@ const redrawCanvas = (
       ctx.globalAlpha = 1.0;
     } else {
       ctx.globalCompositeOperation = "source-over";
-      ctx.globalAlpha = stroke.tool === "highlighter" ? 0.35 : 1.0;
+      const baseAlpha = stroke.opacity ?? 1.0;
+      ctx.globalAlpha = stroke.tool === "highlighter" ? 0.35 * baseAlpha : baseAlpha;
     }
 
     if (stroke.points.length === 0) continue;
@@ -492,15 +519,32 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
   const [brushSize, setBrushSize] = useState(4);
   const [showThicknessMenu, setShowThicknessMenu] = useState(false);
   const [fillShapes, setFillShapes] = useState(false);
+  const [snapToGrid, setSnapToGrid] = useState(false);
   const [pattern, setPattern] = useState<BackgroundPattern>("dots");
   const [canvasTheme, setCanvasTheme] = useState<CanvasTheme>("dark");
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedStrokeIds, setSelectedStrokeIds] = useState<string[]>([]);
   const [showKeyShortcuts, setShowKeyShortcuts] = useState(false);
 
+  // New: Opacity, Brush Popover, Page Title Editing
+  const [strokeOpacity, setStrokeOpacity] = useState(100); // 0-100
+  const [showBrushPopover, setShowBrushPopover] = useState(false);
+  const [editingPageTitle, setEditingPageTitle] = useState<number | null>(null);
+  const [liveSelectionCount, setLiveSelectionCount] = useState(0);
+
+  // Lasso Animation Refs
+  const lassoAnimRef = useRef<number | null>(null);
+  const lassoOffsetRef = useRef(0);
+
+  // Sticky Note Drag Ref
+  const stickyDragRef = useRef<{ id: string; startMouseX: number; startMouseY: number; startNoteX: number; startNoteY: number } | null>(null);
+
   // Ruler State
   const [showRuler, setShowRuler] = useState(false);
   const [rulerPos, setRulerPos] = useState<{ x: number; y: number; angle: number }>({ x: 800, y: 600, angle: 0 });
+
+  // Alignment Guides
+  const [alignmentGuides, setAlignmentGuides] = useState<{axis: 'x' | 'y', pos: number}[]>([]);
 
   // Modals & Panels
   const [showPresetBank, setShowPresetBank] = useState(false);
@@ -555,9 +599,10 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
   const [joined, setJoined] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Text Tool
+  // Text & LaTeX Tool
   const [textInputPos, setTextInputPos] = useState<{ x: number; y: number } | null>(null);
   const [textValue, setTextValue] = useState("");
+  const [isEditingLatex, setIsEditingLatex] = useState(false);
 
   // History Stack
   const [history, setHistory] = useState<string[]>([]);
@@ -722,7 +767,7 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
     }
   };
 
-  // Laser Pointer Animation Loop
+  // Laser Pointer Animation Loop — improved with gradient trail & glow
   useEffect(() => {
     const renderLaser = () => {
       const canvas = laserCanvasRef.current;
@@ -731,15 +776,41 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
         if (ctx) {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           laserParticlesRef.current = laserParticlesRef.current
-            .map(p => ({ ...p, alpha: p.alpha - 0.04 }))
+            .map(p => ({ ...p, alpha: p.alpha - 0.022, size: (p.size ?? 8) * 0.985 }))
             .filter(p => p.alpha > 0);
 
-          for (const p of laserParticlesRef.current) {
+          for (let i = 0; i < laserParticlesRef.current.length; i++) {
+            const p = laserParticlesRef.current[i];
+            const radius = (p.size ?? 8) * p.alpha * 1.8;
+            const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius);
+            gradient.addColorStop(0, `rgba(255, 50, 50, ${p.alpha})`);
+            gradient.addColorStop(0.5, `rgba(255, 20, 20, ${p.alpha * 0.6})`);
+            gradient.addColorStop(1, `rgba(220, 38, 38, 0)`);
             ctx.beginPath();
-            ctx.arc(p.x, p.y, 6 * p.alpha, 0, Math.PI * 2);
-            ctx.fillStyle = p.color === "#ffffff" ? `rgba(6, 182, 212, ${p.alpha})` : `rgba(239, 68, 68, ${p.alpha})`;
-            ctx.shadowBlur = 12;
-            ctx.shadowColor = p.color;
+            ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+          }
+
+          // Draw bright glowing cursor at the most recent particle
+          const last = laserParticlesRef.current[laserParticlesRef.current.length - 1];
+          if (last && last.alpha > 0.5) {
+            // Outer glow ring
+            ctx.beginPath();
+            ctx.arc(last.x, last.y, 20, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255, 60, 60, 0.12)";
+            ctx.fill();
+            // Middle ring
+            ctx.beginPath();
+            ctx.arc(last.x, last.y, 11, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255, 60, 60, 0.28)";
+            ctx.fill();
+            // Bright core dot
+            ctx.beginPath();
+            ctx.arc(last.x, last.y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = "#ff2020";
+            ctx.shadowBlur = 28;
+            ctx.shadowColor = "#ff0000";
             ctx.fill();
             ctx.shadowBlur = 0;
           }
@@ -809,6 +880,70 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
     return () => unsub();
   }, [joined, roomId, nickname, user]);
 
+  // Lasso Marching Ants Animation
+  useEffect(() => {
+    if (tool !== 'lasso') {
+      if (lassoAnimRef.current) cancelAnimationFrame(lassoAnimRef.current);
+      return;
+    }
+    const animate = () => {
+      lassoOffsetRef.current = (lassoOffsetRef.current + 0.4) % 40;
+      lassoAnimRef.current = requestAnimationFrame(animate);
+    };
+    lassoAnimRef.current = requestAnimationFrame(animate);
+    return () => { if (lassoAnimRef.current) cancelAnimationFrame(lassoAnimRef.current); };
+  }, [tool]);
+
+  // Sticky Note Drag: global mouse move/up
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (!stickyDragRef.current) return;
+      const { id, startMouseX, startMouseY, startNoteX, startNoteY } = stickyDragRef.current;
+      const dx = e.clientX - startMouseX;
+      const dy = e.clientY - startMouseY;
+      
+      let newX = startNoteX + dx / zoomLevel;
+      let newY = startNoteY + dy / zoomLevel;
+
+      if (snapToGrid) {
+        newX = Math.round(newX / 20) * 20;
+        newY = Math.round(newY / 20) * 20;
+      }
+
+      // Calculate alignment guides
+      const guides: {axis: 'x' | 'y', pos: number}[] = [];
+      const threshold = 5 / zoomLevel;
+      
+      // Sticky notes are 176px (44 * 4) by 176px roughly. 
+      // Let's just align the top-left corner and center for simplicity.
+      const w = 176; const h = 176;
+      const myCenter = { x: newX + w / 2, y: newY + h / 2 };
+
+      // Check against other sticky notes
+      stickyNotes.forEach(n => {
+        if (n.id === id) return;
+        const nCenter = { x: n.x + w / 2, y: n.y + h / 2 };
+        if (Math.abs(newX - n.x) < threshold) { newX = n.x; guides.push({ axis: 'x', pos: newX }); }
+        if (Math.abs(newY - n.y) < threshold) { newY = n.y; guides.push({ axis: 'y', pos: newY }); }
+        if (Math.abs(myCenter.x - nCenter.x) < threshold) { newX = nCenter.x - w / 2; guides.push({ axis: 'x', pos: nCenter.x }); }
+        if (Math.abs(myCenter.y - nCenter.y) < threshold) { newY = nCenter.y - h / 2; guides.push({ axis: 'y', pos: nCenter.y }); }
+      });
+
+      setAlignmentGuides(guides);
+      setStickyNotes((prev: any[]) => prev.map((n: any) => n.id === id ? { ...n, x: newX, y: newY } : n));
+    };
+    const onUp = () => { 
+      stickyDragRef.current = null; 
+      setAlignmentGuides([]);
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+  }, [zoomLevel, snapToGrid, stickyNotes]);
+
   // Keyboard Shortcuts Listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -831,6 +966,11 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
       else if (key === 'c') setTool("circle");
       else if (key === 't') setTool("text");
       else if (key === 'x') setTool("laser");
+      else if (key === 'f') setFillShapes(f => !f);
+      else if (key === 'g') setSnapToGrid(g => !g);
+      else if (key === '=' || key === '+') setZoomLevel(z => Math.min(3, parseFloat((z + 0.25).toFixed(2))));
+      else if (key === '-') setZoomLevel(z => Math.max(0.25, parseFloat((z - 0.25).toFixed(2))));
+      else if (key === '0') setZoomLevel(1);
       else if (key === 'delete' || key === 'backspace') {
         if (selectedStrokeIds.length > 0) deleteSelectedStrokes();
       }
@@ -950,7 +1090,16 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           image: dataUrl,
-          prompt: strokesText || "log_10(1) + log_10(10) =",
+          prompt: `You are an expert math and science tutor reviewing a student's whiteboard.
+Analyze the image carefully and provide a detailed response structured as:
+
+1. WHAT I SEE: Describe the equations, expressions, diagrams or problems visible.
+2. STEP-BY-STEP SOLUTION: Solve it step by step with clear reasoning.
+3. FINAL ANSWER: State the answer clearly and concisely.
+4. KEY CONCEPTS: Briefly mention the math/science concept being used.
+
+If it's a diagram (geometry, physics, chemistry), explain what it represents.
+Be thorough but easy to understand for a student. Use plain text, no markdown symbols.`,
           strokesText
         })
       });
@@ -998,6 +1147,33 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
         { id: Date.now().toString() + "_2", tool: "circle", color: "#ec4899", brushSize: 3, points: [{ x: cx + 80, y: cy }, { x: cx + 230, y: cy }] },
         { id: Date.now().toString() + "_3", tool: "text", color: "#3b82f6", brushSize: 4, points: [{ x: cx - 160, y: cy - 140 }], text: "Set A" },
         { id: Date.now().toString() + "_4", tool: "text", color: "#ec4899", brushSize: 4, points: [{ x: cx + 140, y: cy - 140 }], text: "Set B" }
+      ];
+    } else if (type === "number_line") {
+      const y = cy;
+      const ticks = Array.from({ length: 7 }, (_, i): Stroke => ({
+        id: `${Date.now()}_tick${i}`, tool: "line", color: colorToUse, brushSize: 2,
+        points: [{ x: cx + (i - 3) * 90, y: y - 16 }, { x: cx + (i - 3) * 90, y: y + 16 }]
+      }));
+      const nums = Array.from({ length: 7 }, (_, i): Stroke => ({
+        id: `${Date.now()}_num${i}`, tool: "text", color: colorToUse, brushSize: 3,
+        points: [{ x: cx + (i - 3) * 90 - 5, y: y + 35 }], text: `${i - 3}`
+      }));
+      newStrokes = [
+        { id: `${Date.now()}_base`, tool: "line", color: colorToUse, brushSize: 3, points: [{ x: cx - 320, y }, { x: cx + 320, y }] },
+        ...ticks,
+        ...nums,
+        { id: `${Date.now()}_zero`, tool: "text", color: colorToUse, brushSize: 4, points: [{ x: cx - 4, y: y - 35 }], text: "0" }
+      ];
+    } else if (type === "right_triangle") {
+      newStrokes = [
+        { id: `${Date.now()}_base`, tool: "line", color: colorToUse, brushSize: 3, points: [{ x: cx - 150, y: cy + 130 }, { x: cx + 150, y: cy + 130 }] },
+        { id: `${Date.now()}_height`, tool: "line", color: colorToUse, brushSize: 3, points: [{ x: cx + 150, y: cy + 130 }, { x: cx + 150, y: cy - 120 }] },
+        { id: `${Date.now()}_hyp`, tool: "line", color: colorToUse, brushSize: 3, points: [{ x: cx - 150, y: cy + 130 }, { x: cx + 150, y: cy - 120 }] },
+        { id: `${Date.now()}_la`, tool: "text", color: colorToUse, brushSize: 4, points: [{ x: cx - 10, y: cy + 160 }], text: "a" },
+        { id: `${Date.now()}_lb`, tool: "text", color: colorToUse, brushSize: 4, points: [{ x: cx + 165, y: cy + 5 }], text: "b" },
+        { id: `${Date.now()}_lc`, tool: "text", color: colorToUse, brushSize: 4, points: [{ x: cx - 50, y: cy - 20 }], text: "c" },
+        { id: `${Date.now()}_90`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx + 110, y: cy + 100 }], text: "90°" },
+        { id: `${Date.now()}_formula`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx - 80, y: cy + 200 }], text: "a² + b² = c²" }
       ];
     }
 
@@ -1073,20 +1249,31 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
   };
 
   // Precise Canvas Coordinate Scaling Calculation
-  const getCoordinates = (e: any) => {
+  const getCoordinates = (e: any): Point => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
-    let clientX = e.clientX;
-    let clientY = e.clientY;
+    let clientX, clientY;
     if (e.touches && e.touches.length > 0) {
       clientX = e.touches[0].clientX;
       clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
     }
     const scaleX = canvas.width / (rect.width || 1);
     const scaleY = canvas.height / (rect.height || 1);
-    const x = ((clientX - rect.left) * scaleX) / zoomLevel;
-    const y = ((clientY - rect.top) * scaleY) / zoomLevel;
+    let x = ((clientX - rect.left) * scaleX) / zoomLevel;
+    let y = ((clientY - rect.top) * scaleY) / zoomLevel;
+    
+    // Snap to Grid (20px) for drawing shapes
+    if (snapToGrid) {
+      if (['rect', 'circle', 'line', 'arrow', 'triangle'].includes(tool)) {
+        x = Math.round(x / 20) * 20;
+        y = Math.round(y / 20) * 20;
+      }
+    }
+
     return { x, y };
   };
 
@@ -1165,7 +1352,7 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
       return;
     }
     
-    if (tool === "text" || tool === "sticky") return;
+    if (tool === "text" || tool === "latex" || tool === "sticky") return;
     
     setIsDrawing(true);
     isDrawingRef.current = true;
@@ -1173,7 +1360,7 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
     strokePointsRef.current = [coords];
 
     if (tool === "laser") {
-      laserParticlesRef.current.push({ x: coords.x, y: coords.y, alpha: 1.0, color });
+      laserParticlesRef.current.push({ x: coords.x, y: coords.y, alpha: 1.0, color, size: 8 });
     }
     
     if (smartPenTimerRef.current) {
@@ -1187,9 +1374,15 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
 
     // Handle Dragging / Moving Selected Elements
     if (isMovingSelectionRef.current && selectionDragStartRef.current) {
-      const dx = coords.x - selectionDragStartRef.current.x;
-      const dy = coords.y - selectionDragStartRef.current.y;
+      let dx = coords.x - selectionDragStartRef.current.x;
+      let dy = coords.y - selectionDragStartRef.current.y;
 
+      if (snapToGrid) {
+        dx = Math.round(dx / 20) * 20;
+        dy = Math.round(dy / 20) * 20;
+      }
+
+      let nextStrokes = strokes;
       setStrokes(prev => {
         const next = prev.map(s => {
           const init = selectionInitialPointsRef.current.find(item => item.strokeId === s.id);
@@ -1201,10 +1394,47 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
           }
           return s;
         });
-        const canvas = canvasRef.current;
-        if (canvas) redrawCanvas(canvas, next, selectedStrokeIds, showRuler, rulerPos);
+        nextStrokes = next;
         return next;
       });
+
+      // Alignment check
+      if (!snapToGrid) {
+        const guides: {axis: 'x' | 'y', pos: number}[] = [];
+        const threshold = 5 / zoomLevel;
+        const selectedGroup = nextStrokes.filter(s => selectedStrokeIds.includes(s.id));
+        const unselectedGroup = nextStrokes.filter(s => !selectedStrokeIds.includes(s.id));
+        
+        if (selectedGroup.length > 0 && unselectedGroup.length > 0) {
+          const myBox = getBoundingBox(selectedGroup.flatMap(s => s.points));
+          const myCenterX = (myBox.minX + myBox.maxX) / 2;
+          const myCenterY = (myBox.minY + myBox.maxY) / 2;
+
+          for (const other of unselectedGroup) {
+            const oBox = getBoundingBox(other.points);
+            const oCenterX = (oBox.minX + oBox.maxX) / 2;
+            const oCenterY = (oBox.minY + oBox.maxY) / 2;
+
+            if (Math.abs(myBox.minX - oBox.minX) < threshold) { dx += (oBox.minX - myBox.minX); guides.push({ axis: 'x', pos: oBox.minX }); break; }
+            if (Math.abs(myBox.minY - oBox.minY) < threshold) { dy += (oBox.minY - myBox.minY); guides.push({ axis: 'y', pos: oBox.minY }); break; }
+            if (Math.abs(myCenterX - oCenterX) < threshold) { dx += (oCenterX - myCenterX); guides.push({ axis: 'x', pos: oCenterX }); break; }
+            if (Math.abs(myCenterY - oCenterY) < threshold) { dy += (oCenterY - myCenterY); guides.push({ axis: 'y', pos: oCenterY }); break; }
+          }
+          setAlignmentGuides(guides);
+
+          if (guides.length > 0) {
+            // Re-apply snapped dx/dy
+            nextStrokes = nextStrokes.map(s => {
+              const init = selectionInitialPointsRef.current.find(item => item.strokeId === s.id);
+              if (init) return { ...s, points: init.points.map(pt => ({ x: pt.x + dx, y: pt.y + dy })) };
+              return s;
+            });
+            setStrokes(nextStrokes);
+          }
+        }
+      }
+      const canvas = canvasRef.current;
+      if (canvas) redrawCanvas(canvas, nextStrokes, selectedStrokeIds, showRuler, rulerPos);
       return;
     }
 
@@ -1229,7 +1459,7 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
     strokePointsRef.current.push(coords);
 
     if (tool === "laser") {
-      laserParticlesRef.current.push({ x: coords.x, y: coords.y, alpha: 1.0, color });
+      laserParticlesRef.current.push({ x: coords.x, y: coords.y, alpha: 1.0, color, size: 8 });
       return;
     }
     
@@ -1240,19 +1470,39 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
       redrawCanvas(canvas, strokes, selectedStrokeIds, showRuler, rulerPos);
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "#6366f1";
-      ctx.fillStyle = "rgba(99, 102, 241, 0.15)";
-      ctx.setLineDash([6, 6]);
+
+      const pts = strokePointsRef.current;
+      if (pts.length < 2) return;
+
+      // Compute live selection count
+      const inside = strokes.filter(s => isStrokeInLasso(s, pts));
+      setLiveSelectionCount(inside.length);
+      const hasHits = inside.length > 0;
+
+      // Marching ants outer shadow stroke
+      ctx.save();
+      ctx.setLineDash([8, 5]);
+      ctx.lineDashOffset = -lassoOffsetRef.current;
       ctx.beginPath();
-      ctx.moveTo(strokePointsRef.current[0].x, strokePointsRef.current[0].y);
-      for (let i = 1; i < strokePointsRef.current.length; i++) {
-        ctx.lineTo(strokePointsRef.current[i].x, strokePointsRef.current[i].y);
-      }
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
       ctx.closePath();
-      ctx.stroke();
+
+      // Semi-transparent fill
+      ctx.fillStyle = hasHits ? "rgba(99,102,241,0.10)" : "rgba(148,163,184,0.06)";
       ctx.fill();
+
+      // Outer dark outline
+      ctx.strokeStyle = "rgba(0,0,0,0.35)";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Colored inner animated dashes
+      ctx.strokeStyle = hasHits ? "#6366f1" : "#94a3b8";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
       ctx.setLineDash([]);
+      ctx.restore();
       return;
     }
 
@@ -1274,6 +1524,7 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
       isMovingSelectionRef.current = false;
       selectionDragStartRef.current = null;
       selectionInitialPointsRef.current = [];
+      setAlignmentGuides([]);
       pushToHistory();
       syncCanvas();
       return;
@@ -1294,7 +1545,8 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
       color,
       brushSize,
       points: points,
-      fill: fillShapes
+      fill: fillShapes,
+      opacity: strokeOpacity / 100,
     };
     
     if (tool === "stroke_eraser") {
@@ -1309,19 +1561,20 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
       if (detected) {
         let cleanStroke: Stroke | null = null;
         if (detected.type === "line") {
-          cleanStroke = { id: Date.now().toString(), tool: "line", color, brushSize, points: [detected.start, detected.end] };
-          showToast("Snapped to Line ");
+          const len = Math.round(Math.sqrt(Math.pow(detected.end.x - detected.start.x, 2) + Math.pow(detected.end.y - detected.start.y, 2)));
+          cleanStroke = { id: Date.now().toString(), tool: "line", color, brushSize, opacity: strokeOpacity / 100, points: [detected.start, detected.end] };
+          showToast(`✨ Snapped to Line (${len}px)`);
         } else if (detected.type === "circle") {
           const { cx, cy, r } = detected;
-          cleanStroke = { id: Date.now().toString(), tool: "circle", color, brushSize, fill: fillShapes, points: [{ x: cx, y: cy }, { x: cx + r, y: cy }] };
-          showToast("Snapped to Circle ");
+          cleanStroke = { id: Date.now().toString(), tool: "circle", color, brushSize, fill: fillShapes, opacity: strokeOpacity / 100, points: [{ x: cx, y: cy }, { x: cx + r, y: cy }] };
+          showToast(`✨ Snapped to Circle (r≈${Math.round(r)}px)`);
         } else if (detected.type === "rectangle") {
           const { x, y, w, h } = detected;
-          cleanStroke = { id: Date.now().toString(), tool: "rect", color, brushSize, fill: fillShapes, points: [{ x, y }, { x: x + w, y: y + h }] };
-          showToast("Snapped to Rectangle ");
+          cleanStroke = { id: Date.now().toString(), tool: "rect", color, brushSize, fill: fillShapes, opacity: strokeOpacity / 100, points: [{ x, y }, { x: x + w, y: y + h }] };
+          showToast(`✨ Snapped to Rectangle (${Math.round(w)}×${Math.round(h)}px)`);
         } else if (detected.type === "triangle") {
-          cleanStroke = { id: Date.now().toString(), tool: "triangle", color, brushSize, fill: fillShapes, points: [detected.start, detected.end] };
-          showToast("Snapped to Triangle ");
+          cleanStroke = { id: Date.now().toString(), tool: "triangle", color, brushSize, fill: fillShapes, opacity: strokeOpacity / 100, points: [detected.start, detected.end] };
+          showToast("✨ Snapped to Triangle");
         }
 
         if (cleanStroke) {
@@ -1336,6 +1589,7 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
         }
       } else {
         setAccumulatedSmartStrokes(prev => [...prev, newStroke]);
+        showToast("Smart Pen: keeping freehand stroke");
         smartPenTimerRef.current = setTimeout(processSmartPen, 400);
       }
     } else if (tool === "lasso") {
@@ -1362,9 +1616,11 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
   };
 
   const handleCanvasClick = (e: React.MouseEvent) => {
-    if (tool === "text") {
+    if (tool === "text" || tool === "latex") {
       const coords = getCoordinates(e);
       setTextInputPos(coords);
+      setIsEditingLatex(tool === "latex");
+      setTextValue("");
       setTextValue("");
     } else if (tool === "sticky") {
       const coords = getCoordinates(e);
@@ -1389,7 +1645,7 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
     if (textInputPos && textValue.trim()) {
       const newStroke: Stroke = {
         id: Date.now().toString(),
-        tool: "text",
+        tool: isEditingLatex ? "latex" : "text",
         color,
         brushSize,
         points: [textInputPos],
@@ -1446,6 +1702,7 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
 
   return (
     <div className={`relative w-full h-screen overflow-hidden select-none ${canvasTheme === "dark" ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"}`}>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" />
       {/* Animated Dot Grid Background */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.15] dark:opacity-[0.05]" 
@@ -1566,14 +1823,29 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
 
           <div className="w-[1px] h-6 bg-slate-300 dark:bg-slate-700/50"></div>
 
-          {/* Slide Deck Switcher */}
+          {/* Slide Deck Switcher — with editable title */}
           <div className="flex items-center gap-1">
             <button onClick={() => setActivePageIndex(prev => Math.max(0, prev - 1))} disabled={activePageIndex === 0} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full dark:text-slate-300 text-slate-700 disabled:opacity-40 transition-colors">
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="font-mono text-xs font-semibold w-10 text-center dark:text-indigo-300 text-indigo-700">
-              {activePageIndex + 1}/{deckPages.length}
-            </span>
+            {editingPageTitle === activePageIndex ? (
+              <input
+                autoFocus
+                value={activePage.title}
+                onChange={(e) => setDeckPages(prev => prev.map((p, i) => i === activePageIndex ? { ...p, title: e.target.value } : p))}
+                onBlur={() => setEditingPageTitle(null)}
+                onKeyDown={(e) => { if (e.key === 'Enter') setEditingPageTitle(null); }}
+                className="w-20 bg-transparent border-b border-indigo-500 text-xs font-semibold text-center focus:outline-none dark:text-indigo-300 text-indigo-700"
+              />
+            ) : (
+              <span
+                onClick={() => setEditingPageTitle(activePageIndex)}
+                title={`${activePage.title} — click to rename`}
+                className="font-mono text-xs font-semibold max-w-[80px] text-center dark:text-indigo-300 text-indigo-700 cursor-pointer hover:underline truncate"
+              >
+                {activePage.title} ({activePageIndex + 1}/{deckPages.length})
+              </span>
+            )}
             <button onClick={() => setActivePageIndex(prev => Math.min(deckPages.length - 1, prev + 1))} disabled={activePageIndex === deckPages.length - 1} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full dark:text-slate-300 text-slate-700 disabled:opacity-40 transition-colors">
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -1603,8 +1875,19 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
 
           <div className="w-[1px] h-6 bg-slate-300 dark:bg-slate-700/50"></div>
 
-          {/* Utils */}
-          <div className="flex items-center gap-1 pr-1">
+          {/* Utils — with Zoom Controls */}
+          <div className="flex items-center gap-0.5 pr-1">
+            {/* Zoom */}
+            <button onClick={() => setZoomLevel(z => Math.min(3, parseFloat((z + 0.25).toFixed(2))))} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg dark:text-slate-300 text-slate-600 transition-colors" title="Zoom In (+)">
+              <ZoomIn className="w-3.5 h-3.5" />
+            </button>
+            <span onClick={() => setZoomLevel(1)} className="font-mono text-[10px] font-bold dark:text-indigo-300 text-indigo-700 w-9 text-center cursor-pointer hover:underline" title="Reset Zoom (0)">
+              {Math.round(zoomLevel * 100)}%
+            </span>
+            <button onClick={() => setZoomLevel(z => Math.max(0.25, parseFloat((z - 0.25).toFixed(2))))} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg dark:text-slate-300 text-slate-600 transition-colors" title="Zoom Out (-)">
+              <ZoomOut className="w-3.5 h-3.5" />
+            </button>
+            <div className="w-[1px] h-5 bg-slate-200 dark:bg-slate-700 mx-0.5" />
             <button onClick={downloadCanvas} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-600 dark:text-slate-300 transition-colors" title="Download PNG">
               <Download className="w-4 h-4" />
             </button>
@@ -1665,25 +1948,85 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
             className="absolute top-0 left-0 pointer-events-none z-20 touch-none"
           />
 
+          {/* Alignment Guides Overlay */}
+          {alignmentGuides.map((guide, idx) => (
+            <div
+              key={idx}
+              className="absolute bg-pink-500/60 pointer-events-none z-30"
+              style={{
+                left: guide.axis === 'x' ? guide.pos : 0,
+                top: guide.axis === 'y' ? guide.pos : 0,
+                width: guide.axis === 'y' ? '100%' : '1px',
+                height: guide.axis === 'x' ? '100%' : '1px',
+              }}
+            />
+          ))}
+
           {/* Text Input Popup */}
           {textInputPos && (
             <div
-              className="absolute z-30 transform -translate-y-1/2"
+              className="absolute z-30 transform -translate-y-1/2 flex flex-col gap-2 min-w-[240px] max-w-[280px]"
               style={{ left: textInputPos.x, top: textInputPos.y }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <form onSubmit={handleTextSubmit} className="flex items-center gap-1 dark:bg-slate-900/90 bg-slate-200/90 border border-indigo-500 rounded-xl p-1.5 shadow-2xl backdrop-blur-md">
+              {/* LaTeX Live Preview Box */}
+              {isEditingLatex && textValue.trim().length > 0 && (
+                <div 
+                  className="bg-slate-900/95 border border-indigo-500/50 p-2.5 rounded-xl text-center text-white text-xs shadow-xl min-h-[44px] flex items-center justify-center overflow-x-auto select-none"
+                  dangerouslySetInnerHTML={{
+                    __html: (() => {
+                      try {
+                        return katex.renderToString(textValue, { throwOnError: false, displayMode: true });
+                      } catch (err) {
+                        return `<span class="text-rose-500 font-sans text-[10px]">Syntax Error</span>`;
+                      }
+                    })()
+                  }}
+                />
+              )}
+
+              <form onSubmit={handleTextSubmit} className="flex items-center gap-1 dark:bg-slate-900/95 bg-slate-200/95 border border-indigo-500 rounded-xl p-1.5 shadow-2xl backdrop-blur-md">
                 <input
                   type="text"
                   autoFocus
                   value={textValue}
                   onChange={(e) => setTextValue(e.target.value)}
-                  placeholder="Type on whiteboard..."
-                  className="bg-transparent dark:text-white text-slate-900 text-sm px-2 focus:outline-none w-48 font-medium"
+                  placeholder={isEditingLatex ? "Enter LaTeX (e.g. E=mc^2)" : "Type on whiteboard..."}
+                  className="bg-transparent dark:text-white text-slate-900 text-sm px-2 focus:outline-none w-full font-medium"
                 />
-                <button type="submit" className="p-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg">
+                <button type="submit" className="p-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shrink-0">
                   <Check className="w-4 h-4" />
                 </button>
               </form>
+
+              {/* LaTeX Quick Template Buttons Helper */}
+              {isEditingLatex && (
+                <div className="p-2 dark:bg-slate-900/95 bg-slate-200/95 border border-slate-200 dark:border-white/10 rounded-xl shadow-xl flex flex-wrap gap-1 justify-center max-w-full backdrop-blur-md select-none">
+                  {[
+                    { label: "½", code: "\\frac{a}{b}" },
+                    { label: "x²", code: "x^{y}" },
+                    { label: "√x", code: "\\sqrt{x}" },
+                    { label: "π", code: "\\pi" },
+                    { label: "θ", code: "\\theta" },
+                    { label: "Δ", code: "\\Delta" },
+                    { label: "±", code: "\\pm" },
+                    { label: "→", code: "\\rightarrow" },
+                    { label: "∑", code: "\\sum_{i=1}^{n}" },
+                    { label: "∫", code: "\\int" }
+                  ].map((tpl) => (
+                    <button
+                      key={tpl.code}
+                      onMouseDown={(e) => {
+                        e.preventDefault(); // prevents input focus loss
+                        setTextValue(prev => prev + tpl.code);
+                      }}
+                      className="px-2 py-1 bg-white/5 hover:bg-white/10 dark:text-slate-300 text-slate-700 hover:text-white border border-transparent hover:border-slate-500/30 text-[10px] font-black rounded-lg transition-all"
+                    >
+                      {tpl.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -1693,9 +2036,24 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
             return (
               <div
                 key={note.id}
-                className={`absolute z-20 w-44 h-44 p-3 rounded-2xl border shadow-xl backdrop-blur-md flex flex-col justify-between ${theme.bg}`}
+                className={`absolute z-20 w-44 rounded-2xl border shadow-xl backdrop-blur-md flex flex-col ${theme.bg}`}
                 style={{ left: note.x, top: note.y }}
               >
+                {/* Drag Handle */}
+                <div
+                  className="flex items-center justify-center h-5 cursor-move opacity-40 hover:opacity-80 transition-opacity rounded-t-2xl shrink-0 select-none"
+                  onMouseDown={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    stickyDragRef.current = { id: note.id, startMouseX: e.clientX, startMouseY: e.clientY, startNoteX: note.x, startNoteY: note.y };
+                  }}
+                >
+                  <div className="flex gap-0.5">
+                    <div className="w-6 h-0.5 rounded bg-current opacity-50" />
+                    <div className="w-6 h-0.5 rounded bg-current opacity-50" />
+                  </div>
+                </div>
+                <div className="px-3 pb-3 flex flex-col flex-1 gap-1">
                 <div className="flex-1 overflow-hidden flex flex-col gap-1">
                   <textarea
                     value={note.text}
@@ -1745,13 +2103,56 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
                     </button>
                   </div>
                 </div>
+                </div>
               </div>
+            );
+          })}
+
+          {/* LaTeX Rendering Overlays */}
+          {strokes.filter(s => s.tool === "latex").map(s => {
+            const start = s.points[0];
+            return (
+              <div
+                key={s.id}
+                className="absolute pointer-events-none z-10"
+                style={{
+                  left: start.x,
+                  top: start.y,
+                  color: s.color,
+                  transform: `scale(${Math.max(1, s.brushSize / 4)})`,
+                  transformOrigin: 'top left',
+                  opacity: s.opacity ?? 1.0
+                }}
+                dangerouslySetInnerHTML={{
+                  __html: (() => {
+                    try {
+                      return katex.renderToString(s.text || "", { throwOnError: false, displayMode: true });
+                    } catch (e) {
+                      return `<span class="text-rose-500 font-sans text-xs">Invalid LaTeX</span>`;
+                    }
+                  })()
+                }}
+              />
             );
           })}
         </div>
       </div>
       {/* Floating Bottom Toolbar */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+        {/* Lasso Live Count Badge */}
+        <AnimatePresence>
+          {tool === 'lasso' && isDrawing && liveSelectionCount > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 6 }}
+              className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1 bg-indigo-600 text-white text-xs font-bold rounded-full shadow-lg whitespace-nowrap pointer-events-none"
+            >
+              {liveSelectionCount} element{liveSelectionCount !== 1 ? 's' : ''} selected
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl border border-slate-200/80 dark:border-white/10 p-2.5 rounded-[1.5rem] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.6)] flex items-center gap-1.5 pointer-events-auto">
           
           <ToolButton active={tool === "hand"} onClick={() => setTool("hand")} icon={Hand} label="Pan (H)" />
@@ -1764,22 +2165,55 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
           
           <div className="w-[1px] h-8 bg-slate-200 dark:bg-slate-700/50 mx-1"></div>
 
-
-          
           <ToolButton active={tool === "rect"} onClick={() => setTool("rect")} icon={Square} label="Rectangle (R)" />
           <ToolButton active={tool === "circle"} onClick={() => setTool("circle")} icon={Circle} label="Circle (C)" />
           <ToolButton active={tool === "triangle"} onClick={() => setTool("triangle")} icon={Triangle} label="Triangle" />
           <ToolButton active={tool === "arrow"} onClick={() => setTool("arrow")} icon={ArrowRight} label="Arrow" />
           <ToolButton active={tool === "line"} onClick={() => setTool("line")} icon={Minus} label="Line" />
           <ToolButton active={tool === "text"} onClick={() => setTool("text")} icon={Type} label="Text (T)" />
+          <ToolButton active={tool === "latex"} onClick={() => setTool("latex")} icon={Calculator} label="LaTeX Equation" />
           <ToolButton active={tool === "sticky"} onClick={() => setTool("sticky")} icon={FileText} label="Sticky" />
           <ToolButton active={tool === "lasso"} onClick={() => setTool("lasso")} icon={LassoSelect} label="Lasso (L)" />
           
           <div className="w-[1px] h-8 bg-slate-200 dark:bg-slate-700/50 mx-1"></div>
           
           <ToolButton active={tool === "eraser"} onClick={() => setTool("eraser")} icon={Eraser} label="Eraser (E)" />
+          <ToolButton active={tool === "stroke_eraser"} onClick={() => setTool("stroke_eraser")} icon={Layers} label="Stroke Eraser (cross to erase)" extraClass={tool === "stroke_eraser" ? "" : "hover:text-orange-500"} />
 
+          <div className="w-[1px] h-8 bg-slate-200 dark:bg-slate-700/50 mx-1"></div>
 
+          {/* Brush Size Popover */}
+          <div className="relative">
+            <button
+              onClick={() => setShowBrushPopover(!showBrushPopover)}
+              title="Brush Size"
+              className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${showBrushPopover ? 'bg-slate-900 dark:bg-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+            >
+              <div
+                className={`rounded-full ${showBrushPopover ? 'bg-white dark:bg-slate-900' : 'bg-slate-700 dark:bg-slate-300'}`}
+                style={{ width: `${Math.min(22, Math.max(4, brushSize))}px`, height: `${Math.min(22, Math.max(4, brushSize))}px` }}
+              />
+            </button>
+            <AnimatePresence>
+              {showBrushPopover && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                  className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 dark:bg-slate-900 bg-white border border-slate-200 dark:border-slate-700 rounded-2xl p-3 shadow-2xl flex items-end gap-3 z-50"
+                >
+                  {[2, 4, 8, 14, 24, 36].map(sz => (
+                    <button key={sz} onClick={() => { setBrushSize(sz); setShowBrushPopover(false); }}
+                      className={`flex flex-col items-center gap-1 transition-all ${brushSize === sz ? 'scale-110 opacity-100' : 'opacity-40 hover:opacity-100'}`}
+                    >
+                      <div className="bg-slate-800 dark:bg-slate-200 rounded-full" style={{ width: `${Math.min(22, Math.max(4, sz / 1.5))}px`, height: `${Math.min(22, Math.max(4, sz / 1.5))}px` }} />
+                      <span className="text-[9px] font-mono dark:text-slate-400 text-slate-600">{sz}</span>
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           <button onClick={handleUndo} disabled={historyStep <= 0} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl disabled:opacity-40">
             <Undo2 className="w-5 h-5 dark:text-slate-300 text-slate-700" />
@@ -1793,6 +2227,7 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
 
         </div>
       </div>
+
 
       {/* Hidden File Input for PDF Import */}
       <input
@@ -1837,15 +2272,36 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
                       style={{ backgroundColor: c }}
                     />
                   ))}
+                  {/* Custom Color Picker */}
+                  <label className="relative w-8 h-8 rounded-full overflow-hidden cursor-pointer hover:scale-110 transition-all shadow-sm border-2 border-dashed border-slate-300 dark:border-slate-600 flex items-center justify-center" title="Custom Color">
+                    <div className="w-full h-full rounded-full" style={{ backgroundColor: color }} />
+                    <span className="absolute text-[8px] font-bold text-white mix-blend-difference">+</span>
+                    <input
+                      type="color"
+                      value={color}
+                      onChange={(e) => { setColor(e.target.value); if (selectedStrokeIds.length > 0) recolorSelectedStrokes(e.target.value); }}
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    />
+                  </label>
                 </div>
                 
-                <label className="flex items-center gap-2 cursor-pointer group">
-                  <div className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors border ${fillShapes ? "bg-indigo-500 border-indigo-500" : "bg-transparent border-slate-300 dark:border-slate-700"}`}>
-                    {fillShapes && <Check className="w-3.5 h-3.5 text-white" />}
-                  </div>
-                  <input type="checkbox" className="hidden" checked={fillShapes} onChange={(e) => setFillShapes(e.target.checked)} />
-                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Fill Shapes</span>
-                </label>
+                <div className="flex flex-col gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <div className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors border ${fillShapes ? "bg-indigo-500 border-indigo-500" : "bg-transparent border-slate-300 dark:border-slate-700"}`}>
+                      {fillShapes && <Check className="w-3.5 h-3.5 text-white" />}
+                    </div>
+                    <input type="checkbox" className="hidden" checked={fillShapes} onChange={(e) => setFillShapes(e.target.checked)} />
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Fill Shapes (F)</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <div className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors border ${snapToGrid ? "bg-indigo-500 border-indigo-500" : "bg-transparent border-slate-300 dark:border-slate-700"}`}>
+                      {snapToGrid && <Check className="w-3.5 h-3.5 text-white" />}
+                    </div>
+                    <input type="checkbox" className="hidden" checked={snapToGrid} onChange={(e) => setSnapToGrid(e.target.checked)} />
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Snap to Grid (G)</span>
+                  </label>
+                </div>
               </div>
 
               {/* Thickness */}
@@ -1869,6 +2325,22 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
                       <div className="bg-slate-800 dark:bg-slate-200 rounded-full" style={{ width: `${Math.min(14, Math.max(4, sz / 1.5))}px`, height: `${Math.min(14, Math.max(4, sz / 1.5))}px` }} />
                     </button>
                   ))}
+                </div>
+              </div>
+
+              {/* Opacity */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Opacity</h3>
+                  <span className="font-mono text-xs dark:text-indigo-400 text-indigo-600 font-bold">{strokeOpacity}%</span>
+                </div>
+                <input
+                  type="range" min="10" max="100" value={strokeOpacity}
+                  onChange={(e) => setStrokeOpacity(Number(e.target.value))}
+                  className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                />
+                <div className="flex justify-between text-[10px] font-mono dark:text-slate-500 text-slate-400 mt-1 px-0.5">
+                  <span>Ghost</span><span>Full</span>
                 </div>
               </div>
 
@@ -1935,28 +2407,54 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
         )}
       </AnimatePresence>
 
-      {/* AI Solution Side Panel */}
+      {/* AI Solution Side Panel — improved */}
       <AnimatePresence>
         {aiSolution && (
           <motion.div
             initial={{ opacity: 0, x: 300 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 300 }}
-            className="absolute top-20 right-6 w-96 max-h-[80vh] overflow-y-auto z-50 dark:bg-slate-900/95 bg-slate-200/95 border border-indigo-500/40 rounded-3xl p-5 shadow-2xl backdrop-blur-2xl dark:text-slate-100 text-slate-900"
+            className="absolute top-20 right-6 w-[400px] max-h-[78vh] overflow-hidden z-50 dark:bg-slate-900/98 bg-white border border-indigo-500/30 rounded-3xl shadow-2xl backdrop-blur-2xl dark:text-slate-100 text-slate-900 flex flex-col"
           >
-            <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-800">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 pb-3 border-b border-slate-200 dark:border-slate-800 shrink-0">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-indigo-600 rounded-xl text-white">
+                <div className="p-1.5 bg-gradient-to-tr from-indigo-600 to-cyan-500 rounded-xl text-white">
                   <Calculator className="w-4 h-4" />
                 </div>
-                <h3 className="text-sm font-bold">AI Math & Science Solution</h3>
+                <div>
+                  <h3 className="text-sm font-bold">AI Math & Science Solution</h3>
+                  <p className="text-[10px] dark:text-slate-400 text-slate-500">Powered by Gemini Vision</p>
+                </div>
               </div>
-              <button onClick={() => setAiSolution(null)} className="p-1 hover:bg-slate-800 rounded-lg dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900">
-                <X className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => navigator.clipboard.writeText(aiSolution || '').then(() => showToast('Solution copied! 📋'))}
+                  className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg dark:text-slate-400 text-slate-600 transition-all"
+                  title="Copy Solution"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                </button>
+                <button onClick={() => setAiSolution(null)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg dark:text-slate-400 text-slate-600 transition-all">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-            <div className="text-xs dark:text-slate-300 text-slate-700 whitespace-pre-line leading-relaxed font-sans">
+            {/* Solution content */}
+            <div className="flex-1 overflow-y-auto p-4 text-xs dark:text-slate-300 text-slate-700 whitespace-pre-line leading-relaxed font-sans custom-scrollbar">
               {aiSolution}
+            </div>
+            {/* Footer */}
+            <div className="px-4 py-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+              <button
+                onClick={solveWhiteboardWithAI}
+                disabled={solvingAI}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all"
+              >
+                {solvingAI ? <Sparkles className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                {solvingAI ? 'Re-solving...' : 'Re-solve'}
+              </button>
+              <span className="text-[10px] dark:text-slate-500 text-slate-400">Draw more & re-solve to update</span>
             </div>
           </motion.div>
         )}
@@ -2013,6 +2511,22 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
                   <Layers className="w-5 h-5 dark:text-pink-400 text-pink-700 mb-2 group-hover:scale-110 transition-transform" />
                   <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">Venn Diagram</h4>
                   <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">Two overlapping set circles</p>
+                </button>
+                <button
+                  onClick={() => insertPresetDiagram("number_line")}
+                  className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
+                >
+                  <Minus className="w-5 h-5 dark:text-green-400 text-green-700 mb-2 group-hover:scale-110 transition-transform" />
+                  <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">Number Line</h4>
+                  <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">Labeled number line -3 to +3</p>
+                </button>
+                <button
+                  onClick={() => insertPresetDiagram("right_triangle")}
+                  className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
+                >
+                  <Triangle className="w-5 h-5 dark:text-yellow-400 text-yellow-600 mb-2 group-hover:scale-110 transition-transform" />
+                  <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">Pythagoras Triangle</h4>
+                  <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">Right-angle triangle with a² + b² = c²</p>
                 </button>
               </div>
             </motion.div>

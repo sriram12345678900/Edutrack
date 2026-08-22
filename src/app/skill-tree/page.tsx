@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   GitFork, Lock, CheckCircle2, Zap, Trophy, Sparkles, BookOpen, 
@@ -9,6 +9,20 @@ import {
 import Link from "next/link";
 import { awardXp } from "@/lib/xp";
 import { cn } from "@/lib/utils";
+import katex from "katex";
+import "katex/dist/katex.min.css";
+
+const MathEquation = ({ formula, displayMode = false }: { formula: string; displayMode?: boolean }) => {
+  try {
+    const html = katex.renderToString(formula, {
+      throwOnError: false,
+      displayMode,
+    });
+    return <span dangerouslySetInnerHTML={{ __html: html }} className="math-equation" />;
+  } catch (e) {
+    return <span className="font-mono">{formula}</span>;
+  }
+};
 
 interface SkillNode {
   id: string;
@@ -44,8 +58,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "mastered",
         xpReward: 100,
         icon: "🪞",
-        description: "Laws of reflection, concave & convex spherical mirrors, mirror formula and sign conventions.",
-        keyFormulas: ["1/f = 1/v + 1/u", "m = -v/u = h_i / h_o"],
+        description: "Explore Fermat's Principle and the laws of reflection. Master ray tracing, Cartesian sign conventions, and focal lengths for concave and convex spherical mirrors to solve board numericals.",
+        keyFormulas: ["\\frac{1}{f} = \\frac{1}{v} + \\frac{1}{u}", "m = -\\frac{v}{u} = \\frac{h_i}{h_o}"],
         studyLink: "/learn/science/light-reflection-refraction"
       },
       {
@@ -56,8 +70,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "mastered",
         xpReward: 150,
         icon: "🔍",
-        description: "Snell's law, refractive index, lens formula, power of lenses in dioptres.",
-        keyFormulas: ["1/f = 1/v - 1/u", "n_21 = v_1 / v_2", "P = 1/f (m)"],
+        description: "Understand Snell's Law and the optical density of media. Discover how light bends across interfaces, and calculate the focal lengths and dioptre power of thin spherical lenses.",
+        keyFormulas: ["\\frac{1}{f} = \\frac{1}{v} - \\frac{1}{u}", "n_{21} = \\frac{\\sin i}{\\sin r} = \\frac{v_1}{v_2}", "P = \\frac{1}{f\\text{ (in meters)}} = \\text{Dioptres (D)}"],
         studyLink: "/learn/science/light-reflection-refraction"
       },
       {
@@ -68,8 +82,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "mastered",
         xpReward: 100,
         icon: "⚡",
-        description: "Electric charge, potential difference, Ohm's law, resistance factors and resistivity.",
-        keyFormulas: ["I = Q/t", "V = IR", "R = \\rho L / A"],
+        description: "Define electric charge, current flow, and potential difference. Learn Ohm's Law and investigate the micro-factors affecting resistance, including length, area, and material resistivity.",
+        keyFormulas: ["I = \\frac{Q}{t}", "V = I R", "R = \\rho \\frac{L}{A}"],
         studyLink: "/learn/science/electricity"
       },
       {
@@ -80,8 +94,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "unlocked",
         xpReward: 200,
         icon: "🔌",
-        description: "Equivalent resistance in series & parallel circuits, Joule's law of heating, electric power.",
-        keyFormulas: ["R_s = R_1 + R_2", "1/R_p = 1/R_1 + 1/R_2", "H = I^2 R t", "P = VI = I^2 R"],
+        description: "Analyze complex electrical networks. Solve equivalent resistance for series and parallel topologies. Learn Joule's Law of Heating and electric power consumption.",
+        keyFormulas: ["R_s = R_1 + R_2 + R_3", "\\frac{1}{R_p} = \\frac{1}{R_1} + \\frac{1}{R_2} + \\frac{1}{R_3}", "H = I^2 R t", "P = V I = I^2 R = \\frac{V^2}{R}"],
         studyLink: "/learn/science/electricity"
       },
       {
@@ -92,7 +106,7 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "unlocked",
         xpReward: 300,
         icon: "🧲",
-        description: "Magnetic field lines, right-hand thumb rule, solenoid field, Lorentz force on a conductor.",
+        description: "Visualize magnetic field lines and field patterns around straight conductors, loops, and solenoids. Apply the Right-Hand Thumb Rule and evaluate Lorentz force on current-carrying conductors.",
         keyFormulas: ["B = \\mu_0 n I", "F = B I L \\sin\\theta"],
         studyLink: "/learn/science/magnetic-effects-electric-current"
       },
@@ -104,8 +118,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "locked",
         xpReward: 500,
         icon: "⚙️",
-        description: "Faraday's experiments, Fleming's left and right hand rules, AC vs DC generators.",
-        keyFormulas: ["\\mathcal{E} = -d\\Phi_B / dt"],
+        description: "Master electromagnetic induction (EMI) and induced potential difference. Contrast AC vs DC generators, learn Fleming's Left and Right Hand Rules, and understand magnetic flux dynamics.",
+        keyFormulas: ["\\mathcal{E} = -\\frac{d\\Phi_B}{dt}"],
         studyLink: "/learn/science/magnetic-effects-electric-current"
       }
     ]
@@ -123,8 +137,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "mastered",
         xpReward: 100,
         icon: "🧪",
-        description: "Types of reactions (Combination, Decomposition, Displacement, Redox), balancing by hit & trial.",
-        keyFormulas: ["Law of Conservation of Mass"],
+        description: "Apply the Law of Conservation of Mass to balance chemical equations. Identify combination, decomposition, displacement, double displacement, and redox (oxidation-reduction) reactions.",
+        keyFormulas: ["\\text{Reactants} \\rightarrow \\text{Products}", "\\sum \\text{Mass}_{\\text{reactants}} = \\sum \\text{Mass}_{\\text{products}}"],
         studyLink: "/learn/science/chemical-reactions-equations"
       },
       {
@@ -135,8 +149,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "mastered",
         xpReward: 150,
         icon: "🍋",
-        description: "Neutralisation reactions, indicators, pH scale calculation, salts in everyday life.",
-        keyFormulas: ["\\text{Acid} + \\text{Base} \\rightarrow \\text{Salt} + \\text{H}_2\\text{O}", "\\text{pH} = -\\log[H^+]"],
+        description: "Investigate Arrhenius acids and bases, chemical indicators, and salt families. Understand the logarithmic pH scale and its daily application in physiology, digestive health, and agriculture.",
+        keyFormulas: ["\\text{Acid} + \\text{Base} \\rightarrow \\text{Salt} + \\text{H}_2\\text{O}", "\\text{pH} = -\\log_{10}[\\text{H}^+]"],
         studyLink: "/learn/science/acids-bases-salts"
       },
       {
@@ -147,8 +161,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "unlocked",
         xpReward: 200,
         icon: "🪙",
-        description: "Physical & chemical properties of metals, reactivity series, extraction and metallurgy roasting/calcination.",
-        keyFormulas: ["\\text{K} > \\text{Na} > \\text{Ca} > \\text{Mg} > \\text{Al} > \\text{Zn}"],
+        description: "Distinguish physical and chemical properties of metals and non-metals. Use the reactivity series to predict displacement reactions, and master metallurgical extraction (calcination vs. roasting).",
+        keyFormulas: ["\\text{K} > \\text{Na} > \\text{Ca} > \\text{Mg} > \\text{Al} > \\text{Zn} > \\text{Fe} > \\text{Pb} > [\\text{H}] > \\text{Cu} > \\text{Ag} > \\text{Au}"],
         studyLink: "/learn/science/metals-non-metals"
       },
       {
@@ -159,8 +173,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "unlocked",
         xpReward: 350,
         icon: "💎",
-        description: "Tetravalency, catenation, homologous series, functional groups (alcohols, aldehydes, carboxylic acids).",
-        keyFormulas: ["\\text{C}_n\\text{H}_{2n+2} (\\text{Alkane})", "\\text{C}_n\\text{H}_{2n} (\\text{Alkene})"],
+        description: "Explore carbon's versatile nature: tetravalency and catenation. Study covalent bonding, homologous series, functional groups (alcohols, aldehydes, ketones, carboxylic acids), and IUPAC rules.",
+        keyFormulas: ["\\text{C}_n\\text{H}_{2n+2}\\text{ (Alkane)}", "\\text{C}_n\\text{H}_{2n}\\text{ (Alkene)}", "\\text{C}_n\\text{H}_{2n-2}\\text{ (Alkyne)}"],
         studyLink: "/learn/science/carbon-compounds"
       },
       {
@@ -171,8 +185,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "locked",
         xpReward: 500,
         icon: "🧬",
-        description: "Esterification, saponification, addition & substitution reactions, soaps and detergents.",
-        keyFormulas: ["\\text{RCOOH} + \\text{R'OH} \\rightarrow \\text{RCOOR'} + \\text{H}_2\\text{O}"],
+        description: "Learn major organic transformations: esterification, saponification, oxidation, addition, and substitution. Understand the micelle structure and cleansing action of soaps and synthetic detergents.",
+        keyFormulas: ["\\text{RCOOH} + \\text{R'OH} \\xrightarrow{\\text{Acid}} \\text{RCOOR'} + \\text{H}_2\\text{O}", "\\text{Fat} + 3\\text{NaOH} \\rightarrow \\text{Glycerol} + 3\\text{Soap (RCOO}^-\\text{Na}^+)"],
         studyLink: "/learn/science/carbon-compounds"
       }
     ]
@@ -190,8 +204,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "mastered",
         xpReward: 100,
         icon: "🌱",
-        description: "Autotrophic vs heterotrophic nutrition, light and dark reactions of photosynthesis, digestive enzymes.",
-        keyFormulas: ["6\\text{CO}_2 + 6\\text{H}_2\\text{O} \\rightarrow \\text{C}_6\\text{H}_{12}\\text{O}_6 + 6\\text{O}_2"],
+        description: "Detail autotrophic (chlorophyll-mediated light and dark reactions) and heterotrophic nutrition. Walk through human ingestion, digestion by salivary/gastric/pancreatic enzymes, absorption, and assimilation.",
+        keyFormulas: ["6\\text{CO}_2 + 12\\text{H}_2\\text{O} \\xrightarrow[\\text{Chlorophyll}]{\\text{Sunlight}} \\text{C}_6\\text{H}_{12}\\text{O}_6 + 6\\text{O}_2 + 6\\text{H}_2\\text{O}"],
         studyLink: "/learn/science/life-processes"
       },
       {
@@ -202,8 +216,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "mastered",
         xpReward: 150,
         icon: "🫁",
-        description: "Aerobic vs anaerobic glycolysis, ATP production, alveoli structure and gas exchange.",
-        keyFormulas: ["\\text{Glucose} \\rightarrow \\text{Pyruvate} \\rightarrow 38 \\text{ ATP}"],
+        description: "Contrast aerobic and anaerobic respiration pathways. Track glycolysis in the cytoplasm, fermentation in yeast/muscle, and the Krebs cycle in mitochondria producing high ATP yields.",
+        keyFormulas: ["\\text{Glucose} \\xrightarrow{\\text{Glycolysis}} \\text{Pyruvate} \\xrightarrow{\\text{Aerobic Respiration}} 36\\text{-}38\\text{ ATP}"],
         studyLink: "/learn/science/life-processes"
       },
       {
@@ -214,8 +228,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "unlocked",
         xpReward: 250,
         icon: "❤️",
-        description: "Double circulation in human heart, blood vessels, nephron structure and urine formation.",
-        keyFormulas: ["\\text{Glomerular Filtration} \\rightarrow \\text{Selective Reabsorption}"],
+        description: "Understand the human heart's double circulation and systemic capillary exchange. Trace the nephron's role in ultrafiltration (Glomerulus/Bowman's) and selective reabsorption (PCT/Henle/DCT).",
+        keyFormulas: ["\\text{Urine Output} = \\text{Glomerular Filtration} - \\text{Selective Reabsorption} + \\text{Active Secretion}"],
         studyLink: "/learn/science/life-processes"
       },
       {
@@ -226,8 +240,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "locked",
         xpReward: 400,
         icon: "🧬",
-        description: "Monohybrid and dihybrid crosses, law of segregation, law of independent assortment, sex determination.",
-        keyFormulas: ["9:3:3:1 \\text{ Phenotypic Ratio}"],
+        description: "Master genetic inheritance. Trace Mendel's monohybrid and dihybrid crosses to explain the Law of Dominance, Law of Segregation, and Law of Independent Assortment. Learn sex determination in humans.",
+        keyFormulas: ["\\text{Monohybrid Phenotypic Ratio} = 3 : 1", "\\text{Dihybrid Phenotypic Ratio} = 9 : 3 : 3 : 1"],
         studyLink: "/learn/science/heredity-evolution"
       }
     ]
@@ -245,8 +259,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "mastered",
         xpReward: 100,
         icon: "🔢",
-        description: "Fundamental Theorem of Arithmetic, irrationality proofs for √2, √3, √5, terminating decimal expansions.",
-        keyFormulas: ["\\text{HCF}(a,b) \\times \\text{LCM}(a,b) = a \\times b"],
+        description: "Explore the Fundamental Theorem of Arithmetic. Learn Euclid's Division Lemma/Algorithm, prove the irrationality of numbers (like √2, √3, √5), and analyze decimal expansions.",
+        keyFormulas: ["a = b q + r \\quad (0 \\le r < b)", "\\text{HCF}(a,b) \\times \\text{LCM}(a,b) = a \\cdot b"],
         studyLink: "/learn/maths/real-numbers"
       },
       {
@@ -257,8 +271,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "mastered",
         xpReward: 150,
         icon: "📈",
-        description: "Relationship between zeroes and coefficients, quadratic formula, nature of roots (D > 0, D = 0, D < 0).",
-        keyFormulas: ["x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}", "\\alpha + \\beta = -b/a, \\quad \\alpha\\beta = c/a"],
+        description: "Connect polynomial zeroes with coefficients. Solve quadratic equations using factorization and the quadratic formula, and evaluate the nature of roots using the discriminant D.",
+        keyFormulas: ["x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}", "\\alpha + \\beta = -\\frac{b}{a}, \\quad \\alpha\\beta = \\frac{c}{a}"],
         studyLink: "/learn/maths/quadratic-equations"
       },
       {
@@ -269,8 +283,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "unlocked",
         xpReward: 300,
         icon: "📐",
-        description: "Trigonometric ratios, values at standard angles (0°, 30°, 45°, 60°, 90°), fundamental Pythagorean identities.",
-        keyFormulas: ["\\sin^2\\theta + \\cos^2\\theta = 1", "1 + \\tan^2\\theta = \\sec^2\\theta"],
+        description: "Define six trigonometric ratios. Memorize standard values at 0°, 30°, 45°, 60°, and 90°, and apply Pythagorean identities to prove complex trigonometric relations.",
+        keyFormulas: ["\\sin^2\\theta + \\cos^2\\theta = 1", "1 + \\tan^2\\theta = \\sec^2\\theta", "1 + \\cot^2\\theta = \\csc^2\\theta"],
         studyLink: "/learn/maths/introduction-to-trigonometry"
       },
       {
@@ -281,8 +295,8 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
         status: "locked",
         xpReward: 450,
         icon: "🏔️",
-        description: "Angle of elevation and depression, line of sight, solving multi-triangle real-world surveying problems.",
-        keyFormulas: ["\\tan\\theta = \\text{Opposite} / \\text{Adjacent}"],
+        description: "Apply trigonometry to real-world scenarios. Draw diagrams representing line of sight, angle of elevation, and angle of depression to calculate heights of towers, mountains, and width of rivers.",
+        keyFormulas: ["\\tan\\theta = \\frac{\\text{Height (Opposite)}}{\\text{Distance (Adjacent)}}"],
         studyLink: "/learn/maths/some-applications-of-trigonometry"
       }
     ]
@@ -486,8 +500,8 @@ export default function SkillTreePage() {
                   <span className="text-xs font-bold text-slate-400">Core Formulas & Principles</span>
                   <div className="space-y-1.5">
                     {activeNode.keyFormulas.map((f, i) => (
-                      <div key={i} className="p-2.5 bg-slate-950 rounded-xl border border-slate-800 font-mono text-xs text-indigo-300">
-                        {f}
+                      <div key={i} className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-center min-h-[48px] text-sm text-indigo-300 overflow-x-auto">
+                        <MathEquation formula={f} displayMode={true} />
                       </div>
                     ))}
                   </div>

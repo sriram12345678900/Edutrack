@@ -21,6 +21,8 @@ import {
 } from '@/lib/chemistry-elements-data';
 import CircuitLab from '@/components/sandbox/CircuitLab';
 import BiologyLab from '@/components/sandbox/BiologyLab';
+import ProjectileLab from '@/components/sandbox/ProjectileLab';
+import TitrationLab from '@/components/sandbox/TitrationLab';
 import { Heart } from 'lucide-react';
 
 import { 
@@ -145,8 +147,18 @@ function calculateOptics(type: OpticElementType, fMag: number, uMag: number, ho:
 //  MAIN VIRTUAL SCIENCE SANDBOX PAGE
 // ==========================================
 export default function SandboxPage() {
-  const [activeTab, setActiveTab] = useState<'chemistry' | 'periodictable' | 'compendium' | 'optics' | 'circuits' | 'biology'>('chemistry');
+  const [activeTab, setActiveTab] = useState<'chemistry' | 'periodictable' | 'compendium' | 'titration' | 'optics' | 'circuits' | 'projectile' | 'biology'>('chemistry');
   const [soundEnabled, setSoundEnabled] = useState(true);
+
+  const activeSubject = useMemo(() => {
+    if (activeTab === 'chemistry' || activeTab === 'periodictable' || activeTab === 'compendium' || activeTab === 'titration') {
+      return 'chemistry';
+    }
+    if (activeTab === 'optics' || activeTab === 'circuits' || activeTab === 'projectile') {
+      return 'physics';
+    }
+    return 'biology';
+  }, [activeTab]);
 
   // ------------------------------------------
   // Virtual Chemistry Lab States
@@ -398,55 +410,37 @@ export default function SandboxPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
-          {/* Main Mode Navigation Bar */}
-          <div className="flex p-1 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md overflow-x-auto max-w-full">
+          {/* Subject Navigation Bar */}
+          <div className="flex p-1 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md overflow-x-auto max-w-full gap-0.5">
             <button
               onClick={() => setActiveTab('chemistry')}
               className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${
-                activeTab === 'chemistry' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white'
+                activeSubject === 'chemistry'
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Beaker className="w-3.5 h-3.5 text-orange-400" /> Virtual Lab
-            </button>
-            <button
-              onClick={() => setActiveTab('periodictable')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${
-                activeTab === 'periodictable' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <Atom className="w-3.5 h-3.5 text-cyan-400" /> Periodic Table 118
-            </button>
-            <button
-              onClick={() => setActiveTab('compendium')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${
-                activeTab === 'compendium' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <BookOpen className="w-3.5 h-3.5 text-emerald-400" /> Reactions Compendium
+              <Beaker className="w-3.5 h-3.5 text-orange-400" /> Chemistry
             </button>
             <button
               onClick={() => setActiveTab('optics')}
               className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${
-                activeTab === 'optics' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white'
+                activeSubject === 'physics'
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Eye className="w-3.5 h-3.5 text-pink-400" /> Optics Ray Lab
-            </button>
-            <button
-              onClick={() => setActiveTab('circuits')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${
-                activeTab === 'circuits' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <Zap className="w-3.5 h-3.5 text-amber-400" /> Circuit Builder
+              <Zap className="w-3.5 h-3.5 text-amber-400" /> Physics
             </button>
             <button
               onClick={() => setActiveTab('biology')}
               className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${
-                activeTab === 'biology' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white'
+                activeSubject === 'biology'
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Heart className="w-3.5 h-3.5 text-emerald-400" /> Biology Explorer
+              <Heart className="w-3.5 h-3.5 text-emerald-400" /> Biology
             </button>
           </div>
 
@@ -464,6 +458,92 @@ export default function SandboxPage() {
           </Link>
         </div>
       </header>
+
+      {/* Secondary Sub-Tabs for Chemistry and Physics */}
+      {activeSubject !== 'biology' && (
+        <div className="max-w-7xl mx-auto flex justify-start mb-6 relative z-10">
+          <div className="flex p-1 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md overflow-x-auto max-w-full gap-1">
+            {activeSubject === 'chemistry' && (
+              <>
+                <button
+                  onClick={() => setActiveTab('chemistry')}
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                    activeTab === 'chemistry'
+                      ? 'bg-indigo-600/80 text-white shadow-sm'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  Beaker Workbench
+                </button>
+                <button
+                  onClick={() => setActiveTab('periodictable')}
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                    activeTab === 'periodictable'
+                      ? 'bg-indigo-600/80 text-white shadow-sm'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  Periodic Table
+                </button>
+                <button
+                  onClick={() => setActiveTab('compendium')}
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                    activeTab === 'compendium'
+                      ? 'bg-indigo-600/80 text-white shadow-sm'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  Reactions Compendium
+                </button>
+                <button
+                  onClick={() => setActiveTab('titration')}
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                    activeTab === 'titration'
+                      ? 'bg-indigo-600/80 text-white shadow-sm'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  Acid-Base Titration
+                </button>
+              </>
+            )}
+            {activeSubject === 'physics' && (
+              <>
+                <button
+                  onClick={() => setActiveTab('optics')}
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                    activeTab === 'optics'
+                      ? 'bg-pink-600/80 text-white shadow-sm'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  Ray Optics Lab
+                </button>
+                <button
+                  onClick={() => setActiveTab('circuits')}
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                    activeTab === 'circuits'
+                      ? 'bg-pink-600/80 text-white shadow-sm'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  Electric Circuit Builder
+                </button>
+                <button
+                  onClick={() => setActiveTab('projectile')}
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                    activeTab === 'projectile'
+                      ? 'bg-pink-600/80 text-white shadow-sm'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  Projectile Launcher
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ───────────────────────────────────────────────────────────── */}
       {/*  TAB 1: VIRTUAL CHEMISTRY LAB & MOLECULAR REACTION WORKBENCH  */}
@@ -1592,6 +1672,24 @@ export default function SandboxPage() {
       {activeTab === 'biology' && (
         <main className="max-w-7xl mx-auto">
           <BiologyLab />
+        </main>
+      )}
+
+      {/* ───────────────────────────────────────────────────────────── */}
+      {/*  TAB 7: ACID-BASE TITRATION LAB                               */}
+      {/* ───────────────────────────────────────────────────────────── */}
+      {activeTab === 'titration' && (
+        <main className="max-w-7xl mx-auto">
+          <TitrationLab />
+        </main>
+      )}
+
+      {/* ───────────────────────────────────────────────────────────── */}
+      {/*  TAB 8: PROJECTILE LAUNCHER LAB                               */}
+      {/* ───────────────────────────────────────────────────────────── */}
+      {activeTab === 'projectile' && (
+        <main className="max-w-7xl mx-auto">
+          <ProjectileLab />
         </main>
       )}
 

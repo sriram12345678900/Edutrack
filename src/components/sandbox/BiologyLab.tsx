@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Confetti from "@/components/Confetti";
 import { awardUserXP } from "@/lib/xp";
 
-type LabSpecimen = "heart" | "nephron" | "microscope" | "stomata";
+type LabSpecimen = "heart" | "nephron" | "microscope" | "stomata" | "photosynthesis";
 type CellType = "plant" | "animal";
 type StainType = "none" | "iodine" | "methylene" | "safranin";
 
@@ -214,11 +214,13 @@ export default function BiologyLab() {
   const [isCardiacBeating, setIsCardiacBeating] = useState<boolean>(true);
   const [cardiacCyclePhase, setCardiacCyclePhase] = useState<"systole" | "diastole">("systole");
   const [ecgPoints, setEcgPoints] = useState<number[]>([]);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // Nephron Simulator States
   const [bloodPressure, setBloodPressure] = useState<number>(120);
   const [adhHormoneActive, setAdhHormoneActive] = useState<boolean>(true);
   const [glucoseFilterActive, setGlucoseFilterActive] = useState<boolean>(true);
+  const [glucoseOverload, setGlucoseOverload] = useState<boolean>(false);
 
   // Microscope Simulator States
   const [cellType, setCellType] = useState<CellType>("plant");
@@ -226,11 +228,22 @@ export default function BiologyLab() {
   const [magnification, setMagnification] = useState<number>(40);
   const [focusKnob, setFocusKnob] = useState<number>(50); // 50 = perfect focus
   const [illumination, setIllumination] = useState<number>(85);
+  const [selectedOrganelle, setSelectedOrganelle] = useState<string | null>(null);
 
   // Stomata Simulator States
   const [isStomaOpen, setIsStomaOpen] = useState<boolean>(true);
   const [lightLux, setLightLux] = useState<number>(75);
   const [co2Ppm, setCo2Ppm] = useState<number>(420);
+  const [temperature, setTemperature] = useState<number>(25);
+  const [windSpeed, setWindSpeed] = useState<number>(3);
+
+  // Photosynthesis Simulator States
+  const [photoLightWavelength, setPhotoLightWavelength] = useState<"white" | "red" | "blue" | "green">("white");
+  const [photoLightIntensity, setPhotoLightIntensity] = useState<number>(100);
+  const [photoCo2, setPhotoCo2] = useState<number>(400);
+  const [photoTemp, setPhotoTemp] = useState<number>(25);
+  const [starchTestBoiled, setStarchTestBoiled] = useState<boolean>(false);
+  const [starchTestIodineAdded, setStarchTestIodineAdded] = useState<boolean>(false);
 
   // Gamification & Quiz
   const [quizActive, setQuizActive] = useState<boolean>(false);
@@ -273,6 +286,29 @@ export default function BiologyLab() {
     } catch {}
   };
 
+  const playSynthSound = (frequency: number, duration: number, type: OscillatorType = "sine") => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!audioCtxRef.current) audioCtxRef.current = new AudioCtx();
+      const ctx = audioCtxRef.current;
+      if (ctx.state === "suspended") ctx.resume();
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + duration);
+    } catch {}
+  };
+
   // Cardiac Loop Simulation
   useEffect(() => {
     if (!isCardiacBeating) return;
@@ -295,10 +331,194 @@ export default function BiologyLab() {
     return () => clearInterval(interval);
   }, [heartBpm, isHeartSoundOn, isCardiacBeating]);
 
+  // EKG Canvas Rendering Effect
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animationId: number;
+    const width = canvas.width;
+    const height = canvas.height;
+    const centerY = height / 2;
+    const points: number[] = new Array(width).fill(centerY);
+
+    const render = () => {
+      const beatDurationMs = (60 / heartBpm) * 1000;
+      const now = Date.now();
+      const cycleTime = now % beatDurationMs;
+      const t = cycleTime / beatDurationMs; // 0 to 1
+
+      // Calculate ECG amplitude at phase t
+      let amp = 0;
+      if (t >= 0.05 && t < 0.15) {
+        // P Wave (atrial depolarization)
+        amp = 0.12 * Math.sin(((t - 0.05) / 0.1) * Math.PI);
+      } else if (t >= 0.19 && t < 0.21) {
+        // Q Wave
+        amp = -0.1 * Math.sin(((t - 0.19) / 0.02) * Math.PI);
+      } else if (t >= 0.21 && t < 0.25) {
+        // R Wave (ventricular depolarization peak)
+        amp = 0.95 * Math.sin(((t - 0.21) / 0.04) * Math.PI);
+      } else if (t >= 0.25 && t < 0.27) {
+        // S Wave
+        amp = -0.22 * Math.sin(((t - 0.25) / 0.02) * Math.PI);
+      } else if (t >= 0.35 && t < 0.5) {
+        // T Wave (ventricular repolarization)
+        amp = 0.25 * Math.sin(((t - 0.35) / 0.15) * Math.PI);
+      }
+
+      const yVal = centerY - amp * (height * 0.38);
+
+      points.push(yVal);
+      if (points.length > width) {
+        points.shift();
+      }
+
+      // Draw dark background
+      ctx.fillStyle = "#020617";
+      ctx.fillRect(0, 0, width, height);
+
+      // Draw faint medical grid lines
+      ctx.strokeStyle = "rgba(16, 185, 129, 0.06)";
+      ctx.lineWidth = 1;
+      for (let gX = 0; gX < width; gX += 20) {
+        ctx.beginPath();
+        ctx.moveTo(gX, 0);
+        ctx.lineTo(gX, height);
+        ctx.stroke();
+      }
+      for (let gY = 0; gY < height; gY += 20) {
+        ctx.beginPath();
+        ctx.moveTo(0, gY);
+        ctx.lineTo(width, gY);
+        ctx.stroke();
+      }
+
+      // Draw EKG green wave line
+      ctx.strokeStyle = "#10b981";
+      ctx.shadowColor = "#10b981";
+      ctx.shadowBlur = 3;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, points[0]);
+      for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(i, points[i]);
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0; // reset
+
+      animationId = requestAnimationFrame(render);
+    };
+
+    if (isCardiacBeating) {
+      render();
+    } else {
+      // Flatline
+      ctx.fillStyle = "#020617";
+      ctx.fillRect(0, 0, width, height);
+      ctx.strokeStyle = "rgba(16, 185, 129, 0.06)";
+      ctx.lineWidth = 1;
+      for (let gX = 0; gX < width; gX += 20) {
+        ctx.beginPath();
+        ctx.moveTo(gX, 0);
+        ctx.lineTo(gX, height);
+        ctx.stroke();
+      }
+      for (let gY = 0; gY < height; gY += 20) {
+        ctx.beginPath();
+        ctx.moveTo(0, gY);
+        ctx.lineTo(width, gY);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = "#ef4444"; // Red flatline
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(0, centerY);
+      ctx.lineTo(width, centerY);
+      ctx.stroke();
+    }
+
+    return () => cancelAnimationFrame(animationId);
+  }, [heartBpm, isCardiacBeating]);
+
   const handleSelectLab = (selected: LabSpecimen) => {
     setLab(selected);
+    setSelectedOrganelle(null);
     if (selected === "heart") setActiveHotspot(HEART_HOTSPOTS[0]);
     else if (selected === "nephron") setActiveHotspot(NEPHRON_HOTSPOTS[0]);
+  };
+
+  const getOrganelleDetails = (cell: CellType, id: string) => {
+    if (cell === "plant") {
+      switch (id) {
+        case "cell_wall":
+          return {
+            name: "Cell Wall",
+            category: "Structure",
+            functionText: "A rigid, protective outer layer made of cellulose. It provides structural support, shapes the plant cell, and maintains turgidity.",
+            cbseTip: "High-Yield Board Question: Exclusive to plants, fungi, and bacteria. The cell wall prevents cell lysis (bursting) when placed in a hypotonic solution by exerting an equal counter-pressure (wall pressure) against turgor pressure.",
+          };
+        case "vacuole":
+          return {
+            name: "Large Central Vacuole",
+            category: "Osmoregulation & Storage",
+            functionText: "Occupies up to 90% of the cell volume, filled with cell sap. It stores salts, sugars, amino acids, and metabolic wastes while maintaining the cell's turgidity.",
+            cbseTip: "Anatomical Difference: Because of its massive size, it pushes the cytoplasm and nucleus to the peripheral edge. Animal cells either lack vacuoles or have small, temporary ones.",
+          };
+        case "nucleus":
+          return {
+            name: "Nucleus (Peripheral)",
+            category: "Genetic Control Center",
+            functionText: "The coordinate center containing chromosomes and genetic DNA. It controls cell metabolism, protein synthesis, and division.",
+            cbseTip: "Practical Exam Note: Stains heavily with Iodine/Safranin, making it stand out as a dark circular body pushed against the cell wall boundary.",
+          };
+        case "chloroplast":
+          return {
+            name: "Chloroplast (Plastid)",
+            category: "Photosynthesis Site",
+            functionText: "Double-membraned organelle containing green pigment Chlorophyll. It traps solar energy to synthesize glucose from CO2 and H2O.",
+            cbseTip: "Board Key point: Only found in photosynthetic plant tissues. Contains its own DNA and 70S ribosomes (semi-autonomous). Colored plastids are chromoplasts; white/colorless starch-storing ones are leucoplasts.",
+          };
+        default:
+          return null;
+      }
+    } else {
+      switch (id) {
+        case "plasma_membrane":
+          return {
+            name: "Plasma Membrane",
+            category: "Selectively Permeable Barrier",
+            functionText: "A flexible, dynamic phospholipid bilayer that controls the selective entry and exit of ions, water, and nutrients.",
+            cbseTip: "Active/Passive Transport: Controls osmosis (diffusion of water). When placed in hypertonic saline, animal cells undergo crenation (shriveling) due to lack of a protective cell wall.",
+          };
+        case "nucleus":
+          return {
+            name: "Nucleus (Centric)",
+            category: "Cellular Command Center",
+            functionText: "Houses genetic information in chromatin fibers. Orchestrates all physiological activities of the animal cell.",
+            cbseTip: "Staining Tip: Stained with Methylene Blue. Appears centrally located (centric) since there is no massive central vacuole to displace it.",
+          };
+        case "mitochondria":
+          return {
+            name: "Mitochondria - 'Powerhouse'",
+            category: "ATP Synthesis",
+            functionText: "Sites of aerobic respiration. Contains inner membrane folds (cristae) to maximize the surface area for oxidative phosphorylation.",
+            cbseTip: "Energy Currency: Synthesizes ATP (Adenosine Triphosphate), which the cell uses to perform work. Like chloroplasts, it contains its own circular DNA and ribosomes.",
+          };
+        case "centrosome":
+          return {
+            name: "Centrosome & Centrioles",
+            category: "Spindle Organization",
+            functionText: "Located near the nucleus, organizing microtubules that form spindle fibers during cell division to separate chromosomes.",
+            cbseTip: "Cytological Detail: Present in animal cells to direct cell cleavage, but absent in plant cells, which use polar caps to organize cell division.",
+          };
+        default:
+          return null;
+      }
+    }
   };
 
   const calculateGfr = () => {
@@ -311,6 +531,16 @@ export default function BiologyLab() {
   const calculatePhotosynthesisRate = () => {
     // Blackman's Law
     const rate = Math.round((lightLux / 100) * (co2Ppm / 400) * 85);
+    return Math.min(100, Math.max(5, rate));
+  };
+
+  const calculateTranspirationRate = () => {
+    if (!isStomaOpen) return 3; // Minimal cuticular transpiration
+    // Scales with light, temperature, and wind speed
+    const tempFactor = Math.max(0.4, (temperature - 5) / 25); // 0.4 at 15C, 1.6 at 45C
+    const windFactor = 1 + windSpeed / 10; // 1 at 0m/s, 2.2 at 12m/s
+    const lightFactor = 0.5 + (lightLux / 200); // 0.5 at 0lux, 1.0 at 100lux
+    const rate = Math.round(22 * tempFactor * windFactor * lightFactor);
     return Math.min(100, Math.max(5, rate));
   };
 
@@ -372,6 +602,14 @@ export default function BiologyLab() {
             }`}
           >
             <Wind className="w-3.5 h-3.5" /> 🌿 Stomata Lab
+          </button>
+          <button
+            onClick={() => handleSelectLab("photosynthesis")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shrink-0 ${
+              lab === "photosynthesis" ? "bg-teal-600 text-white shadow-lg shadow-teal-600/30" : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <Sun className="w-3.5 h-3.5 text-amber-300" /> ☀️ Photosynthesis
           </button>
         </div>
       </div>
@@ -445,22 +683,44 @@ export default function BiologyLab() {
                     </linearGradient>
                   </defs>
 
+                  <style dangerouslySetInnerHTML={{__html: `
+                    @keyframes flow-reverse {
+                      to {
+                        stroke-dashoffset: 28;
+                      }
+                    }
+                    .flow-blue {
+                      stroke-dasharray: 6 8;
+                      animation: flow-reverse 1.2s linear infinite;
+                    }
+                    .flow-red {
+                      stroke-dasharray: 6 8;
+                      animation: flow-reverse 1.2s linear infinite;
+                    }
+                  `}} />
+
                   {/* 1. Superior & Inferior Vena Cava (Deox Blue) */}
                   <path d="M 170 30 L 170 140 M 170 280 L 170 360" stroke="#3b82f6" strokeWidth="22" strokeLinecap="round" />
+                  <path d="M 170 30 L 170 140" stroke="#bfdbfe" strokeWidth="3" strokeLinecap="round" className="flow-blue" />
+                  <path d="M 170 360 L 170 280" stroke="#bfdbfe" strokeWidth="3" strokeLinecap="round" className="flow-blue" />
                   <text x="110" y="55" fill="#60a5fa" className="text-[10px] font-black font-mono">Superior Vena Cava</text>
                   <text x="110" y="380" fill="#60a5fa" className="text-[10px] font-black font-mono">Inferior Vena Cava</text>
 
                   {/* 2. Aorta Arch (Ox Red) */}
                   <path d="M 310 160 C 310 40 400 40 400 110 L 400 160" fill="none" stroke="#ef4444" strokeWidth="26" strokeLinecap="round" />
+                  <path d="M 310 160 C 310 40 400 40 400 110 L 400 160" fill="none" stroke="#fecaca" strokeWidth="3" strokeLinecap="round" className="flow-red" />
                   <path d="M 330 50 L 330 20 M 355 42 L 365 15 M 380 48 L 400 20" stroke="#ef4444" strokeWidth="8" strokeLinecap="round" />
                   <text x="360" y="15" fill="#f87171" className="text-[11px] font-black font-mono">Aortic Arch</text>
 
                   {/* 3. Pulmonary Artery Arch (Deox Blue) */}
                   <path d="M 270 160 C 270 70 200 80 140 100" fill="none" stroke="#3b82f6" strokeWidth="20" strokeLinecap="round" />
+                  <path d="M 270 160 C 270 70 200 80 140 100" fill="none" stroke="#bfdbfe" strokeWidth="3" strokeLinecap="round" className="flow-blue" />
                   <text x="70" y="110" fill="#60a5fa" className="text-[10px] font-black font-mono">To Lungs (Pulmonary Artery)</text>
 
                   {/* 4. Pulmonary Veins (Ox Red) */}
                   <path d="M 460 140 L 380 160 M 460 170 L 380 180" stroke="#ef4444" strokeWidth="12" strokeLinecap="round" />
+                  <path d="M 460 140 L 380 160" stroke="#fecaca" strokeWidth="2.5" strokeLinecap="round" className="flow-red" />
+                  <path d="M 460 170 L 380 180" stroke="#fecaca" strokeWidth="2.5" strokeLinecap="round" className="flow-red" />
                   <text x="470" y="155" fill="#f87171" className="text-[10px] font-black font-mono">From Lungs (Pulmonary Veins)</text>
 
                   {/* 5. Right Atrium Outer Wall */}
@@ -518,6 +778,37 @@ export default function BiologyLab() {
                     </motion.button>
                   );
                 })}
+              </div>
+
+              {/* Dynamic Cardiac Cycle Phase Details */}
+              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs my-2">
+                <div>
+                  <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px] block mb-0.5">Active Cardiac Cycle Phase:</span>
+                  <span className={`font-extrabold text-xs px-2 py-0.5 rounded ${cardiacCyclePhase === 'systole' ? 'bg-rose-500/20 text-rose-300' : 'bg-blue-500/20 text-blue-300'}`}>
+                    {cardiacCyclePhase === "systole" 
+                      ? "Systole (Atrial & Ventricular Contraction)" 
+                      : "Joint Diastole (Relaxation & Filling)"}
+                  </span>
+                </div>
+                <div className="text-slate-350 text-[10px] leading-relaxed max-w-full sm:max-w-[65%]">
+                  {cardiacCyclePhase === "systole" 
+                    ? "AV valves snap shut (LUB sound) preventing backflow, while ventricles contract forcefully to pump blood into Aorta & Pulmonary Artery." 
+                    : "Semilunar valves snap shut (DUB sound) preventing reflux, while all four chambers relax to receive blood from body & lungs."}
+                </div>
+              </div>
+
+              {/* Real-time ECG/EKG Monitor */}
+              <div className="space-y-1.5 mb-2">
+                <div className="flex items-center justify-between text-[9px] font-black uppercase text-slate-400 tracking-wider">
+                  <span className="flex items-center gap-1.5">
+                    <span className={`w-2 h-2 rounded-full ${isCardiacBeating ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
+                    Physiological ECG Monitor (Electrocardiogram)
+                  </span>
+                  <span className={isCardiacBeating ? 'text-emerald-400' : 'text-red-400'}>
+                    {isCardiacBeating ? 'ACTIVE MONITORING' : 'HEART STOPPED / FLATLINE'}
+                  </span>
+                </div>
+                <canvas ref={canvasRef} width={600} height={90} className="w-full h-[90px] rounded-2xl bg-slate-950 border border-white/10 shadow-inner block" />
               </div>
 
               {/* Bottom Real-time Telemetry & BPM Slider */}
@@ -694,10 +985,11 @@ export default function BiologyLab() {
               </div>
 
               {/* Nephron Interactive Parameter Controls */}
-              <div className="border-t border-white/10 pt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="border-t border-white/10 pt-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Blood Pressure Slider */}
                 <div className="space-y-1.5">
-                  <div className="flex justify-between text-xs">
-                    <span className="font-bold text-slate-400">Systemic Blood Pressure:</span>
+                  <div className="flex justify-between text-[11px]">
+                    <span className="font-bold text-slate-400">Blood Pressure:</span>
                     <span className="font-mono font-bold text-amber-400">{bloodPressure} mmHg</span>
                   </div>
                   <input
@@ -710,19 +1002,144 @@ export default function BiologyLab() {
                   />
                 </div>
 
+                {/* ADH Hormone Toggle */}
                 <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white/5 border border-white/10">
                   <div>
-                    <div className="text-[11px] font-bold text-white">ADH (Vasopressin) Hormone</div>
-                    <div className="text-[9px] text-slate-400">Controls collecting duct water channels</div>
+                    <div className="text-[11px] font-bold text-white">ADH (Vasopressin)</div>
+                    <div className="text-[9px] text-slate-400">Water reabsorption</div>
                   </div>
                   <button
                     onClick={() => setAdhHormoneActive(!adhHormoneActive)}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                    className={`px-2 py-1 rounded-lg text-[10px] font-black transition-all ${
                       adhHormoneActive ? "bg-emerald-600 text-white" : "bg-white/10 text-slate-400"
                     }`}
                   >
-                    {adhHormoneActive ? "ADH Active" : "ADH Low"}
+                    {adhHormoneActive ? "Active" : "Low"}
                   </button>
+                </div>
+
+                {/* Glucose Overload Toggle */}
+                <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white/5 border border-white/10">
+                  <div>
+                    <div className="text-[11px] font-bold text-white">Glucose Load</div>
+                    <div className="text-[9px] text-slate-400">Diabetes Sim</div>
+                  </div>
+                  <button
+                    onClick={() => setGlucoseOverload(!glucoseOverload)}
+                    className={`px-2 py-1 rounded-lg text-[10px] font-black transition-all ${
+                      glucoseOverload ? "bg-red-650 text-white animate-pulse border border-red-500" : "bg-white/10 text-slate-400"
+                    }`}
+                  >
+                    {glucoseOverload ? "Overload" : "Normal"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Real-time Filtrate Composition Analyzer Table */}
+              <div className="border-t border-white/10 pt-4 mt-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
+                    <Sliders className="w-3.5 h-3.5" /> Real-time Nephron Filtrate Composition Analyzer
+                  </span>
+                  {glucoseOverload && (
+                    <span className="text-[9px] font-black uppercase bg-red-950 text-red-300 px-2 py-0.5 rounded animate-pulse border border-red-500/30">
+                      ⚠️ Glucosuria Detected (Diabetes Sim)
+                    </span>
+                  )}
+                </div>
+                
+                <div className="overflow-x-auto rounded-xl border border-white/5 bg-slate-950/40">
+                  <table className="w-full text-left border-collapse text-[10px]">
+                    <thead>
+                      <tr className="border-b border-white/10 bg-white/5 text-slate-400 font-bold">
+                        <th className="p-2">Segment</th>
+                        <th className="p-2 text-center">Proteins</th>
+                        <th className="p-2 text-center">Glucose</th>
+                        <th className="p-2 text-center">Amino Acids</th>
+                        <th className="p-2 text-center">Salts</th>
+                        <th className="p-2 text-center">Urea</th>
+                        <th className="p-2 text-center">Water</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5 text-slate-350 font-mono">
+                      {/* Row 1: Bowman's Capsule */}
+                      <tr>
+                        <td className="p-2 font-sans font-bold text-white">Bowman's Cap.</td>
+                        <td className="p-2 text-center text-slate-500">0%</td>
+                        <td className="p-2 text-center text-amber-400">{glucoseOverload ? "300 mg/dL" : "90 mg/dL"}</td>
+                        <td className="p-2 text-center text-emerald-400 font-bold">100%</td>
+                        <td className="p-2 text-center text-blue-400">100%</td>
+                        <td className="p-2 text-center text-yellow-400">Normal</td>
+                        <td className="p-2 text-center text-blue-400">100%</td>
+                      </tr>
+                      {/* Row 2: PCT */}
+                      <tr>
+                        <td className="p-2 font-sans font-bold text-white">PCT</td>
+                        <td className="p-2 text-center text-slate-500">0%</td>
+                        <td className={`p-2 text-center ${glucoseOverload ? "text-red-400 font-bold" : "text-emerald-400"}`}>
+                          {glucoseOverload ? "150 mg/dL" : "0% (Reabsorbed)"}
+                        </td>
+                        <td className="p-2 text-center text-emerald-400">0% (Reabsorbed)</td>
+                        <td className="p-2 text-center text-blue-400">30%</td>
+                        <td className="p-2 text-center text-yellow-400">Normal</td>
+                        <td className="p-2 text-center text-blue-400">30%</td>
+                      </tr>
+                      {/* Row 3: Descending Loop */}
+                      <tr>
+                        <td className="p-2 font-sans font-bold text-white">Desc. Loop</td>
+                        <td className="p-2 text-center text-slate-500">0%</td>
+                        <td className={`p-2 text-center ${glucoseOverload ? "text-red-400 font-bold" : "text-slate-500"}`}>
+                          {glucoseOverload ? "150 mg/dL" : "0%"}
+                        </td>
+                        <td className="p-2 text-center text-slate-500">0%</td>
+                        <td className="p-2 text-center text-blue-400 font-bold">30% (Concentrated)</td>
+                        <td className="p-2 text-center text-yellow-400">Elevated</td>
+                        <td className="p-2 text-center text-blue-400">10%</td>
+                      </tr>
+                      {/* Row 4: Ascending Loop */}
+                      <tr>
+                        <td className="p-2 font-sans font-bold text-white">Asc. Loop</td>
+                        <td className="p-2 text-center text-slate-500">0%</td>
+                        <td className={`p-2 text-center ${glucoseOverload ? "text-red-400 font-bold" : "text-slate-500"}`}>
+                          {glucoseOverload ? "150 mg/dL" : "0%"}
+                        </td>
+                        <td className="p-2 text-center text-slate-500">0%</td>
+                        <td className="p-2 text-center text-blue-400">5% (Diluted)</td>
+                        <td className="p-2 text-center text-yellow-400 font-bold">Elevated</td>
+                        <td className="p-2 text-center text-blue-400">10%</td>
+                      </tr>
+                      {/* Row 5: DCT */}
+                      <tr>
+                        <td className="p-2 font-sans font-bold text-white">DCT</td>
+                        <td className="p-2 text-center text-slate-500">0%</td>
+                        <td className={`p-2 text-center ${glucoseOverload ? "text-red-400 font-bold" : "text-slate-500"}`}>
+                          {glucoseOverload ? "150 mg/dL" : "0%"}
+                        </td>
+                        <td className="p-2 text-center text-slate-500">0%</td>
+                        <td className="p-2 text-center text-blue-400">4%</td>
+                        <td className="p-2 text-center text-yellow-400 font-bold">Elevated</td>
+                        <td className="p-2 text-center text-blue-400">8%</td>
+                      </tr>
+                      {/* Row 6: Collecting Duct (Urine) */}
+                      <tr className="bg-white/5 font-extrabold">
+                        <td className="p-2 font-sans text-amber-400">Urine Output</td>
+                        <td className="p-2 text-center text-slate-500">0% (Healthy)</td>
+                        <td className={`p-2 text-center ${glucoseOverload ? "text-red-500 font-black animate-pulse" : "text-emerald-450"}`}>
+                          {glucoseOverload ? "150 mg/dL (Glucosuria)" : "0% (Healthy)"}
+                        </td>
+                        <td className="p-2 text-center text-emerald-400">0% (Healthy)</td>
+                        <td className="p-2 text-center text-blue-400">{adhHormoneActive ? "3% (Normal)" : "1% (Diluted)"}</td>
+                        <td className="p-2 text-center text-yellow-500">HIGH (Concentrated)</td>
+                        <td className={`p-2 text-center ${adhHormoneActive ? "text-blue-400" : "text-blue-500 font-black"}`}>
+                          {adhHormoneActive ? "1% (Concentrated)" : "12% (Excessive Output)"}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <div className="text-[9px] text-slate-450 italic leading-tight">
+                  Note: Healthy kidneys selectively reabsorb 100% of glucose and amino acids in the PCT. Under ADH action, water channels open in the collecting duct to reabsorb 99% of water, making urine highly concentrated.
                 </div>
               </div>
 
@@ -785,7 +1202,7 @@ export default function BiologyLab() {
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
                 <div className="flex p-1 bg-white/5 rounded-xl border border-white/10">
                   <button
-                    onClick={() => setCellType("plant")}
+                    onClick={() => { setCellType("plant"); setSelectedOrganelle(null); }}
                     className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                       cellType === "plant" ? "bg-emerald-600 text-white" : "text-slate-400"
                     }`}
@@ -793,7 +1210,7 @@ export default function BiologyLab() {
                     🌱 Onion Peel (Plant Cell)
                   </button>
                   <button
-                    onClick={() => setCellType("animal")}
+                    onClick={() => { setCellType("animal"); setSelectedOrganelle(null); }}
                     className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                       cellType === "animal" ? "bg-indigo-600 text-white" : "text-slate-400"
                     }`}
@@ -835,21 +1252,41 @@ export default function BiologyLab() {
                       <polygon
                         points="50,40 250,40 280,150 250,260 50,260 20,150"
                         fill={stain === "safranin" ? "rgba(244, 63, 94, 0.25)" : stain === "iodine" ? "rgba(180, 83, 9, 0.2)" : "rgba(16, 185, 129, 0.15)"}
-                        stroke={stain === "safranin" ? "#f43f5e" : "#10b981"}
-                        strokeWidth="8"
+                        stroke={selectedOrganelle === "cell_wall" ? "#fbbf24" : stain === "safranin" ? "#f43f5e" : "#10b981"}
+                        strokeWidth={selectedOrganelle === "cell_wall" ? "10" : "7"}
+                        className="cursor-pointer hover:stroke-amber-450 transition-all"
+                        onClick={() => setSelectedOrganelle("cell_wall")}
                       />
                       {/* Large Central Vacuole */}
-                      <ellipse cx="160" cy="150" rx="70" ry="45" fill="rgba(6, 182, 212, 0.2)" stroke="#06b6d4" strokeWidth="2" strokeDasharray="3 3" />
-                      <text x="160" y="154" textAnchor="middle" fill="#67e8f9" className="text-[9px] font-bold">Central Vacuole</text>
+                      <g className="cursor-pointer group" onClick={() => setSelectedOrganelle("vacuole")}>
+                        <ellipse 
+                          cx="160" cy="150" rx="70" ry="45" 
+                          fill={selectedOrganelle === "vacuole" ? "rgba(6, 182, 212, 0.35)" : "rgba(6, 182, 212, 0.2)"} 
+                          stroke={selectedOrganelle === "vacuole" ? "#fbbf24" : "#06b6d4"} 
+                          strokeWidth="2" strokeDasharray="3 3" 
+                          className="group-hover:fill-cyan-500/25 transition-all" 
+                        />
+                        <text x="160" y="153" textAnchor="middle" fill="#67e8f9" className="text-[8px] font-black group-hover:fill-white">Central Vacuole</text>
+                      </g>
 
                       {/* Peripheral Nucleus (Pushed to side by vacuole) */}
-                      <circle cx="85" cy="110" r="24" fill={stain === "methylene" ? "rgba(59, 130, 246, 0.7)" : "rgba(168, 85, 247, 0.4)"} stroke="#a855f7" strokeWidth="3" />
-                      <circle cx="85" cy="110" r="8" fill="#a855f7" />
+                      <g className="cursor-pointer group" onClick={() => setSelectedOrganelle("nucleus")}>
+                        <circle 
+                          cx="85" cy="110" r="24" 
+                          fill={stain === "methylene" ? "rgba(59, 130, 246, 0.7)" : "rgba(168, 85, 247, 0.4)"} 
+                          stroke={selectedOrganelle === "nucleus" ? "#fbbf24" : "#a855f7"} 
+                          strokeWidth={selectedOrganelle === "nucleus" ? "4.5" : "2.5"} 
+                          className="group-hover:stroke-purple-300 transition-all" 
+                        />
+                        <circle cx="85" cy="110" r="8" fill="#a855f7" />
+                      </g>
 
                       {/* Chloroplasts */}
-                      <ellipse cx="220" cy="90" rx="16" ry="10" fill="#10b981" />
-                      <ellipse cx="225" cy="210" rx="16" ry="10" fill="#10b981" />
-                      <ellipse cx="90" cy="210" rx="16" ry="10" fill="#10b981" />
+                      <g className="cursor-pointer group" onClick={() => setSelectedOrganelle("chloroplast")}>
+                        <ellipse cx="220" cy="90" rx="16" ry="10" fill="#10b981" stroke={selectedOrganelle === "chloroplast" ? "#fbbf24" : "none"} strokeWidth="2.5" className="group-hover:fill-emerald-400 transition-all" />
+                        <ellipse cx="225" cy="210" rx="16" ry="10" fill="#10b981" stroke={selectedOrganelle === "chloroplast" ? "#fbbf24" : "none"} strokeWidth="2.5" className="group-hover:fill-emerald-400 transition-all" />
+                        <ellipse cx="90" cy="210" rx="16" ry="10" fill="#10b981" stroke={selectedOrganelle === "chloroplast" ? "#fbbf24" : "none"} strokeWidth="2.5" className="group-hover:fill-emerald-400 transition-all" />
+                      </g>
                     </svg>
                   ) : (
                     /* Animal Cell Detailed Structure */
@@ -860,20 +1297,34 @@ export default function BiologyLab() {
                         cy="150"
                         r="115"
                         fill={stain === "methylene" ? "rgba(59, 130, 246, 0.15)" : "rgba(244, 63, 94, 0.1)"}
-                        stroke={stain === "methylene" ? "#3b82f6" : "#f43f5e"}
-                        strokeWidth="4"
+                        stroke={selectedOrganelle === "plasma_membrane" ? "#fbbf24" : stain === "methylene" ? "#3b82f6" : "#f43f5e"}
+                        strokeWidth={selectedOrganelle === "plasma_membrane" ? "7" : "3.5"}
+                        className="cursor-pointer hover:stroke-amber-450 transition-all"
+                        onClick={() => setSelectedOrganelle("plasma_membrane")}
                       />
                       {/* Central Large Nucleus */}
-                      <circle cx="150" cy="150" r="38" fill={stain === "methylene" ? "rgba(59, 130, 246, 0.8)" : "rgba(168, 85, 247, 0.5)"} stroke="#a855f7" strokeWidth="3" />
-                      <circle cx="150" cy="150" r="14" fill="#a855f7" />
-                      <text x="150" y="205" textAnchor="middle" fill="#d8b4fe" className="text-[9px] font-bold">Nucleus & Chromatin</text>
+                      <g className="cursor-pointer group" onClick={() => setSelectedOrganelle("nucleus")}>
+                        <circle 
+                          cx="150" cy="150" r="38" 
+                          fill={stain === "methylene" ? "rgba(59, 130, 246, 0.8)" : "rgba(168, 85, 247, 0.5)"} 
+                          stroke={selectedOrganelle === "nucleus" ? "#fbbf24" : "#a855f7"} 
+                          strokeWidth={selectedOrganelle === "nucleus" ? "4.5" : "2.5"} 
+                          className="group-hover:stroke-purple-300 transition-all" 
+                        />
+                        <circle cx="150" cy="150" r="14" fill="#a855f7" />
+                        <text x="150" y="204" textAnchor="middle" fill="#d8b4fe" className="text-[8px] font-black group-hover:fill-white">Nucleus & Chromatin</text>
+                      </g>
 
                       {/* Mitochondria with Cristae */}
-                      <ellipse cx="80" cy="110" rx="18" ry="10" fill="rgba(239, 68, 68, 0.6)" stroke="#ef4444" strokeWidth="1.5" />
-                      <ellipse cx="220" cy="180" rx="18" ry="10" fill="rgba(239, 68, 68, 0.6)" stroke="#ef4444" strokeWidth="1.5" />
+                      <g className="cursor-pointer group" onClick={() => setSelectedOrganelle("mitochondria")}>
+                        <ellipse cx="80" cy="110" rx="18" ry="10" fill="rgba(239, 68, 68, 0.6)" stroke={selectedOrganelle === "mitochondria" ? "#fbbf24" : "#ef4444"} strokeWidth={selectedOrganelle === "mitochondria" ? "2.5" : "1"} className="group-hover:fill-rose-500 transition-all" />
+                        <ellipse cx="220" cy="180" rx="18" ry="10" fill="rgba(239, 68, 68, 0.6)" stroke={selectedOrganelle === "mitochondria" ? "#fbbf24" : "#ef4444"} strokeWidth={selectedOrganelle === "mitochondria" ? "2.5" : "1"} className="group-hover:fill-rose-500 transition-all" />
+                      </g>
 
                       {/* Centrosome */}
-                      <circle cx="190" cy="100" r="8" fill="#f59e0b" />
+                      <g className="cursor-pointer group" onClick={() => setSelectedOrganelle("centrosome")}>
+                        <circle cx="190" cy="100" r="8" fill="#f59e0b" stroke={selectedOrganelle === "centrosome" ? "#fbbf24" : "none"} strokeWidth="2.5" className="group-hover:fill-amber-400 transition-all" />
+                      </g>
                     </svg>
                   )}
                 </div>
@@ -934,52 +1385,106 @@ export default function BiologyLab() {
           </div>
 
           <div className="lg:col-span-5 space-y-4">
-            <div className="p-6 rounded-3xl bg-slate-900 border border-white/10 shadow-2xl space-y-5">
-              <div className="border-b border-white/10 pb-4">
-                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                  Comparative Cytology
-                </span>
-                <h3 className="text-lg font-black text-white mt-1">
-                  {cellType === "plant" ? "Plant Cell Architecture" : "Animal Cell Architecture"}
-                </h3>
-              </div>
+            {selectedOrganelle && getOrganelleDetails(cellType, selectedOrganelle) ? (
+              // Selected Organelle Details
+              (() => {
+                const details = getOrganelleDetails(cellType, selectedOrganelle)!;
+                return (
+                  <div className="p-6 rounded-3xl bg-slate-900 border border-white/10 shadow-2xl space-y-5">
+                    <div className="border-b border-white/10 pb-4 flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                          {details.category}
+                        </span>
+                        <h3 className="text-lg font-black text-white mt-1">
+                          {details.name}
+                        </h3>
+                      </div>
+                      <button
+                        onClick={() => setSelectedOrganelle(null)}
+                        className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-350 text-[10px] font-bold transition-all"
+                      >
+                        ← Back to Table
+                      </button>
+                    </div>
 
-              <div className="space-y-3 text-xs">
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex justify-between items-center">
-                  <span className="text-slate-400">Cell Wall:</span>
-                  <span className="font-bold text-white">
-                    {cellType === "plant" ? "Present (Cellulose)" : "Absent"}
-                  </span>
-                </div>
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex justify-between items-center">
-                  <span className="text-slate-400">Chloroplasts / Plastids:</span>
-                  <span className="font-bold text-white">
-                    {cellType === "plant" ? "Present (Photosynthesis)" : "Absent"}
-                  </span>
-                </div>
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex justify-between items-center">
-                  <span className="text-slate-400">Vacuole:</span>
-                  <span className="font-bold text-white">
-                    {cellType === "plant" ? "Large & Permanent (Central)" : "Small & Temporary"}
-                  </span>
-                </div>
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex justify-between items-center">
-                  <span className="text-slate-400">Nucleus Position:</span>
-                  <span className="font-bold text-white">
-                    {cellType === "plant" ? "Peripheral (Pushed to edge)" : "Centric"}
-                  </span>
-                </div>
-              </div>
+                    <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+                        Structure & Function:
+                      </span>
+                      <p className="text-xs text-slate-200 leading-relaxed font-sans">
+                        {details.functionText}
+                      </p>
+                    </div>
 
-              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 space-y-1.5">
-                <div className="flex items-center gap-1.5 font-black text-emerald-400 uppercase text-[10px] tracking-wide">
-                  <ShieldCheck className="w-4 h-4" /> CBSE Practical Exam Key:
+                    <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/25 space-y-1.5">
+                      <div className="flex items-center gap-1.5 font-black text-amber-400 uppercase text-[10px] tracking-wide">
+                        <ShieldCheck className="w-4 h-4" /> CBSE Syllabus Focus:
+                      </div>
+                      <p className="text-xs text-slate-305 leading-relaxed font-sans">
+                        {details.cbseTip}
+                      </p>
+                    </div>
+                    
+                    <div className="text-[10px] text-slate-500 italic text-center pt-2">
+                      💡 Click on other cell structures in the eyepiece to view their details.
+                    </div>
+                  </div>
+                );
+              })()
+            ) : (
+              // Standard Comparative Cytology Table
+              <div className="p-6 rounded-3xl bg-slate-900 border border-white/10 shadow-2xl space-y-5">
+                <div className="border-b border-white/10 pb-4">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                    Comparative Cytology
+                  </span>
+                  <h3 className="text-lg font-black text-white mt-1">
+                    {cellType === "plant" ? "Plant Cell Architecture" : "Animal Cell Architecture"}
+                  </h3>
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  When preparing a temporary mount of an onion peel or cheek cell, always mount in <strong>Glycerine</strong> to prevent drying out and use <strong>Safranin / Methylene Blue</strong> to clearly contrast nucleus chromatin.
-                </p>
+
+                <div className="space-y-3 text-xs">
+                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex justify-between items-center">
+                    <span className="text-slate-400">Cell Wall:</span>
+                    <span className="font-bold text-white">
+                      {cellType === "plant" ? "Present (Cellulose)" : "Absent"}
+                    </span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex justify-between items-center">
+                    <span className="text-slate-400">Chloroplasts / Plastids:</span>
+                    <span className="font-bold text-white">
+                      {cellType === "plant" ? "Present (Photosynthesis)" : "Absent"}
+                    </span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex justify-between items-center">
+                    <span className="text-slate-400">Vacuole:</span>
+                    <span className="font-bold text-white">
+                      {cellType === "plant" ? "Large & Permanent (Central)" : "Small & Temporary"}
+                    </span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex justify-between items-center">
+                    <span className="text-slate-400">Nucleus Position:</span>
+                    <span className="font-bold text-white">
+                      {cellType === "plant" ? "Peripheral (Pushed to edge)" : "Centric"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 space-y-1.5">
+                  <div className="flex items-center gap-1.5 font-black text-emerald-400 uppercase text-[10px] tracking-wide">
+                    <ShieldCheck className="w-4 h-4" /> CBSE Practical Exam Key:
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    When preparing a temporary mount of an onion peel or cheek cell, always mount in <strong>Glycerine</strong> to prevent drying out and use <strong>Safranin / Methylene Blue</strong> to clearly contrast nucleus chromatin.
+                  </p>
+                </div>
+                
+                <div className="text-[10px] text-slate-500 italic text-center pt-2">
+                  💡 Hint: Click on organelles inside the microscope eyepiece to dissect them!
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}
@@ -1055,33 +1560,119 @@ export default function BiologyLab() {
               </div>
 
               {/* Turgor Toggle & Environmental Conditions */}
-              <div className="border-t border-white/10 pt-3 grid sm:grid-cols-2 gap-4">
-                <div className="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/10">
-                  <div>
-                    <div className="text-xs font-bold text-white">Guard Cell Turgidity</div>
-                    <div className="text-[9px] text-slate-400">Simulate K+ and Water Osmosis</div>
+              <div className="border-t border-white/10 pt-3 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Guard Cell Turgidity Controller */}
+                  <div className="flex items-center justify-between p-2.5 rounded-2xl bg-white/5 border border-white/10">
+                    <div>
+                      <div className="text-[11px] font-bold text-white">Stomatal Pore</div>
+                      <div className="text-[9px] text-slate-400">Osmotic turgidity</div>
+                    </div>
+                    <button
+                      onClick={() => setIsStomaOpen(!isStomaOpen)}
+                      className={`px-3 py-1.5 rounded-xl text-[10px] font-black transition-all ${
+                        isStomaOpen ? "bg-emerald-600 text-white shadow-md" : "bg-rose-600 text-white shadow-md"
+                      }`}
+                    >
+                      {isStomaOpen ? "Open" : "Closed"}
+                    </button>
                   </div>
-                  <button
-                    onClick={() => setIsStomaOpen(!isStomaOpen)}
-                    className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${
-                      isStomaOpen ? "bg-emerald-600 text-white shadow-md" : "bg-rose-600 text-white shadow-md"
-                    }`}
-                  >
-                    {isStomaOpen ? "Close Stoma" : "Open Stoma"}
-                  </button>
-                </div>
 
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="font-bold text-slate-400">Photosynthetic Rate:</span>
-                    <span className="font-mono font-bold text-emerald-400">{isStomaOpen ? calculatePhotosynthesisRate() : 0}%</span>
-                  </div>
-                  <div className="h-3 w-full bg-white/10 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-emerald-500 rounded-full transition-all duration-300"
-                      style={{ width: `${isStomaOpen ? calculatePhotosynthesisRate() : 0}%` }}
+                  {/* Temperature Slider */}
+                  <div className="space-y-1 p-2 rounded-2xl bg-white/5 border border-white/10">
+                    <div className="flex justify-between text-[11px]">
+                      <span className="font-bold text-slate-400">Air Temp:</span>
+                      <span className="font-mono font-bold text-emerald-400">{temperature}°C</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="15"
+                      max="45"
+                      value={temperature}
+                      onChange={(e) => setTemperature(parseInt(e.target.value))}
+                      className="w-full accent-emerald-500"
                     />
                   </div>
+
+                  {/* Wind Speed Slider */}
+                  <div className="space-y-1 p-2 rounded-2xl bg-white/5 border border-white/10">
+                    <div className="flex justify-between text-[11px]">
+                      <span className="font-bold text-slate-400">Wind Speed:</span>
+                      <span className="font-mono font-bold text-emerald-400">{windSpeed} m/s</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="12"
+                      value={windSpeed}
+                      onChange={(e) => setWindSpeed(parseInt(e.target.value))}
+                      className="w-full accent-emerald-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Physiology Rate Bars */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Photosynthetic Rate */}
+                  <div className="space-y-1 bg-slate-900/40 p-3 rounded-2xl border border-white/5">
+                    <div className="flex justify-between text-xs">
+                      <span className="font-bold text-slate-400">Photosynthetic Rate:</span>
+                      <span className="font-mono font-bold text-emerald-400">{isStomaOpen ? calculatePhotosynthesisRate() : 0}%</span>
+                    </div>
+                    <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                        style={{ width: `${isStomaOpen ? calculatePhotosynthesisRate() : 0}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Transpiration Rate */}
+                  <div className="space-y-1 bg-slate-900/40 p-3 rounded-2xl border border-white/5">
+                    <div className="flex justify-between text-xs">
+                      <span className="font-bold text-slate-400">Transpiration Pull Rate:</span>
+                      <span className="font-mono font-bold text-cyan-400">{calculateTranspirationRate()}%</span>
+                    </div>
+                    <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-cyan-500 rounded-full transition-all duration-300"
+                        style={{ width: `${calculateTranspirationRate()}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Safety / Transpiration Pull Warning Indicator */}
+                <div className="p-2.5 rounded-xl border border-white/5 bg-white/5 flex items-center gap-2 text-xs text-[11px] leading-tight justify-center text-center">
+                  {(() => {
+                    const rate = calculateTranspirationRate();
+                    if (!isStomaOpen) {
+                      return (
+                        <span className="text-amber-400 flex items-center gap-1.5 font-bold">
+                          ⚠️ Guard cells flaccid. Stomata closed. Transpiration minimized. Carbon dioxide uptake blocked.
+                        </span>
+                      );
+                    }
+                    if (rate > 80) {
+                      return (
+                        <span className="text-red-450 font-black flex items-center gap-1.5 animate-pulse">
+                          🚨 Warning: Excessive Transpiration! High wind/heat risk cell wilting (loss of turgor).
+                        </span>
+                      );
+                    }
+                    if (rate < 15) {
+                      return (
+                        <span className="text-blue-400 flex items-center gap-1.5 font-bold">
+                          💧 Warning: Low Transpiration Pull! Insufficient suction to pull minerals from roots.
+                        </span>
+                      );
+                    }
+                    return (
+                      <span className="text-emerald-450 flex items-center gap-1.5 font-bold">
+                        ✅ Healthy Transpiration Pull: Optimal sap ascent and thermoregulation active.
+                      </span>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -1117,6 +1708,335 @@ export default function BiologyLab() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ───────────────────────────────────────────────────────────── */}
+      {/*  TAB 5: PHOTOSYNTHESIS & STARCH EXPERIMENT LAB                 */}
+      {/* ───────────────────────────────────────────────────────────── */}
+      {lab === "photosynthesis" && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fadeIn">
+          
+          <style>{`
+            @keyframes riseBubble {
+              0% { transform: translateY(110px) translateX(0); opacity: 0; }
+              10% { opacity: 0.8; }
+              90% { opacity: 0.8; }
+              100% { transform: translateY(10px) translateX(var(--drift)); opacity: 0; }
+            }
+            .animate-bubble-1 { animation: riseBubble 2.4s infinite ease-in; }
+            .animate-bubble-2 { animation: riseBubble 1.7s infinite ease-in 0.4s; }
+            .animate-bubble-3 { animation: riseBubble 3.0s infinite ease-in 0.9s; }
+            .animate-bubble-4 { animation: riseBubble 2.1s infinite ease-in 1.4s; }
+          `}</style>
+
+          {/* Visual Panel (7 Cols) */}
+          <div className="lg:col-span-7 dark:bg-[#070916] bg-white dark:border-white/10 border-slate-200 rounded-3xl p-5 shadow-2xl backdrop-blur-xl flex flex-col">
+            
+            <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+              <h3 className="text-sm font-black dark:text-white text-slate-900 flex items-center gap-2 uppercase tracking-wider">
+                <Sun className="w-4 h-4 text-amber-400" /> Plant Photosynthesis Workbench
+              </h3>
+              
+              <span className="text-[10px] font-bold text-slate-400 bg-white/5 px-2.5 py-0.5 rounded-lg border border-white/10">
+                Wavelength: {photoLightWavelength.toUpperCase()}
+              </span>
+            </div>
+
+            {/* Simulated Apparatus screen */}
+            <div className="relative border border-white/10 dark:bg-black/40 bg-slate-900 rounded-2xl overflow-hidden min-h-[300px] flex items-center justify-center p-4">
+              
+              {/* Light beam overlay */}
+              {photoLightIntensity > 0 && (
+                <div 
+                  className="absolute inset-0 transition-colors duration-500 pointer-events-none"
+                  style={{
+                    backgroundColor: 
+                      photoLightWavelength === "white" ? `rgba(253, 224, 71, ${0.05 + (photoLightIntensity/200)*0.1})` :
+                      photoLightWavelength === "red" ? `rgba(239, 68, 68, ${0.05 + (photoLightIntensity/200)*0.12})` :
+                      photoLightWavelength === "blue" ? `rgba(59, 130, 246, ${0.05 + (photoLightIntensity/200)*0.12})` :
+                      `rgba(52, 211, 153, ${0.05 + (photoLightIntensity/200)*0.08})`
+                  }}
+                />
+              )}
+
+              {/* The Hydrilla Bubbling Setup (Left) */}
+              <div className="flex flex-col items-center justify-center relative w-1/2">
+                {/* SVG Beaker, funnel, and inverted test tube */}
+                <svg className="w-40 h-56 text-slate-400/50" viewBox="0 0 100 120" fill="none">
+                  {/* Beaker */}
+                  <rect x="15" y="40" width="70" height="75" rx="2" stroke="currentColor" strokeWidth="2" />
+                  <line x1="15" y1="50" x2="20" y2="50" stroke="currentColor" strokeWidth="1" />
+                  <line x1="15" y1="70" x2="20" y2="70" stroke="currentColor" strokeWidth="1" />
+                  <line x1="15" y1="90" x2="20" y2="90" stroke="currentColor" strokeWidth="1" />
+
+                  {/* Water line */}
+                  <line x1="16" y1="48" x2="84" y2="48" stroke="#38bdf8" strokeWidth="1.5" strokeDasharray="3,2" />
+
+                  {/* Glass funnel */}
+                  <path d="M25 105 L45 80 V55 H55 V80 L75 105 Z" stroke="currentColor" strokeWidth="1.5" />
+
+                  {/* Inverted test tube */}
+                  <rect x="44" y="20" width="12" height="50" rx="4" stroke="currentColor" strokeWidth="1.5" />
+
+                  {/* Green Hydrilla Plant */}
+                  {/* Stem */}
+                  <path d="M50 110 C48 95 52 85 50 78" stroke="#10b981" strokeWidth="2.5" />
+                  {/* Leaves */}
+                  <path d="M47 100 Q40 98 44 94 Q48 97 48 100 Z" fill="#047857" />
+                  <path d="M53 102 Q60 100 56 96 Q52 99 53 102 Z" fill="#047857" />
+                  <path d="M48 88 Q41 85 45 81 Q49 84 48 88 Z" fill="#047857" />
+                  <path d="M52 90 Q59 87 55 83 Q51 86 52 90 Z" fill="#047857" />
+                  <path d="M48 76 Q42 70 46 67 Q49 71 48 76 Z" fill="#047857" />
+                </svg>
+
+                {/* Oxygen Bubbles rising from cut stem (approx x=50, y=78 to y=20) */}
+                {photoLightIntensity > 0 && (
+                  <div className="absolute inset-0 pointer-events-none flex justify-center">
+                    {/* Only render rising bubbles if rate is positive */}
+                    {(() => {
+                      // Calculate bubble rate
+                      const intensityFactor = photoLightIntensity / 100;
+                      const co2Factor = 0.3 + (photoCo2 / 400) * 0.7;
+                      const tempFactor = photoTemp < 10 ? 0.1 : photoTemp > 45 ? 0.05 : 1.0 - Math.abs(25 - photoTemp) * 0.025;
+                      const wavelengthFactor = photoLightWavelength === "white" ? 1.0 : photoLightWavelength === "red" ? 1.25 : photoLightWavelength === "blue" ? 0.9 : 0.08;
+                      const rate = Math.round(45 * intensityFactor * co2Factor * tempFactor * wavelengthFactor);
+                      
+                      if (rate < 4) return null;
+                      return (
+                        <>
+                          <div className="w-1.5 h-1.5 rounded-full bg-white/70 absolute animate-bubble-1" style={{ left: "calc(50% - 2px)", "--drift": "-8px" } as any} />
+                          <div className="w-2 h-2 rounded-full bg-white/60 absolute animate-bubble-2" style={{ left: "calc(50% + 2px)", "--drift": "6px" } as any} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-white/70 absolute animate-bubble-3" style={{ left: "calc(50% - 4px)", "--drift": "-4px" } as any} />
+                          {rate > 20 && (
+                            <div className="w-1 h-1 rounded-full bg-white/85 absolute animate-bubble-4" style={{ left: "calc(50% + 1px)", "--drift": "8px" } as any} />
+                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
+
+              {/* Starch Test Simulator (Right) */}
+              <div className="w-1/2 flex flex-col items-center justify-center border-l border-white/5 pl-4">
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">Starch Test Leaf</span>
+                
+                {/* Leaf graphic */}
+                <div className="relative w-28 h-28 flex items-center justify-center mb-4">
+                  <svg className="w-24 h-24" viewBox="0 0 100 100" fill="none">
+                    {/* Leaf main shape */}
+                    <path 
+                      d="M50 15 C85 45 75 80 50 85 C25 80 15 45 50 15 Z" 
+                      fill={
+                        starchTestIodineAdded
+                          ? "rgba(15, 23, 42, 0.95)" // blue-black (starch present)
+                          : starchTestBoiled
+                          ? "rgba(241, 245, 249, 0.85)" // white (chlorophyll extracted)
+                          : "#10b981" // fresh green
+                      } 
+                      stroke="#047857" 
+                      strokeWidth="2.5" 
+                      className="transition-colors duration-1000"
+                    />
+                    
+                    {/* Starch test variegation or partial light block */}
+                    {starchTestIodineAdded && (
+                      <path 
+                        d="M50 25 C65 45 65 65 50 80 C35 65 35 45 50 25 Z" 
+                        fill="rgba(241, 245, 249, 0.85)" // center remained white/brown (no starch due to covered stripe)
+                        stroke="rgba(0,0,0,0.1)"
+                      />
+                    )}
+
+                    {/* Leaf Veins */}
+                    <path d="M50 15 L50 85" stroke="rgba(0,0,0,0.15)" strokeWidth="1.5" />
+                    <path d="M50 35 Q65 45 70 48" stroke="rgba(0,0,0,0.12)" strokeWidth="1" />
+                    <path d="M50 35 Q35 45 30 48" stroke="rgba(0,0,0,0.12)" strokeWidth="1" />
+                    <path d="M50 55 Q70 65 72 68" stroke="rgba(0,0,0,0.12)" strokeWidth="1" />
+                    <path d="M50 55 Q30 65 28 68" stroke="rgba(0,0,0,0.12)" strokeWidth="1" />
+                  </svg>
+                  
+                  {/* Black paper clip (CBSE light screening experiment) */}
+                  {!starchTestBoiled && (
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-4 bg-slate-900 border border-slate-700 rounded shadow-md flex items-center justify-center text-[7px] font-black text-slate-400 select-none">
+                      LIGHT SCREEN
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setStarchTestBoiled(true);
+                      playSynthSound(300, 0.3, "triangle");
+                    }}
+                    disabled={starchTestBoiled}
+                    className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[9px] font-black uppercase text-white disabled:opacity-40"
+                  >
+                    1. Boil in Alcohol
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (!starchTestBoiled) return;
+                      setStarchTestIodineAdded(true);
+                      playSynthSound(440, 0.25);
+                      // Award XP for completing starch test
+                      awardUserXP(35);
+                    }}
+                    disabled={!starchTestBoiled || starchTestIodineAdded}
+                    className="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-[9px] font-black uppercase text-white disabled:opacity-40"
+                  >
+                    2. Add Iodine
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Output Diagnostics */}
+            <div className="grid grid-cols-2 gap-3.5 mt-4 p-4 dark:bg-white/5 bg-slate-100 rounded-2xl border dark:border-white/5 border-slate-200">
+              <div>
+                <div className="text-[9px] font-bold dark:text-slate-400 text-slate-600 uppercase tracking-widest">Rate of Photosynthesis:</div>
+                <div className="text-sm font-black dark:text-teal-300 text-teal-700 font-mono mt-0.5">
+                  {(() => {
+                    const intensityFactor = photoLightIntensity / 100;
+                    const co2Factor = 0.3 + (photoCo2 / 400) * 0.7;
+                    const tempFactor = photoTemp < 10 ? 0.1 : photoTemp > 45 ? 0.05 : 1.0 - Math.abs(25 - photoTemp) * 0.025;
+                    const wavelengthFactor = photoLightWavelength === "white" ? 1.0 : photoLightWavelength === "red" ? 1.25 : photoLightWavelength === "blue" ? 0.9 : 0.08;
+                    const rate = Math.round(45 * intensityFactor * co2Factor * tempFactor * wavelengthFactor);
+                    return photoLightIntensity === 0 ? "0 bubbles/min" : `${rate} bubbles/min`;
+                  })()}
+                </div>
+              </div>
+              <div>
+                <div className="text-[9px] font-bold dark:text-slate-400 text-slate-600 uppercase tracking-widest">Starch Test Status:</div>
+                <div className="text-sm font-black dark:text-indigo-300 text-indigo-700 font-mono mt-0.5">
+                  {starchTestIodineAdded ? "Blue-Black (Starch Present)" : starchTestBoiled ? "Chlorophyll Extracted" : "Untested leaf"}
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Controls Column (5 Cols) */}
+          <div className="lg:col-span-5 space-y-4">
+            
+            <div className="p-6 rounded-3xl dark:bg-slate-900 bg-white border dark:border-white/10 border-slate-200 shadow-2xl space-y-5">
+              <div className="border-b dark:border-white/10 border-slate-200 pb-3">
+                <h3 className="text-sm font-black dark:text-white text-slate-900 uppercase tracking-wide">Environment Controls</h3>
+              </div>
+
+              {/* Light Wavelength Selector */}
+              <div className="space-y-2">
+                <span className="text-xs font-bold dark:text-slate-300 text-slate-700 block">Light Wavelength (Color):</span>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {[
+                    { id: "white", color: "bg-slate-200 text-slate-900", border: "border-slate-400" },
+                    { id: "red", color: "bg-red-500 text-white", border: "border-red-650" },
+                    { id: "blue", color: "bg-blue-500 text-white", border: "border-blue-650" },
+                    { id: "green", color: "bg-emerald-500 text-white", border: "border-emerald-650" }
+                  ].map((w) => (
+                    <button
+                      key={w.id}
+                      onClick={() => setPhotoLightWavelength(w.id as any)}
+                      className={`py-1.5 rounded-lg text-[9px] font-black uppercase border transition-all ${w.color} ${
+                        photoLightWavelength === w.id ? "scale-105 border-white ring-2 ring-indigo-500/50" : "opacity-75 border-transparent"
+                      }`}
+                    >
+                      {w.id}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Light Intensity Slider */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold dark:text-slate-300 text-slate-700">Light Intensity (Lux)</span>
+                  <span className="font-mono text-amber-400 font-bold">{photoLightIntensity} Lux</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="200"
+                  step="10"
+                  value={photoLightIntensity}
+                  onChange={(e) => setPhotoLightIntensity(parseInt(e.target.value))}
+                  className="w-full accent-amber-500"
+                />
+              </div>
+
+              {/* CO2 Concentration Slider */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold dark:text-slate-300 text-slate-700">CO₂ Concentration</span>
+                  <span className="font-mono text-cyan-400 font-bold">{photoCo2} ppm</span>
+                </div>
+                <input
+                  type="range"
+                  min="100"
+                  max="1000"
+                  step="50"
+                  value={photoCo2}
+                  onChange={(e) => setPhotoCo2(parseInt(e.target.value))}
+                  className="w-full accent-cyan-500"
+                />
+              </div>
+
+              {/* Temperature Slider */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold dark:text-slate-300 text-slate-700">Temperature (°C)</span>
+                  <span className="font-mono text-rose-450 font-bold">{photoTemp} °C</span>
+                </div>
+                <input
+                  type="range"
+                  min="5"
+                  max="50"
+                  step="1"
+                  value={photoTemp}
+                  onChange={(e) => setPhotoTemp(parseInt(e.target.value))}
+                  className="w-full accent-rose-500"
+                />
+              </div>
+
+              {/* Action Reset */}
+              <button
+                onClick={() => {
+                  setStarchTestBoiled(false);
+                  setStarchTestIodineAdded(false);
+                }}
+                className="w-full py-2.5 rounded-xl border dark:border-white/10 border-slate-200 hover:bg-white/5 text-[10px] font-black uppercase tracking-wider text-slate-300 transition-colors"
+              >
+                Reset Leaf Starch Test
+              </button>
+            </div>
+
+            {/* Informative Theory Box */}
+            <div className="p-5 rounded-3xl dark:bg-slate-900 bg-white border dark:border-white/10 border-slate-200 space-y-4">
+              <div className="flex items-center gap-2 text-xs font-black dark:text-indigo-400 text-indigo-700 uppercase tracking-wider">
+                <Info className="w-4 h-4" /> CBSE Board Theory Guide:
+              </div>
+              
+              <ul className="space-y-2.5 text-xs dark:text-slate-300 text-slate-700 list-disc list-inside leading-relaxed">
+                <li>
+                  <strong className="dark:text-indigo-300 text-indigo-700">Photosynthesis Equation:</strong>
+                  <div className="my-1.5 p-2 bg-slate-950 rounded-xl border border-slate-800 text-center font-mono text-[10px] text-indigo-300 overflow-x-auto">
+                    6CO₂ + 12H₂O &rarr; C₆H₁₂O₆ + 6O₂ + 6H₂O
+                  </div>
+                </li>
+                <li>
+                  <strong className="dark:text-pink-300 text-pink-700">Wavelength Effect:</strong> Chlorophyll absorbs <strong className="underline">Red</strong> and <strong className="underline">Blue</strong> light best. It <strong className="underline">reflects Green light</strong>, which is why photosynthesis slows down dramatically under green illumination.
+                </li>
+                <li>
+                  <strong className="dark:text-emerald-300 text-emerald-700">Starch Test:</strong> Chlorophyll is extracted by boiling the leaf in alcohol in a water bath (alcohol is flammable). Iodine turns starch <strong className="underline">blue-black</strong>. Covered parts remain brown/white, showing light is essential for starch synthesis.
+                </li>
+              </ul>
+            </div>
+
+          </div>
+
         </div>
       )}
 

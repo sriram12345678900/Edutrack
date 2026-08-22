@@ -15,6 +15,7 @@ import AppTour from "./AppTour";
 import MobileHeader from "./MobileHeader";
 import MobileBottomNav from "./MobileBottomNav";
 import MobileDrawer from "./MobileDrawer";
+import InteractiveAiGuide from "./InteractiveAiGuide";
 
 // Categorized premium sidebar links for desktop
 const categories = [
@@ -183,6 +184,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     <div className="min-h-screen h-screen max-h-screen bg-slate-50 dark:bg-[#06080f] bg-[#eef1f9] text-slate-900 dark:text-slate-100 flex flex-col md:flex-row overflow-hidden grid-bg-overlay selection:bg-indigo-500/30 selection:text-indigo-200">
       {/* Global Interactive App Tour */}
       <AppTour />
+      <InteractiveAiGuide />
 
       {/* ── DESKTOP UNVEILING SIDEBAR ── */}
       <aside 
