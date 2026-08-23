@@ -285,6 +285,7 @@ export default function StudyCirclesDMs() {
   const [activeGroup, setActiveGroup] = useState<Group | null>(null);
   const [activeChatId, setActiveChatId] = useState<string>("");
   const [hubView, setHubView] = useState<'chats' | 'feed'>('chats');
+  const [searchQuery, setSearchQuery] = useState("");
   
   // Add Friend States
   const [searchCode, setSearchCode] = useState("");
@@ -1481,8 +1482,17 @@ const [liveKitToken, setLiveKitToken] = useState("");
     setActiveGroup(group);
   };
 
+  const filteredFriends = friends.filter(f => 
+    f.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    f.friendCode.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const filteredGroups = groups.filter(g => 
+    g.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    g.groupCode.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="h-full max-h-full bg-slate-50 dark:bg-[#070b13] bg-[#f5f7ff] flex flex-col transition-colors duration-300 relative overflow-hidden">
+    <div className="h-screen max-h-screen bg-[#f8fafc] dark:bg-[#070b14] text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-300 relative overflow-hidden font-sans">
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 5px;
@@ -1492,33 +1502,37 @@ const [liveKitToken, setLiveKitToken] = useState("");
           background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(99, 102, 241, 0.2);
+          background: rgba(99, 102, 241, 0.25);
           border-radius: 99px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(99, 102, 241, 0.4);
+          background: rgba(99, 102, 241, 0.45);
         }
       `}</style>
       {/* Background Blobs */}
-      <div className="absolute top-[-10%] right-[-5%] w-[450px] h-[450px] bg-purple-500/10 rounded-full blur-[100px] pointer-events-none"></div>
-      <div className="absolute bottom-[-10%] left-[-5%] w-[450px] h-[450px] bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+      <div className="absolute -top-32 -right-32 w-96 h-96 bg-purple-500/15 dark:bg-purple-600/10 rounded-full blur-[120px] pointer-events-none animate-pulse"></div>
+      <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-indigo-500/15 dark:bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none"></div>
 
       {/* Direct Chat Hub Area */}
-      <div className="flex-1 w-full max-w-7xl mx-auto flex h-full border-x border-slate-200/50 dark:border-slate-800/50 bg-white/70 dark:bg-[#0d121f] bg-[#f5f7ff] backdrop-blur-2xl shadow-2xl relative z-10 overflow-hidden min-h-0">
+      <div className="flex-1 w-full max-w-7xl mx-auto flex h-full border-x border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-[#0c101d]/90 backdrop-blur-2xl shadow-2xl relative z-10 overflow-hidden min-h-0">
         
-        {/* LEFT PANEL: WHATSAPP SIDEBAR (Chat list & Add Friend / Create Group) */}
-        <aside className="w-80 md:w-96 border-r border-slate-200/50 dark:border-slate-800/50 flex flex-col shrink-0 bg-white/40 dark:bg-[#0a0f18] bg-[#eef1f9] backdrop-blur-xl">
+        {/* LEFT PANEL: SIDEBAR (Chat list & Add Friend / Create Group) */}
+        <aside className="w-80 md:w-96 border-r border-slate-200/70 dark:border-slate-800/70 flex flex-col shrink-0 bg-slate-50/60 dark:bg-[#090d18]/90 backdrop-blur-xl">
           
           {/* Sidebar Header: Profile Information */}
-          <div className="p-5 border-b border-slate-200/40 dark:border-slate-800/40 bg-slate-50/20 dark:bg-slate-900/10 bg-slate-200/10 flex flex-col gap-3 shrink-0">
+          <div className="p-4 sm:p-5 border-b border-slate-200/70 dark:border-slate-800/70 bg-white/60 dark:bg-slate-900/40 flex flex-col gap-3.5 shrink-0">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Link href="/dashboard" className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition-colors text-slate-500 shrink-0">
+              <div className="flex items-center gap-2.5">
+                <Link href="/dashboard" className="p-2 hover:bg-slate-200/70 dark:hover:bg-slate-800/70 rounded-xl transition-all text-slate-500 hover:text-slate-900 dark:hover:text-white shrink-0" title="Back to Dashboard">
                   <ArrowLeft className="w-4 h-4" />
                 </Link>
-                <h1 className="text-lg font-black text-slate-900 dark:text-white leading-none">StudyCircles</h1>
+                <div className="flex items-center gap-1.5">
+                  <h1 className="text-lg font-black text-slate-900 dark:text-white leading-none tracking-tight">StudyCircles</h1>
+                  <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">LIVE</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
+
+              <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => {
                     const html = document.documentElement;
@@ -1530,106 +1544,156 @@ const [liveKitToken, setLiveKitToken] = useState("");
                       localStorage.setItem('edutrack_theme', 'dark');
                     }
                   }}
-                  className="p-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl transition-all flex items-center justify-center"
+                  className="p-2 bg-white hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 rounded-xl transition-all shadow-sm flex items-center justify-center"
                   title="Toggle Theme"
                 >
-                  <Moon className="w-4 h-4 hidden dark:block" />
-                  <Sun className="w-4 h-4 block dark:hidden" />
+                  <Moon className="w-4 h-4 hidden dark:block text-indigo-400" />
+                  <Sun className="w-4 h-4 block dark:hidden text-amber-500" />
                 </button>
                 <button 
                   onClick={() => setShowAddModal(true)}
-                  className="p-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl transition-all flex items-center justify-center"
+                  className="p-2 bg-white hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/60 text-indigo-600 dark:text-indigo-400 rounded-xl transition-all shadow-sm flex items-center justify-center hover:scale-105"
                   title="Add Classmate by Code"
                 >
-                  <UserPlus className="w-4 h-4 text-indigo-650 dark:text-indigo-400" />
+                  <UserPlus className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={() => setShowGroupModal(true)}
-                  className="p-2 bg-indigo-650 hover:bg-indigo-700 text-white rounded-xl shadow-md transition-all flex items-center gap-1.5"
-                  title="Create Group Chat"
+                  className="px-3 py-2 bg-gradient-to-r from-indigo-600 to-purple-650 hover:from-indigo-500 hover:to-purple-550 text-white rounded-xl shadow-md shadow-indigo-500/20 transition-all flex items-center gap-1.5 hover:scale-105"
+                  title="Create Group Circle"
                 >
-                  <Plus className="w-4 h-4" />
-                  <span className="text-[10px] font-black uppercase tracking-wider hidden sm:inline">New Group</span>
+                  <Plus className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-black uppercase tracking-wider hidden sm:inline">New Circle</span>
                 </button>
               </div>
             </div>
 
             {/* My Friend Code Banner */}
-            <div className="bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 px-4 py-3 rounded-2xl flex items-center justify-between">
+            <div className="bg-gradient-to-r from-indigo-50/80 via-purple-50/50 to-indigo-50/80 dark:from-indigo-950/40 dark:via-purple-950/20 dark:to-indigo-950/40 border border-indigo-200/60 dark:border-indigo-800/50 px-3.5 py-2.5 rounded-2xl flex items-center justify-between shadow-sm">
               <div className="overflow-hidden">
-                <p className="text-[9px] font-black text-indigo-500 uppercase tracking-widest leading-none">My Friend Code</p>
-                <p className="font-mono font-black text-sm text-indigo-600 dark:text-indigo-400 mt-1 select-all truncate">{friendCode || "Generating..."}</p>
+                <p className="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest leading-none">Your Roster ID</p>
+                <p className="font-mono font-black text-xs sm:text-sm text-slate-800 dark:text-white mt-1 select-all truncate tracking-wider">{friendCode || "Generating..."}</p>
               </div>
               <button 
                 onClick={copyMyCode} 
-                className="p-2 hover:bg-indigo-150 dark:hover:bg-indigo-900/60 rounded-xl text-indigo-550 transition-colors"
+                className="px-2.5 py-1.5 bg-white dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 border border-indigo-200/50 dark:border-indigo-700/50 rounded-xl text-indigo-600 dark:text-indigo-400 font-extrabold text-[10px] uppercase tracking-wider transition-all flex items-center gap-1 shadow-sm shrink-0 ml-2"
                 title="Copy Friend Code"
               >
-                {copied ? <CheckCheck className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                {copied ? (
+                  <>
+                    <CheckCheck className="w-3.5 h-3.5 text-emerald-500" />
+                    <span className="text-emerald-500 font-black">Copied</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>Copy</span>
+                  </>
+                )}
               </button>
             </div>
 
             {/* View Switcher: Chats vs StudyFeed */}
-            <div className="flex p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl">
+            <div className="flex p-1 bg-slate-200/70 dark:bg-slate-800/70 rounded-xl border border-slate-200/50 dark:border-slate-700/50">
               <button
                 onClick={() => setHubView('chats')}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  hubView === 'chats' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'
+                  hubView === 'chats' ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/25' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                💬 Study Circles
+                💬 Circles &amp; DMs
               </button>
               <button
                 onClick={() => setHubView('feed')}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  hubView === 'feed' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'
+                  hubView === 'feed' ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/25' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 🌐 StudyFeed
               </button>
             </div>
+
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search circles or classmates..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-8 pr-7 py-2 bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Chat List Sections (Groups and Direct Chats) */}
-          <div className="flex-1 overflow-y-auto p-2 space-y-5 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-2.5 space-y-4 custom-scrollbar">
             
             {/* 1. STUDY GROUPS SECTION */}
             <div className="space-y-1.5">
-              <span className="text-[9px] font-black uppercase tracking-widest dark:text-slate-400 text-slate-600 dark:text-slate-555 px-3 block mb-1">
-                Group Study Circles
-              </span>
-              <div className="space-y-0.5">
-                {groups.length === 0 ? (
-                  <p className="text-[10px] dark:text-slate-400 text-slate-600 font-semibold px-3 py-2 italic">No group chats created yet.</p>
+              <div className="flex items-center justify-between px-3 mb-1">
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                  Group Circles ({filteredGroups.length})
+                </span>
+                <button 
+                  onClick={() => setShowGroupModal(true)}
+                  className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                >
+                  + New
+                </button>
+              </div>
+
+              <div className="space-y-1">
+                {filteredGroups.length === 0 ? (
+                  <div className="p-3 bg-white/40 dark:bg-slate-900/30 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 text-center">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">No group circles yet</p>
+                    <button 
+                      onClick={() => setShowGroupModal(true)}
+                      className="text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 mt-1 inline-flex items-center gap-1 hover:underline"
+                    >
+                      <Plus className="w-3 h-3" /> Create Study Circle
+                    </button>
+                  </div>
                 ) : (
-                  groups.map((group) => {
+                  filteredGroups.map((group) => {
                     const isActive = activeGroup?.groupCode === group.groupCode;
                     return (
                       <div
                         key={group.groupCode}
                         onClick={() => selectGroupChat(group)}
                         className={cn(
-                          "flex items-center gap-3.5 p-3.5 rounded-2xl cursor-pointer transition-all select-none border border-transparent",
+                          "flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all select-none border relative overflow-hidden",
                           isActive 
-                            ? "bg-indigo-500/10 dark:bg-indigo-500/10 border-indigo-200/50 dark:border-indigo-500/20 shadow-md backdrop-blur-md" 
-                            : "hover:bg-slate-50/50 dark:hover:dark:bg-slate-900/20 bg-slate-200/20 border-transparent hover:border-slate-200/30 dark:hover:border-slate-800/30"
+                            ? "bg-indigo-50/90 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800/80 shadow-sm" 
+                            : "hover:bg-white/80 dark:hover:bg-slate-900/50 bg-white/40 dark:bg-slate-900/20 border-transparent hover:border-slate-200/60 dark:hover:border-slate-800/60"
                         )}
                       >
+                        {isActive && (
+                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-7 bg-indigo-600 dark:bg-indigo-500 rounded-r-full" />
+                        )}
                         <div className={cn(
-                          "w-11 h-11 rounded-2xl bg-gradient-to-br flex items-center justify-center text-white font-black text-sm shadow-sm border border-white/10 shrink-0",
+                          "w-10 h-10 rounded-2xl bg-gradient-to-br flex items-center justify-center text-white font-black text-xs shadow-sm border border-white/15 shrink-0",
                           group.color
                         )}>
-                          <Users className="w-5 h-5" />
+                          <Users className="w-4 h-4" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-baseline mb-0.5">
-                            <p className="font-extrabold text-sm text-slate-850 dark:text-slate-100 truncate flex items-center gap-1.5">
+                            <p className="font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate flex items-center gap-1.5">
                               {group.name}
-                              <span className="text-[8px] font-black uppercase text-indigo-550 dark:text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded-md shrink-0">Group</span>
+                              <span className="text-[8px] font-black uppercase text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded-md shrink-0">Circle</span>
                             </p>
-                            <span className="text-[9px] font-bold dark:text-slate-400 text-slate-600 uppercase tracking-tight shrink-0">{group.time}</span>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight shrink-0">{group.time}</span>
                           </div>
-                          <p className="text-xs text-slate-505 dark:text-slate-450 truncate leading-snug">{group.lastMsg}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate leading-snug">{group.lastMsg}</p>
                         </div>
                       </div>
                     );
@@ -1640,13 +1704,13 @@ const [liveKitToken, setLiveKitToken] = useState("");
 
             {/* 1.5. PENDING FRIEND REQUESTS SECTION */}
             {pendingRequests.length > 0 && (
-              <div className="space-y-1.5 mb-4">
-                <span className="text-[9px] font-black uppercase tracking-widest text-amber-500 dark:text-amber-400 px-3 block mb-1">
+              <div className="space-y-1.5 mb-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 px-3 block mb-1">
                   Friend Requests ({pendingRequests.length})
                 </span>
-                <div className="space-y-1.5 p-2 bg-amber-500/5 rounded-2xl border border-amber-500/10">
+                <div className="space-y-1.5 p-2 bg-amber-500/10 rounded-2xl border border-amber-500/20">
                   {pendingRequests.map((req) => (
-                    <div key={req.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+                    <div key={req.id} className="flex items-center justify-between p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
                       <div className="min-w-0 flex-1">
                         <p className="font-extrabold text-xs text-slate-850 dark:text-slate-200 truncate">{req.senderName}</p>
                         <p className="text-[9px] font-mono text-slate-450 truncate mt-0.5">{req.senderCode}</p>
@@ -1667,20 +1731,20 @@ const [liveKitToken, setLiveKitToken] = useState("");
 
             {/* 1.7. SENT INVITES SECTION */}
             {sentRequests.length > 0 && (
-              <div className="space-y-1.5 mb-4">
-                <span className="text-[9px] font-black uppercase tracking-widest dark:text-slate-400 text-slate-600 dark:text-slate-555 px-3 block mb-1">
+              <div className="space-y-1.5 mb-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 px-3 block mb-1">
                   Sent Requests ({sentRequests.length})
                 </span>
                 <div className="space-y-1.5 p-2 bg-slate-500/5 rounded-2xl border border-slate-500/10">
                   {sentRequests.map((req) => (
-                    <div key={req.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+                    <div key={req.id} className="flex items-center justify-between p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
                       <div className="min-w-0 flex-1">
                         <p className="font-extrabold text-xs text-slate-855 dark:text-slate-200 truncate">{req.recipientCode}</p>
                         <p className="text-[9px] font-bold text-indigo-500 uppercase tracking-widest mt-0.5 animate-pulse">Pending accept...</p>
                       </div>
                       <button 
                         onClick={() => handleCancelRequest(req)} 
-                        className="px-2.5 py-1.5 bg-slate-100 hover:bg-rose-50 hover:text-rose-600 dark:bg-slate-800 dark:hover:bg-rose-700 text-slate-600 dark:text-slate-350 text-[10px] font-black uppercase tracking-wider rounded-lg transition-colors"
+                        className="px-2.5 py-1.5 bg-slate-100 hover:bg-rose-50 hover:text-rose-600 dark:bg-slate-800 dark:hover:bg-rose-900/30 text-slate-600 dark:text-slate-350 text-[10px] font-black uppercase tracking-wider rounded-lg transition-colors"
                         title="Cancel Request"
                       >
                         Cancel
@@ -1693,43 +1757,63 @@ const [liveKitToken, setLiveKitToken] = useState("");
 
             {/* 2. DIRECT CHATS SECTION */}
             <div className="space-y-1.5">
-              <span className="text-[9px] font-black uppercase tracking-widest dark:text-slate-400 text-slate-600 dark:text-slate-555 px-3 block mb-1">
-                Direct Chats
-              </span>
-              <div className="space-y-0.5">
-                {friends.length === 0 ? (
-                  <p className="text-[10px] dark:text-slate-400 text-slate-600 font-semibold px-3 py-2 italic">Add a classmate by code to start direct chats!</p>
+              <div className="flex items-center justify-between px-3 mb-1">
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                  Direct Chats ({filteredFriends.length})
+                </span>
+                <button 
+                  onClick={() => setShowAddModal(true)}
+                  className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                >
+                  + Add
+                </button>
+              </div>
+
+              <div className="space-y-1">
+                {filteredFriends.length === 0 ? (
+                  <div className="p-3 bg-white/40 dark:bg-slate-900/30 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 text-center">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">No study buddies yet</p>
+                    <button 
+                      onClick={() => setShowAddModal(true)}
+                      className="text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 mt-1 inline-flex items-center gap-1 hover:underline"
+                    >
+                      <UserPlus className="w-3 h-3" /> Add Classmate by Code
+                    </button>
+                  </div>
                 ) : (
-                  friends.map((friend) => {
+                  filteredFriends.map((friend) => {
                     const isActive = activeFriend?.friendCode === friend.friendCode;
                     return (
                       <div
                         key={friend.friendCode}
                         onClick={() => selectFriendChat(friend)}
                         className={cn(
-                          "flex items-center gap-3.5 p-3.5 rounded-2xl cursor-pointer transition-all select-none border border-transparent",
+                          "flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all select-none border relative overflow-hidden",
                           isActive 
-                            ? "bg-indigo-500/10 dark:bg-indigo-500/10 border-indigo-200/50 dark:border-indigo-500/20 shadow-md backdrop-blur-md" 
-                            : "hover:bg-slate-50/50 dark:hover:dark:bg-slate-900/20 bg-slate-200/20 border-transparent hover:border-slate-200/30 dark:hover:border-slate-800/30"
+                            ? "bg-indigo-50/90 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800/80 shadow-sm" 
+                            : "hover:bg-white/80 dark:hover:bg-slate-900/50 bg-white/40 dark:bg-slate-900/20 border-transparent hover:border-slate-200/60 dark:hover:border-slate-800/60"
                         )}
                       >
+                        {isActive && (
+                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-7 bg-indigo-600 dark:bg-indigo-500 rounded-r-full" />
+                        )}
                         <div className="relative shrink-0">
                           <div className={cn(
-                            "w-11 h-11 rounded-2xl bg-gradient-to-br flex items-center justify-center text-white font-black text-sm shadow-sm border border-white/10",
+                            "w-10 h-10 rounded-2xl bg-gradient-to-br flex items-center justify-center text-white font-black text-xs shadow-sm border border-white/15",
                             friend.color
                           )}>
                             {friend.avatar}
                           </div>
                           {friend.online && (
-                            <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-950 shadow-[0_0_8px_rgba(16,185,129,0.7)] animate-pulse" />
+                            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-950 shadow-[0_0_8px_rgba(16,185,129,0.7)] animate-pulse" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-baseline mb-0.5">
-                            <p className="font-extrabold text-sm text-slate-850 dark:text-slate-100 truncate">{friend.name}</p>
-                            <span className="text-[9px] font-bold dark:text-slate-400 text-slate-600 uppercase tracking-tight shrink-0">{friend.time}</span>
+                            <p className="font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate">{friend.name}</p>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight shrink-0">{friend.time}</span>
                           </div>
-                          <p className="text-xs text-slate-505 dark:text-slate-450 truncate leading-snug">{friend.lastMsg}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate leading-snug">{friend.lastMsg}</p>
                         </div>
                       </div>
                     );
@@ -1742,7 +1826,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
         </aside>
 
         {/* RIGHT PANEL: CHAT WINDOW & CONVERSATION CANVAS */}
-        <main className="flex-1 flex flex-col h-full bg-slate-50/20 dark:bg-slate-950/10 backdrop-blur-md min-w-0 min-h-0 overflow-hidden">
+        <main className="flex-1 flex flex-col h-full bg-slate-50/40 dark:bg-[#070b14]/60 backdrop-blur-md min-w-0 min-h-0 overflow-hidden">
           {hubView === 'feed' ? (
             <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
               <StudyFeed />
@@ -1757,53 +1841,53 @@ const [liveKitToken, setLiveKitToken] = useState("");
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
-                className="flex-1 flex flex-col items-center justify-center p-8 text-center max-w-2xl mx-auto"
+                className="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center max-w-2xl mx-auto overflow-y-auto custom-scrollbar"
               >
-                <div className="bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 p-6 rounded-3xl border border-indigo-500/20 mb-6 shadow-lg shadow-indigo-500/5 relative group">
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-indigo-500 to-purple-650 opacity-0 group-hover:opacity-10 transition-opacity blur-md" />
-                  <MessageCircle className="w-12 h-12 text-indigo-650 dark:text-indigo-400 relative z-10 animate-pulse" />
+                <div className="bg-gradient-to-br from-indigo-500/15 via-purple-500/15 to-pink-500/10 p-6 rounded-3xl border border-indigo-200/60 dark:border-indigo-500/20 mb-5 shadow-lg shadow-indigo-500/10 relative group">
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-indigo-500 to-purple-650 opacity-0 group-hover:opacity-15 transition-opacity blur-md" />
+                  <MessageCircle className="w-12 h-12 text-indigo-600 dark:text-indigo-400 relative z-10 animate-pulse" />
                 </div>
-                <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">StudyCircles Direct Chat</h2>
-                <p className="text-xs font-semibold text-slate-500 dark:text-slate-450 max-w-sm leading-relaxed mb-8">
-                  Add friends using their unique codes to message privately in real-time, or create group study circles to collaborate with classmates just like WhatsApp!
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">StudyCircles Collaboration Hub</h2>
+                <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 max-w-md leading-relaxed mb-6">
+                  Add friends using their unique codes to message privately in real-time, or create group study circles to collaborate with classmates across India.
                 </p>
 
                 {/* Features Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full mb-8">
-                  <div className="p-4 bg-white/40 dark:bg-slate-900/30 bg-slate-200/30 border border-slate-200/50 dark:border-white/5 rounded-2xl flex flex-col items-center text-center backdrop-blur-sm shadow-sm hover:scale-[1.03] transition-all duration-300">
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 mb-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 w-full mb-6">
+                  <div className="p-4 bg-white/70 dark:bg-slate-900/50 border border-slate-200/70 dark:border-slate-800 rounded-2xl flex flex-col items-center text-center backdrop-blur-sm shadow-sm hover:scale-[1.02] transition-all">
+                    <div className="w-8 h-8 rounded-xl bg-amber-500/15 flex items-center justify-center text-amber-500 mb-2">
                       <PenTool className="w-4 h-4" />
                     </div>
-                    <h3 className="font-extrabold text-[11px] text-slate-800 dark:text-slate-250 uppercase tracking-wider mb-1">Co-Op Board</h3>
-                    <p className="text-[10px] dark:text-slate-400 text-slate-600 leading-normal">Real-time canvas sharing to sketch answers together.</p>
+                    <h3 className="font-extrabold text-[11px] text-slate-900 dark:text-slate-100 uppercase tracking-wider mb-1">Co-Op Board</h3>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">Real-time canvas sharing to sketch formulas &amp; answers together.</p>
                   </div>
-                  <div className="p-4 bg-white/40 dark:bg-slate-900/30 bg-slate-200/30 border border-slate-200/50 dark:border-white/5 rounded-2xl flex flex-col items-center text-center backdrop-blur-sm shadow-sm hover:scale-[1.03] transition-all duration-300">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-2">
+                  <div className="p-4 bg-white/70 dark:bg-slate-900/50 border border-slate-200/70 dark:border-slate-800 rounded-2xl flex flex-col items-center text-center backdrop-blur-sm shadow-sm hover:scale-[1.02] transition-all">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-500/15 flex items-center justify-center text-emerald-500 mb-2">
                       <Video className="w-4 h-4" />
                     </div>
-                    <h3 className="font-extrabold text-[11px] text-slate-800 dark:text-slate-250 uppercase tracking-wider mb-1">Video Calls</h3>
-                    <p className="text-[10px] dark:text-slate-400 text-slate-600 leading-normal">Join voice & video rooms instantly with one click.</p>
+                    <h3 className="font-extrabold text-[11px] text-slate-900 dark:text-slate-100 uppercase tracking-wider mb-1">Video Meets</h3>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">Join voice &amp; video study rooms instantly with one click.</p>
                   </div>
-                  <div className="p-4 bg-white/40 dark:bg-slate-900/30 bg-slate-200/30 border border-slate-200/50 dark:border-white/5 rounded-2xl flex flex-col items-center text-center backdrop-blur-sm shadow-sm hover:scale-[1.03] transition-all duration-300">
-                    <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 mb-2">
+                  <div className="p-4 bg-white/70 dark:bg-slate-900/50 border border-slate-200/70 dark:border-slate-800 rounded-2xl flex flex-col items-center text-center backdrop-blur-sm shadow-sm hover:scale-[1.02] transition-all">
+                    <div className="w-8 h-8 rounded-xl bg-indigo-500/15 flex items-center justify-center text-indigo-500 mb-2">
                       <Trophy className="w-4 h-4" />
                     </div>
-                    <h3 className="font-extrabold text-[11px] text-slate-800 dark:text-slate-250 uppercase tracking-wider mb-1">Quiz Duels</h3>
-                    <p className="text-[10px] dark:text-slate-400 text-slate-600 leading-normal">Challenge peers to CBSE syllabus question games.</p>
+                    <h3 className="font-extrabold text-[11px] text-slate-900 dark:text-slate-100 uppercase tracking-wider mb-1">Quiz Duels</h3>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">Challenge peers to CBSE syllabus question games &amp; earn XP.</p>
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 dark:from-slate-900/40 dark:to-slate-900/20 p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 text-xs font-bold text-slate-650 dark:text-slate-300 max-w-sm w-full flex flex-col gap-2 shadow-inner">
+                <div className="bg-gradient-to-br from-indigo-50/80 to-purple-50/80 dark:from-slate-900/60 dark:to-slate-900/40 p-4 rounded-2xl border border-indigo-200/60 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 max-w-sm w-full flex flex-col gap-2 shadow-inner">
                   <div className="flex justify-between items-center">
-                    <span>Your Code: <strong className="font-mono text-indigo-500 tracking-wider uppercase select-all ml-1">{friendCode}</strong></span>
+                    <span>Your Code: <strong className="font-mono text-indigo-600 dark:text-indigo-400 tracking-wider uppercase select-all ml-1">{friendCode}</strong></span>
                     <button 
                       onClick={copyMyCode} 
-                      className="px-2.5 py-1 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-500 dark:text-indigo-400 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all"
+                      className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[10px] font-black uppercase tracking-wider transition-all shadow-sm"
                     >
                       {copied ? "Copied!" : "Copy"}
                     </button>
                   </div>
-                  <span className="text-[10px] text-slate-450 font-normal leading-normal text-left">Share this code with your classmates so they can add and message you directly!</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal leading-normal text-left">Share this code with your classmates so they can add and message you directly!</span>
                 </div>
               </motion.div>
             ) : (
@@ -1818,11 +1902,11 @@ const [liveKitToken, setLiveKitToken] = useState("");
                 {/* Main Content Column */}
                 <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0 min-h-0 relative">
                   {/* Chat Header */}
-                  <div className="p-4 sm:p-5 border-b border-slate-200/50 dark:border-slate-800/55 bg-white/60 dark:bg-[#0c101b] bg-[#f5f7ff] backdrop-blur-xl flex items-center justify-between shrink-0 relative z-20">
+                  <div className="p-3.5 sm:p-4 border-b border-slate-200/70 dark:border-slate-800/70 bg-white/80 dark:bg-[#0c101d]/90 backdrop-blur-xl flex items-center justify-between shrink-0 relative z-20">
                   <div className="flex items-center gap-3">
                     <div className="relative">
                       <div className={cn(
-                        "w-10 h-10 rounded-2xl bg-gradient-to-br flex items-center justify-center text-white font-black text-sm",
+                        "w-10 h-10 rounded-2xl bg-gradient-to-br flex items-center justify-center text-white font-black text-sm shadow-sm border border-white/15",
                         activeGroup ? activeGroup.color : activeFriend?.color
                       )}>
                         {activeGroup ? <Users className="w-5 h-5" /> : activeFriend?.avatar}
@@ -1832,58 +1916,58 @@ const [liveKitToken, setLiveKitToken] = useState("");
                       )}
                     </div>
                     <div>
-                      <p className="font-black text-sm text-slate-900 dark:text-white leading-tight">
+                      <p className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white leading-tight">
                         {activeGroup ? activeGroup.name : activeFriend?.name}
                       </p>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-450 font-semibold mt-1">
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">
                         {activeGroup 
-                          ? `${activeGroup.members.length + 1} Members • Active Study Circle` 
-                          : activeFriend?.online ? "Online Now • Study Buddy" : "Offline • Roster Code: " + activeFriend?.friendCode
+                          ? `${activeGroup.members.length + 1} Members • Group Study Circle` 
+                          : activeFriend?.online ? "Online Now • Study Buddy" : "Offline • Code: " + activeFriend?.friendCode
                         }
                       </p>
                     </div>
                   </div>
                   {/* Action Buttons */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5 sm:gap-2">
                     <button 
                       onClick={() => setShowWhiteboard(!showWhiteboard)}
                       className={cn(
-                        "px-3.5 py-2.5 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all flex items-center gap-2 shadow-md border hover:scale-[1.03] active:scale-[0.97]",
+                        "px-3 py-2 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all flex items-center gap-1.5 shadow-sm border hover:scale-[1.03] active:scale-[0.97]",
                         showWhiteboard
                           ? "bg-amber-500 text-white border-amber-400 shadow-amber-500/20" 
-                          : "bg-white dark:bg-slate-900 bg-slate-100 border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20"
+                          : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20"
                       )}
                     >
-                      <PenTool className="w-4 h-4" />
+                      <PenTool className="w-3.5 h-3.5" />
                       <span className="hidden sm:inline">Board</span>
                     </button>
                     <button 
                       onClick={initiateCall}
                       className={cn(
-                        "px-3.5 py-2.5 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all flex items-center gap-2 shadow-md border hover:scale-[1.03] active:scale-[0.97]",
+                        "px-3 py-2 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all flex items-center gap-1.5 shadow-sm border hover:scale-[1.03] active:scale-[0.97]",
                         showVideoMeeting 
                           ? "bg-rose-500 text-white border-rose-400 shadow-rose-500/20" 
-                          : "bg-white dark:bg-slate-900 bg-slate-100 border-slate-200 dark:border-slate-800 text-emerald-650 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
+                          : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
                       )}
                     >
-                      <Video className="w-4 h-4 shrink-0" />
+                      <Video className="w-3.5 h-3.5 shrink-0" />
                       <span className="hidden sm:inline">{showVideoMeeting ? "End Call" : "Video"}</span>
                     </button>
                     <button 
                       onClick={startQuizDuel}
-                      className="px-3.5 py-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:to-red-650 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all shadow-md shadow-orange-500/20 hover:scale-[1.03] active:scale-[0.97]"
+                      className="px-3 py-2 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:to-red-650 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all shadow-sm shadow-orange-500/20 hover:scale-[1.03] active:scale-[0.97] flex items-center gap-1.5"
                     >
+                       <Trophy className="w-3.5 h-3.5" />
                        <span className="hidden sm:inline">Duel</span>
                     </button>
 
-                    {/* Invite button removed as it is for nothing */}
                     {!activeGroup && (
                       <button 
                         onClick={handleRemoveFriend}
-                        className="px-3.5 py-2.5 bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 hover:bg-rose-500 hover:text-white dark:hover:bg-rose-600 text-rose-600 dark:text-rose-400 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all hover:scale-[1.03] active:scale-[0.97]"
+                        className="px-2.5 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-rose-500 hover:text-white dark:hover:bg-rose-600 text-rose-600 dark:text-rose-400 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all hover:scale-[1.03] active:scale-[0.97]"
                         title="Remove Friend"
                       >
-                        Remove
+                        <X className="w-3.5 h-3.5" />
                       </button>
                     )}
                   </div>
@@ -1896,11 +1980,11 @@ const [liveKitToken, setLiveKitToken] = useState("");
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "45vh", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="w-full dark:bg-[#0a0f1d] bg-[#eef1f9] border-b border-white/10 relative z-20 shrink-0 overflow-hidden flex flex-col shadow-[0_10px_40px_rgb(0,0,0,0.5)] ring-1 ring-white/5"
+                      className="w-full bg-[#0a0f1d] border-b border-white/10 relative z-20 shrink-0 overflow-hidden flex flex-col shadow-2xl ring-1 ring-white/5"
                     >
                       <button 
                         onClick={() => setShowVideoMeeting(false)}
-                        className="absolute top-4 right-4 z-50 p-2 bg-slate-800/80 hover:bg-slate-700 dark:text-white text-slate-900 rounded-full transition-colors backdrop-blur-sm shadow-md border border-white/10"
+                        className="absolute top-4 right-4 z-50 p-2 bg-slate-800/80 hover:bg-slate-700 text-white rounded-full transition-colors backdrop-blur-sm shadow-md border border-white/10"
                         title="Close Video Meeting"
                       >
                         <X className="w-4 h-4" />
@@ -1923,8 +2007,8 @@ const [liveKitToken, setLiveKitToken] = useState("");
                       ) : (
                         <div className="flex-1 p-4 flex items-center justify-center h-full w-full">
                           <div className="flex flex-col items-center justify-center text-center">
-                            <Loader2 className="w-10 h-10 dark:text-indigo-400 text-indigo-700 animate-spin mb-4 mx-auto drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]" />
-                            <p className="dark:text-slate-200 text-slate-800 font-black text-sm tracking-wide uppercase">Securing video bridge...</p>
+                            <Loader2 className="w-10 h-10 text-indigo-400 animate-spin mb-4 mx-auto drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]" />
+                            <p className="text-slate-200 font-black text-sm tracking-wide uppercase">Securing video bridge...</p>
                           </div>
                         </div>
                       )}
@@ -1934,18 +2018,18 @@ const [liveKitToken, setLiveKitToken] = useState("");
 
                 {activeDuel ? (
                   /* Quiz Duel Arena Canvas */
-                  <div className="flex-1 flex flex-col h-full dark:bg-[#0a0f1d] bg-[#eef1f9] dark:text-white text-slate-900 overflow-y-auto p-6 relative">
+                  <div className="flex-1 flex flex-col h-full bg-slate-900 text-white overflow-y-auto p-6 relative">
                     {/* Matchmaking Lobby Screen */}
                     {activeDuel.status === 'waiting' && (
                       <div className="flex-1 flex flex-col items-center justify-center text-center p-8 select-none animate-in fade-in duration-300">
                         <div className="relative mb-6">
                           <div className="absolute inset-0 rounded-full bg-indigo-500/20 animate-ping duration-1000" />
                           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-650 flex items-center justify-center border border-white/20 shadow-2xl">
-                            <Sparkles className="w-10 h-10 dark:text-white text-slate-900 animate-pulse" />
+                            <Sparkles className="w-10 h-10 text-white animate-pulse" />
                           </div>
                         </div>
-                        <h3 className="text-xl font-black dark:text-white text-slate-900 tracking-wide">StudyCircle Quiz Lobby</h3>
-                        <p className="text-xs dark:text-slate-400 text-slate-600 font-semibold mt-2 max-w-xs leading-relaxed">
+                        <h3 className="text-xl font-black text-white tracking-wide">StudyCircle Quiz Lobby</h3>
+                        <p className="text-xs text-slate-400 font-semibold mt-2 max-w-xs leading-relaxed">
                           Classmate <strong>{activeGroup ? activeGroup.name : activeFriend?.name}</strong> is entering the StudyCircle Quiz Arena...
                         </p>
                         {/* Animated loading */}
@@ -1963,14 +2047,14 @@ const [liveKitToken, setLiveKitToken] = useState("");
                       return (
                         <div className="flex-1 flex flex-col h-full justify-between gap-6">
                           {/* Top stats HUD */}
-                          <div className="flex justify-between items-center dark:bg-[#111930] bg-[#f5f7ff] p-4 rounded-2xl border border-white/5 shadow-inner shrink-0">
+                          <div className="flex justify-between items-center bg-[#111930] p-4 rounded-2xl border border-white/5 shadow-inner shrink-0">
                             <div className="flex items-center gap-2">
                               <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center font-extrabold text-[10px] text-white">
                                 {nickname.substring(0, 2).toUpperCase()}
                               </div>
                               <div>
-                                <span className="text-[9px] font-black dark:text-indigo-400 text-indigo-700 uppercase tracking-widest block leading-none">Score</span>
-                                <span className="text-xs font-black dark:text-white text-slate-900 mt-0.5 block">{activeDuel.myScore} pts</span>
+                                <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest block leading-none">Score</span>
+                                <span className="text-xs font-black text-white mt-0.5 block">{activeDuel.myScore} pts</span>
                               </div>
                             </div>
 
@@ -1985,13 +2069,13 @@ const [liveKitToken, setLiveKitToken] = useState("");
                                   className="transition-all duration-1000 ease-linear origin-center -rotate-90"
                                 />
                               </svg>
-                              <span className="absolute text-sm font-black dark:text-white text-slate-900">{activeDuel.timer}s</span>
+                              <span className="absolute text-sm font-black text-white">{activeDuel.timer}s</span>
                             </div>
 
                             <div className="flex items-center gap-2 text-right">
                               <div>
-                                <span className="text-[9px] font-black dark:text-emerald-400 text-emerald-700 uppercase tracking-widest block leading-none">Buddy</span>
-                                <span className="text-xs font-black dark:text-white text-slate-900 mt-0.5 block">{activeDuel.buddyScore} pts</span>
+                                <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest block leading-none">Buddy</span>
+                                <span className="text-xs font-black text-white mt-0.5 block">{activeDuel.buddyScore} pts</span>
                               </div>
                               <div className="w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center font-extrabold text-[10px] text-white">
                                 {activeFriend ? activeFriend.avatar : "CB"}
@@ -2000,11 +2084,11 @@ const [liveKitToken, setLiveKitToken] = useState("");
                           </div>
 
                           {/* Board question Card */}
-                          <div className="dark:bg-[#111930] bg-[#f5f7ff] border border-white/5 p-6 rounded-3xl text-center shadow-lg relative overflow-hidden flex-1 flex flex-col justify-center">
+                          <div className="bg-[#111930] border border-white/5 p-6 rounded-3xl text-center shadow-lg relative overflow-hidden flex-1 flex flex-col justify-center">
                             <span className="absolute top-4 left-4 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
                               CBSE BOARD QUESTION {activeDuel.currentQuestionIndex + 1} of 3
                             </span>
-                            <h4 className="text-base sm:text-lg font-bold leading-relaxed dark:text-slate-100 text-slate-900 mt-4">
+                            <h4 className="text-base sm:text-lg font-bold leading-relaxed text-slate-100 mt-4">
                               <span dangerouslySetInnerHTML={{
                                 __html: q.question
                                   .replace(/_([a-zA-Z0-9\+\-]+)/g, '<sub>$1</sub>')
@@ -2020,7 +2104,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                               const isCorrectAnswer = option === q.correctAnswer;
                               const hasAnswered = activeDuel.myAnswered !== null;
                               
-                              let btnClass = "dark:bg-[#111930] bg-[#f5f7ff] hover:bg-[#15203d] border-white/5 text-slate-200 hover:border-indigo-500/40";
+                              let btnClass = "bg-[#111930] hover:bg-[#15203d] border-white/5 text-slate-200 hover:border-indigo-500/40";
                               if (hasAnswered) {
                                 if (isCorrectAnswer) {
                                   btnClass = "bg-emerald-700/80 border-emerald-500 text-white shadow-lg shadow-emerald-500/10 pointer-events-none";
@@ -2041,7 +2125,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                                     btnClass
                                   )}
                                 >
-                                  <span className="w-6 h-6 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-bold text-xs shrink-0 select-none dark:text-slate-400 text-slate-600">
+                                  <span className="w-6 h-6 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-bold text-xs shrink-0 select-none text-slate-400">
                                     {String.fromCharCode(65 + idx)}
                                   </span>
                                   <span className="flex-1 break-words">
@@ -2052,7 +2136,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                                     }} />
                                   </span>
 
-                                  {/* opponent dot choice tag indicator */}
+                                  {/* opponent choice tag indicator */}
                                   {hasAnswered && activeDuel.buddyAnswered === option && (
                                     <span className="absolute top-2 right-2 bg-emerald-500 text-white text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shadow-md animate-pulse">
                                       {activeFriend ? activeFriend.name.split(" ")[0] : "Buddy"}
@@ -2073,13 +2157,13 @@ const [liveKitToken, setLiveKitToken] = useState("");
                           <div className="relative">
                             <div className="absolute inset-0 rounded-full bg-amber-500/20 animate-ping duration-2000" />
                             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center border border-white/20 shadow-2xl">
-                              <Trophy className="w-10 h-10 dark:text-white text-slate-900 animate-bounce" />
+                              <Trophy className="w-10 h-10 text-white animate-bounce" />
                             </div>
                           </div>
 
                           <div>
-                            <h3 className="text-2xl font-black dark:text-white text-slate-900 tracking-wide">Classroom Podium</h3>
-                            <p className="text-xs dark:text-slate-400 text-slate-600 font-semibold mt-1">
+                            <h3 className="text-2xl font-black text-white tracking-wide">Classroom Podium</h3>
+                            <p className="text-xs text-slate-400 font-semibold mt-1">
                               You completed the Chemistry board preparation duel!
                             </p>
                           </div>
@@ -2088,32 +2172,32 @@ const [liveKitToken, setLiveKitToken] = useState("");
                           <div className="flex items-end justify-center gap-4 mt-8 h-40 w-full max-w-xs px-4">
                             {/* Rank 2 (Opponent) */}
                             <div className="flex flex-col items-center flex-1">
-                              <span className="text-[10px] font-black dark:text-slate-300 text-slate-700 uppercase truncate max-w-[80px] mb-1.5">
+                              <span className="text-[10px] font-black text-slate-300 uppercase truncate max-w-[80px] mb-1.5">
                                 {activeFriend ? activeFriend.name.split(" ")[0] : "Buddy"}
                               </span>
                               <div className="bg-slate-700 border border-slate-600 rounded-t-2xl w-full h-16 flex items-center justify-center relative shadow-inner">
-                                <span className="font-mono font-black text-2xl dark:text-slate-200 text-slate-800">2</span>
-                                <span className="absolute -bottom-6 text-[10px] font-black dark:text-slate-400 text-slate-600 tracking-tight">{activeDuel.buddyScore} pts</span>
+                                <span className="font-mono font-black text-2xl text-slate-200">2</span>
+                                <span className="absolute -bottom-6 text-[10px] font-black text-slate-400 tracking-tight">{activeDuel.buddyScore} pts</span>
                               </div>
                             </div>
 
                             {/* Rank 1 (User or Winner) */}
                             <div className="flex flex-col items-center flex-1">
-                              <span className="text-[10px] font-black dark:text-amber-400 text-amber-700 uppercase truncate max-w-[80px] mb-1.5 animate-pulse">
+                              <span className="text-[10px] font-black text-amber-400 uppercase truncate max-w-[80px] mb-1.5 animate-pulse">
                                 You
                               </span>
-                              <div className="bg-amber-650 border border-amber-500 rounded-t-2xl w-full h-24 flex items-center justify-center relative shadow-inner">
+                              <div className="bg-amber-600 border border-amber-500 rounded-t-2xl w-full h-24 flex items-center justify-center relative shadow-inner">
                                 <div className="absolute top-2 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center">
                                   <Sparkles className="w-2.5 h-2.5 text-slate-900" />
                                 </div>
-                                <span className="font-mono font-black text-3xl dark:text-amber-200 text-amber-800">1</span>
-                                <span className="absolute -bottom-6 text-[10px] font-black dark:text-amber-400 text-amber-700 tracking-tight">{activeDuel.myScore} pts</span>
+                                <span className="font-mono font-black text-3xl text-amber-200">1</span>
+                                <span className="absolute -bottom-6 text-[10px] font-black text-amber-400 tracking-tight">{activeDuel.myScore} pts</span>
                               </div>
                             </div>
                           </div>
 
                           <div className="bg-emerald-500/10 border border-emerald-500/20 px-6 py-3 rounded-2xl max-w-xs mt-8 shrink-0">
-                            <p className="text-xs dark:text-emerald-400 text-emerald-700 font-extrabold m-0 leading-normal">
+                            <p className="text-xs text-emerald-400 font-extrabold m-0 leading-normal">
                                Double Reward Added! You have gained up to <strong>+{activeDuel.myScore * 15 + 10} XP</strong> for board exam practice!
                             </p>
                           </div>
@@ -2135,7 +2219,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                 ) : (
                   <>
                     {/* Direct & Group Message Feed */}
-                    <div ref={messagesEndRef} className="flex-1 h-0 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-4 bg-slate-50/10 dark:bg-[#090d16] bg-[#eef1f9] backdrop-blur-md custom-scrollbar">
+                    <div ref={messagesEndRef} className="flex-1 h-0 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-4 bg-slate-50/30 dark:bg-[#080c16]/50 backdrop-blur-md custom-scrollbar">
                       {error && (
                         <div className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-2xl px-4 py-3 mb-4 text-xs font-semibold">
                           <AlertCircle className="w-4 h-4 shrink-0" /> {error}
@@ -2149,12 +2233,12 @@ const [liveKitToken, setLiveKitToken] = useState("");
                         </div>
                       ) : messages.length === 0 ? (
                         <div className="h-full flex flex-col items-center justify-center gap-4 text-center p-6 select-none">
-                          <div className="bg-indigo-50 dark:bg-indigo-950/20 p-4 rounded-full border border-indigo-150/40 dark:border-indigo-900/30">
+                          <div className="bg-indigo-50 dark:bg-indigo-950/30 p-4 rounded-full border border-indigo-200/60 dark:border-indigo-900/40">
                             <Sparkles className="w-6 h-6 text-indigo-500" />
                           </div>
                           <div>
                             <h3 className="font-extrabold text-slate-800 dark:text-white">This Chat is Empty</h3>
-                            <p className="text-xs text-slate-500 dark:text-slate-450 mt-1 max-w-xs mx-auto leading-relaxed">
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs mx-auto leading-relaxed">
                               Type a private study message below to start your real-time chat with <strong>{activeGroup ? activeGroup.name : activeFriend?.name}</strong>!
                             </p>
                           </div>
@@ -2180,7 +2264,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                             <div 
                               key={msg.id} 
                               className={cn(
-                                "flex gap-3 max-w-[80%] cursor-pointer",
+                                "flex gap-3 max-w-[85%] sm:max-w-[78%] cursor-pointer group",
                                 isOwn ? "ml-auto flex-row-reverse" : "mr-auto",
                                 isConsecutive ? "mt-1" : "mt-4"
                               )}
@@ -2193,40 +2277,40 @@ const [liveKitToken, setLiveKitToken] = useState("");
                                 <div className="w-8 shrink-0" />
                               ) : (
                                 <div className={cn(
-                                  "w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-black select-none",
+                                  "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-black select-none shadow-sm border",
                                   isOwn 
-                                    ? "bg-indigo-100 text-indigo-650 dark:bg-indigo-900/50 dark:text-indigo-400" 
-                                    : "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-500/20"
+                                    ? "bg-indigo-100 text-indigo-650 dark:bg-indigo-900/60 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800" 
+                                    : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800"
                                 )}>
                                   {isOwn ? nickname.substring(0, 2).toUpperCase() : (senderBuddy?.avatar || msg.senderCode.substring(0, 2).toUpperCase())}
                                 </div>
                               )}
                               
-                              <div className="flex flex-col gap-0.5">
+                              <div className="flex flex-col gap-0.5 min-w-0">
                                 {!isConsecutive && (
-                                  <span className={`text-[9px] font-black uppercase tracking-wider ${isOwn ? "text-indigo-500 text-right pr-1" : "text-slate-500 pl-1"}`}>
+                                  <span className={`text-[9px] font-black uppercase tracking-wider ${isOwn ? "text-indigo-600 dark:text-indigo-400 text-right pr-1" : "text-slate-500 dark:text-slate-400 pl-1"}`}>
                                     {displaySenderName}
                                   </span>
                                 )}
                                 
                                 <div className={cn(
-                                  "px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-md break-words transition-all duration-200 hover:-translate-y-0.5 border",
+                                  "px-4 py-2.5 rounded-2xl text-xs sm:text-sm leading-relaxed shadow-sm break-words transition-all duration-200 border relative",
                                   isOwn 
-                                    ? "bg-gradient-to-br from-indigo-600 via-indigo-555 to-purple-650 text-white border-indigo-400/20 shadow-[0_4px_20px_rgba(99,102,241,0.25)]" 
-                                    : "bg-white/60 dark:bg-slate-900/60 bg-slate-200/60 border-slate-200/40 dark:border-white/5 backdrop-blur-md text-slate-800 dark:text-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.02)]",
-                                  isOwn && !isConsecutive && "rounded-tr-none",
-                                  !isOwn && !isConsecutive && "rounded-tl-none",
+                                    ? "bg-gradient-to-r from-indigo-600 via-indigo-650 to-purple-650 text-white border-indigo-400/30 shadow-indigo-500/15" 
+                                    : "bg-white dark:bg-[#131929] border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-slate-200/20 dark:shadow-none",
+                                  isOwn && !isConsecutive && "rounded-tr-sm",
+                                  !isOwn && !isConsecutive && "rounded-tl-sm",
                                   isSelected && "ring-4 ring-indigo-500 ring-offset-2 dark:ring-offset-slate-900 scale-[1.02]"
                                 )}>
                                   {msg.attachmentUrl && (
                                     <div className="mb-2">
                                       {msg.attachmentType?.startsWith('image/') ? (
-                                        <img src={msg.attachmentUrl} alt="Attachment" className="max-w-full rounded-xl" />
+                                        <img src={msg.attachmentUrl} alt="Attachment" className="max-w-full rounded-xl border border-white/10" />
                                       ) : msg.attachmentType?.startsWith('audio/') ? (
                                         <audio src={msg.attachmentUrl} controls className="w-full h-10" />
                                       ) : (
-                                        <a href={msg.attachmentUrl} target="_blank" className="flex items-center gap-2 underline text-sm break-all">
-                                          <Paperclip className="w-4 h-4 shrink-0" />
+                                        <a href={msg.attachmentUrl} target="_blank" className="flex items-center gap-2 underline text-xs break-all">
+                                          <Paperclip className="w-3.5 h-3.5 shrink-0" />
                                           {msg.attachmentName || "Download File"}
                                         </a>
                                       )}
@@ -2237,28 +2321,28 @@ const [liveKitToken, setLiveKitToken] = useState("");
                                       .replace(/~([^~]+)~/g, (match, p1) => {
                                         return p1.replace(/_([a-zA-Z0-9\+\-]+)/g, '<sub>$1</sub>').replace(/\^([a-zA-Z0-9\+\-]+)/g, '<sup>$1</sup>');
                                       })
-                                      .replace(/<sub>/g, '<sub class="select-none font-bold text-indigo-300 dark:text-indigo-400">')
-                                      .replace(/<sup>/g, '<sup class="select-none font-bold text-indigo-300 dark:text-indigo-400">')
+                                      .replace(/<sub>/g, `<sub class="select-none font-bold ${isOwn ? 'text-indigo-200' : 'text-indigo-600 dark:text-indigo-400'}">`)
+                                      .replace(/<sup>/g, `<sup class="select-none font-bold ${isOwn ? 'text-indigo-200' : 'text-indigo-600 dark:text-indigo-400'}">`)
                                   }} />}
                                 </div>
-                                <div className={`flex items-center gap-2 mt-1 ${isOwn ? "justify-end" : "justify-start"}`}>
+                                <div className={`flex items-center gap-2 mt-0.5 ${isOwn ? "justify-end" : "justify-start"}`}>
                                   {msg.text && (
                                     <button 
                                       onClick={() => handleReadAloud(msg.text)} 
-                                      className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors dark:text-slate-400 text-slate-600 opacity-60 hover:opacity-100"
+                                      className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-0 group-hover:opacity-100"
                                       title="Read Aloud"
                                     >
                                       <Volume2 className="w-3 h-3" />
                                     </button>
                                   )}
-                                  <span className="text-[9px] font-medium dark:text-slate-400 text-slate-600 dark:text-slate-500">
+                                  <span className="text-[9px] font-medium text-slate-400">
                                     {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                   </span>
                                   {isOwn && (
                                     msg.read ? (
-                                      <CheckCheck className="w-3 h-3 dark:text-indigo-400 text-indigo-700 shrink-0" />
+                                      <CheckCheck className="w-3 h-3 text-indigo-400 shrink-0" />
                                     ) : (
-                                      <Check className="w-3 h-3 dark:text-slate-400 text-slate-600 dark:text-slate-500 shrink-0" />
+                                      <Check className="w-3 h-3 text-slate-400 shrink-0" />
                                     )
                                   )}
                                 </div>
@@ -2270,29 +2354,46 @@ const [liveKitToken, setLiveKitToken] = useState("");
                     </div>
 
                     {/* Private / Group Message Input Bar */}
-                    <div className="p-4 border-t border-slate-200/50 dark:border-slate-800/55 bg-white/60 dark:bg-[#0c101b] bg-[#f5f7ff] backdrop-blur-xl shrink-0">
+                    <div className="p-3.5 sm:p-4 border-t border-slate-200/70 dark:border-slate-800/70 bg-white/80 dark:bg-[#0c101d]/90 backdrop-blur-xl shrink-0">
                       <form 
                         onSubmit={(e) => handleSend(e)}
                         className="flex gap-2.5 relative max-w-4xl mx-auto w-full items-center"
                       >
                         <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
-                        <button type="button" onClick={() => fileInputRef.current?.click()} className="p-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-500">
-                          <Paperclip className="w-5 h-5" />
+                        <button 
+                          type="button" 
+                          onClick={() => fileInputRef.current?.click()} 
+                          className="p-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 rounded-2xl transition-colors text-slate-600 dark:text-slate-300 shrink-0"
+                          title="Attach file"
+                        >
+                          <Paperclip className="w-4 h-4" />
                         </button>
                         <input
                           type="text"
                           value={chatInput}
                           onChange={(e) => setChatInput(e.target.value)}
-                          placeholder={activeGroup ? `Message ${activeGroup.name}...` : `Message ${activeFriend?.name}...`}
+                          placeholder={activeGroup ? `Message ${activeGroup.name} (type @studybot for AI helper)...` : `Message ${activeFriend?.name}...`}
                           maxLength={500}
-                          className="flex-1 rounded-full pl-5 pr-14 py-3.5 bg-slate-50/30 dark:bg-[#111625] bg-[#f5f7ff] backdrop-blur-md border border-slate-200/60 dark:border-slate-800/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 shadow-inner text-sm sm:text-base text-slate-855 dark:text-white transition-all focus:border-indigo-500"
+                          className="flex-1 rounded-2xl pl-4 pr-12 py-3 bg-slate-100/90 dark:bg-[#131929] border border-slate-200/80 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                         />
                         {chatInput.trim() ? (
-                          <button type="submit" className="absolute right-1.5 top-1.5 bottom-1.5 aspect-square bg-indigo-650 hover:bg-indigo-700 text-white rounded-full transition-all flex items-center justify-center shadow-md">
+                          <button type="submit" className="absolute right-2 top-2 bottom-2 aspect-square bg-gradient-to-r from-indigo-600 to-purple-650 hover:from-indigo-500 hover:to-purple-550 text-white rounded-xl transition-all flex items-center justify-center shadow-md shadow-indigo-500/20">
                             <Send className="w-4 h-4 ml-0.5" />
                           </button>
                         ) : (
-                          <button type="button" onMouseDown={startRecording} onMouseUp={stopRecording} onMouseLeave={stopRecording} onTouchStart={startRecording} onTouchEnd={stopRecording} className={cn("absolute right-1.5 top-1.5 bottom-1.5 aspect-square rounded-full transition-all flex items-center justify-center shadow-md", isRecording ? "bg-red-500 text-white animate-pulse scale-110" : "bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300")}>
+                          <button 
+                            type="button" 
+                            onMouseDown={startRecording} 
+                            onMouseUp={stopRecording} 
+                            onMouseLeave={stopRecording} 
+                            onTouchStart={startRecording} 
+                            onTouchEnd={stopRecording} 
+                            className={cn(
+                              "absolute right-2 top-2 bottom-2 aspect-square rounded-xl transition-all flex items-center justify-center shadow-sm", 
+                              isRecording ? "bg-red-500 text-white animate-pulse scale-110" : "bg-slate-200/80 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300"
+                            )}
+                            title="Hold to record voice note"
+                          >
                             <Mic className="w-4 h-4" />
                           </button>
                         )}
@@ -2331,64 +2432,60 @@ const [liveKitToken, setLiveKitToken] = useState("");
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6"
+              className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 text-slate-900 dark:text-white"
             >
               <div className="text-center">
-                <div className="flex items-center gap-4 text-slate-800 dark:text-white mb-2">
-                  <div className="p-3 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl">
-                    <UserPlus className="w-6 h-6 text-indigo-650 dark:text-indigo-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-black">Add or Join</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Enter a friend code or group code</p>
-                  </div>
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 mb-3">
+                  <UserPlus className="w-6 h-6" />
                 </div>
+                <h3 className="text-xl font-black">Add Classmate or Join Circle</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mt-1">Enter a classmate's code or circle code</p>
               </div>
 
               <form onSubmit={handleAddFriend} className="space-y-4">
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase ml-1 block">Friend/Group Code</label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Search className="w-5 h-5 dark:text-slate-400 text-slate-600" />
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                      <Search className="w-4 h-4 text-slate-400" />
                     </div>
                     <input
                       type="text"
                       value={searchCode}
                       onChange={(e) => { setSearchCode(e.target.value.toUpperCase()); setAddError(""); }}
                       maxLength={20}
-                      className="block w-full pl-11 pr-4 py-3.5 bg-slate-50 dark:bg-slate-900/50 bg-slate-200/50 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono font-bold tracking-widest text-sm uppercase transition-all"
+                      className="block w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono font-bold tracking-widest text-xs sm:text-sm uppercase transition-all"
                       placeholder="e.g. ADITYA#9581 or GROUP-1234"
                     />
                   </div>
                 </div>
 
                 {addError && (
-                  <div className="text-red-500 text-xs font-bold text-center bg-red-50 dark:bg-red-950/20 border border-red-150 dark:border-red-900/50 p-3 rounded-xl">
+                  <div className="text-red-500 text-xs font-bold text-center bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 p-3 rounded-xl">
                     {addError}
                   </div>
                 )}
 
                 {addSuccess && (
-                  <div className="text-emerald-500 text-xs font-bold text-center bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-150 dark:border-emerald-900/50 p-3 rounded-xl">
+                  <div className="text-emerald-500 text-xs font-bold text-center bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50 p-3 rounded-xl">
                     {addSuccess}
                   </div>
                 )}
 
-                <div className="flex gap-3">
+                <div className="flex gap-3 pt-2">
                   <button
                     type="button"
                     onClick={() => { setShowAddModal(false); setAddError(""); }}
-                    className="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-extrabold py-3.5 rounded-2xl transition-all"
+                    className="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-extrabold py-3 rounded-2xl transition-all text-xs"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={!searchCode.trim()}
-                    className="flex-1 bg-indigo-650 hover:bg-indigo-700 text-white font-extrabold py-3.5 rounded-2xl transition-all shadow-md shadow-indigo-500/10 disabled:opacity-50"
+                    className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-650 hover:from-indigo-700 hover:to-purple-700 text-white font-extrabold py-3 rounded-2xl transition-all shadow-md shadow-indigo-500/20 disabled:opacity-50 text-xs"
                   >
-                    Add Friend
+                    Connect
                   </button>
                 </div>
               </form>
@@ -2405,38 +2502,38 @@ const [liveKitToken, setLiveKitToken] = useState("");
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6"
+              className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 text-slate-900 dark:text-white"
             >
               <div className="text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/35 border border-indigo-150 dark:border-indigo-850 text-indigo-600 dark:text-indigo-400 mb-4">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 mb-3">
                   <Users className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-black text-slate-900 dark:text-white">Create Group Study Circle</h3>
+                <h3 className="text-xl font-black">Create Study Circle</h3>
                 <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">
-                  Assemble a study group with your classmates to message each other together.
+                  Assemble a group with your classmates to message and review board topics together.
                 </p>
               </div>
 
-              <form onSubmit={handleCreateGroup} className="space-y-5">
+              <form onSubmit={handleCreateGroup} className="space-y-4">
                 {/* Group Name input */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase ml-1 block">Group Name</label>
+                  <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase ml-1 block">Circle Name</label>
                   <input
                     type="text"
                     value={newGroupName}
                     onChange={(e) => setNewGroupName(e.target.value)}
-                    placeholder="e.g. Maths Study Squad or Science Stars"
+                    placeholder="e.g. Science Board Toppers or Math Squad"
                     maxLength={25}
-                    className="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-855 dark:text-white transition-all"
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-bold text-xs sm:text-sm text-slate-900 dark:text-white transition-all"
                   />
                 </div>
 
                 {/* Buddy checklist selection */}
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase ml-1 block">Select Members</label>
-                  <div className="max-h-40 overflow-y-auto space-y-2 border border-slate-100 dark:border-slate-800 rounded-2xl p-3 bg-slate-50/50 dark:bg-slate-900/40 bg-slate-200/40">
+                  <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase ml-1 block">Select Classmate Buddies</label>
+                  <div className="max-h-40 overflow-y-auto space-y-1.5 border border-slate-200 dark:border-slate-800 rounded-2xl p-2.5 bg-slate-50/50 dark:bg-slate-900/40 custom-scrollbar">
                     {friends.length === 0 ? (
-                      <p className="text-[10px] dark:text-slate-400 text-slate-600 font-semibold italic text-center py-4">Add some friends by code first before creating a group!</p>
+                      <p className="text-[11px] text-slate-400 font-semibold italic text-center py-4">Add some friends by code first before creating a circle!</p>
                     ) : (
                       friends.map((friend) => {
                         const isChecked = selectedMembers.includes(friend.friendCode);
@@ -2444,7 +2541,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                           <div 
                             key={friend.friendCode}
                             onClick={() => toggleSelectMember(friend.friendCode)}
-                            className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-150/50 dark:border-slate-850 cursor-pointer select-none"
+                            className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 cursor-pointer select-none"
                           >
                             <div className="flex items-center gap-2.5">
                               <div className={cn(
@@ -2455,17 +2552,15 @@ const [liveKitToken, setLiveKitToken] = useState("");
                               </div>
                               <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{friend.name}</span>
                             </div>
-                            {/* Checkbox circle indicator */}
+                            {/* Checkbox indicator */}
                             <div className={cn(
                               "w-5 h-5 rounded-full border flex items-center justify-center transition-all",
                               isChecked 
-                                ? "bg-indigo-650 border-indigo-650 text-white" 
-                                : "border-slate-300 dark:border-slate-700"
+                                ? "bg-indigo-600 border-indigo-600 text-white" 
+                                : "border-slate-300 dark:border-slate-600"
                             )}>
                               {isChecked && (
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                </svg>
+                                <Check className="w-3 h-3" />
                               )}
                             </div>
                           </div>
@@ -2476,25 +2571,25 @@ const [liveKitToken, setLiveKitToken] = useState("");
                 </div>
 
                 {groupError && (
-                  <div className="text-red-500 text-xs font-bold text-center bg-red-50 dark:bg-red-950/20 border border-red-150 dark:border-red-900/50 p-3 rounded-xl">
+                  <div className="text-red-500 text-xs font-bold text-center bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 p-3 rounded-xl">
                     {groupError}
                   </div>
                 )}
 
-                <div className="flex gap-3">
+                <div className="flex gap-3 pt-2">
                   <button
                     type="button"
                     onClick={() => { setShowGroupModal(false); setNewGroupName(""); setSelectedMembers([]); setGroupError(""); }}
-                    className="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-extrabold py-3.5 rounded-2xl transition-all"
+                    className="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-extrabold py-3 rounded-2xl transition-all text-xs"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={!newGroupName.trim() || selectedMembers.length === 0}
-                    className="flex-1 bg-indigo-650 hover:bg-indigo-700 text-white font-extrabold py-3.5 rounded-2xl transition-all shadow-md shadow-indigo-500/10 disabled:opacity-50"
+                    className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-650 hover:from-indigo-700 hover:to-purple-700 text-white font-extrabold py-3 rounded-2xl transition-all shadow-md shadow-indigo-500/20 disabled:opacity-50 text-xs"
                   >
-                    Create Group
+                    Create Circle
                   </button>
                 </div>
               </form>
@@ -2511,37 +2606,37 @@ const [liveKitToken, setLiveKitToken] = useState("");
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="w-full max-w-sm bg-white/80 dark:bg-[#0c0f1d] bg-[#f5f7ff] backdrop-blur-2xl border border-white/20 dark:border-white/10 rounded-[2rem] p-8 shadow-[0_20px_50px_rgb(0,0,0,0.3)] dark:shadow-[0_20px_50px_rgba(99,102,241,0.15)] ring-1 ring-slate-900/5 space-y-6 text-center relative overflow-hidden"
+              className="w-full max-w-sm bg-white/90 dark:bg-[#0c0f1d] backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-[2rem] p-8 shadow-2xl space-y-6 text-center relative overflow-hidden"
             >
               <div className="absolute top-0 left-0 w-full h-32 bg-indigo-500/20 blur-[50px] -z-10 pointer-events-none"></div>
               <motion.div 
-                animate={{ y: [0, -10, 0] }}
+                animate={{ y: [0, -8, 0] }}
                 transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                className="w-24 h-24 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-full mx-auto flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-indigo-500/40 relative"
+                className="w-20 h-20 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-indigo-500/40 relative"
               >
                 {incomingCall.callerName.substring(0, 2).toUpperCase()}
                 <div className="absolute inset-0 rounded-full border-4 border-indigo-500 animate-ping opacity-75"></div>
               </motion.div>
               
               <div>
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white">{incomingCall.callerName}</h3>
-                <p className="text-slate-500 dark:text-slate-400 font-bold mt-1">Incoming Video Call...</p>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white">{incomingCall.callerName}</h3>
+                <p className="text-slate-500 dark:text-slate-400 font-bold mt-1 text-xs">Incoming Video Call...</p>
               </div>
 
-              <div className="flex justify-center gap-4 mt-8">
+              <div className="flex justify-center gap-4 mt-6">
                 <button 
                   onClick={handleDeclineCall}
-                  className="w-16 h-16 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105"
+                  className="w-14 h-14 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105"
                   title="Decline"
                 >
-                  <X className="w-8 h-8" />
+                  <X className="w-6 h-6" />
                 </button>
                 <button 
                   onClick={handleAcceptCall}
-                  className="w-16 h-16 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105"
+                  className="w-14 h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105"
                   title="Accept"
                 >
-                  <Video className="w-8 h-8" />
+                  <Video className="w-6 h-6" />
                 </button>
               </div>
             </motion.div>
@@ -2557,25 +2652,25 @@ const [liveKitToken, setLiveKitToken] = useState("");
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="w-full max-w-sm dark:bg-[#0c0f1d] bg-[#f5f7ff] backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 shadow-[0_20px_50px_rgba(99,102,241,0.15)] space-y-6 text-center relative overflow-hidden"
+              className="w-full max-w-sm bg-white/90 dark:bg-[#0c0f1d] backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-[2rem] p-8 shadow-2xl space-y-6 text-center relative overflow-hidden"
             >
               <div className="absolute top-0 left-0 w-full h-32 bg-indigo-500/20 blur-[50px] -z-10 pointer-events-none"></div>
-              <div className="w-24 h-24 bg-slate-800 rounded-full mx-auto flex items-center justify-center dark:text-slate-400 text-slate-600 text-3xl font-black relative overflow-hidden">
+              <div className="w-20 h-20 bg-slate-200 dark:bg-slate-800 rounded-full mx-auto flex items-center justify-center text-slate-600 dark:text-slate-300 text-2xl font-black relative overflow-hidden">
                 <div className="absolute w-full h-full bg-indigo-500/20 animate-pulse"></div>
-                <UserPlus className="w-8 h-8 relative z-10" />
+                <UserPlus className="w-7 h-7 relative z-10" />
               </div>
               
               <div>
-                <h3 className="text-2xl font-black dark:text-white text-slate-900">Calling Buddy...</h3>
-                <p className="dark:text-slate-400 text-slate-600 font-bold mt-1">Waiting for them to answer</p>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white">Calling Buddy...</h3>
+                <p className="text-slate-500 dark:text-slate-400 font-bold mt-1 text-xs">Waiting for them to answer</p>
               </div>
 
-              <div className="flex justify-center mt-8">
+              <div className="flex justify-center mt-6">
                 <button 
                   onClick={cancelOutgoingCall}
-                  className="px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-500 font-bold rounded-full transition-colors flex items-center gap-2"
+                  className="px-6 py-2.5 bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-600 dark:text-red-400 font-bold text-xs rounded-full transition-colors flex items-center gap-2"
                 >
-                  <X className="w-5 h-5" /> Cancel Call
+                  <X className="w-4 h-4" /> Cancel Call
                 </button>
               </div>
             </motion.div>
@@ -2591,12 +2686,12 @@ const [liveKitToken, setLiveKitToken] = useState("");
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-sm bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-850 dark:text-white"
+              className="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-900 dark:text-white"
             >
               {/* Header / Preview */}
               <div className="border-b border-slate-100 dark:border-slate-800 pb-3">
-                <span className="text-[10px] font-black text-indigo-550 dark:text-indigo-400 uppercase tracking-widest block mb-2">Message Options</span>
-                <p className="text-xs bg-slate-50 dark:bg-slate-950 p-3 rounded-xl font-mono truncate text-slate-505 dark:text-slate-400">
+                <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest block mb-2">Message Options</span>
+                <p className="text-xs bg-slate-50 dark:bg-slate-950 p-3 rounded-xl font-mono truncate text-slate-600 dark:text-slate-400">
                   "{selectedContextMenuMsg.text || "[Attachment]"}"
                 </p>
               </div>
@@ -2604,18 +2699,18 @@ const [liveKitToken, setLiveKitToken] = useState("");
               {/* Info section */}
               <div className="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-850 text-xs space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-black dark:text-slate-400 text-slate-600 dark:text-slate-500 uppercase tracking-wider">Sent Time</span>
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Sent Time</span>
                   <span className="font-bold text-slate-700 dark:text-slate-300">
                     {new Date(selectedContextMenuMsg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-black dark:text-slate-400 text-slate-600 dark:text-slate-500 uppercase tracking-wider">Read Status</span>
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Read Status</span>
                   {selectedContextMenuMsg.senderCode === friendCode ? (
                     selectedContextMenuMsg.read ? (
-                      <span className="font-black text-indigo-500 flex items-center gap-1">Read by classmate <CheckCheck className="w-3.5 h-3.5 dark:text-indigo-400 text-indigo-700" /></span>
+                      <span className="font-black text-indigo-500 flex items-center gap-1">Read by classmate <CheckCheck className="w-3.5 h-3.5 text-indigo-400" /></span>
                     ) : (
-                      <span className="font-black text-slate-455 dark:text-slate-400 flex items-center gap-1">Delivered <Check className="w-3.5 h-3.5" /></span>
+                      <span className="font-black text-slate-400 flex items-center gap-1">Delivered <Check className="w-3.5 h-3.5" /></span>
                     )
                   ) : (
                     <span className="font-black text-slate-700 dark:text-slate-350">Received message</span>
@@ -2624,21 +2719,21 @@ const [liveKitToken, setLiveKitToken] = useState("");
               </div>
 
               {/* Action Buttons List */}
-              <div className="space-y-2 pt-2">
+              <div className="space-y-2 pt-1">
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(selectedContextMenuMsg.text || "");
                     alert("Message copied to clipboard!");
                     setSelectedContextMenuMsg(null);
                   }}
-                  className="w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-855 dark:hover:bg-slate-800 rounded-xl text-xs font-extrabold tracking-wide uppercase transition-colors flex items-center gap-2.5 text-slate-700 dark:text-slate-300"
+                  className="w-full text-left px-4 py-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl text-xs font-extrabold tracking-wide uppercase transition-colors flex items-center gap-2.5 text-slate-700 dark:text-slate-300"
                 >
                   <Copy className="w-4 h-4 text-indigo-500" /> Copy Text
                 </button>
 
                 <button
                   onClick={() => handleDeleteForMe(selectedContextMenuMsg)}
-                  className="w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-855 dark:hover:bg-slate-800 rounded-xl text-xs font-extrabold tracking-wide uppercase transition-colors flex items-center gap-2.5 text-slate-700 dark:text-slate-300"
+                  className="w-full text-left px-4 py-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl text-xs font-extrabold tracking-wide uppercase transition-colors flex items-center gap-2.5 text-slate-700 dark:text-slate-300"
                 >
                   <Clock className="w-4 h-4 text-amber-500" /> Delete for Me
                 </button>
@@ -2646,7 +2741,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
                 {selectedContextMenuMsg.senderCode === friendCode && (
                   <button
                     onClick={() => handleDeleteForAll(selectedContextMenuMsg)}
-                    className="w-full text-left px-4 py-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-955/20 dark:hover:bg-rose-955/40 rounded-xl text-xs font-extrabold tracking-wide uppercase transition-colors flex items-center gap-2.5 text-rose-600 dark:text-rose-450"
+                    className="w-full text-left px-4 py-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/30 dark:hover:bg-rose-950/50 rounded-xl text-xs font-extrabold tracking-wide uppercase transition-colors flex items-center gap-2.5 text-rose-600 dark:text-rose-400"
                   >
                     <X className="w-4 h-4 text-rose-500" /> Delete for Everyone
                   </button>
@@ -2654,7 +2749,7 @@ const [liveKitToken, setLiveKitToken] = useState("");
 
                 <button
                   onClick={() => setSelectedContextMenuMsg(null)}
-                  className="w-full text-center py-3.5 text-xs font-black uppercase tracking-wider dark:text-slate-400 text-slate-600 hover:text-slate-500 mt-2 block"
+                  className="w-full text-center py-2 text-xs font-black uppercase tracking-wider text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 mt-2 block"
                 >
                   Cancel
                 </button>
