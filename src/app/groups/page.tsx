@@ -512,7 +512,14 @@ export default function StudyCirclesDMs() {
       const storedGroups = localStorage.getItem("edutrack_groups");
       if (storedGroups) {
         try {
-          setGroups(JSON.parse(storedGroups));
+          const parsed: Group[] = JSON.parse(storedGroups);
+          const filtered = parsed.filter(
+            (g) => g.name !== "Science Avengers" && g.groupCode !== "GROUP-1010"
+          );
+          setGroups(filtered);
+          if (filtered.length !== parsed.length) {
+            localStorage.setItem("edutrack_groups", JSON.stringify(filtered));
+          }
         } catch {
           initializeDefaultGroups();
         }
@@ -533,18 +540,7 @@ export default function StudyCirclesDMs() {
   };
 
   const initializeDefaultGroups = () => {
-    const defaults: Group[] = [
-      {
-        name: "Science Avengers",
-        groupCode: "GROUP-1010",
-        avatar: "SA",
-        color: "from-purple-500 to-indigo-650",
-        members: ["ADITYA#9581", "PRIYA#7204", "ROHAN#3401"],
-        lastMsg: "Let's crack CBSE Class 10 Chemistry together! ",
-        time: "10:30 AM",
-        isGroup: true
-      }
-    ];
+    const defaults: Group[] = [];
     setGroups(defaults);
     localStorage.setItem("edutrack_groups", JSON.stringify(defaults));
   };
