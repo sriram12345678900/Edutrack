@@ -4,7 +4,8 @@ import {
   Brain, Flame, Target, Book, BookOpen, ChevronRight, Loader2, Trophy, 
   Sparkles, Compass, ArrowUpRight, Users, Award, MessageCircle, 
   Copy, CheckCheck, Camera, Activity, Palette, Timer, Star, Zap, Lock, RefreshCw,
-  GraduationCap, Video, Shield, Globe, Mic, Radio, GitFork, Sliders, FileText, Gamepad2
+  GraduationCap, Video, Shield, Globe, Mic, Radio, GitFork, Sliders, FileText, Gamepad2,
+  CheckCircle2, Sun, Moon, LayoutGrid, Eye, Maximize2
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
@@ -35,11 +36,8 @@ function SwiperCard({ card, index, activeIndex, totalCards, onSwipeLeft, onSwipe
   const isTop = index === activeIndex;
   const dragX = useMotionValue(0);
   
-  // Transform drag offset to rotation, tilt, and exit direction
-  const rotate = useTransform(dragX, [-150, 150], [-25, 25]);
+  const rotate = useTransform(dragX, [-150, 150], [-20, 20]);
   const cardOpacity = useTransform(dragX, [-150, -80, 0, 80, 150], [0.6, 1, 1, 1, 0.6]);
-  
-  // Swipe feedback labels opacity
   const studyLabelOpacity = useTransform(dragX, [-100, -20], [1, 0]);
   const masterLabelOpacity = useTransform(dragX, [20, 100], [0, 1]);
 
@@ -52,38 +50,37 @@ function SwiperCard({ card, index, activeIndex, totalCards, onSwipeLeft, onSwipe
         x: dragX,
         rotate: isTop ? rotate : 0,
         opacity: isTop ? cardOpacity : Math.max(0, 0.95 - (index - activeIndex) * 0.1),
-        y: isTop ? 0 : (index - activeIndex) * 12,
-        scale: isTop ? 1 : Math.max(0.8, 1 - (index - activeIndex) * 0.04),
+        y: isTop ? 0 : (index - activeIndex) * 10,
+        scale: isTop ? 1 : Math.max(0.85, 1 - (index - activeIndex) * 0.04),
       }}
       drag={isTop ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.7}
-      whileDrag={{ scale: 1.05, cursor: "grabbing" }}
+      dragElastic={0.65}
+      whileDrag={{ scale: 1.03, cursor: "grabbing" }}
       onDragEnd={(e, info) => {
         if (!isTop) return;
-        if (info.offset.x > 130) {
+        if (info.offset.x > 110) {
           onSwipeRight();
-        } else if (info.offset.x < -130) {
+        } else if (info.offset.x < -110) {
           onSwipeLeft();
         }
       }}
       className={cn(
-        "!absolute inset-0 premium-glass-panel p-6 flex flex-col justify-between cursor-grab",
+        "!absolute inset-0 premium-glass-panel p-5 flex flex-col justify-between cursor-grab select-none rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-lg",
         !isTop && "pointer-events-none"
       )}
     >
-      {/* Swipe Overlay Feedback Indicators */}
       {isTop && (
         <>
           <motion.div 
             style={{ opacity: studyLabelOpacity }}
-            className="absolute top-4 left-4 bg-red-500/25 border border-red-500/50 px-3 py-1 rounded-full text-red-400 text-[10px] font-black uppercase tracking-wider pointer-events-none"
+            className="absolute top-3.5 left-3.5 bg-rose-500/20 border border-rose-500/40 px-2.5 py-0.5 rounded-full text-rose-400 text-[9px] font-black uppercase tracking-wider pointer-events-none"
           >
-            Study Later
+            Review Later
           </motion.div>
           <motion.div 
             style={{ opacity: masterLabelOpacity }}
-            className="absolute top-4 right-4 bg-emerald-500/25 border border-emerald-500/50 px-3 py-1 rounded-full text-emerald-400 text-[10px] font-black uppercase tracking-wider pointer-events-none"
+            className="absolute top-3.5 right-3.5 bg-emerald-500/20 border border-emerald-500/40 px-2.5 py-0.5 rounded-full text-emerald-400 text-[9px] font-black uppercase tracking-wider pointer-events-none"
           >
             Mastered! +50 XP
           </motion.div>
@@ -91,16 +88,19 @@ function SwiperCard({ card, index, activeIndex, totalCards, onSwipeLeft, onSwipe
       )}
 
       <div className="flex justify-between items-center relative z-10">
-        <span className="text-[9px] font-black uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/25">Question</span>
-        <span className="text-[9px] text-slate-500 font-bold">Card {index + 1} of {totalCards}</span>
+        <span className="text-[9px] font-black uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/20">
+          Flashcard
+        </span>
+        <span className="text-[10px] text-slate-400 font-bold">{index + 1} / {totalCards}</span>
       </div>
       
-      <p className="text-center font-extrabold text-sm dark:text-white text-slate-900 px-2 mt-2 leading-relaxed relative z-10">{card.front}</p>
+      <p className="text-center font-extrabold text-sm dark:text-white text-slate-800 px-2 my-auto leading-relaxed relative z-10">
+        {card.front}
+      </p>
       
-      {/* Interactive Swipe Hint */}
-      <div className="mt-3 text-[10px] text-slate-500 font-black tracking-widest uppercase text-center border-t border-slate-200/60 dark:border-white/5 pt-2 flex justify-between items-center relative z-10">
-        <span className="text-red-400/80">← Swipe Left</span>
-        <span className="text-slate-600">Active Recall</span>
+      <div className="text-[9px] text-slate-400 font-black tracking-wider uppercase text-center border-t border-slate-200/60 dark:border-white/5 pt-2 flex justify-between items-center relative z-10">
+        <span className="text-rose-400/80">← Swipe Left</span>
+        <span className="text-slate-500">Active Recall</span>
         <span className="text-emerald-400/80">Swipe Right →</span>
       </div>
     </motion.div>
@@ -114,13 +114,16 @@ export default function Dashboard() {
 
   const { userClass, userLanguage, nickname, setUserClass, setUserLanguage, setNickname } = useProfileStore();
   const { xp, level, streak, missions, initializeMissions, awardXP } = useGamificationStore();
+  
+  // Clean View Modes: 'focus' (My Day), 'tools' (AI & Labs), 'social' (Classroom & Progress)
+  const [activeTab, setActiveTab] = useState<"focus" | "tools" | "social">("focus");
+  const [zenMode, setZenMode] = useState<boolean>(false);
+
   const [showLevelUp, setShowLevelUp] = useState<boolean>(false);
   const [confettiActive, setConfettiActive] = useState<boolean>(false);
   const [showQuestCelebration, setShowQuestCelebration] = useState<boolean>(false);
   const [selectedNode, setSelectedNode] = useState<any>(null);
   const [swiperIndex, setSwiperIndex] = useState<number>(0);
-  
-  // Strict Quest Guide modal state
   const [activeMissionGuide, setActiveMissionGuide] = useState<string | null>(null);
 
   useEffect(() => {
@@ -159,19 +162,19 @@ export default function Dashboard() {
 
   const toggleMission = (id: string) => {
     if (id === "theory") {
-      setActiveMissionGuide("To complete the 'NCERT Scholar' quest (+50 XP), click on 'Subjects Hub' or 'NCERT Books' in the sidebar, open a chapter, and read its dynamic AI textbook content!");
+      setActiveMissionGuide("To complete the 'NCERT Scholar' quest (+50 XP), open 'Study Hub' in the navigation, open any chapter, and read its dynamic AI textbook notes!");
     } else if (id === "flashcards") {
-      setActiveMissionGuide("To complete the 'Recall Wizard' quest (+50 XP), open any chapter under 'Subjects Hub', go to the 'Flashcards' tab, and promote a card into box 5!");
+      setActiveMissionGuide("To complete the 'Recall Wizard' quest (+50 XP), open 'Flashcards' and promote a card into box 5!");
     } else if (id === "notes") {
-      setActiveMissionGuide("To complete the 'Quick Summary' quest (+30 XP), open any chapter under 'Subjects Hub' and load its 'Quick Revision' cheat sheet!");
+      setActiveMissionGuide("To complete the 'Quick Summary' quest (+30 XP), open any chapter under 'Study Hub' and load its Quick Revision cheat sheet!");
     }
   };
 
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
-        <p className="text-slate-500 dark:text-slate-400 font-semibold">Loading academic workspace...</p>
+        <Loader2 className="w-10 h-10 text-indigo-500 animate-spin mb-4" />
+        <p className="text-slate-400 font-semibold text-sm">Preparing your personal study space...</p>
       </div>
     );
   }
@@ -180,1004 +183,674 @@ export default function Dashboard() {
   const initials = (nickname || user?.displayName || user?.email || "S").charAt(0).toUpperCase();
   const weakSubjects = profile?.weakSubjects || [];
 
-  // Gamified Leaderboard & Buddies sorting
   const userTotalXp = xp + (level === 1 ? 0 : Array.from({length: level - 1}, (_, i) => (i + 1) * 200).reduce((a, b) => a + b, 0));
   
   const classmates = [
-    { name: "Aditya Sharma", totalXp: 950, status: "Active Study ️", online: true, avatar: "AS", color: "from-amber-500 to-orange-500" },
-    { name: "Priya Nair", totalXp: 720, status: "In Call Arena ", online: true, avatar: "PN", color: "from-emerald-400 to-teal-500" },
-    { name: `${firstName} (You)`, totalXp: userTotalXp, status: "On Dashboard ", online: true, isSelf: true, avatar: initials, color: "from-indigo-500 to-purple-600" },
+    { name: "Aditya Sharma", totalXp: 950, status: "Studying Science 🔬", online: true, avatar: "AS", color: "from-amber-500 to-orange-500" },
+    { name: "Priya Nair", totalXp: 720, status: "In Study Room 👥", online: true, avatar: "PN", color: "from-emerald-400 to-teal-500" },
+    { name: `${firstName} (You)`, totalXp: userTotalXp, status: "On Dashboard ✨", online: true, isSelf: true, avatar: initials, color: "from-indigo-500 to-purple-600" },
     { name: "Rohan Das", totalXp: 340, status: "Idle", online: false, avatar: "RD", color: "from-blue-400 to-cyan-500" },
-    { name: "Sneha Patel", totalXp: 180, status: "Active Study ️", online: true, avatar: "SP", color: "from-fuchsia-400 to-pink-500" }
+    { name: "Sneha Patel", totalXp: 180, status: "Active Recall ⚡", online: true, avatar: "SP", color: "from-fuchsia-400 to-pink-500" }
   ];
+  classmates.sort((a, b) => b.totalXp - a.totalXp);
 
   const skillNodes = [
-    { id: "reactions", label: "Chemical Reactions", status: "completed", percent: 100, x: 12, y: 55, color: "stroke-emerald-500 fill-emerald-500/10 text-emerald-450 border-emerald-500/30", desc: "Balance chemical equations and explore corrosion.", keyPoints: ["Balanced equations show conservation of mass.", "Combination vs Decomposition reactions.", "Oxidation is loss of electrons, Reduction is gain."] },
-    { id: "acids", label: "Acids & Bases", status: "active", percent: 45, x: 32, y: 25, color: "stroke-indigo-500 fill-indigo-500/10 text-indigo-400 border-indigo-500/30", desc: "Understand pH scales, indicators, and salt families.", keyPoints: ["Acids release H+ ions in solution; Bases release OH-.", "pH < 7 is acidic; pH > 7 is basic.", "Chlor-alkali process creates NaOH, Cl2, and H2."] },
-    { id: "metals", label: "Metals & Nonmetals", status: "locked", percent: 0, x: 52, y: 75, color: "stroke-slate-700 fill-slate-800/10 text-slate-500 border-slate-800", desc: "Reactivity series, ionic bonding, and metallurgy.", keyPoints: ["Prerequisite: Complete Acids & Bases first.", "Metals form basic oxides, non-metals form acidic oxides.", "Ionic compounds have high melting points."] },
-    { id: "carbon", label: "Carbon Compounds", status: "locked", percent: 0, x: 72, y: 25, color: "stroke-slate-700 fill-slate-800/10 text-slate-500 border-slate-800", desc: "Covalent bonding, isomerism, and functional groups.", keyPoints: ["Prerequisite: Unlock Metals first.", "Catenation is carbon's unique ability to form long chains.", "Saturated vs Unsaturated hydrocarbons."] },
-    { id: "life", label: "Life Processes", status: "locked", percent: 0, x: 90, y: 55, color: "stroke-slate-700 fill-slate-800/10 text-slate-500 border-slate-800", desc: "Nutrition, respiration, circulation, and excretion.", keyPoints: ["Prerequisite: Unlock Carbon Compounds first.", "Autotrophic vs Heterotrophic nutrition.", "Double circulation in humans prevents mixing of blood."] }
+    { id: "reactions", label: "Chemical Reactions", status: "completed", percent: 100, x: 12, y: 55, desc: "Balance chemical equations and explore corrosion.", keyPoints: ["Balanced equations show conservation of mass.", "Combination vs Decomposition reactions.", "Oxidation is loss of electrons, Reduction is gain."] },
+    { id: "acids", label: "Acids & Bases", status: "active", percent: 45, x: 32, y: 25, desc: "Understand pH scales, indicators, and salt families.", keyPoints: ["Acids release H+ ions in solution; Bases release OH-.", "pH < 7 is acidic; pH > 7 is basic.", "Chlor-alkali process creates NaOH, Cl2, and H2."] },
+    { id: "metals", label: "Metals & Nonmetals", status: "locked", percent: 0, x: 52, y: 75, desc: "Reactivity series, ionic bonding, and metallurgy.", keyPoints: ["Prerequisite: Complete Acids & Bases first.", "Metals form basic oxides, non-metals form acidic oxides.", "Ionic compounds have high melting points."] },
+    { id: "carbon", label: "Carbon Compounds", status: "locked", percent: 0, x: 72, y: 25, desc: "Covalent bonding, isomerism, and functional groups.", keyPoints: ["Prerequisite: Unlock Metals first.", "Catenation is carbon's unique ability to form long chains.", "Saturated vs Unsaturated hydrocarbons."] },
+    { id: "life", label: "Life Processes", status: "locked", percent: 0, x: 90, y: 55, desc: "Nutrition, respiration, circulation, and excretion.", keyPoints: ["Prerequisite: Unlock Carbon Compounds first.", "Autotrophic vs Heterotrophic nutrition.", "Double circulation in humans prevents mixing of blood."] }
   ];
 
   const swiperCards = [
-    { id: "card_1", front: "Why do copper vessels lose shine?", back: "Due to basic copper carbonate formation from reaction with moist CO2 and O2." },
-    { id: "card_2", front: "What is the pH scale?", back: "A logarithmic scale measuring hydrogen ion concentration, running from 0 (highly acidic) to 14 (highly basic)." },
-    { id: "card_3", front: "What is double circulation?", back: "Blood flows through the heart twice for every complete body cycle, preventing oxygenated and deoxygenated blood from mixing." }
+    { id: "card_1", front: "Why do copper vessels lose their shine?", back: "Due to basic copper carbonate formation from reaction with moist CO2 and O2." },
+    { id: "card_2", front: "What is the pH scale?", back: "A logarithmic scale measuring hydrogen ion concentration, running from 0 (acidic) to 14 (basic)." },
+    { id: "card_3", front: "What is double circulation in humans?", back: "Blood passes through the heart twice per body cycle, separating oxygenated and deoxygenated blood." }
   ];
 
-  // Sort classmates by total XP descending
-  classmates.sort((a, b) => b.totalXp - a.totalXp);
-
-  // Stagger variants
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.08 }
-    }
+  const getRankBadge = (rank: number) => {
+    if (rank === 1) return <span className="text-[10px] font-black text-amber-400 bg-amber-400/15 border border-amber-400/30 px-1.5 py-0.5 rounded-full shrink-0">#1</span>;
+    if (rank === 2) return <span className="text-[10px] font-black text-slate-300 bg-slate-300/15 border border-slate-300/25 px-1.5 py-0.5 rounded-full shrink-0">#2</span>;
+    if (rank === 3) return <span className="text-[10px] font-black text-amber-600 bg-amber-600/15 border border-amber-600/25 px-1.5 py-0.5 rounded-full shrink-0">#3</span>;
+    return <span className="w-4 font-black text-[10px] text-center font-mono shrink-0 text-slate-500">#{rank}</span>;
   };
 
   const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 220, damping: 20 } }
-  };
-
-  // Rank badge mapping helper
-  const getRankBadge = (rank: number) => {
-    if (rank === 1) return <span className="text-xs font-black text-amber-400 bg-amber-400/10 border border-amber-400/30 px-1.5 py-0.5 rounded-full shrink-0">#1</span>;
-    if (rank === 2) return <span className="text-xs font-black dark:text-slate-300 text-slate-700 bg-slate-300/10 border border-slate-300/20 px-1.5 py-0.5 rounded-full shrink-0">#2</span>;
-    if (rank === 3) return <span className="text-xs font-black text-amber-700 bg-amber-700/10 border border-amber-700/20 px-1.5 py-0.5 rounded-full shrink-0">#3</span>;
-    return <span className="w-5 font-black text-xs text-center font-mono shrink-0 text-slate-500">#{rank}</span>;
+    hidden: { opacity: 0, y: 15 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.3 } }
   };
 
   return (
-    <motion.div 
-      variants={container}
-      initial="hidden"
-      animate="show"
-      className="space-y-10 relative max-w-7xl mx-auto"
-    >
-      {/* Premium Vanilla CSS Backgrounds */}
+    <div className="space-y-6 relative max-w-7xl mx-auto pb-12">
+      {/* Background Ambience */}
       <div className="premium-mesh-bg">
-        <div className="premium-mesh-blob-1"></div>
-        <div className="premium-mesh-blob-2"></div>
-        <div className="premium-mesh-blob-3"></div>
-        <div className="premium-grid-overlay"></div>
+        <div className="premium-mesh-blob-1" />
+        <div className="premium-mesh-blob-2" />
+        <div className="premium-grid-overlay" />
       </div>
 
-      {/* ── HEADER SECTION ── */}
-      <DashboardHeader 
-        firstName={firstName} 
-        userClass={profile?.className || userClass} 
-        userLanguage={userLanguage} 
-        streak={streak} 
-        itemVariants={item} 
-      />
-
-      {/* ── VIRTUAL SCHOOL & CLASSROOM LIVE LAUNCHER ── */}
-      <ClassroomLauncher itemVariants={item} />
-
-      {/* ── MOBILE QUICK ACTION RIBBON (Touch-First Horizontal Stories) ── */}
-      <motion.div variants={item} className="md:hidden space-y-2">
-        <div className="flex items-center justify-between px-1">
-          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-500 animate-pulse" />
-            Quick AI Study Tools
-          </span>
-          <span className="text-[9px] font-bold text-slate-400">Swipe →</span>
-        </div>
-        <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1.5 pt-0.5 px-0.5 touch-pan-x">
-          {[
-            { href: "/lens", label: "Doubt Lens", icon: Camera, color: "from-emerald-500 to-teal-600", badge: "Live" },
-            { href: "/tutor", label: "AI Tutor", icon: MessageCircle, color: "from-cyan-500 to-blue-600", badge: "AI" },
-            { href: "/pomodoro", label: "Focus Timer", icon: Timer, color: "from-rose-500 to-red-600" },
-            { href: "/study-room", label: "Study Rooms", icon: Users, color: "from-blue-500 to-indigo-600", badge: "Co-op" },
-            { href: "/formulas", label: "Formulas", icon: Compass, color: "from-amber-500 to-orange-600" },
-            { href: "/whiteboard", label: "Whiteboard", icon: Palette, color: "from-purple-500 to-violet-600" },
-            { href: "/flashcards", label: "Flashcards", icon: Sparkles, color: "from-fuchsia-500 to-pink-600" },
-            { href: "/pyq", label: "PYQ Vault", icon: Award, color: "from-indigo-500 to-purple-600" },
-            { href: "/sandbox", label: "Sim Sandbox", icon: Zap, color: "from-yellow-500 to-amber-600" },
-          ].map((action, i) => {
-            const Icon = action.icon;
-            return (
-              <button
-                key={i}
-                onClick={() => router.push(action.href)}
-                className="flex flex-col items-center justify-center shrink-0 w-[76px] p-2.5 rounded-2xl bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/10 shadow-sm active:scale-95 transition-all text-center group"
-              >
-                <div className={cn("w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center text-white shadow-md mb-1.5 relative", action.color)}>
-                  <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  {action.badge && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[7px] font-black px-1 rounded-full border border-white dark:border-black">
-                      {action.badge}
-                    </span>
-                  )}
-                </div>
-                <span className="text-[10px] font-extrabold text-slate-800 dark:text-slate-200 truncate w-full leading-tight">
-                  {action.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </motion.div>
-
-      {/* ── TWO-COLUMN MAIN LAYOUT ── */}
-      <div className="grid lg:grid-cols-3 gap-8 items-start">
+      {/* ── HEADER WITH ZEN MODE TOGGLE ── */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-1">
+        <DashboardHeader 
+          firstName={firstName} 
+          userClass={profile?.className || userClass} 
+          userLanguage={userLanguage} 
+          streak={streak} 
+          itemVariants={item} 
+        />
         
-        {/* LEFT COLUMN: PRIMARY WORKSPACE (Wide) */}
-        <div className="lg:col-span-2 space-y-8">
-          
-          {/* QUICK PREMIUM UTILITY ROW */}
-          <motion.section variants={item} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5">
-            <motion.div id="tour-quick-lens" whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/lens')} className="premium-glass-panel micro-hover-lift p-5 flex flex-col items-center justify-center text-center cursor-pointer group">
-              <Camera className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-500 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(16,185,129,0.35)]" />
-              <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">AI Lens</span>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/formulas')} className="premium-glass-panel micro-hover-lift p-5 flex flex-col items-center justify-center text-center cursor-pointer group">
-              <Compass className="w-7 h-7 sm:w-8 sm:h-8 dark:text-cyan-400 text-cyan-700 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(34,211,238,0.35)]" />
-              <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Formulas</span>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/sandbox')} className="premium-glass-panel micro-hover-lift p-5 flex flex-col items-center justify-center text-center cursor-pointer group">
-              <Zap className="w-7 h-7 sm:w-8 sm:h-8 text-orange-500 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(249,115,22,0.35)]" />
-              <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Sandbox</span>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/trophies')} className="premium-glass-panel micro-hover-lift p-5 flex flex-col items-center justify-center text-center cursor-pointer group">
-              <Trophy className="w-7 h-7 sm:w-8 sm:h-8 text-yellow-500 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(234,179,8,0.35)]" />
-              <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Trophies</span>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05, y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => router.push('/analytics')} className="premium-glass-panel micro-hover-lift p-5 flex flex-col items-center justify-center text-center cursor-pointer group">
-              <Activity className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-500 mb-2.5 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(99,102,241,0.35)]" />
-              <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Analytics</span>
-            </motion.div>
-          </motion.section>
-          
-          {/* STATS & PROGRESS HUD (Glassmorphic Command Deck) */}
-          <motion.section 
-            id="tour-stats-hud"
-            variants={item}
-            className="premium-glass-panel premium-glow-border p-6.5 select-none"
-          >
-            {/* Ambient Background Glows */}
-            
-            
-            
-            
-            
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
-              <div className="flex items-center gap-6 w-full md:w-auto">
-                {/* Immersive Circular SVG Level Ring */}
-                <div className="relative flex items-center justify-center shrink-0 w-22 h-22 group">
-                  <div className="absolute inset-0.5 bg-gradient-to-tr from-indigo-500/15 to-pink-500/15 rounded-full blur-md group-hover:scale-105 transition-transform duration-300" />
-                  <svg className="w-full h-full transform -rotate-90">
-                    <circle
-                      cx="44"
-                      cy="44"
-                      r="37"
-                      className="stroke-white/[0.03] fill-none"
-                      strokeWidth="5"
-                    />
-                    <motion.circle
-                      cx="44"
-                      cy="44"
-                      r="37"
-                      className="stroke-indigo-500 fill-none"
-                      strokeWidth="5.5"
-                      strokeDasharray={2 * Math.PI * 37}
-                      initial={{ strokeDashoffset: 2 * Math.PI * 37 }}
-                      animate={{ strokeDashoffset: 2 * Math.PI * 37 - ((xp / (level * 200)) * 100 / 100) * 2 * Math.PI * 37 }}
-                      transition={{ duration: 1.2, ease: "easeOut" }}
-                      strokeLinecap="round"
-                      style={{
-                        stroke: "url(#progressGradient)"
-                      }}
-                      filter="drop-shadow(0 0 6px rgba(168, 85, 247, 0.4))"
-                    />
-                    <defs>
-                      <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#6366f1" />
-                        <stop offset="50%" stopColor="#a855f7" />
-                        <stop offset="100%" stopColor="#ec4899" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <div className="absolute flex flex-col items-center justify-center text-center">
-                    <span className="text-[8px] font-black uppercase tracking-widest dark:text-indigo-300 text-indigo-700 opacity-80 leading-none">Level</span>
-                    <span className="text-2.5xl font-black dark:text-white text-slate-900 leading-none mt-0.5">{level}</span>
-                  </div>
-                </div>
+        {/* Quick Zen Mode Toggle Button */}
+        <button
+          onClick={() => setZenMode(!zenMode)}
+          className={cn(
+            "self-end sm:self-center flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all border shadow-sm",
+            zenMode 
+              ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400 ring-2 ring-emerald-500/20" 
+              : "bg-white/5 hover:bg-white/10 border-white/10 text-slate-400 hover:text-white"
+          )}
+          title="Toggle Zen Focus Mode"
+        >
+          <Sparkles className={cn("w-3.5 h-3.5", zenMode ? "text-emerald-400 animate-pulse" : "text-slate-400")} />
+          <span>{zenMode ? "Zen Mode: Active" : "Zen Focus Mode"}</span>
+        </button>
+      </div>
 
-                <div>
-                  <h3 className="font-black text-xl dark:text-white text-slate-900 leading-tight flex items-center gap-2">
-                    {level <= 1 ? "Study Novice" : level <= 3 ? "Elite Revisionist" : level <= 5 ? "Academic Warrior" : "Grandmaster Scholar"} 
-                  </h3>
-                  <div className="flex items-center gap-2 mt-1.5 text-xs dark:text-indigo-300 text-indigo-700 font-bold tracking-wide">
-                    <Star className="w-3.5 h-3.5 fill-current dark:text-indigo-400 text-indigo-700" />
-                    <span>{xp} / {level * 200} XP to Level UP</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Progress Detail HUD info */}
-              <div className="flex flex-col gap-1 w-full md:w-60">
-                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest text-right hidden md:block">Progression Tracker</span>
-                <div className="w-full dark:bg-[#050710] bg-[#eef1f9] h-3.5 rounded-full overflow-hidden border border-slate-200/60 dark:border-white/5 shadow-inner relative mt-1">
-                  <div 
-                    className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-400 rounded-full transition-all duration-500 shadow-[0_0_12px_rgba(129,140,248,0.5)]"
-                    style={{ width: `${(xp / (level * 200)) * 100}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="shrink-0 w-full md:w-auto">
-                <span className="text-xs font-black text-indigo-200 bg-indigo-500/10 px-4 py-2.5 rounded-xl border border-indigo-500/20 uppercase tracking-widest block text-center md:inline-block">
-                  {userTotalXp} Total XP
-                </span>
-              </div>
+      {/* ── ZEN FOCUS VIEW (MINIMALIST DISTRACTION-FREE) ── */}
+      {zenMode ? (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.98 }}
+          className="space-y-6"
+        >
+          {/* Zen Hero Card */}
+          <div className="premium-glass-panel p-8 sm:p-10 rounded-3xl border border-emerald-500/20 bg-emerald-950/10 text-center relative overflow-hidden">
+            <div className="w-14 h-14 bg-emerald-500/15 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-500/30 text-emerald-400">
+              <Compass className="w-7 h-7" />
             </div>
-          </motion.section>
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              Calm & Focused Study Mode
+            </h2>
+            <p className="text-slate-400 text-sm max-w-md mx-auto mt-2 leading-relaxed">
+              All visual distractions, leaderboards, and extra cards are hidden. Choose your task and learn with full clarity.
+            </p>
 
-          {/* DAILY CHALLENGE */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto mt-8">
+              <Link href="/learn" className="p-4 bg-white/5 hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-500/30 rounded-2xl transition-all group text-left">
+                <BookOpen className="w-5 h-5 text-emerald-400 mb-2 group-hover:scale-110 transition-transform" />
+                <h4 className="font-black text-sm text-white">Study Hub</h4>
+                <p className="text-[11px] text-slate-400 mt-0.5">Read NCERT chapters</p>
+              </Link>
+              <Link href="/pomodoro" className="p-4 bg-white/5 hover:bg-rose-500/10 border border-white/10 hover:border-rose-500/30 rounded-2xl transition-all group text-left">
+                <Timer className="w-5 h-5 text-rose-400 mb-2 group-hover:scale-110 transition-transform" />
+                <h4 className="font-black text-sm text-white">Focus Timer</h4>
+                <p className="text-[11px] text-slate-400 mt-0.5">25-min Pomodoro cycles</p>
+              </Link>
+              <Link href="/tutor" className="p-4 bg-white/5 hover:bg-indigo-500/10 border border-white/10 hover:border-indigo-500/30 rounded-2xl transition-all group text-left">
+                <Brain className="w-5 h-5 text-indigo-400 mb-2 group-hover:scale-110 transition-transform" />
+                <h4 className="font-black text-sm text-white">AI Tutor</h4>
+                <p className="text-[11px] text-slate-400 mt-0.5">Ask 1-on-1 doubts</p>
+              </Link>
+            </div>
+          </div>
+
+          {/* Minimal Daily Question */}
           <DailyQuestionWidget />
+        </motion.div>
+      ) : (
+        /* ── STANDARD MODULAR BENTO DASHBOARD ── */
+        <div className="space-y-6">
+          
+          {/* ── CLEAN TAB NAVIGATOR ── */}
+          <div className="flex items-center gap-2 p-1.5 bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl w-fit">
+            <button
+              onClick={() => setActiveTab("focus")}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all",
+                activeTab === "focus" 
+                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30" 
+                  : "text-slate-400 hover:text-white hover:bg-white/5"
+              )}
+            >
+              <Compass className="w-3.5 h-3.5" />
+              <span>Today's Focus</span>
+            </button>
 
-          {/* GLOBAL DOUBTS & NEXT-GEN AI INNOVATION SUITE */}
-          <motion.section variants={item} className="space-y-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                  <Globe className="w-5 h-5 text-indigo-500 animate-spin" />
-                  Global Community & Next-Gen AI
-                </h2>
-                <p className="text-xs text-slate-500 font-bold">Worldwide Q&A exchange, voice oral viva, live battles & science simulations</p>
+            <button
+              onClick={() => setActiveTab("tools")}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all",
+                activeTab === "tools" 
+                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30" 
+                  : "text-slate-400 hover:text-white hover:bg-white/5"
+              )}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Explore AI & Labs</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("social")}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all",
+                activeTab === "social" 
+                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30" 
+                  : "text-slate-400 hover:text-white hover:bg-white/5"
+              )}
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>Classroom & Progress</span>
+            </button>
+          </div>
+
+          {/* ── TAB 1: TODAY'S FOCUS (CLEAN & ACTION-ORIENTED) ── */}
+          {activeTab === "focus" && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-6"
+            >
+              {/* Top Compact Hero Bar: Level HUD + Quick Actions */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                {/* Level HUD Card */}
+                <div id="tour-stats-hud" className="premium-glass-panel p-5 rounded-2xl flex items-center justify-between gap-4 border border-indigo-500/20">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-lg shadow-md">
+                      L{level}
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">
+                        {level <= 1 ? "Study Novice" : level <= 3 ? "Elite Scholar" : "Grandmaster"}
+                      </h4>
+                      <p className="text-[11px] text-indigo-400 font-bold mt-0.5">
+                        {xp} / {level * 200} XP to Level {level + 1}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Total Score</span>
+                    <span className="text-sm font-black text-slate-900 dark:text-white font-mono">{userTotalXp} XP</span>
+                  </div>
+                </div>
+
+                {/* Quick 4 Core Shortcuts */}
+                <div className="md:col-span-2 grid grid-cols-4 gap-2.5">
+                  <Link href="/lens" id="tour-quick-lens" className="premium-glass-panel p-3.5 rounded-2xl flex flex-col items-center justify-center text-center hover:border-emerald-500/40 transition-all group">
+                    <Camera className="w-5 h-5 text-emerald-400 mb-1 group-hover:scale-110 transition-transform" />
+                    <span className="text-[11px] font-black text-slate-200">AI Lens</span>
+                  </Link>
+                  <Link href="/tutor" id="tour-tools-aibot" className="premium-glass-panel p-3.5 rounded-2xl flex flex-col items-center justify-center text-center hover:border-indigo-500/40 transition-all group">
+                    <MessageCircle className="w-5 h-5 text-indigo-400 mb-1 group-hover:scale-110 transition-transform" />
+                    <span className="text-[11px] font-black text-slate-200">AI Tutor</span>
+                  </Link>
+                  <Link href="/learn" className="premium-glass-panel p-3.5 rounded-2xl flex flex-col items-center justify-center text-center hover:border-purple-500/40 transition-all group">
+                    <BookOpen className="w-5 h-5 text-purple-400 mb-1 group-hover:scale-110 transition-transform" />
+                    <span className="text-[11px] font-black text-slate-200">Study Hub</span>
+                  </Link>
+                  <Link href="/whiteboard" className="premium-glass-panel p-3.5 rounded-2xl flex flex-col items-center justify-center text-center hover:border-pink-500/40 transition-all group">
+                    <Palette className="w-5 h-5 text-pink-400 mb-1 group-hover:scale-110 transition-transform" />
+                    <span className="text-[11px] font-black text-slate-200">Whiteboard</span>
+                  </Link>
+                </div>
+
               </div>
-            </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {/* Global Doubt Forum */}
-              <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/community')} className="group cursor-pointer">
-                <div className="premium-glass-panel p-5 flex flex-col justify-between h-44 bg-gradient-to-br from-blue-950/20 to-indigo-950/20 border-indigo-500/30">
-                  <div className="flex justify-between items-start">
-                    <div className="p-3 bg-indigo-500/10 rounded-2xl w-fit text-indigo-400 group-hover:scale-110 transition-transform">
-                      <Globe className="w-5 h-5" />
+              {/* Main Content Grid: Daily Challenge + Daily Quests + Flashcard Warmup */}
+              <div className="grid lg:grid-cols-3 gap-6">
+                
+                {/* Left Column: Today's Question + Flashcard Swiper */}
+                <div className="lg:col-span-2 space-y-6">
+                  
+                  {/* Daily Question */}
+                  <DailyQuestionWidget />
+
+                  {/* 2-Minute Active Recall Swiper */}
+                  <div id="tour-flashcards-deck" className="premium-glass-panel p-6 rounded-3xl border border-pink-500/20 relative">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-pink-400" />
+                          Quick Active Recall Warmup
+                        </h3>
+                        <p className="text-xs text-slate-400 mt-0.5">Drag card right if you know the answer (+50 XP)</p>
+                      </div>
+                      <Link href="/flashcards" className="text-[11px] font-bold text-pink-400 hover:underline">
+                        Open Full Deck →
+                      </Link>
                     </div>
-                    <span className="text-[9px] font-black uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full">Global</span>
-                  </div>
-                  <div>
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-indigo-400 transition-colors text-xs uppercase tracking-wider">Global Doubt Forum</h4>
-                    <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1 font-bold">Ask questions worldwide & get peer + AI answers.</p>
-                  </div>
-                </div>
-              </motion.div>
 
-              {/* AI Voice Viva */}
-              <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/viva')} className="group cursor-pointer">
-                <div className="premium-glass-panel p-5 flex flex-col justify-between h-44 bg-gradient-to-br from-purple-950/20 to-indigo-950/20 border-purple-500/30">
-                  <div className="flex justify-between items-start">
-                    <div className="p-3 bg-purple-500/10 rounded-2xl w-fit text-purple-400 group-hover:scale-110 transition-transform">
-                      <Mic className="w-5 h-5" />
-                    </div>
-                    <span className="text-[9px] font-black uppercase tracking-wider text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full">Voice</span>
-                  </div>
-                  <div>
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-purple-400 transition-colors text-xs uppercase tracking-wider">AI Voice Viva</h4>
-                    <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1 font-bold">Conversational oral board practical examiner.</p>
-                  </div>
-                </div>
-              </motion.div>
+                    <div className="relative flex flex-col items-center justify-center min-h-[190px] bg-black/20 rounded-2xl border border-white/5 p-4 overflow-hidden">
+                      {swiperIndex < swiperCards.length ? (
+                        <div className="relative w-full max-w-sm flex flex-col items-center">
+                          <div className="relative w-full h-32 flex items-center justify-center">
+                            {swiperCards.map((card, idx) => (
+                              <SwiperCard
+                                key={card.id}
+                                card={card}
+                                index={idx}
+                                activeIndex={swiperIndex}
+                                totalCards={swiperCards.length}
+                                onSwipeLeft={() => setSwiperIndex(prev => prev + 1)}
+                                onSwipeRight={() => {
+                                  handleAwardXP(50);
+                                  setConfettiActive(true);
+                                  setSwiperIndex(prev => prev + 1);
+                                }}
+                              />
+                            ))}
+                          </div>
 
-              {/* Live Quiz Arena */}
-              <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/arena')} className="group cursor-pointer">
-                <div className="premium-glass-panel p-5 flex flex-col justify-between h-44 bg-gradient-to-br from-amber-950/20 to-red-950/20 border-amber-500/30">
-                  <div className="flex justify-between items-start">
-                    <div className="p-3 bg-amber-500/10 rounded-2xl w-fit text-amber-400 group-hover:scale-110 transition-transform">
-                      <Gamepad2 className="w-5 h-5" />
-                    </div>
-                    <span className="text-[9px] font-black uppercase tracking-wider text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full">Battle</span>
-                  </div>
-                  <div>
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-amber-400 transition-colors text-xs uppercase tracking-wider">Quiz Battle Arena</h4>
-                    <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1 font-bold">Multiplayer real-time speed battle with power-ups.</p>
-                  </div>
-                </div>
-              </motion.div>
-
-
-            </div>
-          </motion.section>
-
-          {/* AI & INTERACTIVE STUDY LAB ROW */}
-          <motion.section variants={item} className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-indigo-650 dark:text-indigo-400" />
-                Study Tools Hub
-              </h2>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              
-              {/* AI Bot Card */}
-              <motion.div id="tour-tools-aibot" whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/tutor')} className="group cursor-pointer">
-                <div className="premium-glass-panel micro-hover-lift p-5 flex flex-col justify-between h-44 group">
-                  <div className="p-3 bg-indigo-500/10 rounded-2xl w-fit text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
-                    <Sparkles className="w-5 h-5 drop-shadow-[0_0_8px_rgba(99,102,241,0.4)]" />
-                  </div>
-                  <div>
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:dark:text-indigo-400 text-indigo-700 transition-colors text-xs uppercase tracking-wider">AI Study Bot</h4>
-                    <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1.5 font-bold">Instant doubt solver & learning coach.</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Study Hub Card */}
-              <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/learn')} className="group cursor-pointer">
-                <div className="premium-glass-panel micro-hover-lift p-5 flex flex-col justify-between h-44 group">
-                  <div className="p-3 bg-emerald-500/10 rounded-2xl w-fit text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
-                    <Book className="w-5 h-5 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-                  </div>
-                  <div>
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-emerald-650 dark:group-hover:dark:text-emerald-400 text-emerald-700 transition-colors text-xs uppercase tracking-wider">Study Hub</h4>
-                    <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1.5 font-bold">NCERT books & dynamic summaries.</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Whiteboard Card */}
-              <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/whiteboard')} className="group cursor-pointer">
-                <div className="premium-glass-panel micro-hover-lift p-5 flex flex-col justify-between h-44 group">
-                  <div className="p-3 bg-pink-500/10 rounded-2xl w-fit text-pink-600 dark:text-pink-400 group-hover:scale-110 transition-transform">
-                    <Palette className="w-5 h-5 drop-shadow-[0_0_8px_rgba(236,72,153,0.4)]" />
-                  </div>
-                  <div>
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-pink-650 dark:group-hover:dark:text-pink-400 text-pink-700 transition-colors text-xs uppercase tracking-wider">Whiteboard</h4>
-                    <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1.5 font-bold">Collaborative sketching & notes canvas.</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Study Rooms Card */}
-              <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/study-room')} className="group cursor-pointer">
-                <div className="premium-glass-panel micro-hover-lift p-5 flex flex-col justify-between h-44 group">
-                  <div className="p-3 bg-blue-500/10 rounded-2xl w-fit text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
-                    <Users className="w-5 h-5 drop-shadow-[0_0_8px_rgba(59,130,246,0.4)]" />
-                  </div>
-                  <div>
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:dark:text-blue-400 text-blue-700 transition-colors text-xs uppercase tracking-wider">Study Rooms</h4>
-                    <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1.5 font-bold">Sync timers & chat with friends.</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Pomodoro Card */}
-              <motion.div whileHover={{ scale: 1.03, y: -4 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/pomodoro')} className="group cursor-pointer">
-                <div className="premium-glass-panel micro-hover-lift p-5 flex flex-col justify-between h-44 group">
-                  <div className="p-3 bg-amber-500/10 rounded-2xl w-fit text-amber-500 dark:text-amber-400 group-hover:scale-110 transition-transform">
-                    <Timer className="w-5 h-5 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]" />
-                  </div>
-                  <div>
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:dark:text-amber-400 text-amber-700 transition-colors text-xs uppercase tracking-wider">Focus Timer</h4>
-                    <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-snug mt-1.5 font-bold">Structured study & break cycles.</p>
-                  </div>
-                </div>
-              </motion.div>
-
-            </div>
-          </motion.section>
-
-          {/* DYNAMIC CORE STUDY PATH */}
-          <motion.section 
-            variants={item}
-            className="premium-glass-panel p-8 relative"
-          >
-            <div className="absolute top-[-20px] right-[-20px] w-24 h-24 bg-indigo-500/5 rounded-full blur-xl pointer-events-none" />
-
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3">
-                  <div className="p-2 bg-indigo-500/10 rounded-xl">
-                    <Compass className="w-6 h-6 text-indigo-650 dark:text-indigo-400" />
-                  </div>
-                  Daily Study Path
-                </h2>
-                <p className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider mt-1.5 ml-1">
-                  AI Scheduled Roadmap for CBSE Success
-                </p>
-              </div>
-              <Link href="/plan">
-                <button className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 text-xs font-black uppercase hover:underline">
-                  Full Planner <ArrowUpRight className="w-4 h-4" />
-                </button>
-              </Link>
-            </div>
-
-            {/* Interactive Timeline Flow */}
-            <div className="grid md:grid-cols-3 gap-6 relative">
-              <div className="hidden md:block absolute top-[45%] inset-x-12 h-[2px] bg-gradient-to-r from-indigo-150/40 via-purple-150/40 to-indigo-150/40 dark:from-white/5 dark:via-white/10 dark:to-white/5 -z-10" />
-
-              {/* Task 1: NCERT Textbook */}
-              <Link href="/learn" className="group">
-                <div className="premium-glass-panel micro-hover-lift p-6 h-48 flex flex-col justify-between">
-                  <div className="flex justify-between items-start">
-                    <div className="p-2.5 bg-indigo-500/10 rounded-xl text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
-                      <Book className="w-5 h-5" />
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-indigo-500 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/10">Step 1</span>
-                  </div>
-                  <div className="mt-4">
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:dark:text-indigo-400 text-indigo-700 transition-colors text-base">NCERT Theory</h4>
-                    <p className="text-slate-500 dark:text-slate-400 text-xs mt-1.5 leading-relaxed font-bold">Read dynamic AI Textbook chapters without mole concepts.</p>
-                  </div>
-                </div>
-              </Link>
-
-              {/* Task 2: AI Recall Cards */}
-              <Link href="/flashcards" className="group">
-                <div className="premium-glass-panel micro-hover-lift p-6 h-48 flex flex-col justify-between">
-                  <div className="flex justify-between items-start">
-                    <div className="p-2.5 bg-purple-500/10 rounded-xl text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
-                      <Sparkles className="w-5 h-5" />
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-purple-500 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/10">Step 2</span>
-                  </div>
-                  <div className="mt-4">
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:dark:text-purple-400 text-purple-700 transition-colors text-base">Spaced Recall</h4>
-                    <p className="text-slate-500 dark:text-slate-400 text-xs mt-1.5 leading-relaxed font-bold">Master high-yield questions using active Leitner boxes.</p>
-                  </div>
-                </div>
-              </Link>
-
-              {/* Task 3: StudyCircles Chat */}
-              <Link href="/groups" className="group">
-                <div className="premium-glass-panel micro-hover-lift p-6 h-48 flex flex-col justify-between">
-                  <div className="flex justify-between items-start">
-                    <div className="p-2.5 bg-emerald-500/10 rounded-xl text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
-                      <Users className="w-5 h-5" />
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/10">Step 3</span>
-                  </div>
-                  <div className="mt-4">
-                    <h4 className="font-black text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:dark:text-emerald-400 text-emerald-700 transition-colors text-base">StudyCircles</h4>
-                    <p className="text-slate-500 dark:text-slate-400 text-xs mt-1.5 leading-relaxed font-bold">Join code-based rooms to message friends in real-time.</p>
-                  </div>
-                </div>
-              </Link>
-            </div>
-          </motion.section>
-
-          {/* SYLLABUS SKILL TREE / MIND MAP */}
-          <motion.section 
-            variants={item}
-            className="premium-glass-panel p-8 relative"
-          >
-            <div className="absolute top-[-20px] right-[-20px] w-24 h-24 bg-indigo-500/5 rounded-full blur-xl pointer-events-none" />
-            
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3">
-                  <div className="p-2 bg-indigo-500/10 rounded-xl">
-                    <Compass className="w-6 h-6 text-indigo-650 dark:text-indigo-400" />
-                  </div>
-                  Mastery Mind Map & Syllabus Tree
-                </h2>
-                <p className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider mt-1.5 ml-1">
-                  Click nodes to open syllabus sheets & trigger mock tests
-                </p>
-              </div>
-            </div>
-
-            {/* Interactive SVG Canvas */}
-            <div className="relative w-full bg-slate-950/40 dark:bg-black/35 rounded-2xl border border-slate-200/20 dark:border-slate-200/60 dark:border-white/5 p-4 overflow-x-auto scrollbar-none min-h-[220px]">
-              <svg className="w-full max-w-[800px] h-auto mx-auto relative z-10" viewBox="0 0 800 160">
-                {/* Connecting Paths with dynamic flows */}
-                <path d="M 96 80 Q 176 40 256 40" fill="none" className="stroke-emerald-500/50 animate-laser-flow" strokeWidth="3.5" />
-                <path d="M 256 40 Q 336 80 416 120" fill="none" className="stroke-indigo-500/40 animate-laser-flow" strokeWidth="3" />
-                <path d="M 416 120 Q 496 80 576 40" fill="none" className="stroke-slate-800" strokeWidth="2" />
-                <path d="M 576 40 Q 656 80 720 88" fill="none" className="stroke-slate-800" strokeWidth="2" />
-
-                {/* SVG Node Circles */}
-                {skillNodes.map((node, idx) => {
-                  const isLocked = node.status === "locked";
-                  const isActive = node.status === "active";
-                  const isCompleted = node.status === "completed";
-                  const cx = node.x * 8; // scale x coordinate
-                  const cy = node.y * 1.5; // scale y coordinate
-
-                  return (
-                    <g 
-                      key={node.id}
-                      onClick={() => setSelectedNode(node)}
-                      className="cursor-pointer group select-none"
-                    >
-                      {/* Outer glowing ring for active node */}
-                      {isActive && (
-                        <circle
-                          cx={cx}
-                          cy={cy}
-                          r="28"
-                          className="stroke-indigo-500 fill-none animate-pulse-glow"
-                          strokeWidth="2.5"
-                          filter="drop-shadow(0 0 8px rgba(99, 102, 241, 0.6))"
-                        />
-                      )}
-                      
-                      {/* Completed Glow */}
-                      {isCompleted && (
-                        <circle
-                          cx={cx}
-                          cy={cy}
-                          r="26"
-                          className="stroke-emerald-500/20 fill-none"
-                          strokeWidth="3"
-                          filter="drop-shadow(0 0 4px rgba(16, 185, 129, 0.4))"
-                        />
-                      )}
-                      
-                      <circle
-                        cx={cx}
-                        cy={cy}
-                        r="21"
-                        className={cn(
-                          "transition-all duration-300 stroke-2 fill-slate-905/90 group-hover:scale-110",
-                          isCompleted ? "stroke-emerald-500 fill-emerald-950/20" : "",
-                          isActive ? "stroke-indigo-500 fill-indigo-950/20" : "",
-                          isLocked ? "stroke-slate-800 fill-slate-950/40" : ""
-                        )}
-                      />
-                      
-                      {/* Node representation (completed: Check, Active: star, Locked: Lock) */}
-                      {isCompleted ? (
-                        <path 
-                          d={`M ${cx - 5.5} ${cy} L ${cx - 2} ${cy + 4.5} L ${cx + 5} ${cy - 4}`}
-                          fill="none"
-                          stroke="#10b981"
-                          strokeWidth="3.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      ) : isLocked ? (
-                        <g transform={`translate(${cx - 5.5}, ${cy - 6.5}) scale(0.65)`}>
-                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke="#64748b" strokeWidth="2.5"/>
-                        </g>
+                          <div className="flex items-center justify-between gap-3 w-full mt-3 z-20">
+                            <button
+                              type="button"
+                              onClick={() => setSwiperIndex(prev => prev + 1)}
+                              className="flex-1 py-1.5 px-3 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all text-center"
+                            >
+                              ← Review Later
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                handleAwardXP(50);
+                                setConfettiActive(true);
+                                setSwiperIndex(prev => prev + 1);
+                              }}
+                              className="flex-1 py-1.5 px-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all text-center"
+                            >
+                              Mastered (+50 XP) →
+                            </button>
+                          </div>
+                        </div>
                       ) : (
-                        <text
-                          x={cx}
-                          y={cy + 4}
-                          textAnchor="middle"
-                          className="text-xs font-black fill-indigo-400 font-mono"
-                        >
-                          {node.percent}%
-                        </text>
+                        <div className="text-center py-4">
+                          <Trophy className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
+                          <h4 className="text-sm font-black text-white">Recall Warmup Complete!</h4>
+                          <p className="text-xs text-slate-400 mt-0.5">Bonus XP added to your daily progress.</p>
+                          <button 
+                            onClick={() => setSwiperIndex(0)}
+                            className="mt-3 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all"
+                          >
+                            Restart Warmup
+                          </button>
+                        </div>
                       )}
-
-                      {/* Floating tooltip label */}
-                      <text
-                        x={cx}
-                        y={cy - 30}
-                        textAnchor="middle"
-                        className="text-[10px] font-black fill-slate-400 opacity-80 group-hover:opacity-100 uppercase tracking-wider transition-opacity"
-                      >
-                        {node.label.split(" ")[0]}
-                      </text>
-                    </g>
-                  );
-                })}
-              </svg>
-            </div>
-          </motion.section>
-
-          {/* ACTIVE MEMORY STUDY SWIPER */}
-          <motion.section 
-            id="tour-flashcards-deck"
-            variants={item}
-            className="premium-glass-panel p-8 relative"
-          >
-            <div className="absolute top-[-20px] right-[-20px] w-24 h-24 bg-pink-500/5 rounded-full blur-xl pointer-events-none" />
-            
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-3">
-                  <div className="p-2 bg-pink-500/10 rounded-xl">
-                    <Sparkles className="w-6 h-6 text-pink-600 dark:text-pink-400" />
+                    </div>
                   </div>
-                  Supersonic Card Swiper
-                </h2>
-                <p className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider mt-1.5 ml-1">
-                  Drag cards: Right to Master (+50 XP), Left to Study Later
-                </p>
-              </div>
-            </div>
 
-            <div className="relative flex flex-col items-center justify-center min-h-[220px] bg-slate-950/40 dark:bg-black/35 rounded-2xl border border-slate-200/20 dark:border-slate-200/60 dark:border-white/5 p-6 overflow-hidden">
-              {swiperIndex < swiperCards.length ? (
-                <div className="relative w-full max-w-sm flex flex-col items-center">
-                  <div className="relative w-full h-40 flex items-center justify-center">
-                    {swiperCards.map((card, idx) => (
-                      <SwiperCard
-                        key={card.id}
-                        card={card}
-                        index={idx}
-                        activeIndex={swiperIndex}
-                        totalCards={swiperCards.length}
-                        onSwipeLeft={() => setSwiperIndex(prev => prev + 1)}
-                        onSwipeRight={() => {
-                          handleAwardXP(50);
-                          setConfettiActive(true);
-                          setSwiperIndex(prev => prev + 1);
-                        }}
-                      />
+                </div>
+
+                {/* Right Column: Daily Quests */}
+                <div className="space-y-6">
+                  <div className="premium-glass-panel p-6 rounded-3xl border border-indigo-500/20">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        <Trophy className="w-4 h-4 text-indigo-400" />
+                        Today's Quests
+                      </h3>
+                      <span className="text-[10px] font-black text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
+                        {missions.filter(m => m.completed).length} / {missions.length} Done
+                      </span>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      {missions.map((mission) => (
+                        <div 
+                          key={mission.id}
+                          onClick={() => toggleMission(mission.id)}
+                          className={cn(
+                            "p-3 rounded-2xl border transition-all flex items-center gap-3 cursor-pointer select-none",
+                            mission.completed 
+                              ? "bg-emerald-500/5 border-emerald-500/20 text-slate-400" 
+                              : "bg-white/5 border-white/5 hover:border-indigo-500/30 text-white"
+                          )}
+                        >
+                          <div className={cn(
+                            "w-5 h-5 rounded-lg border flex items-center justify-center shrink-0 text-xs",
+                            mission.completed 
+                              ? "bg-emerald-500 border-emerald-500 text-white" 
+                              : "border-white/20 bg-white/5"
+                          )}>
+                            {mission.completed && <CheckCircle2 className="w-3.5 h-3.5" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={cn("text-xs font-bold truncate", mission.completed && "line-through opacity-60")}>
+                              {mission.title}
+                            </p>
+                            <p className="text-[10px] text-slate-400 truncate">{mission.desc}</p>
+                          </div>
+                          <span className="text-[9px] font-black text-indigo-400 shrink-0">
+                            +{mission.xp} XP
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Target Weak Subjects */}
+                  {weakSubjects.length > 0 && (
+                    <div className="premium-glass-panel p-5 rounded-3xl border border-rose-500/20">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-rose-400 flex items-center gap-1.5 mb-3">
+                        <Target className="w-3.5 h-3.5" /> Weak Subject Focus
+                      </h4>
+                      <div className="space-y-2">
+                        {weakSubjects.map((sub, i) => (
+                          <div key={i} className="flex items-center justify-between p-2.5 bg-white/5 rounded-xl border border-white/5">
+                            <span className="text-xs font-bold text-white truncate">{sub}</span>
+                            <Link href="/tutor" className="text-[10px] font-black text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-lg hover:bg-indigo-500/20 transition-all">
+                              Practice
+                            </Link>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── TAB 2: EXPLORE AI & LABS (BENTO SUITE) ── */}
+          {activeTab === "tools" && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-6"
+            >
+              <div>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white">AI Tools & Interactive Study Labs</h3>
+                <p className="text-xs text-slate-400 font-semibold mt-0.5">Explore Next-Gen interactive STEM simulations, oral examiners, and collaborative spaces.</p>
+              </div>
+
+              {/* Bento Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                
+                {/* 1. AI Doubt Lens */}
+                <Link href="/lens" className="premium-glass-panel p-6 rounded-3xl border border-emerald-500/20 hover:border-emerald-500/50 transition-all group flex flex-col justify-between h-48">
+                  <div className="flex justify-between items-start">
+                    <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-400 group-hover:scale-110 transition-transform">
+                      <Camera className="w-6 h-6" />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">Camera OCR</span>
+                  </div>
+                  <div>
+                    <h4 className="font-black text-base text-white group-hover:text-emerald-400 transition-colors">AI Doubt Lens</h4>
+                    <p className="text-slate-400 text-xs mt-1">Upload or snap any textbook diagram or handwritten equation for instant step-by-step solutions.</p>
+                  </div>
+                </Link>
+
+                {/* 2. Simulation Sandbox */}
+                <Link href="/sandbox" className="premium-glass-panel p-6 rounded-3xl border border-amber-500/20 hover:border-amber-500/50 transition-all group flex flex-col justify-between h-48">
+                  <div className="flex justify-between items-start">
+                    <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-400 group-hover:scale-110 transition-transform">
+                      <Zap className="w-6 h-6" />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">Interactive Lab</span>
+                  </div>
+                  <div>
+                    <h4 className="font-black text-base text-white group-hover:text-amber-400 transition-colors">Science Sandbox</h4>
+                    <p className="text-slate-400 text-xs mt-1">Mix real reagents in a beaker, test pH colors, and trigger interactive chemistry reactions in real-time.</p>
+                  </div>
+                </Link>
+
+                {/* 3. AI Voice Viva */}
+                <Link href="/viva" className="premium-glass-panel p-6 rounded-3xl border border-purple-500/20 hover:border-purple-500/50 transition-all group flex flex-col justify-between h-48">
+                  <div className="flex justify-between items-start">
+                    <div className="p-3 bg-purple-500/10 rounded-2xl text-purple-400 group-hover:scale-110 transition-transform">
+                      <Mic className="w-6 h-6" />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-wider text-purple-400 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20">Oral Practice</span>
+                  </div>
+                  <div>
+                    <h4 className="font-black text-base text-white group-hover:text-purple-400 transition-colors">AI Voice Viva</h4>
+                    <p className="text-slate-400 text-xs mt-1">Conversational oral board practical examiner with real-time speech dialogue and score feedback.</p>
+                  </div>
+                </Link>
+
+                {/* 4. Whiteboard */}
+                <Link href="/whiteboard" className="premium-glass-panel p-6 rounded-3xl border border-pink-500/20 hover:border-pink-500/50 transition-all group flex flex-col justify-between h-48">
+                  <div className="flex justify-between items-start">
+                    <div className="p-3 bg-pink-500/10 rounded-2xl text-pink-400 group-hover:scale-110 transition-transform">
+                      <Palette className="w-6 h-6" />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-wider text-pink-400 bg-pink-500/10 px-2.5 py-0.5 rounded-full border border-pink-500/20">Canvas</span>
+                  </div>
+                  <div>
+                    <h4 className="font-black text-base text-white group-hover:text-pink-400 transition-colors">Smart Whiteboard</h4>
+                    <p className="text-slate-400 text-xs mt-1">Draw, sketch formulas, and have AI solve handwritten equations directly on your canvas.</p>
+                  </div>
+                </Link>
+
+                {/* 5. Battle Quiz Arena */}
+                <Link href="/arena" className="premium-glass-panel p-6 rounded-3xl border border-rose-500/20 hover:border-rose-500/50 transition-all group flex flex-col justify-between h-48">
+                  <div className="flex justify-between items-start">
+                    <div className="p-3 bg-rose-500/10 rounded-2xl text-rose-400 group-hover:scale-110 transition-transform">
+                      <Gamepad2 className="w-6 h-6" />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-wider text-rose-400 bg-rose-500/10 px-2.5 py-0.5 rounded-full border border-rose-500/20">Multiplayer</span>
+                  </div>
+                  <div>
+                    <h4 className="font-black text-base text-white group-hover:text-rose-400 transition-colors">Quiz Battle Arena</h4>
+                    <p className="text-slate-400 text-xs mt-1">Compete against classmates in fast-paced real-time live question duels with powerups.</p>
+                  </div>
+                </Link>
+
+                {/* 6. Formula & Cheatsheet Vault */}
+                <Link href="/formulas" className="premium-glass-panel p-6 rounded-3xl border border-cyan-500/20 hover:border-cyan-500/50 transition-all group flex flex-col justify-between h-48">
+                  <div className="flex justify-between items-start">
+                    <div className="p-3 bg-cyan-500/10 rounded-2xl text-cyan-400 group-hover:scale-110 transition-transform">
+                      <Compass className="w-6 h-6" />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded-full border border-cyan-500/20">Quick Revision</span>
+                  </div>
+                  <div>
+                    <h4 className="font-black text-base text-white group-hover:text-cyan-400 transition-colors">Formula Vault</h4>
+                    <p className="text-slate-400 text-xs mt-1">High-yield equations, periodic trends, math theorems, and quick revision cards.</p>
+                  </div>
+                </Link>
+
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── TAB 3: CLASSROOM & PROGRESS (SYLLABUS & SOCIAL) ── */}
+          {activeTab === "social" && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-6"
+            >
+              {/* Virtual School Launcher */}
+              <ClassroomLauncher itemVariants={item} />
+
+              <div className="grid lg:grid-cols-3 gap-6">
+                
+                {/* Syllabus Mind Map (Left 2 cols) */}
+                <div className="lg:col-span-2 space-y-6">
+                  <div className="premium-glass-panel p-6 rounded-3xl border border-indigo-500/20">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                          <Compass className="w-4 h-4 text-indigo-400" />
+                          Mastery Mind Map & Syllabus Tree
+                        </h3>
+                        <p className="text-xs text-slate-400 mt-0.5">Click nodes to view chapter highlights and trigger mock tests</p>
+                      </div>
+                    </div>
+
+                    <div className="relative w-full bg-black/30 rounded-2xl border border-white/5 p-4 overflow-x-auto min-h-[200px]">
+                      <svg className="w-full max-w-[700px] h-auto mx-auto" viewBox="0 0 800 160">
+                        <path d="M 96 80 Q 176 40 256 40" fill="none" className="stroke-emerald-500/50" strokeWidth="3" />
+                        <path d="M 256 40 Q 336 80 416 120" fill="none" className="stroke-indigo-500/40" strokeWidth="3" />
+                        <path d="M 416 120 Q 496 80 576 40" fill="none" className="stroke-slate-800" strokeWidth="2" />
+                        <path d="M 576 40 Q 656 80 720 88" fill="none" className="stroke-slate-800" strokeWidth="2" />
+
+                        {skillNodes.map((node) => {
+                          const isLocked = node.status === "locked";
+                          const isActive = node.status === "active";
+                          const isCompleted = node.status === "completed";
+                          const cx = node.x * 8;
+                          const cy = node.y * 1.5;
+
+                          return (
+                            <g 
+                              key={node.id}
+                              onClick={() => setSelectedNode(node)}
+                              className="cursor-pointer group select-none"
+                            >
+                              <circle
+                                cx={cx}
+                                cy={cy}
+                                r="20"
+                                className={cn(
+                                  "transition-all duration-300 stroke-2 group-hover:scale-110",
+                                  isCompleted ? "stroke-emerald-500 fill-emerald-950/40" : "",
+                                  isActive ? "stroke-indigo-500 fill-indigo-950/40" : "",
+                                  isLocked ? "stroke-slate-800 fill-black/60" : ""
+                                )}
+                              />
+                              {isCompleted ? (
+                                <path 
+                                  d={`M ${cx - 5} ${cy} L ${cx - 2} ${cy + 4} L ${cx + 5} ${cy - 4}`}
+                                  fill="none"
+                                  stroke="#10b981"
+                                  strokeWidth="3"
+                                  strokeLinecap="round"
+                                />
+                              ) : isLocked ? (
+                                <g transform={`translate(${cx - 4.5}, ${cy - 5.5}) scale(0.55)`}>
+                                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke="#64748b" strokeWidth="2.5"/>
+                                </g>
+                              ) : (
+                                <text x={cx} y={cy + 4} textAnchor="middle" className="text-[11px] font-black fill-indigo-400 font-mono">
+                                  {node.percent}%
+                                </text>
+                              )}
+                              <text x={cx} y={cy - 26} textAnchor="middle" className="text-[10px] font-black fill-slate-400 uppercase">
+                                {node.label.split(" ")[0]}
+                              </text>
+                            </g>
+                          );
+                        })}
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Classmates Leaderboard (Right col) */}
+                <div id="tour-leaderboard-section" className="premium-glass-panel p-6 rounded-3xl border border-indigo-500/20 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                      <Users className="w-4 h-4 text-indigo-400" />
+                      Classmate Ranks
+                    </h3>
+                    <Link href="/groups" className="text-[10px] font-bold text-indigo-400 hover:underline">
+                      StudyCircles →
+                    </Link>
+                  </div>
+
+                  <div className="space-y-2">
+                    {classmates.map((buddy, index) => (
+                      <div 
+                        key={buddy.name}
+                        className={cn(
+                          "flex items-center justify-between p-2.5 rounded-2xl border transition-all",
+                          buddy.isSelf 
+                            ? "bg-indigo-500/10 border-indigo-500/40" 
+                            : "bg-white/5 border-white/5 hover:bg-white/10"
+                        )}
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          {getRankBadge(index + 1)}
+                          <div className={cn("w-7 h-7 rounded-full bg-gradient-to-br flex items-center justify-center text-white font-black text-[10px]", buddy.color)}>
+                            {buddy.avatar}
+                          </div>
+                          <div className="min-w-0">
+                            <p className={cn("text-xs font-bold truncate", buddy.isSelf ? "text-indigo-300" : "text-white")}>
+                              {buddy.name}
+                            </p>
+                            <p className="text-[10px] text-slate-400 truncate">{buddy.totalXp} XP</p>
+                          </div>
+                        </div>
+
+                        {!buddy.isSelf && (
+                          <Link href="/groups" className="p-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-all">
+                            <MessageCircle className="w-3.5 h-3.5" />
+                          </Link>
+                        )}
+                      </div>
                     ))}
                   </div>
+                </div>
 
-                  {/* Touch-Friendly Action Buttons */}
-                  <div className="flex items-center justify-between gap-3 w-full mt-4 z-20">
-                    <button
-                      type="button"
-                      onClick={() => setSwiperIndex(prev => prev + 1)}
-                      className="flex-1 py-2 px-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/25 rounded-xl font-extrabold text-[11px] uppercase tracking-wider active:scale-95 transition-all text-center"
-                    >
-                      ← Study Later
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        handleAwardXP(50);
-                        setConfettiActive(true);
-                        setSwiperIndex(prev => prev + 1);
-                      }}
-                      className="flex-1 py-2 px-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 border border-emerald-500/25 rounded-xl font-extrabold text-[11px] uppercase tracking-wider active:scale-95 transition-all text-center"
-                    >
-                      Mastered (+50 XP) →
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-6"
-                >
-                  <div className="w-14 h-14 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
-                    <Trophy className="w-7 h-7 dark:text-emerald-400 text-emerald-700" />
-                  </div>
-                  <h3 className="text-base font-black dark:text-white text-slate-900">All Cards Cleared! </h3>
-                  <p className="text-xs text-slate-500 font-bold mt-1">Great job! You gained bonus XP revision points.</p>
-                  <button 
-                    onClick={() => setSwiperIndex(0)}
-                    className="mt-4 px-5 py-2.5 bg-indigo-650 hover:bg-indigo-600 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all border border-white/10"
-                  >
-                    Reset Deck
-                  </button>
-                </motion.div>
-              )}
-            </div>
-          </motion.section>
-
-          {/* HIGH-YIELD PYQ & EXAM HUB */}
-          {userClass === 10 && (
-            <motion.section 
-              variants={item}
-              className="bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/15 rounded-[2rem] p-8 shadow-sm hover:shadow-xl relative overflow-hidden group"
-            >
-              <div className="absolute right-6 top-6 opacity-[0.05] group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 pointer-events-none">
-                <Trophy className="w-40 h-40 text-amber-500" />
               </div>
-              <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 px-3.5 py-1.5 rounded-full font-black text-[10px] uppercase tracking-wider border border-amber-500/25">
-                  <Award className="w-4 h-4" /> Board Exam Practice
-                </div>
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-4">Jump into PYQ Subject Hub</h3>
-                <p className="text-slate-500 dark:text-slate-400 text-sm mt-2.5 max-w-xl leading-relaxed font-bold">
-                  Practice previous years' board exam question sheets mapped exactly to CBSE grading schemes. Submit answers and receive detailed AI evaluations.
-                </p>
-                <div className="mt-6 flex flex-wrap items-center gap-4">
-                  <Link href="/pyq">
-                    <button className="bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs uppercase tracking-wider px-6 py-3 rounded-2xl hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-amber-500/10 border border-white/10">
-                      Start Grading Practice
-                    </button>
-                  </Link>
-                  <Link href="/ncert">
-                    <button className="bg-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-300 font-extrabold text-xs uppercase tracking-wider px-6 py-3 rounded-2xl border border-slate-200 dark:border-slate-200/60 dark:border-white/5 transition-all">
-                      Browse NCERT Books
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            </motion.section>
+            </motion.div>
           )}
 
         </div>
+      )}
 
-        {/* RIGHT COLUMN: SIDEBAR STATS & QUESTBOARD */}
-        <div className="space-y-8">
-          
-          {/* DAILY QUESTBOARD (MISSIONS) */}
-          <motion.section 
-            variants={item} 
-            className="premium-glass-panel p-8"
-          >
-            <h3 className="text-xl font-extrabold flex items-center gap-3 mb-6 text-slate-900 dark:text-white">
-              <div className="p-2 bg-indigo-500/10 rounded-xl">
-                <Trophy className="w-5 h-5 text-indigo-650 dark:text-indigo-400" />
-              </div>
-              Daily Quests
-            </h3>
-            
-            <div className="space-y-3.5">
-              {missions.map((mission) => (
-                <div 
-                  key={mission.id}
-                  onClick={() => toggleMission(mission.id)}
-                  className={`group cursor-pointer p-4 rounded-2xl border transition-all duration-300 flex items-center gap-3.5 select-none ${
-                    mission.completed
-                      ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40 shadow-sm shadow-emerald-500/5'
-                      : 'bg-slate-50/50 dark:bg-white/[0.01] border-slate-200/30 dark:border-slate-200/60 dark:border-white/5 hover:border-indigo-500/40 hover:scale-[1.01]'
-                  }`}
-                >
-                  {/* Dynamic Spring Checkbox */}
-                  <motion.div 
-                    whileTap={{ scale: 0.8 }}
-                    className={`w-5.5 h-5.5 rounded-xl border flex items-center justify-center shrink-0 transition-all ${
-                      mission.completed
-                        ? 'bg-emerald-500 border-emerald-500 text-white scale-[1.05] shadow-[0_0_8px_rgba(16,185,129,0.4)]'
-                        : 'border-slate-300 dark:border-white/10 bg-white/5 group-hover:border-indigo-500/50'
-                    }`}
-                  >
-                    {mission.completed && (
-                      <motion.svg 
-                        initial={{ scale: 0, rotate: -30 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                        className="w-3.5 h-3.5" 
-                        fill="none" 
-                        viewBox="0 0 24 24" 
-                        stroke="currentColor" 
-                        strokeWidth="3.5"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </motion.svg>
-                    )}
-                  </motion.div>
-
-                  <div className="flex-1 overflow-hidden">
-                    <p className={`font-black text-xs transition-all truncate ${
-                      mission.completed 
-                        ? 'text-slate-400 dark:text-slate-500 line-through font-semibold' 
-                        : 'text-slate-800 dark:text-slate-200'
-                    }`}>
-                      {mission.title}
-                    </p>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-450 leading-snug mt-0.5 truncate font-bold">{mission.desc}</p>
-                  </div>
-                  
-                  <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0 border transition-all ${
-                    mission.completed
-                      ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-                      : 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20 group-hover:bg-indigo-500/15'
-                  }`}>
-                    +{mission.xp} XP
-                  </span>
-                </div>
-              ))}
-            </div>
-          </motion.section>
-
-          {/* CLASSMATES LEADERBOARD & STUDY BUDDIES */}
-          <motion.section 
-            id="tour-leaderboard-section"
-            variants={item} 
-            className="premium-glass-panel p-8"
-          >
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-extrabold flex items-center gap-3 text-slate-900 dark:text-white">
-                <div className="p-2 bg-indigo-500/10 rounded-xl">
-                  <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /> 
-                </div>
-                Classmates
-              </h3>
-              <span className="text-[9px] font-black text-indigo-500 dark:text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-full border border-indigo-500/25 uppercase tracking-wide">
-                Leaderboard
-              </span>
-            </div>
-            
-            <div className="space-y-3">
-              {classmates.map((buddy, index) => {
-                const rank = index + 1;
-                return (
-                  <div 
-                    key={buddy.name} 
-                    className={cn(
-                      "flex items-center justify-between p-3 rounded-2xl border transition-all duration-300",
-                      buddy.isSelf
-                        ? "bg-indigo-500/10 dark:bg-indigo-500/10 border-indigo-500/45 shadow-[0_0_12px_rgba(99,102,241,0.1)] shimmer-border"
-                        : "bg-slate-50/50 dark:bg-white/[0.01] border-slate-200/30 dark:border-slate-200/60 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.02]"
-                    )}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      {getRankBadge(rank)}
-                      
-                      <div className="relative shrink-0 select-none">
-                        <div className={cn(
-                          "w-8 h-8 rounded-full bg-gradient-to-br flex items-center justify-center text-white font-black text-xs shadow-sm border border-white/10",
-                          buddy.color
-                        )}>
-                          {buddy.avatar}
-                        </div>
-                        {buddy.online && (
-                          <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900 shadow-[0_0_8px_rgba(16,185,129,0.7)] animate-pulse" />
-                        )}
-                      </div>
-
-                      <div className="min-w-0">
-                        <p className={cn(
-                          "text-xs truncate font-black leading-tight",
-                          buddy.isSelf ? "text-indigo-950 dark:text-white" : "text-slate-800 dark:text-slate-250"
-                        )}>
-                          {buddy.name}
-                        </p>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-450 leading-none mt-1 font-bold">
-                          Lvl {buddy.isSelf ? level : Math.floor(buddy.totalXp / 200) + 1} • {buddy.totalXp} XP • <span className="dark:text-indigo-400 text-indigo-700 font-semibold">{buddy.status}</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    {!buddy.isSelf && (
-                      <button
-                        onClick={() => router.push("/groups")}
-                        className="p-2 bg-white/5 hover:bg-indigo-500/10 dark:hover:bg-indigo-500/15 border border-slate-200 dark:border-slate-200/60 dark:border-white/5 hover:border-indigo-500/25 rounded-xl text-slate-500 hover:text-indigo-650 dark:text-slate-400 dark:hover:text-indigo-400 shadow-sm transition-all"
-                        title={`Message ${buddy.name}`}
-                      >
-                        <MessageCircle className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </motion.section>
-
-          {/* TARGET SUBJECT AREAS (WEAK AREAS) */}
-          <motion.section 
-            variants={item} 
-            className="premium-glass-panel p-8"
-          >
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-extrabold flex items-center gap-3 text-slate-900 dark:text-white">
-                <div className="p-2 bg-emerald-500/10 rounded-xl">
-                  <Target className="w-5 h-5 text-emerald-650 dark:text-emerald-400" /> 
-                </div>
-                Target Areas
-              </h3>
-              <Link href="/analytics">
-                <span className="text-indigo-600 dark:text-indigo-400 text-xs font-black uppercase hover:underline cursor-pointer">
-                  Stats
-                </span>
-              </Link>
-            </div>
-            
-            <div className="space-y-3.5">
-              {weakSubjects.length > 0 ? (
-                weakSubjects.map((subject, idx) => (
-                  <div key={idx} className="group bg-slate-50/50 dark:bg-white/[0.01] hover:bg-indigo-500/5 dark:hover:bg-indigo-550/5 p-4.5 rounded-2xl flex justify-between items-center transition-all border border-slate-200/30 dark:border-slate-200/60 dark:border-white/5 hover:border-indigo-500/20">
-                    <div className="overflow-hidden mr-2">
-                      <p className="font-black text-sm text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:dark:text-indigo-400 text-indigo-700 transition-colors truncate">{subject}</p>
-                      <p className="text-[10px] font-bold text-red-500 mt-1 flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Needs Focus
-                      </p>
-                    </div>
-                    <Link href="/tutor" className="shrink-0">
-                      <button className="text-[10px] font-black uppercase tracking-wider bg-white/5 text-indigo-650 dark:text-indigo-400 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-200/60 dark:border-white/5 shadow-sm hover:shadow-md hover:scale-105 transition-all">
-                        Train
-                      </button>
-                    </Link>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center p-6 bg-slate-50/30 dark:bg-white/[0.01] rounded-2xl border border-slate-200/30 dark:border-slate-200/60 dark:border-white/5">
-                  <p className="text-slate-650 dark:text-slate-350 font-black text-sm mb-1">Looking Great!</p>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed font-bold">No weak areas identified yet. Practice quizzes to check performance.</p>
-                </div>
-              )}
-            </div>
-          </motion.section>
-
-        </div>
-
-      </div>
-
-      {/* ── LEVEL UP MODAL CELEBRATION ── */}
+      {/* ── SYLLABUS NODE MODAL ── */}
       <AnimatePresence>
-        {showLevelUp && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9, y: 50 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 50 }}
-            className="fixed bottom-10 right-10 z-50 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-[2rem] p-6 shadow-2xl flex items-center gap-5 border border-white/20 select-none pointer-events-none"
-          >
-            <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center shrink-0 border border-white/30 animate-bounce">
-              <Trophy className="w-7 h-7 dark:text-white text-slate-900" />
-            </div>
-            <div>
-              <h4 className="font-black text-xl leading-none">Level Up! </h4>
-              <p className="text-sm font-bold opacity-90 mt-1">You reached Level {level}! Keep studying!</p>
-            </div>
-          </motion.div>
-        )}
-
-        {showQuestCelebration && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9, y: 50, x: "-50%" }}
-            animate={{ opacity: 1, scale: 1, y: 0, x: "-50%" }}
-            exit={{ opacity: 0, scale: 0.9, y: 50, x: "-50%" }}
-            className="fixed bottom-10 left-1/2 z-50 bg-gradient-to-r from-fuchsia-600 to-indigo-650 text-white rounded-[2rem] p-6.5 shadow-2xl flex items-center gap-4.5 border border-white/10 select-none"
-          >
-            <div className="w-13 h-13 bg-white/10 rounded-full flex items-center justify-center shrink-0 border border-white/25 animate-pulse">
-              <Sparkles className="w-6.5 h-6.5 text-yellow-300" />
-            </div>
-            <div>
-              <h4 className="font-black text-lg leading-none">All Quests Completed! </h4>
-              <p className="text-xs font-bold opacity-90 mt-1.5">Fantastic job! You've conquered all daily study missions!</p>
-            </div>
-          </motion.div>
-        )}
-
         {selectedNode && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="dark:bg-[#0c0f1d] bg-[#f5f7ff] backdrop-blur-xl border border-white/10 w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden p-7 text-left dark:text-white text-slate-900"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-slate-900 border border-white/10 w-full max-w-md rounded-3xl p-6 text-left text-white shadow-2xl space-y-4"
             >
-              <div className="flex justify-between items-start border-b border-slate-200/60 dark:border-white/5 pb-4 mb-4">
+              <div className="flex justify-between items-start">
                 <div>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/25">CBSE Syllabus Node</span>
-                  <h3 className="text-2xl font-black mt-2 leading-none">{selectedNode.label}</h3>
+                  <span className="text-[9px] font-black uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
+                    CBSE Syllabus Node
+                  </span>
+                  <h3 className="text-xl font-black mt-1.5">{selectedNode.label}</h3>
                 </div>
                 <button 
                   onClick={() => setSelectedNode(null)} 
-                  className="p-2 bg-white/5 hover:bg-white/10 hover:text-red-400 rounded-xl transition-all font-black text-xs uppercase border border-slate-200/60 dark:border-white/5"
+                  className="p-1.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white rounded-xl text-xs"
                 >
-                  Close
+                  ✕
                 </button>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center justify-between bg-white/[0.02] px-4 py-2.5 rounded-xl border border-slate-200/60 dark:border-white/5">
-                  <span className="text-xs font-semibold dark:text-slate-400 text-slate-600">Mastery Progress</span>
-                  <span className="text-xs font-black dark:text-indigo-400 text-indigo-700">{selectedNode.percent}% Complete</span>
-                </div>
+              <p className="text-slate-300 text-xs leading-relaxed">{selectedNode.desc}</p>
+              
+              <div className="bg-white/5 border border-white/5 p-3.5 rounded-2xl">
+                <h4 className="text-[10px] font-black uppercase tracking-wider text-indigo-400 mb-1.5">Key Board Highlights</h4>
+                <ul className="space-y-1.5">
+                  {selectedNode.keyPoints.map((point: string, idx: number) => (
+                    <li key={idx} className="text-xs text-slate-300 font-semibold flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0 mt-1.5" />
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-                <p className="dark:text-slate-400 text-slate-600 text-sm font-semibold leading-relaxed">{selectedNode.desc}</p>
-                
-                <div className="bg-white/[0.02] border border-slate-200/60 dark:border-white/5 p-4.5 rounded-2xl">
-                  <h4 className="text-[10px] font-black uppercase tracking-wider dark:text-indigo-400 text-indigo-700 mb-2">High-Yield Board Highlights</h4>
-                  <ul className="space-y-2">
-                    {selectedNode.keyPoints.map((point: string, idx: number) => (
-                      <li key={idx} className="text-xs dark:text-slate-300 text-slate-700 font-bold flex items-start gap-2.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0 mt-1.5"></span>
-                        <span>{point}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  <Link href="/mocktest">
-                    <button 
-                      onClick={() => setSelectedNode(null)}
-                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-650 text-white font-extrabold text-xs uppercase tracking-wider py-3.5 rounded-xl border border-white/10 hover:scale-[1.02] active:scale-[0.98] transition-all"
-                    >
-                      <Trophy className="w-4 h-4" /> Start Mock Test
-                    </button>
-                  </Link>
-                  <Link href="/learn">
-                    <button 
-                      onClick={() => setSelectedNode(null)}
-                      className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 dark:text-slate-200 text-slate-800 font-extrabold text-xs uppercase tracking-wider py-3.5 rounded-xl border border-slate-200/60 dark:border-white/5 transition-all"
-                    >
-                      <Book className="w-4 h-4" /> Read Theory
-                    </button>
-                  </Link>
-                </div>
+              <div className="grid grid-cols-2 gap-2.5 pt-2">
+                <Link href="/mocktest">
+                  <button 
+                    onClick={() => setSelectedNode(null)}
+                    className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all"
+                  >
+                    Start Mock Test
+                  </button>
+                </Link>
+                <Link href="/learn">
+                  <button 
+                    onClick={() => setSelectedNode(null)}
+                    className="w-full py-2.5 bg-white/5 hover:bg-white/10 text-white font-bold text-xs rounded-xl transition-all border border-white/10"
+                  >
+                    Read Theory
+                  </button>
+                </Link>
               </div>
             </motion.div>
           </div>
@@ -1192,37 +865,31 @@ export default function Dashboard() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-white dark:bg-[#0c0f1d] bg-[#f5f7ff] border border-slate-200 dark:border-white/10 rounded-3xl p-8 shadow-2xl space-y-6 text-center"
+              className="w-full max-w-md bg-slate-900 border border-white/10 rounded-3xl p-6 shadow-2xl space-y-4 text-center text-white"
             >
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 mb-2">
-                <Sparkles className="w-6 h-6 animate-pulse" />
+              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mx-auto flex items-center justify-center">
+                <Sparkles className="w-5 h-5 animate-pulse" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-slate-900 dark:text-white">Quest Guide</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mt-1 uppercase tracking-wider">How to earn XP</p>
+                <h3 className="text-lg font-black">Quest Guide</h3>
+                <p className="text-xs text-slate-400 mt-0.5">How to complete this mission</p>
               </div>
-              
-              <p className="text-sm text-slate-650 dark:text-slate-350 leading-relaxed font-bold">
+              <p className="text-xs text-slate-300 leading-relaxed font-semibold">
                 {activeMissionGuide}
               </p>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setActiveMissionGuide(null)}
-                  className="flex-1 bg-indigo-650 hover:bg-indigo-700 text-white font-extrabold py-3.5 rounded-2xl transition-all shadow-md shadow-indigo-500/10"
-                >
-                  Got it!
-                </button>
-              </div>
+              <button
+                onClick={() => setActiveMissionGuide(null)}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition-all text-xs"
+              >
+                Understood!
+              </button>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
 
       <Confetti active={confettiActive} onComplete={() => setConfettiActive(false)} />
-      
-      {/* Interactive Feature Callout & Coach Marks Spotlight Tour */}
       <FeatureSpotlightTour />
-    </motion.div>
+    </div>
   );
 }
