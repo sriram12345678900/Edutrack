@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { 
   Users, Sparkles, Send, ArrowLeft, Plus, Copy, CheckCheck, Check,
-  MessageSquare, BookOpen, AlertCircle, Loader2, LogOut, MessageCircle, UserPlus, Search, Trophy, Video, X, PenTool, Download, Paperclip, Mic, StopCircle, Volume2, Moon, Sun, Clock
+  MessageSquare, BookOpen, AlertCircle, Loader2, LogOut, MessageCircle, UserPlus, Search, Trophy, Video, X, PenTool, Download, Paperclip, Mic, StopCircle, Volume2, Moon, Sun, Clock,
+  Play, RefreshCw
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -112,6 +113,64 @@ const DUEL_QUESTIONS: QuizDuelQuestion[] = [
     correctAnswer: "~Fe_2O_3 · xH_2O~ (Hydrated Ferric Oxide)"
   }
 ];
+
+const SUBJECT_CHAPTERS: { [subject: string]: string[] } = {
+  "Science": [
+    "Chemical Reactions and Equations",
+    "Acids, Bases and Salts",
+    "Metals and Non-metals",
+    "Carbon and its Compounds",
+    "Life Processes",
+    "Control and Coordination",
+    "How do Organisms Reproduce?",
+    "Heredity and Evolution",
+    "Light - Reflection and Refraction",
+    "The Human Eye and the Colourful World",
+    "Electricity",
+    "Magnetic Effects of Electric Current",
+    "Our Environment"
+  ],
+  "Mathematics": [
+    "Real Numbers",
+    "Polynomials",
+    "Pair of Linear Equations in Two Variables",
+    "Quadratic Equations",
+    "Arithmetic Progressions",
+    "Triangles",
+    "Coordinate Geometry",
+    "Introduction to Trigonometry",
+    "Some Applications of Trigonometry",
+    "Circles",
+    "Surface Areas and Volumes",
+    "Statistics",
+    "Probability"
+  ],
+  "Social Science": [
+    "The Rise of Nationalism in Europe",
+    "Nationalism in India",
+    "Resources and Development",
+    "Forest and Wildlife Resources",
+    "Water Resources",
+    "Agriculture",
+    "Power Sharing",
+    "Federalism",
+    "Gender, Religion and Caste",
+    "Development",
+    "Sectors of the Indian Economy",
+    "Money and Credit",
+    "Globalization and the Indian Economy"
+  ],
+  "English": [
+    "A Letter to God",
+    "Nelson Mandela: Long Walk to Freedom",
+    "Two Stories about Flying",
+    "From the Diary of Anne Frank",
+    "Glimpses of India",
+    "Madam Rides the Bus",
+    "The Sermon at Benares",
+    "The Proposal"
+  ]
+};
 
 const WhiteboardPanel = ({ chatId, nickname, db }: { chatId: string, nickname: string, db: any }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -309,6 +368,10 @@ export default function StudyCirclesDMs() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const activeChatIdRef = useRef<string>("");
   const [activeDuel, setActiveDuel] = useState<QuizDuelState | null>(null);
+  const [showDuelConfigModal, setShowDuelConfigModal] = useState(false);
+  const [duelSubject, setDuelSubject] = useState("Science");
+  const [duelChapter, setDuelChapter] = useState("Chemical Reactions and Equations");
+  const [isGeneratingDuel, setIsGeneratingDuel] = useState(false);
   const [showVideoMeeting, setShowVideoMeeting] = useState(false);
   const [joinError, setJoinError] = useState("");
   const [showWhiteboard, setShowWhiteboard] = useState(false);
@@ -343,16 +406,55 @@ export default function StudyCirclesDMs() {
   }, []);
 
   const startQuizDuel = () => {
-    setActiveDuel({
-      status: 'waiting',
-      currentQuestionIndex: 0,
-      timer: 10,
-      myScore: 0,
-      buddyScore: 0,
-      myAnswered: null,
-      buddyAnswered: null,
-      questions: DUEL_QUESTIONS
-    });
+    setDuelSubject("Science");
+    setDuelChapter("Chemical Reactions and Equations");
+    setShowDuelConfigModal(true);
+  };
+
+  const startDynamicQuizDuel = async () => {
+    setIsGeneratingDuel(true);
+    try {
+      const res = await fetch("/api/groups/quiz/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: duelSubject,
+          chapter: duelChapter
+        })
+      });
+      const data = await res.json();
+      if (data.questions && data.questions.length > 0) {
+        setActiveDuel({
+          status: 'waiting',
+          currentQuestionIndex: 0,
+          timer: 10,
+          myScore: 0,
+          buddyScore: 0,
+          myAnswered: null,
+          buddyAnswered: null,
+          questions: data.questions
+        });
+        setShowDuelConfigModal(false);
+      } else {
+        throw new Error(data.error || "Failed to generate questions");
+      }
+    } catch (e: any) {
+      console.error("Duel start error:", e);
+      // Fallback to offline questions
+      setActiveDuel({
+        status: 'waiting',
+        currentQuestionIndex: 0,
+        timer: 10,
+        myScore: 0,
+        buddyScore: 0,
+        myAnswered: null,
+        buddyAnswered: null,
+        questions: DUEL_QUESTIONS
+      });
+      setShowDuelConfigModal(false);
+    } finally {
+      setIsGeneratingDuel(false);
+    }
   };
 
   const handleQuestionTimeOut = () => {
@@ -2593,6 +2695,96 @@ const [liveKitToken, setLiveKitToken] = useState("");
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL 3: START QUIZ DUEL */}
+      <AnimatePresence>
+        {showDuelConfigModal && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 text-slate-900 dark:text-white"
+            >
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-955/20 border border-amber-200 dark:border-amber-900 text-amber-600 dark:text-amber-400 mb-3">
+                  <Trophy className="w-6 h-6 animate-bounce" />
+                </div>
+                <h3 className="text-xl font-black">Configure Study Duel</h3>
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">
+                  Choose your subject and chapter to generate a customized AI quiz challenge.
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {/* Subject dropdown selection */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase ml-1 block">Subject</label>
+                  <select
+                    value={duelSubject}
+                    onChange={(e) => {
+                      const subj = e.target.value;
+                      setDuelSubject(subj);
+                      if (SUBJECT_CHAPTERS[subj] && SUBJECT_CHAPTERS[subj].length > 0) {
+                        setDuelChapter(SUBJECT_CHAPTERS[subj][0]);
+                      }
+                    }}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-xs sm:text-sm font-bold text-slate-900 dark:text-white outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500/20"
+                  >
+                    {Object.keys(SUBJECT_CHAPTERS).map((subj) => (
+                      <option key={subj} value={subj} className="dark:bg-slate-900 text-slate-900 dark:text-white">{subj}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Chapter dropdown selection */}
+                {SUBJECT_CHAPTERS[duelSubject] && (
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 tracking-widest uppercase ml-1 block">Chapter / Topic</label>
+                    <select
+                      value={duelChapter}
+                      onChange={(e) => setDuelChapter(e.target.value)}
+                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-xs sm:text-sm font-bold text-slate-900 dark:text-white outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500/20"
+                    >
+                      {SUBJECT_CHAPTERS[duelSubject].map((ch) => (
+                        <option key={ch} value={ch} className="dark:bg-slate-900 text-slate-900 dark:text-white">{ch}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => { setShowDuelConfigModal(false); }}
+                    className="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-extrabold py-3 rounded-2xl transition-all text-xs"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={startDynamicQuizDuel}
+                    disabled={isGeneratingDuel}
+                    className="flex-1 bg-gradient-to-r from-amber-500 to-orange-650 hover:from-amber-600 hover:to-orange-700 text-white font-extrabold py-3 rounded-2xl transition-all shadow-md shadow-amber-500/20 disabled:opacity-50 text-xs flex items-center justify-center gap-1.5"
+                  >
+                    {isGeneratingDuel ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-3.5 h-3.5" />
+                        Start Duel Challenge
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </div>
         )}

@@ -11,7 +11,8 @@ import {
   PenTool, Highlighter, ChevronDown, FileText, X, Hand, Move, LassoSelect, 
   Triangle, ArrowRight, ZoomIn, ZoomOut, RotateCcw, Keyboard,
   Zap, Sun, Moon, Layers, Crosshair, Calculator, Library, Compass,
-  Maximize2, Minimize2, Sliders, Image as ImageIcon, Ruler, Mic, Volume2, Plus, ChevronLeft, Menu, Upload, FileUp, Link, Minus
+  Maximize2, Minimize2, Sliders, Image as ImageIcon, Ruler, Mic, Volume2, Plus, ChevronLeft, Menu, Upload, FileUp, Link, Minus,
+  Settings, ChevronUp, MoreHorizontal, MousePointer2, StickyNote, Sigma
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import jsPDF from "jspdf";
@@ -1700,8 +1701,102 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
   const selectedPts = selectedStrokes.flatMap(s => s.points);
   const selBox = selectedPts.length > 0 ? getBoundingBox(selectedPts) : null;
 
+  // ─── Mobile detection ──────────────────────────────────────────────────────
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // ─── Mobile tool drawer state ───────────────────────────────────────────────
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [mobileDrawerTab, setMobileDrawerTab] = useState<"draw" | "shapes" | "select" | "insert">("draw");
+  const [mobileSettingsOpen, setMobileSettingsOpen] = useState(false);
+  const [showOverflowMenu, setShowOverflowMenu] = useState(false);
+
+  // ─── Pinch-to-zoom state ────────────────────────────────────────────────────
+  const pinchStartDistRef = useRef<number | null>(null);
+  const pinchStartZoomRef = useRef<number>(1);
+
+  const handleTouchStartPinch = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinchStartDistRef.current = Math.hypot(dx, dy);
+      pinchStartZoomRef.current = zoomLevel;
+    }
+  };
+
+  const handleTouchMovePinch = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && pinchStartDistRef.current !== null) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.hypot(dx, dy);
+      const scale = dist / pinchStartDistRef.current;
+      const newZoom = Math.max(0.25, Math.min(3, parseFloat((pinchStartZoomRef.current * scale).toFixed(2))));
+      setZoomLevel(newZoom);
+    }
+  };
+
+  const handleTouchEndPinch = () => {
+    pinchStartDistRef.current = null;
+  };
+
+  // Close mobile drawer when drawing starts
+  const wrappedStartDrawing = (e: any) => {
+    if (mobileDrawerOpen) setMobileDrawerOpen(false);
+    startDrawing(e);
+  };
+
+  // Tool groups definition
+  const toolGroups = {
+    draw: [
+      { id: "pen" as DrawTool, icon: PenTool, label: "Pen", shortcut: "P" },
+      { id: "smart_pen" as DrawTool, icon: Sparkles, label: "Smart Pen", shortcut: "S" },
+      { id: "highlighter" as DrawTool, icon: Highlighter, label: "Highlighter", shortcut: "" },
+      { id: "laser" as DrawTool, icon: Crosshair, label: "Laser", shortcut: "X" },
+    ],
+    shapes: [
+      { id: "line" as DrawTool, icon: Minus, label: "Line", shortcut: "" },
+      { id: "arrow" as DrawTool, icon: ArrowRight, label: "Arrow", shortcut: "" },
+      { id: "rect" as DrawTool, icon: Square, label: "Rectangle", shortcut: "R" },
+      { id: "circle" as DrawTool, icon: Circle, label: "Circle", shortcut: "C" },
+      { id: "triangle" as DrawTool, icon: Triangle, label: "Triangle", shortcut: "" },
+    ],
+    select: [
+      { id: "hand" as DrawTool, icon: Hand, label: "Pan", shortcut: "H" },
+      { id: "lasso" as DrawTool, icon: LassoSelect, label: "Lasso", shortcut: "L" },
+      { id: "eraser" as DrawTool, icon: Eraser, label: "Eraser", shortcut: "E" },
+      { id: "stroke_eraser" as DrawTool, icon: Layers, label: "Stroke Eraser", shortcut: "" },
+    ],
+    insert: [
+      { id: "text" as DrawTool, icon: Type, label: "Text", shortcut: "T" },
+      { id: "latex" as DrawTool, icon: Sigma, label: "LaTeX", shortcut: "" },
+      { id: "sticky" as DrawTool, icon: StickyNote, label: "Sticky", shortcut: "" },
+      { id: "image" as DrawTool, icon: ImageIcon, label: "Image", shortcut: "" },
+    ],
+  };
+
+  // Active tab from current tool
+  const getActiveTab = (): "draw" | "shapes" | "select" | "insert" => {
+    if (toolGroups.draw.some(t => t.id === tool)) return "draw";
+    if (toolGroups.shapes.some(t => t.id === tool)) return "shapes";
+    if (toolGroups.select.some(t => t.id === tool)) return "select";
+    if (toolGroups.insert.some(t => t.id === tool)) return "insert";
+    return "draw";
+  };
+
+  const activeTab = getActiveTab();
+
   return (
-    <div className={`relative w-full h-screen overflow-hidden select-none ${canvasTheme === "dark" ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"}`}>
+    <div
+      className={`relative w-full h-screen overflow-hidden select-none ${canvasTheme === "dark" ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"}`}
+      onTouchStart={handleTouchStartPinch}
+      onTouchMove={handleTouchMovePinch}
+      onTouchEnd={handleTouchEndPinch}
+    >
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" />
       {/* Animated Dot Grid Background */}
       <div 
@@ -1805,108 +1900,180 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
         )}
       </AnimatePresence>
 
-      {/* Top Floating Pill Header */}
-      <header className="absolute top-6 left-1/2 -translate-x-1/2 z-40 flex items-center justify-between pointer-events-none">
-        <div className="flex items-center gap-4 px-2 py-1.5 dark:bg-slate-900/80 bg-white/90 backdrop-blur-2xl border border-slate-700/50 shadow-2xl rounded-full pointer-events-auto transition-all">
-          
-          {/* Logo / Title */}
-          <div className="flex items-center gap-2 pl-3">
-            <div className="p-1.5 bg-gradient-to-tr from-indigo-500 to-cyan-400 rounded-full text-white shadow-md">
-              <Zap className="w-4 h-4" />
+      {/* ── Slim Top Bar ──────────────────────────────────────────────────── */}
+      <header className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-3 py-2 dark:bg-slate-900/90 bg-white/90 backdrop-blur-2xl border-b border-slate-200/60 dark:border-slate-800/60 shadow-sm pointer-events-auto">
+        {/* Left: Logo + page nav */}
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="flex items-center gap-1.5 shrink-0">
+            <div className="p-1.5 bg-gradient-to-tr from-indigo-500 to-cyan-400 rounded-xl text-white shadow-md">
+              <Zap className="w-3.5 h-3.5" />
             </div>
-            <div className="hidden sm:block">
-              <h1 className="text-xs font-bold tracking-wide bg-gradient-to-r from-indigo-500 to-cyan-500 dark:from-indigo-300 dark:to-cyan-200 bg-clip-text text-transparent">
-                {isEmbedded ? "Co-Op Board" : "Pro Whiteboard"}
-              </h1>
-            </div>
+            <span className="hidden sm:block text-xs font-black bg-gradient-to-r from-indigo-500 to-cyan-500 dark:from-indigo-300 dark:to-cyan-200 bg-clip-text text-transparent whitespace-nowrap">
+              {isEmbedded ? "Co-Op Board" : "Whiteboard"}
+            </span>
           </div>
 
-          <div className="w-[1px] h-6 bg-slate-300 dark:bg-slate-700/50"></div>
+          <div className="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1 shrink-0" />
 
-          {/* Slide Deck Switcher — with editable title */}
-          <div className="flex items-center gap-1">
-            <button onClick={() => setActivePageIndex(prev => Math.max(0, prev - 1))} disabled={activePageIndex === 0} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full dark:text-slate-300 text-slate-700 disabled:opacity-40 transition-colors">
-              <ChevronLeft className="w-4 h-4" />
+          {/* Page nav */}
+          <div className="flex items-center gap-0.5">
+            <button onClick={() => setActivePageIndex(prev => Math.max(0, prev - 1))} disabled={activePageIndex === 0}
+              className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg dark:text-slate-300 text-slate-600 disabled:opacity-30 transition-colors">
+              <ChevronLeft className="w-3.5 h-3.5" />
             </button>
+
             {editingPageTitle === activePageIndex ? (
-              <input
-                autoFocus
-                value={activePage.title}
+              <input autoFocus value={activePage.title}
                 onChange={(e) => setDeckPages(prev => prev.map((p, i) => i === activePageIndex ? { ...p, title: e.target.value } : p))}
                 onBlur={() => setEditingPageTitle(null)}
                 onKeyDown={(e) => { if (e.key === 'Enter') setEditingPageTitle(null); }}
-                className="w-20 bg-transparent border-b border-indigo-500 text-xs font-semibold text-center focus:outline-none dark:text-indigo-300 text-indigo-700"
+                className="w-16 bg-transparent border-b border-indigo-500 text-xs font-semibold text-center focus:outline-none dark:text-indigo-300 text-indigo-700"
               />
             ) : (
-              <span
-                onClick={() => setEditingPageTitle(activePageIndex)}
-                title={`${activePage.title} — click to rename`}
-                className="font-mono text-xs font-semibold max-w-[80px] text-center dark:text-indigo-300 text-indigo-700 cursor-pointer hover:underline truncate"
-              >
-                {activePage.title} ({activePageIndex + 1}/{deckPages.length})
-              </span>
+              <button onClick={() => setEditingPageTitle(activePageIndex)}
+                className="text-xs font-semibold dark:text-indigo-300 text-indigo-700 hover:underline px-1 max-w-[70px] truncate">
+                {activePage.title} <span className="opacity-60 font-normal">({activePageIndex + 1}/{deckPages.length})</span>
+              </button>
             )}
-            <button onClick={() => setActivePageIndex(prev => Math.min(deckPages.length - 1, prev + 1))} disabled={activePageIndex === deckPages.length - 1} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full dark:text-slate-300 text-slate-700 disabled:opacity-40 transition-colors">
-              <ChevronRight className="w-4 h-4" />
+
+            <button onClick={() => setActivePageIndex(prev => Math.min(deckPages.length - 1, prev + 1))} disabled={activePageIndex === deckPages.length - 1}
+              className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg dark:text-slate-300 text-slate-600 disabled:opacity-30 transition-colors">
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
-            <button onClick={addNewPage} className="p-1.5 bg-indigo-100 dark:bg-indigo-900/50 hover:bg-indigo-200 dark:hover:bg-indigo-800 text-indigo-600 dark:text-indigo-300 rounded-full transition-all ml-1" title="Add Slide">
-              <Plus className="w-4 h-4" />
+
+            <button onClick={addNewPage}
+              className="p-1 ml-0.5 bg-indigo-100 dark:bg-indigo-900/50 hover:bg-indigo-200 dark:hover:bg-indigo-800 text-indigo-600 dark:text-indigo-300 rounded-lg transition-all" title="Add Page">
+              <Plus className="w-3.5 h-3.5" />
             </button>
           </div>
+        </div>
 
-          <div className="w-[1px] h-6 bg-slate-300 dark:bg-slate-700/50"></div>
+        {/* Center: Zoom indicator (desktop) */}
+        <div className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
+          <button onClick={() => setZoomLevel(z => Math.max(0.25, parseFloat((z - 0.25).toFixed(2))))}
+            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg dark:text-slate-400 text-slate-500 transition-colors">
+            <ZoomOut className="w-3.5 h-3.5" />
+          </button>
+          <button onClick={() => setZoomLevel(1)}
+            className="font-mono text-[11px] font-bold dark:text-indigo-300 text-indigo-700 w-10 text-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 py-0.5 transition-colors">
+            {Math.round(zoomLevel * 100)}%
+          </button>
+          <button onClick={() => setZoomLevel(z => Math.min(3, parseFloat((z + 0.25).toFixed(2))))}
+            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg dark:text-slate-400 text-slate-500 transition-colors">
+            <ZoomIn className="w-3.5 h-3.5" />
+          </button>
+        </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-1">
-            <button onClick={() => imageUploadInputRef.current?.click()} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-600 dark:text-slate-300 transition-colors" title="Import Image">
+        {/* Right: Actions */}
+        <div className="flex items-center gap-1 shrink-0">
+          {/* Desktop actions */}
+          <div className="hidden md:flex items-center gap-1">
+            <button onClick={() => imageUploadInputRef.current?.click()}
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300 transition-colors" title="Import Image">
               <ImageIcon className="w-4 h-4" />
             </button>
-            <button onClick={() => setShowRuler(!showRuler)} className={`p-2 rounded-full transition-colors ${showRuler ? "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300" : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"}`} title="Toggle Ruler">
+            <button onClick={() => setShowRuler(!showRuler)}
+              className={`p-2 rounded-xl transition-colors ${showRuler ? "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300" : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"}`} title="Ruler">
               <Ruler className="w-4 h-4" />
             </button>
-            <button onClick={() => setShowPresetBank(true)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-600 dark:text-slate-300 transition-colors" title="Diagram Presets">
+            <button onClick={() => setShowPresetBank(true)}
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300 transition-colors" title="Presets">
               <Library className="w-4 h-4" />
             </button>
-            <button onClick={solveWhiteboardWithAI} disabled={solvingAI} className="px-3 py-1.5 ml-1 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white rounded-full text-xs font-semibold shadow-md flex items-center gap-1.5 transition-all disabled:opacity-50">
-              {solvingAI ? <Sparkles className="w-3.5 h-3.5 animate-spin" /> : <Calculator className="w-3.5 h-3.5" />}
-              <span className="hidden sm:inline">{solvingAI ? "Solving..." : "AI Solve"}</span>
-            </button>
-          </div>
-
-          <div className="w-[1px] h-6 bg-slate-300 dark:bg-slate-700/50"></div>
-
-          {/* Utils — with Zoom Controls */}
-          <div className="flex items-center gap-0.5 pr-1">
-            {/* Zoom */}
-            <button onClick={() => setZoomLevel(z => Math.min(3, parseFloat((z + 0.25).toFixed(2))))} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg dark:text-slate-300 text-slate-600 transition-colors" title="Zoom In (+)">
-              <ZoomIn className="w-3.5 h-3.5" />
-            </button>
-            <span onClick={() => setZoomLevel(1)} className="font-mono text-[10px] font-bold dark:text-indigo-300 text-indigo-700 w-9 text-center cursor-pointer hover:underline" title="Reset Zoom (0)">
-              {Math.round(zoomLevel * 100)}%
-            </span>
-            <button onClick={() => setZoomLevel(z => Math.max(0.25, parseFloat((z - 0.25).toFixed(2))))} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg dark:text-slate-300 text-slate-600 transition-colors" title="Zoom Out (-)">
-              <ZoomOut className="w-3.5 h-3.5" />
-            </button>
-            <div className="w-[1px] h-5 bg-slate-200 dark:bg-slate-700 mx-0.5" />
-            <button onClick={downloadCanvas} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-600 dark:text-slate-300 transition-colors" title="Download PNG">
-              <Download className="w-4 h-4" />
-            </button>
-            <button onClick={() => setCanvasTheme(t => t === "dark" ? "light" : "dark")} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-600 dark:text-slate-300 transition-colors" title="Toggle Theme">
+            <button onClick={() => setCanvasTheme(t => t === "dark" ? "light" : "dark")}
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300 transition-colors" title="Toggle Theme">
               {canvasTheme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
-            <button onClick={() => setShowKeyShortcuts(true)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-600 dark:text-slate-300 transition-colors" title="Keyboard Shortcuts">
-              <Keyboard className="w-4 h-4" />
+            <button onClick={downloadCanvas}
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300 transition-colors" title="Download PNG">
+              <Download className="w-4 h-4" />
             </button>
+            <div className="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1" />
           </div>
-          
+
+          {/* AI Solve — always visible */}
+          <button onClick={solveWhiteboardWithAI} disabled={solvingAI}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white rounded-xl text-xs font-bold shadow-md transition-all disabled:opacity-50">
+            {solvingAI ? <Sparkles className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+            <span className="hidden sm:inline">{solvingAI ? "Solving..." : "AI Solve"}</span>
+          </button>
+
+          {/* Overflow menu (mobile + desktop extra) */}
+          <div className="relative">
+            <button onClick={() => setShowOverflowMenu(v => !v)}
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300 transition-colors ml-1">
+              <MoreHorizontal className="w-4 h-4" />
+            </button>
+            <AnimatePresence>
+              {showOverflowMenu && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                  className="absolute right-0 top-[calc(100%+8px)] w-52 dark:bg-slate-900 bg-white border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl p-1.5 z-50"
+                  onClick={() => setShowOverflowMenu(false)}
+                >
+                  {/* Mobile-only items */}
+                  <div className="md:hidden">
+                    <button onClick={() => imageUploadInputRef.current?.click()}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
+                      <ImageIcon className="w-4 h-4 text-indigo-500" /> Import Image
+                    </button>
+                    <button onClick={() => setShowRuler(!showRuler)}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
+                      <Ruler className="w-4 h-4 text-indigo-500" /> {showRuler ? "Hide Ruler" : "Show Ruler"}
+                    </button>
+                    <button onClick={() => setShowPresetBank(true)}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
+                      <Library className="w-4 h-4 text-indigo-500" /> Diagram Presets
+                    </button>
+                    <button onClick={() => setCanvasTheme(t => t === "dark" ? "light" : "dark")}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
+                      {canvasTheme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}
+                      {canvasTheme === "dark" ? "Light Mode" : "Dark Mode"}
+                    </button>
+                    <button onClick={downloadCanvas}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
+                      <Download className="w-4 h-4 text-indigo-500" /> Download PNG
+                    </button>
+                    <div className="my-1 border-t border-slate-100 dark:border-slate-800" />
+                  </div>
+                  {/* Shared items */}
+                  <button onClick={() => pdfUploadInputRef.current?.click()}
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
+                    <FileUp className="w-4 h-4 text-indigo-500" /> Upload PDF
+                  </button>
+                  <button onClick={exportToPdf}
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
+                    <Download className="w-4 h-4 text-indigo-500" /> Export as PDF
+                  </button>
+                  <button onClick={copyShareLink}
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
+                    <Link className="w-4 h-4 text-indigo-500" /> Share Link
+                  </button>
+                  <div className="my-1 border-t border-slate-100 dark:border-slate-800" />
+                  <button onClick={() => setShowKeyShortcuts(true)}
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
+                    <Keyboard className="w-4 h-4 text-slate-400" /> Shortcuts
+                  </button>
+                  <button onClick={clearCanvas}
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-500/10 text-sm font-medium text-rose-600 dark:text-rose-400 transition-colors">
+                    <Trash2 className="w-4 h-4" /> Clear Canvas
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </header>
 
       {/* Main Canvas Scroll Viewport */}
       <div
         ref={containerRef}
-        className="w-full h-full overflow-auto cursor-crosshair relative"
+        className="w-full overflow-auto cursor-crosshair relative"
         style={{
+          paddingTop: "48px",
+          height: "100%",
           backgroundImage: pattern === "dots" 
             ? `radial-gradient(${canvasTheme === "dark" ? "#334155" : "#cbd5e1"} 1px, transparent 1px)`
             : pattern === "grid"
@@ -1923,10 +2090,10 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
           className="relative transition-transform duration-75 origin-top-left"
           style={{ transform: `scale(${zoomLevel})`, width: `${canvasSize.width}px`, height: `${canvasSize.height}px` }}
           onClick={handleCanvasClick}
-          onMouseDown={startDrawing}
+          onMouseDown={wrappedStartDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}
-          onTouchStart={startDrawing}
+          onTouchStart={wrappedStartDrawing}
           onTouchMove={draw}
           onTouchEnd={stopDrawing}
         >
@@ -2137,169 +2304,294 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
           })}
         </div>
       </div>
-      {/* Floating Bottom Toolbar */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
-        {/* Lasso Live Count Badge */}
+
+      {/* ── Hidden File Input for PDF Import ─────────────────────────── */}
+      <input ref={pdfUploadInputRef} type="file" accept="application/pdf" onChange={handlePdfImport} className="hidden" />
+
+      {/* ════════════════════════════════════════════════════════════════
+          DESKTOP — Grouped Bottom Toolbar (hidden on mobile)
+      ════════════════════════════════════════════════════════════════ */}
+      <div className="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex-col items-center gap-2">
+        {/* Lasso count badge */}
         <AnimatePresence>
           {tool === 'lasso' && isDrawing && liveSelectionCount > 0 && (
             <motion.div
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 6 }}
-              className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1 bg-indigo-600 text-white text-xs font-bold rounded-full shadow-lg whitespace-nowrap pointer-events-none"
+              initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }}
+              className="px-3 py-1 bg-indigo-600 text-white text-xs font-bold rounded-full shadow-lg whitespace-nowrap"
             >
               {liveSelectionCount} element{liveSelectionCount !== 1 ? 's' : ''} selected
             </motion.div>
           )}
         </AnimatePresence>
 
-        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl border border-slate-200/80 dark:border-white/10 p-2.5 rounded-[1.5rem] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.6)] flex items-center gap-1.5 pointer-events-auto">
-          
-          <ToolButton active={tool === "hand"} onClick={() => setTool("hand")} icon={Hand} label="Pan (H)" />
-          <div className="w-[1px] h-8 bg-slate-200 dark:bg-slate-700/50 mx-1"></div>
-          
-          <ToolButton active={tool === "pen"} onClick={() => setTool("pen")} icon={PenTool} label="Pen (P)" />
-          <ToolButton active={tool === "smart_pen"} onClick={() => setTool("smart_pen")} icon={Sparkles} label="Smart Pen (S)" extraClass={tool === "smart_pen" ? "bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] scale-105" : "hover:text-indigo-600 dark:hover:text-indigo-400"} />
-          <ToolButton active={tool === "highlighter"} onClick={() => setTool("highlighter")} icon={Highlighter} label="Highlighter" />
-          <ToolButton active={tool === "laser"} onClick={() => setTool("laser")} icon={Crosshair} label="Laser Pointer (X)" extraClass={tool === "laser" ? "bg-rose-600 text-white shadow-[0_0_20px_rgba(225,29,72,0.5)] scale-105" : "hover:text-rose-500"} />
-          
-          <div className="w-[1px] h-8 bg-slate-200 dark:bg-slate-700/50 mx-1"></div>
+        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-3xl border border-slate-200/80 dark:border-white/10 px-3 py-2.5 rounded-2xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.25)] dark:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.6)] flex items-center gap-2 pointer-events-auto">
 
-          <ToolButton active={tool === "rect"} onClick={() => setTool("rect")} icon={Square} label="Rectangle (R)" />
-          <ToolButton active={tool === "circle"} onClick={() => setTool("circle")} icon={Circle} label="Circle (C)" />
-          <ToolButton active={tool === "triangle"} onClick={() => setTool("triangle")} icon={Triangle} label="Triangle" />
-          <ToolButton active={tool === "arrow"} onClick={() => setTool("arrow")} icon={ArrowRight} label="Arrow" />
-          <ToolButton active={tool === "line"} onClick={() => setTool("line")} icon={Minus} label="Line" />
-          <ToolButton active={tool === "text"} onClick={() => setTool("text")} icon={Type} label="Text (T)" />
-          <ToolButton active={tool === "latex"} onClick={() => setTool("latex")} icon={Calculator} label="LaTeX Equation" />
-          <ToolButton active={tool === "sticky"} onClick={() => setTool("sticky")} icon={FileText} label="Sticky" />
-          <ToolButton active={tool === "lasso"} onClick={() => setTool("lasso")} icon={LassoSelect} label="Lasso (L)" />
-          
-          <div className="w-[1px] h-8 bg-slate-200 dark:bg-slate-700/50 mx-1"></div>
-          
-          <ToolButton active={tool === "eraser"} onClick={() => setTool("eraser")} icon={Eraser} label="Eraser (E)" />
-          <ToolButton active={tool === "stroke_eraser"} onClick={() => setTool("stroke_eraser")} icon={Layers} label="Stroke Eraser (cross to erase)" extraClass={tool === "stroke_eraser" ? "" : "hover:text-orange-500"} />
-
-          <div className="w-[1px] h-8 bg-slate-200 dark:bg-slate-700/50 mx-1"></div>
-
-          {/* Brush Size Popover */}
-          <div className="relative">
-            <button
-              onClick={() => setShowBrushPopover(!showBrushPopover)}
-              title="Brush Size"
-              className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${showBrushPopover ? 'bg-slate-900 dark:bg-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`}
-            >
-              <div
-                className={`rounded-full ${showBrushPopover ? 'bg-white dark:bg-slate-900' : 'bg-slate-700 dark:bg-slate-300'}`}
-                style={{ width: `${Math.min(22, Math.max(4, brushSize))}px`, height: `${Math.min(22, Math.max(4, brushSize))}px` }}
-              />
-            </button>
-            <AnimatePresence>
-              {showBrushPopover && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                  className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 dark:bg-slate-900 bg-white border border-slate-200 dark:border-slate-700 rounded-2xl p-3 shadow-2xl flex items-end gap-3 z-50"
-                >
-                  {[2, 4, 8, 14, 24, 36].map(sz => (
-                    <button key={sz} onClick={() => { setBrushSize(sz); setShowBrushPopover(false); }}
-                      className={`flex flex-col items-center gap-1 transition-all ${brushSize === sz ? 'scale-110 opacity-100' : 'opacity-40 hover:opacity-100'}`}
-                    >
-                      <div className="bg-slate-800 dark:bg-slate-200 rounded-full" style={{ width: `${Math.min(22, Math.max(4, sz / 1.5))}px`, height: `${Math.min(22, Math.max(4, sz / 1.5))}px` }} />
-                      <span className="text-[9px] font-mono dark:text-slate-400 text-slate-600">{sz}</span>
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+          {/* Group: Draw */}
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600">Draw</span>
+            <div className="flex items-center gap-0.5">
+              {toolGroups.draw.map(t => <ToolButton key={t.id} active={tool === t.id} onClick={() => setTool(t.id)} icon={t.icon} label={`${t.label}${t.shortcut ? ` (${t.shortcut})` : ''}`} extraClass={t.id === 'smart_pen' && tool === 'smart_pen' ? 'bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.5)]' : t.id === 'laser' && tool === 'laser' ? 'bg-rose-600 text-white shadow-[0_0_20px_rgba(225,29,72,0.5)]' : ''} />)}
+            </div>
           </div>
 
-          <button onClick={handleUndo} disabled={historyStep <= 0} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl disabled:opacity-40">
-            <Undo2 className="w-5 h-5 dark:text-slate-300 text-slate-700" />
-          </button>
-          <button onClick={handleRedo} disabled={historyStep >= history.length - 1} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl disabled:opacity-40">
-            <Redo2 className="w-5 h-5 dark:text-slate-300 text-slate-700" />
-          </button>
-          <button onClick={clearCanvas} className="p-2 hover:bg-rose-50 dark:hover:bg-rose-500/20 text-rose-500 rounded-xl transition-all" title="Clear Canvas">
-            <Trash2 className="w-5 h-5" />
-          </button>
+          <div className="w-px h-10 bg-slate-200 dark:bg-slate-700/60 mx-1" />
 
+          {/* Group: Shapes */}
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600">Shapes</span>
+            <div className="flex items-center gap-0.5">
+              {toolGroups.shapes.map(t => <ToolButton key={t.id} active={tool === t.id} onClick={() => setTool(t.id)} icon={t.icon} label={`${t.label}${t.shortcut ? ` (${t.shortcut})` : ''}`} />)}
+            </div>
+          </div>
+
+          <div className="w-px h-10 bg-slate-200 dark:bg-slate-700/60 mx-1" />
+
+          {/* Group: Select */}
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600">Select</span>
+            <div className="flex items-center gap-0.5">
+              {toolGroups.select.map(t => <ToolButton key={t.id} active={tool === t.id} onClick={() => setTool(t.id)} icon={t.icon} label={t.label} />)}
+            </div>
+          </div>
+
+          <div className="w-px h-10 bg-slate-200 dark:bg-slate-700/60 mx-1" />
+
+          {/* Group: Insert */}
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600">Insert</span>
+            <div className="flex items-center gap-0.5">
+              {toolGroups.insert.map(t => <ToolButton key={t.id} active={tool === t.id} onClick={() => { if (t.id === 'image') { imageUploadInputRef.current?.click(); } else { setTool(t.id); } }} icon={t.icon} label={`${t.label}${t.shortcut ? ` (${t.shortcut})` : ''}`} />)}
+            </div>
+          </div>
+
+          <div className="w-px h-10 bg-slate-200 dark:bg-slate-700/60 mx-1" />
+
+          {/* Color swatch + brush + undo/redo */}
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600">Style</span>
+            <div className="flex items-center gap-1">
+              {/* Color */}
+              <label className="relative w-9 h-9 rounded-xl overflow-hidden cursor-pointer hover:scale-105 transition-all border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center" title="Color">
+                <div className="w-full h-full rounded-xl" style={{ backgroundColor: color }} />
+                <input type="color" value={color} onChange={(e) => { setColor(e.target.value); if (selectedStrokeIds.length > 0) recolorSelectedStrokes(e.target.value); }} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
+              </label>
+              {/* Brush size popover */}
+              <div className="relative">
+                <button onClick={() => setShowBrushPopover(!showBrushPopover)} title="Brush Size"
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showBrushPopover ? 'bg-slate-900 dark:bg-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                  <div className={`rounded-full ${showBrushPopover ? 'bg-white dark:bg-slate-900' : 'bg-slate-700 dark:bg-slate-300'}`}
+                    style={{ width: `${Math.min(18, Math.max(4, brushSize))}px`, height: `${Math.min(18, Math.max(4, brushSize))}px` }} />
+                </button>
+                <AnimatePresence>
+                  {showBrushPopover && (
+                    <motion.div initial={{ opacity: 0, y: 8, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                      className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 dark:bg-slate-900 bg-white border border-slate-200 dark:border-slate-700 rounded-2xl p-3 shadow-2xl flex items-end gap-3 z-50">
+                      {[2, 4, 8, 14, 24, 36].map(sz => (
+                        <button key={sz} onClick={() => { setBrushSize(sz); setShowBrushPopover(false); }}
+                          className={`flex flex-col items-center gap-1 transition-all ${brushSize === sz ? 'scale-110 opacity-100' : 'opacity-40 hover:opacity-100'}`}>
+                          <div className="bg-slate-800 dark:bg-slate-200 rounded-full" style={{ width: `${Math.min(22, Math.max(4, sz / 1.5))}px`, height: `${Math.min(22, Math.max(4, sz / 1.5))}px` }} />
+                          <span className="text-[9px] font-mono dark:text-slate-400 text-slate-600">{sz}</span>
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+              <button onClick={handleUndo} disabled={historyStep <= 0} className="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all">
+                <Undo2 className="w-4 h-4 dark:text-slate-300 text-slate-700" />
+              </button>
+              <button onClick={handleRedo} disabled={historyStep >= history.length - 1} className="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all">
+                <Redo2 className="w-4 h-4 dark:text-slate-300 text-slate-700" />
+              </button>
+            </div>
+          </div>
+
+          <div className="w-px h-10 bg-slate-200 dark:bg-slate-700/60 mx-1" />
+
+          {/* Settings toggle */}
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600">Panel</span>
+            <button onClick={() => setIsSidebarOpen(v => !v)}
+              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${isSidebarOpen ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'}`} title="Studio Panel">
+              <Settings className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
 
+      {/* ════════════════════════════════════════════════════════════════
+          MOBILE — Compact Bottom Bar (visible only on mobile)
+      ════════════════════════════════════════════════════════════════ */}
+      <div className="md:hidden absolute bottom-0 left-0 right-0 z-50 dark:bg-slate-900/98 bg-white/98 backdrop-blur-2xl border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-between safe-area-bottom shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
+        {/* Current tool indicator */}
+        <button onClick={() => { setMobileDrawerOpen(true); setMobileDrawerTab(activeTab); }}
+          className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors">
+          {(() => {
+            const allTools = [...toolGroups.draw, ...toolGroups.shapes, ...toolGroups.select, ...toolGroups.insert];
+            const current = allTools.find(t => t.id === tool);
+            const Icon = current?.icon || PenTool;
+            return <><Icon className="w-4 h-4" /><span className="text-xs font-semibold">{current?.label || 'Pen'}</span></>;
+          })()}
+        </button>
 
-      {/* Hidden File Input for PDF Import */}
-      <input
-        ref={pdfUploadInputRef}
-        type="file"
-        accept="application/pdf"
-        onChange={handlePdfImport}
-        className="hidden"
-      />
+        {/* Center controls */}
+        <div className="flex items-center gap-1">
+          {/* Color */}
+          <label className="relative w-10 h-10 rounded-xl overflow-hidden cursor-pointer border-2 border-slate-200 dark:border-slate-700" title="Color">
+            <div className="w-full h-full rounded-xl" style={{ backgroundColor: color }} />
+            <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
+          </label>
+          {/* Undo */}
+          <button onClick={handleUndo} disabled={historyStep <= 0}
+            className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all">
+            <Undo2 className="w-5 h-5 dark:text-slate-300 text-slate-600" />
+          </button>
+          {/* Redo */}
+          <button onClick={handleRedo} disabled={historyStep >= history.length - 1}
+            className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all">
+            <Redo2 className="w-5 h-5 dark:text-slate-300 text-slate-600" />
+          </button>
+        </div>
 
-      {/* Animated Sidebar */}
+        {/* Expand tool drawer */}
+        <button onClick={() => setMobileDrawerOpen(v => !v)}
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all ${mobileDrawerOpen ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200'}`}>
+          <ChevronUp className={`w-4 h-4 transition-transform ${mobileDrawerOpen ? 'rotate-180' : ''}`} />
+          <span className="text-xs font-semibold">Tools</span>
+        </button>
+      </div>
+
+      {/* ════════════════════════════════════════════════════════════════
+          MOBILE — Tool Drawer Bottom Sheet
+      ════════════════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {mobileDrawerOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="md:hidden fixed inset-0 bg-black/20 z-40 backdrop-blur-sm"
+              onClick={() => setMobileDrawerOpen(false)} />
+
+            {/* Sheet */}
+            <motion.div
+              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 400, damping: 40 }}
+              className="md:hidden fixed bottom-0 left-0 right-0 z-50 dark:bg-slate-900 bg-white rounded-t-3xl shadow-2xl border-t border-slate-200 dark:border-slate-800 pb-24"
+            >
+              {/* Drag handle */}
+              <div className="flex justify-center pt-3 pb-1">
+                <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+              </div>
+
+              {/* Tab bar */}
+              <div className="flex items-center gap-1 px-4 pt-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                {(["draw", "shapes", "select", "insert"] as const).map(tab => (
+                  <button key={tab} onClick={() => setMobileDrawerTab(tab)}
+                    className={`flex-1 py-2 rounded-xl text-xs font-bold capitalize transition-all ${mobileDrawerTab === tab ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                    {tab}
+                  </button>
+                ))}
+              </div>
+
+              {/* Tools grid */}
+              <div className="grid grid-cols-4 gap-2 p-4">
+                {toolGroups[mobileDrawerTab].map(t => {
+                  const isActive = tool === t.id;
+                  return (
+                    <button key={t.id}
+                      onClick={() => { if (t.id === 'image') { imageUploadInputRef.current?.click(); } else { setTool(t.id); } setMobileDrawerOpen(false); if (typeof window !== 'undefined' && navigator.vibrate) navigator.vibrate(8); }}
+                      className={`flex flex-col items-center gap-2 py-3.5 px-2 rounded-2xl transition-all ${isActive ? 'bg-indigo-600 text-white shadow-lg scale-105' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
+                      <t.icon className="w-5 h-5" />
+                      <span className="text-[10px] font-semibold leading-tight text-center">{t.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Quick style controls */}
+              <div className="px-4 pt-1 pb-2 border-t border-slate-100 dark:border-slate-800">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Style</p>
+                <div className="flex items-center gap-3">
+                  {/* Color palette */}
+                  <div className="flex items-center gap-1.5 flex-wrap flex-1">
+                    {paletteColors.slice(0, 8).map(c => (
+                      <button key={c} onClick={() => setColor(c)}
+                        className={`w-7 h-7 rounded-full border-2 transition-all ${color === c ? 'border-indigo-500 scale-125 shadow-md' : 'border-transparent hover:scale-110'}`}
+                        style={{ backgroundColor: c }} />
+                    ))}
+                    <label className="relative w-7 h-7 rounded-full cursor-pointer border-2 border-dashed border-slate-300 dark:border-slate-600 overflow-hidden">
+                      <div className="w-full h-full rounded-full" style={{ backgroundColor: color }} />
+                      <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="absolute inset-0 opacity-0 w-full h-full" />
+                    </label>
+                  </div>
+                  {/* Brush size */}
+                  <div className="flex items-center gap-1">
+                    {[2, 6, 14, 28].map(sz => (
+                      <button key={sz} onClick={() => setBrushSize(sz)}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${brushSize === sz ? 'bg-indigo-100 dark:bg-indigo-900/50 scale-110' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                        <div className="bg-slate-700 dark:bg-slate-300 rounded-full" style={{ width: `${Math.min(18, Math.max(4, sz / 1.5))}px`, height: `${Math.min(18, Math.max(4, sz / 1.5))}px` }} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ════════════════════════════════════════════════════════════════
+          DESKTOP — Studio Settings Sidebar
+      ════════════════════════════════════════════════════════════════ */}
       <AnimatePresence>
         {isSidebarOpen && (
           <motion.div
-            initial={{ x: -300, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -300, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="absolute top-0 left-0 h-full w-72 z-50 dark:bg-slate-900/95 bg-white/95 backdrop-blur-3xl border-r border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col"
+            initial={{ x: -288, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -288, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 320, damping: 32 }}
+            className="hidden md:flex absolute top-[48px] left-0 bottom-0 w-72 z-40 dark:bg-slate-900/97 bg-white/97 backdrop-blur-3xl border-r border-slate-200 dark:border-slate-800 shadow-2xl flex-col"
           >
-            <div className="p-5 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
-              <h2 className="text-lg font-black bg-gradient-to-r from-indigo-500 to-cyan-400 bg-clip-text text-transparent flex items-center gap-2">
-                <Palette className="w-5 h-5 text-indigo-500" /> 
-                Studio Tools
+            <div className="p-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
+              <h2 className="text-sm font-black bg-gradient-to-r from-indigo-500 to-cyan-400 bg-clip-text text-transparent flex items-center gap-2">
+                <Settings className="w-4 h-4 text-indigo-500" /> Studio Panel
               </h2>
-              <button onClick={() => setIsSidebarOpen(false)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors">
-                <ChevronLeft className="w-5 h-5" />
+              <button onClick={() => setIsSidebarOpen(false)}
+                className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors">
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-5 space-y-8 custom-scrollbar">
-              
+            <div className="flex-1 overflow-y-auto p-5 space-y-7 custom-scrollbar">
+
               {/* Colors */}
               <div>
-                <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Colors</h3>
-                <div className="flex flex-wrap gap-3 mb-4">
+                <h3 className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Colors</h3>
+                <div className="flex flex-wrap gap-2.5 mb-4">
                   {paletteColors.map((c) => (
-                    <button
-                      key={c}
+                    <button key={c}
                       onClick={() => { setColor(c); if (selectedStrokeIds.length > 0) recolorSelectedStrokes(c); }}
-                      className={`w-8 h-8 rounded-full transition-all ${color === c ? "scale-125 ring-2 ring-offset-2 dark:ring-offset-slate-900 ring-indigo-500 shadow-lg" : "hover:scale-110 shadow-sm border border-black/10 dark:border-white/10"}`}
-                      style={{ backgroundColor: c }}
-                    />
+                      className={`w-7 h-7 rounded-full transition-all ${color === c ? "scale-125 ring-2 ring-offset-2 dark:ring-offset-slate-900 ring-indigo-500 shadow-lg" : "hover:scale-110 shadow-sm border border-black/10 dark:border-white/10"}`}
+                      style={{ backgroundColor: c }} />
                   ))}
-                  {/* Custom Color Picker */}
-                  <label className="relative w-8 h-8 rounded-full overflow-hidden cursor-pointer hover:scale-110 transition-all shadow-sm border-2 border-dashed border-slate-300 dark:border-slate-600 flex items-center justify-center" title="Custom Color">
+                  <label className="relative w-7 h-7 rounded-full overflow-hidden cursor-pointer hover:scale-110 transition-all shadow-sm border-2 border-dashed border-slate-300 dark:border-slate-600 flex items-center justify-center" title="Custom Color">
                     <div className="w-full h-full rounded-full" style={{ backgroundColor: color }} />
                     <span className="absolute text-[8px] font-bold text-white mix-blend-difference">+</span>
-                    <input
-                      type="color"
-                      value={color}
-                      onChange={(e) => { setColor(e.target.value); if (selectedStrokeIds.length > 0) recolorSelectedStrokes(e.target.value); }}
-                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                    />
+                    <input type="color" value={color} onChange={(e) => { setColor(e.target.value); if (selectedStrokeIds.length > 0) recolorSelectedStrokes(e.target.value); }} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
                   </label>
                 </div>
-                
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2.5">
                   <label className="flex items-center gap-2 cursor-pointer group">
-                    <div className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors border ${fillShapes ? "bg-indigo-500 border-indigo-500" : "bg-transparent border-slate-300 dark:border-slate-700"}`}>
-                      {fillShapes && <Check className="w-3.5 h-3.5 text-white" />}
+                    <div className={`w-4 h-4 rounded-md flex items-center justify-center transition-colors border ${fillShapes ? "bg-indigo-500 border-indigo-500" : "bg-transparent border-slate-300 dark:border-slate-700"}`}>
+                      {fillShapes && <Check className="w-3 h-3 text-white" />}
                     </div>
                     <input type="checkbox" className="hidden" checked={fillShapes} onChange={(e) => setFillShapes(e.target.checked)} />
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Fill Shapes (F)</span>
+                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Fill Shapes (F)</span>
                   </label>
-
                   <label className="flex items-center gap-2 cursor-pointer group">
-                    <div className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors border ${snapToGrid ? "bg-indigo-500 border-indigo-500" : "bg-transparent border-slate-300 dark:border-slate-700"}`}>
-                      {snapToGrid && <Check className="w-3.5 h-3.5 text-white" />}
+                    <div className={`w-4 h-4 rounded-md flex items-center justify-center transition-colors border ${snapToGrid ? "bg-indigo-500 border-indigo-500" : "bg-transparent border-slate-300 dark:border-slate-700"}`}>
+                      {snapToGrid && <Check className="w-3 h-3 text-white" />}
                     </div>
                     <input type="checkbox" className="hidden" checked={snapToGrid} onChange={(e) => setSnapToGrid(e.target.checked)} />
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Snap to Grid (G)</span>
+                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Snap to Grid (G)</span>
                   </label>
                 </div>
               </div>
@@ -2307,21 +2599,16 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
               {/* Thickness */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Thickness</h3>
+                  <h3 className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Thickness</h3>
                   <span className="font-mono text-xs dark:text-indigo-400 text-indigo-600 font-bold">{brushSize}px</span>
                 </div>
-                <input
-                  type="range" min="1" max="40" value={brushSize}
+                <input type="range" min="1" max="40" value={brushSize}
                   onChange={(e) => setBrushSize(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500 mb-4"
-                />
+                  className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500 mb-3" />
                 <div className="flex justify-between items-end px-1">
                   {[2, 4, 8, 14, 24].map(sz => (
-                    <button
-                      key={sz}
-                      onClick={() => setBrushSize(sz)}
-                      className={`flex flex-col items-center gap-1.5 transition-all ${brushSize === sz ? "scale-110" : "opacity-50 hover:opacity-100"}`}
-                    >
+                    <button key={sz} onClick={() => setBrushSize(sz)}
+                      className={`flex flex-col items-center gap-1.5 transition-all ${brushSize === sz ? "scale-110" : "opacity-50 hover:opacity-100"}`}>
                       <div className="bg-slate-800 dark:bg-slate-200 rounded-full" style={{ width: `${Math.min(14, Math.max(4, sz / 1.5))}px`, height: `${Math.min(14, Math.max(4, sz / 1.5))}px` }} />
                     </button>
                   ))}
@@ -2331,79 +2618,32 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
               {/* Opacity */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Opacity</h3>
+                  <h3 className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Opacity</h3>
                   <span className="font-mono text-xs dark:text-indigo-400 text-indigo-600 font-bold">{strokeOpacity}%</span>
                 </div>
-                <input
-                  type="range" min="10" max="100" value={strokeOpacity}
+                <input type="range" min="10" max="100" value={strokeOpacity}
                   onChange={(e) => setStrokeOpacity(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
-                />
+                  className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500" />
                 <div className="flex justify-between text-[10px] font-mono dark:text-slate-500 text-slate-400 mt-1 px-0.5">
                   <span>Ghost</span><span>Full</span>
                 </div>
               </div>
 
-              {/* Background Patterns */}
+              {/* Background */}
               <div>
-                <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Background</h3>
-                <div className="grid grid-cols-2 gap-2">
+                <h3 className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Background</h3>
+                <div className="grid grid-cols-3 gap-1.5">
                   {(["blank", "dots", "grid", "ruled", "isometric"] as BackgroundPattern[]).map(p => (
-                    <button
-                      key={p}
-                      onClick={() => setPattern(p)}
-                      className={`p-2 rounded-xl text-xs font-semibold capitalize border transition-all ${pattern === p ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 shadow-sm" : "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400"}`}
-                    >
+                    <button key={p} onClick={() => setPattern(p)}
+                      className={`p-2 rounded-xl text-xs font-semibold capitalize border transition-all ${pattern === p ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300" : "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400"}`}>
                       {p}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Actions */}
-              <div>
-                <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">File & Share</h3>
-                <div className="space-y-2">
-                  <button onClick={copyShareLink} className="w-full p-3 rounded-xl flex items-center justify-between bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 transition-all font-semibold text-sm border border-indigo-200 dark:border-indigo-500/30">
-                    <div className="flex items-center gap-2">
-                      <Link className="w-4 h-4" /> Share Link
-                    </div>
-                    <ChevronRight className="w-4 h-4 opacity-50" />
-                  </button>
-                  
-                  <button onClick={() => pdfUploadInputRef.current?.click()} className="w-full p-3 rounded-xl flex items-center justify-between hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all font-semibold text-sm border border-slate-200 dark:border-slate-700">
-                    <div className="flex items-center gap-2">
-                      <FileUp className="w-4 h-4" /> Upload PDF
-                    </div>
-                    <Upload className="w-4 h-4 opacity-50" />
-                  </button>
-
-                  <button onClick={exportToPdf} className="w-full p-3 rounded-xl flex items-center justify-between hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all font-semibold text-sm border border-slate-200 dark:border-slate-700">
-                    <div className="flex items-center gap-2">
-                      <Download className="w-4 h-4" /> Export as PDF
-                    </div>
-                    <ChevronRight className="w-4 h-4 opacity-50" />
-                  </button>
-                </div>
-              </div>
-              
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Sidebar Toggle Button (when closed) */}
-      <AnimatePresence>
-        {!isSidebarOpen && (
-          <motion.button
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            onClick={() => setIsSidebarOpen(true)}
-            className="absolute top-1/2 -translate-y-1/2 left-4 z-40 p-3 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 hover:scale-110 transition-transform"
-          >
-            <Menu className="w-6 h-6" />
-          </motion.button>
         )}
       </AnimatePresence>
 
@@ -2414,7 +2654,7 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
             initial={{ opacity: 0, x: 300 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 300 }}
-            className="absolute top-20 right-6 w-[400px] max-h-[78vh] overflow-hidden z-50 dark:bg-slate-900/98 bg-white border border-indigo-500/30 rounded-3xl shadow-2xl backdrop-blur-2xl dark:text-slate-100 text-slate-900 flex flex-col"
+            className="absolute top-14 right-6 w-[400px] max-h-[78vh] overflow-hidden z-50 dark:bg-slate-900/98 bg-white border border-indigo-500/30 rounded-3xl shadow-2xl backdrop-blur-2xl dark:text-slate-100 text-slate-900 flex flex-col"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 pb-3 border-b border-slate-200 dark:border-slate-800 shrink-0">

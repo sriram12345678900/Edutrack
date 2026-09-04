@@ -22,9 +22,11 @@ import {
   Maximize2,
   Download,
   X,
-  Brain
+  Brain,
+  Globe
 } from "lucide-react";
 import { completeDailyMission, awardUserXP } from "@/lib/xp";
+import { SUPPORTED_LANGUAGES } from "@/lib/languages";
 
 // Map chapter slug → chapter number for PYQ links
 const chapterNumbers: Record<string, number> = {
@@ -755,7 +757,47 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold">{chapterName}</h1>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-3 py-2 text-xs">
+            <Globe className="w-4 h-4 text-indigo-500 shrink-0" />
+            <select
+              value={userLanguage}
+              onChange={(e) => {
+                const newLang = e.target.value;
+                setUserLanguage(newLang);
+                localStorage.setItem("edutrack_language", newLang);
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new CustomEvent("edutrack_profile_updated", {
+                    detail: { language: newLang }
+                  }));
+                }
+              }}
+              className="bg-transparent dark:text-white text-slate-900 font-bold focus:outline-none cursor-pointer text-xs pr-1 max-w-[130px]"
+            >
+              <optgroup label="Standard" className="dark:bg-[#080b18] bg-[#eef1f9] font-bold text-indigo-500">
+                {SUPPORTED_LANGUAGES.filter(l => l.category === "standard").map(l => (
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                    {l.label}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Bilingual Blends (-ish)" className="dark:bg-[#080b18] bg-[#eef1f9] font-bold text-amber-500">
+                {SUPPORTED_LANGUAGES.filter(l => l.category === "bilingual").map(l => (
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                    {l.label}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Regional Languages (Native)" className="dark:bg-[#080b18] bg-[#eef1f9] font-bold text-purple-500">
+                {SUPPORTED_LANGUAGES.filter(l => l.category === "regional").map(l => (
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                    {l.label}
+                  </option>
+                ))}
+              </optgroup>
+            </select>
+          </div>
+
           {userClass === 10 && (
             <Link href={`/pyq/${subjectCode}/${chapterNum}`}
               className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-xl font-bold text-sm hover:shadow-lg hover:-translate-y-0.5 transition-all">

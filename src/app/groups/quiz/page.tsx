@@ -1,12 +1,70 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Users, Play, Trophy, XCircle, CheckCircle2, ChevronRight, Crown } from "lucide-react";
+import { Users, Play, Trophy, XCircle, CheckCircle2, ChevronRight, Crown, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, setDoc, updateDoc, onSnapshot } from "firebase/firestore";
 import Confetti from "@/components/Confetti";
+
+const SUBJECT_CHAPTERS: { [subject: string]: string[] } = {
+  "Science": [
+    "Chemical Reactions and Equations",
+    "Acids, Bases and Salts",
+    "Metals and Non-metals",
+    "Carbon and its Compounds",
+    "Life Processes",
+    "Control and Coordination",
+    "How do Organisms Reproduce?",
+    "Heredity and Evolution",
+    "Light - Reflection and Refraction",
+    "The Human Eye and the Colourful World",
+    "Electricity",
+    "Magnetic Effects of Electric Current",
+    "Our Environment"
+  ],
+  "Mathematics": [
+    "Real Numbers",
+    "Polynomials",
+    "Pair of Linear Equations in Two Variables",
+    "Quadratic Equations",
+    "Arithmetic Progressions",
+    "Triangles",
+    "Coordinate Geometry",
+    "Introduction to Trigonometry",
+    "Some Applications of Trigonometry",
+    "Circles",
+    "Surface Areas and Volumes",
+    "Statistics",
+    "Probability"
+  ],
+  "Social Science": [
+    "The Rise of Nationalism in Europe",
+    "Nationalism in India",
+    "Resources and Development",
+    "Forest and Wildlife Resources",
+    "Water Resources",
+    "Agriculture",
+    "Power Sharing",
+    "Federalism",
+    "Gender, Religion and Caste",
+    "Development",
+    "Sectors of the Indian Economy",
+    "Money and Credit",
+    "Globalization and the Indian Economy"
+  ],
+  "English": [
+    "A Letter to God",
+    "Nelson Mandela: Long Walk to Freedom",
+    "Two Stories about Flying",
+    "From the Diary of Anne Frank",
+    "Glimpses of India",
+    "Madam Rides the Bus",
+    "The Sermon at Benares",
+    "The Proposal"
+  ]
+};
 
 const QUIZ_QUESTIONS = [
   { q: "What is the powerhouse of the cell?", options: ["Nucleus", "Mitochondria", "Ribosome", "Chloroplast"], a: 1 },
@@ -25,6 +83,11 @@ export default function MultiplayerQuiz() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
 
+  // Dynamic quiz configuration states
+  const [selectedSubject, setSelectedSubject] = useState("Science");
+  const [selectedChapter, setSelectedChapter] = useState("Chemical Reactions and Equations");
+  const [isGenerating, setIsGenerating] = useState(false);
+
   useEffect(() => {
     if (!roomId || !hasJoined) return;
     
@@ -38,17 +101,44 @@ export default function MultiplayerQuiz() {
 
   const createRoom = async () => {
     if (!user || !profile) return alert("Must be logged in");
+    setIsGenerating(true);
     const newId = Math.random().toString(36).substring(2, 8).toUpperCase();
     
+    let generatedQuestions = [];
+    try {
+      const res = await fetch("/api/groups/quiz/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: selectedSubject,
+          chapter: selectedChapter
+        })
+      });
+      const data = await res.json();
+      if (data.questions && data.questions.length > 0) {
+        generatedQuestions = data.questions.map((item: any) => ({
+          q: item.question || item.q,
+          options: item.options,
+          correctAnswer: item.correctAnswer || item.a
+        }));
+      }
+    } catch (e) {
+      console.error("Multiplayer quiz generation failed, using mock questions", e);
+    }
+
     await setDoc(doc(db, "quiz_rooms", newId), {
       status: "waiting",
       host: user.uid,
       players: [{ uid: user.uid, name: profile.displayName || "Player", score: 0 }],
-      currentQuestion: 0
+      currentQuestion: 0,
+      questions: generatedQuestions,
+      subject: selectedSubject,
+      chapter: selectedChapter
     });
     
     setRoomId(newId);
     setHasJoined(true);
+    setIsGenerating(false);
   };
 
   const joinRoom = async (e: React.FormEvent) => {
@@ -87,7 +177,19 @@ export default function MultiplayerQuiz() {
     setSelectedOption(optIdx);
     
     const qIdx = roomData.currentQuestion;
-    const isCorrect = optIdx === QUIZ_QUESTIONS[qIdx].a;
+    const questionsList = (roomData.questions && roomData.questions.length > 0)
+      ? roomData.questions
+      : QUIZ_QUESTIONS;
+    const q = questionsList[qIdx];
+    
+    let isCorrect = false;
+    if (typeof q.a === "number") {
+      isCorrect = optIdx === q.a;
+    } else if (typeof q.correctAnswer === "string") {
+      isCorrect = q.options[optIdx] === q.correctAnswer;
+    } else if (typeof q.a === "string") {
+      isCorrect = q.options[optIdx] === q.a;
+    }
     
     if (isCorrect) {
       const newPlayers = roomData.players.map((p: any) => 
@@ -102,7 +204,11 @@ export default function MultiplayerQuiz() {
     setSelectedOption(null);
     
     const nextQ = roomData.currentQuestion + 1;
-    if (nextQ >= QUIZ_QUESTIONS.length) {
+    const questionsLength = (roomData.questions && roomData.questions.length > 0)
+      ? roomData.questions.length
+      : QUIZ_QUESTIONS.length;
+
+    if (nextQ >= questionsLength) {
       await updateDoc(doc(db, "quiz_rooms", roomId), { status: "finished" });
       setShowConfetti(true);
     } else {
@@ -120,11 +226,56 @@ export default function MultiplayerQuiz() {
           <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2">Live Quiz Arena</h1>
           <p className="text-slate-500 mb-8 font-medium">Compete with friends in real-time</p>
           
+          {/* Dynamic Subject & Chapter selectors */}
+          <div className="space-y-4 mb-6 text-left">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-slate-500 tracking-widest uppercase block">Select Quiz Subject</label>
+              <select
+                value={selectedSubject}
+                onChange={(e) => {
+                  const subj = e.target.value;
+                  setSelectedSubject(subj);
+                  if (SUBJECT_CHAPTERS[subj] && SUBJECT_CHAPTERS[subj].length > 0) {
+                    setSelectedChapter(SUBJECT_CHAPTERS[subj][0]);
+                  }
+                }}
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500/20"
+              >
+                {Object.keys(SUBJECT_CHAPTERS).map((subj) => (
+                  <option key={subj} value={subj}>{subj}</option>
+                ))}
+              </select>
+            </div>
+
+            {SUBJECT_CHAPTERS[selectedSubject] && (
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-slate-500 tracking-widest uppercase block">Select Quiz Chapter</label>
+                <select
+                  value={selectedChapter}
+                  onChange={(e) => setSelectedChapter(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500/20"
+                >
+                  {SUBJECT_CHAPTERS[selectedSubject].map((ch) => (
+                    <option key={ch} value={ch}>{ch}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
           <button 
             onClick={createRoom}
-            className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg transition-all mb-6"
+            disabled={isGenerating}
+            className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg transition-all mb-6 flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
           >
-            Create New Room
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin text-white" />
+                Generating AI Quiz...
+              </>
+            ) : (
+              "Create New Room"
+            )}
           </button>
           
           <div className="flex items-center gap-4 mb-6">
@@ -139,9 +290,9 @@ export default function MultiplayerQuiz() {
               placeholder="Enter Room Code"
               value={roomId}
               onChange={(e) => setRoomId(e.target.value.toUpperCase())}
-              className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 font-bold text-slate-900 dark:text-white"
+              className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 font-bold text-slate-900 dark:text-white text-sm"
             />
-            <button type="submit" className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 font-bold rounded-xl hover:opacity-90 transition-opacity">
+            <button type="submit" className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 font-bold rounded-xl hover:opacity-90 transition-opacity text-sm">
               Join
             </button>
           </form>
@@ -153,7 +304,10 @@ export default function MultiplayerQuiz() {
   if (!roomData) return <div className="text-center p-10 font-bold">Loading Room...</div>;
 
   const isHost = roomData.host === user?.uid;
-  const currentQ = QUIZ_QUESTIONS[roomData.currentQuestion];
+  const questionsList = (roomData.questions && roomData.questions.length > 0)
+    ? roomData.questions
+    : QUIZ_QUESTIONS;
+  const currentQ = questionsList[roomData.currentQuestion];
 
   return (
     <div className="max-w-4xl mx-auto p-6 min-h-[80vh]">
@@ -163,7 +317,11 @@ export default function MultiplayerQuiz() {
         <div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white">Room: <span className="text-indigo-500">{roomId}</span></h1>
           <p className="text-sm font-bold text-slate-500">
-            {roomData.status === "waiting" ? "Waiting for players..." : roomData.status === "finished" ? "Game Over!" : `Question ${roomData.currentQuestion + 1} of ${QUIZ_QUESTIONS.length}`}
+            {roomData.status === "waiting" 
+              ? `Waiting for players... [Topic: ${roomData.subject || "General"} - ${roomData.chapter || "Mixed"}]` 
+              : roomData.status === "finished" 
+                ? "Game Over!" 
+                : `Question ${roomData.currentQuestion + 1} of ${questionsList.length}`}
           </p>
         </div>
         <div className="bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-xl font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
@@ -202,12 +360,16 @@ export default function MultiplayerQuiz() {
         <div className="grid md:grid-cols-3 gap-8">
           <div className="md:col-span-2 space-y-6">
             <div className="premium-glass-panel p-8">
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">{currentQ.q}</h2>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">{currentQ.q || currentQ.question}</h2>
               <div className="space-y-3">
-                {currentQ.options.map((opt, i) => {
+                {currentQ.options.map((opt: string, i: number) => {
                   let stateClass = "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-indigo-500";
+                  const isCorrectAnswer = typeof currentQ.a === "number" 
+                    ? i === currentQ.a 
+                    : (currentQ.correctAnswer === opt || currentQ.a === opt);
+
                   if (selectedOption !== null) {
-                    if (i === currentQ.a) stateClass = "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-500 text-emerald-700 dark:text-emerald-400 font-bold";
+                    if (isCorrectAnswer) stateClass = "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-500 text-emerald-700 dark:text-emerald-400 font-bold";
                     else if (i === selectedOption) stateClass = "bg-red-50 dark:bg-red-900/20 border-red-500 text-red-700 dark:text-red-400 font-bold";
                     else stateClass = "opacity-50";
                   }
@@ -220,8 +382,8 @@ export default function MultiplayerQuiz() {
                       className={`w-full text-left p-4 rounded-xl border-2 transition-all flex justify-between items-center ${stateClass}`}
                     >
                       <span>{opt}</span>
-                      {selectedOption !== null && i === currentQ.a && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
-                      {selectedOption !== null && i === selectedOption && i !== currentQ.a && <XCircle className="w-5 h-5 text-red-500" />}
+                      {selectedOption !== null && isCorrectAnswer && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
+                      {selectedOption !== null && i === selectedOption && !isCorrectAnswer && <XCircle className="w-5 h-5 text-red-500" />}
                     </button>
                   );
                 })}

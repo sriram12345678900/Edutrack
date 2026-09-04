@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { 
@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { SUPPORTED_LANGUAGES, getSpeechLanguageCode } from "@/lib/languages";
 
 // Chat Session interface
 interface ChatSession {
@@ -86,6 +87,54 @@ export default function TutorPage() {
     });
   };
 
+  useEffect(() => {
+    const handleGlobalPaste = async (e: ClipboardEvent) => {
+      const files = e.clipboardData?.files;
+      let imageAttached = false;
+      
+      if (files && files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+          if (files[i].type.startsWith("image/")) {
+            try {
+              const base64 = await fileToBase64(files[i]);
+              setAttachedImage(base64);
+              e.preventDefault();
+              imageAttached = true;
+              break;
+            } catch (err) {
+              console.error("Error pasting image file globally:", err);
+            }
+          }
+        }
+      }
+
+      if (!imageAttached) {
+        const items = e.clipboardData?.items;
+        if (items) {
+          for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf("image") !== -1) {
+              const file = items[i].getAsFile();
+              if (file) {
+                try {
+                  const base64 = await fileToBase64(file);
+                  setAttachedImage(base64);
+                  e.preventDefault();
+                  imageAttached = true;
+                } catch (err) {
+                  console.error("Error pasting image item globally:", err);
+                }
+              }
+              break;
+            }
+          }
+        }
+      }
+    };
+
+    window.addEventListener("paste", handleGlobalPaste);
+    return () => window.removeEventListener("paste", handleGlobalPaste);
+  }, []);
+
   // ── SPEECH TO TEXT ──
   const startSpeechToText = () => {
     if (typeof window !== "undefined") {
@@ -97,7 +146,7 @@ export default function TutorPage() {
       const rec = new SpeechRecognition();
       rec.continuous = false;
       rec.interimResults = false;
-      rec.lang = userLanguage === "Hindi" ? "hi-IN" : "en-IN";
+      rec.lang = getSpeechLanguageCode(userLanguage);
 
       rec.onstart = () => setIsListening(true);
       rec.onend = () => setIsListening(false);
@@ -272,6 +321,27 @@ export default function TutorPage() {
         setAttachedImage(base64);
       } catch (e) {
         console.error("Error loading chat image:", e);
+      }
+    }
+  };
+
+  const handleChatPaste = async (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const items = e.clipboardData?.items;
+    if (items) {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") !== -1) {
+          const file = items[i].getAsFile();
+          if (file) {
+            try {
+              const base64 = await fileToBase64(file);
+              setAttachedImage(base64);
+              e.preventDefault();
+            } catch (err) {
+              console.error("Error pasting image:", err);
+            }
+          }
+          break;
+        }
       }
     }
   };
@@ -606,14 +676,38 @@ export default function TutorPage() {
             <select
               value={userLanguage}
               onChange={(e) => {
-                setUserLanguage(e.target.value);
-                localStorage.setItem("edutrack_language", e.target.value);
+                const newLang = e.target.value;
+                setUserLanguage(newLang);
+                localStorage.setItem("edutrack_language", newLang);
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new CustomEvent("edutrack_profile_updated", {
+                    detail: { language: newLang }
+                  }));
+                }
               }}
-              className="bg-transparent dark:text-white text-slate-900 font-extrabold focus:outline-none cursor-pointer text-xs pr-1"
+              className="bg-transparent dark:text-white text-slate-900 font-extrabold focus:outline-none cursor-pointer text-xs pr-1 max-w-[140px]"
             >
-              <option value="Hinglish" className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900 text-slate-900">Hinglish</option>
-              <option value="English" className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900 text-slate-900">English</option>
-              <option value="Hindi" className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900 text-slate-900">Hindi</option>
+              <optgroup label="Standard" className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-cyan-400 text-cyan-700 font-bold">
+                {SUPPORTED_LANGUAGES.filter(l => l.category === "standard").map(l => (
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                    {l.label}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Conversational Blends (-ish)" className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-amber-400 text-amber-700 font-bold">
+                {SUPPORTED_LANGUAGES.filter(l => l.category === "bilingual").map(l => (
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                    {l.label}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Regional Languages (Native)" className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-purple-400 text-purple-700 font-bold">
+                {SUPPORTED_LANGUAGES.filter(l => l.category === "regional").map(l => (
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                    {l.label}
+                  </option>
+                ))}
+              </optgroup>
             </select>
           </div>
         </div>
@@ -927,6 +1021,7 @@ export default function TutorPage() {
                     type="text" 
                     value={chatInputValue}
                     onChange={(e) => setChatInputValue(e.target.value)}
+                    onPaste={handleChatPaste}
                     placeholder={isListening ? "Listening closely to your voice..." : "Ask your doubt (e.g. solve 2x² - 5x + 3 = 0, or upload photo)..."}
                     className={`w-full dark:bg-[#030514] bg-[#eef1f9] border ${
                       isListening 

@@ -23,17 +23,23 @@ interface ParentNotification {
   read: boolean;
 }
 
+import { db } from "@/lib/firebase";
+import { collection, query, where, getDocs, doc, updateDoc, onSnapshot } from "firebase/firestore";
+import { UserProfile } from "@/lib/db";
+
 export default function ParentPortal() {
   const router = useRouter();
   const { user } = useAuth();
   const { profile, loading } = useProfile();
   const { xp, level, streak } = useGamificationStore();
   
-  const [pinEntry, setPinEntry] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [error, setError] = useState(false);
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<"overview" | "digest" | "notifications">("overview");
+  
+  const [linkCode, setLinkCode] = useState("");
+  const [linkingError, setLinkingError] = useState("");
+  const [linking, setLinking] = useState(false);
+  const [childProfile, setChildProfile] = useState<UserProfile | null>(null);
 
   // Notifications State
   const [notifications, setNotifications] = useState<ParentNotification[]>([
@@ -41,7 +47,7 @@ export default function ParentPortal() {
       id: "notif-1",
       type: "achievement",
       title: "🔥 7-Day Study Streak Milestone!",
-      message: `${profile?.displayName || "Your student"} completed their daily study mission for 7 consecutive days in Physics & Mathematics.`,
+      message: `Your student completed their daily study mission for 7 consecutive days in Physics & Mathematics.`,
       time: "2 hours ago",
       read: false
     },
@@ -67,28 +73,50 @@ export default function ParentPortal() {
     if (!loading && !user) {
       router.push("/login");
     }
-    
-    // If profile exists and no PIN is set, auto-authenticate
-    if (!loading && profile && !profile.parentPin) {
-      setIsAuthenticated(true);
-    }
-  }, [loading, user, profile, router]);
+  }, [loading, user, router]);
 
-  const handlePinSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!profile?.linkedStudentId) {
+      setChildProfile(null);
+      return;
+    }
+    const unsub = onSnapshot(doc(db, "users", profile.linkedStudentId), (docSnap) => {
+      if (docSnap.exists()) {
+        setChildProfile(docSnap.data() as UserProfile);
+      }
+    });
+    return () => unsub();
+  }, [profile?.linkedStudentId]);
+
+  const handleLinkChild = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (profile?.parentPin === pinEntry) {
-      setIsAuthenticated(true);
-      setError(false);
-    } else {
-      setError(true);
-      setPinEntry("");
+    setLinkingError("");
+    if (!linkCode.trim()) return;
+    setLinking(true);
+    try {
+      const q = query(collection(db, "users"), where("friendCode", "==", linkCode.trim()));
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        setLinkingError("No student found with that code.");
+        setLinking(false);
+        return;
+      }
+      const childDoc = snap.docs[0];
+      await updateDoc(doc(db, "users", user!.uid), {
+        linkedStudentId: childDoc.id,
+        role: "parent"
+      });
+      setLinking(false);
+    } catch (e: any) {
+      setLinkingError(e.message);
+      setLinking(false);
     }
   };
 
   const getDigestMessage = () => {
-    const name = profile?.displayName || "Your Student";
+    const name = childProfile?.displayName || "Your Student";
     return `*EduTrack Weekly Student Progress Digest* 🎓\n\n` +
-      `👤 *Student:* ${name} (Class ${profile?.className || "10"})\n` +
+      `👤 *Student:* ${name} (Class ${childProfile?.className || "10"})\n` +
       `🔥 *Active Streak:* ${streak} Days\n` +
       `⭐ *Level & XP:* Level ${level} (${xp} Total XP)\n` +
       `⏱️ *Weekly Study Time:* 14.5 Hours\n` +
@@ -147,54 +175,42 @@ export default function ParentPortal() {
       </header>
 
       <AnimatePresence mode="wait">
-        {!isAuthenticated ? (
-          <motion.div 
-            key="login"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="max-w-md mx-auto mt-16"
-          >
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-2xl space-y-6">
-              <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto text-slate-400 border border-slate-700">
+        <motion.div
+          key="dashboard"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-5xl mx-auto space-y-6"
+        >
+          {!profile?.linkedStudentId ? (
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 max-w-md mx-auto text-center space-y-6 shadow-xl">
+              <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mx-auto">
                 <Lock className="w-8 h-8" />
               </div>
-              <div>
-                <h2 className="text-2xl font-black text-white">Enter Parent PIN</h2>
-                <p className="text-xs text-slate-400 mt-1">Please enter the 4-digit security PIN to view student progress.</p>
+              <div className="space-y-2">
+                <h2 className="text-xl font-black text-white">Link Your Student</h2>
+                <p className="text-xs text-slate-400">Enter the unique Link Code from your student's dashboard to link their account to your Parent Portal.</p>
               </div>
-              
-              <form onSubmit={handlePinSubmit} className="space-y-4">
-                <input 
-                  type="password" 
-                  maxLength={4}
-                  value={pinEntry}
-                  onChange={(e) => {
-                    setPinEntry(e.target.value.replace(/\D/g, ''));
-                    setError(false);
-                  }}
-                  className={`w-full max-w-[200px] mx-auto text-center text-3xl tracking-[0.5em] font-black p-4 rounded-2xl border-2 ${error ? 'border-red-500 bg-red-950/40 text-red-400' : 'border-slate-800 bg-slate-950 text-white focus:border-indigo-500'}`}
-                  placeholder="••••"
+              <form onSubmit={handleLinkChild} className="space-y-4">
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={linkCode}
+                  onChange={e => setLinkCode(e.target.value)}
+                  placeholder="Enter 6-Digit Code"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-center text-lg font-black tracking-widest text-indigo-400 placeholder-slate-600 focus:outline-none focus:border-indigo-500 uppercase"
                 />
-                {error && <p className="text-red-400 text-xs font-bold">Incorrect PIN. Try again.</p>}
-                
-                <button 
+                {linkingError && <p className="text-xs text-red-400">{linkingError}</p>}
+                <button
                   type="submit"
-                  disabled={pinEntry.length < 4}
-                  className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white font-black text-xs rounded-xl transition-all shadow-lg shadow-indigo-600/30"
+                  disabled={linking || linkCode.length < 4}
+                  className="w-full py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white font-black text-xs shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2"
                 >
-                  Unlock Parent Dashboard
+                  {linking ? "Linking..." : "Link Student Account"}
                 </button>
               </form>
             </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="dashboard"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-5xl mx-auto space-y-6"
-          >
+          ) : (
+            <>
             {/* Tabs */}
             <div className="flex items-center gap-2 bg-slate-900/80 p-1.5 rounded-2xl border border-slate-800 w-fit">
               <button
@@ -235,11 +251,11 @@ export default function ParentPortal() {
                   {/* Student Overview */}
                   <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:col-span-2 flex items-center gap-6 shadow-xl">
                     <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-3xl text-white font-black shadow-lg">
-                      {(profile?.displayName || "S").charAt(0).toUpperCase()}
+                      {(childProfile?.displayName || "S").charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <h2 className="text-2xl font-black text-white">{profile?.displayName || "Student"}</h2>
-                      <p className="text-xs font-bold text-slate-400">Class {profile?.className || "10"} • Academic Dashboard</p>
+                      <h2 className="text-2xl font-black text-white">{childProfile?.displayName || "Student"}</h2>
+                      <p className="text-xs font-bold text-slate-400">Class {childProfile?.className || "10"} • Academic Dashboard</p>
                       <div className="flex items-center gap-3 mt-3">
                         <div className="flex items-center gap-1.5 text-xs font-black text-indigo-400 bg-indigo-500/10 border border-indigo-500/30 px-3 py-1 rounded-full">
                           <Trophy className="w-3.5 h-3.5" /> Level {level}
@@ -400,8 +416,10 @@ export default function ParentPortal() {
               </div>
             )}
 
+            </>
+          )}
+
           </motion.div>
-        )}
       </AnimatePresence>
     </div>
   );

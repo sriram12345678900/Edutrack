@@ -242,60 +242,101 @@ export default function PodcastPage() {
     setCurrentLineIndex(0);
   };
 
-  const handleGenerateCustom = (e: React.FormEvent) => {
+  const handleGenerateCustom = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!customTopic.trim()) return;
 
     setIsGenerating(true);
-    setTimeout(() => {
-      const newEp: PodcastEpisode = {
-        id: `pod-custom-${Date.now()}`,
-        title: `${customTopic} Deep Dive`,
-        subject: "Custom Topic",
-        duration: "3 min",
-        summary: `Alex and Maya explore key concepts, real-life applications, and exam strategies for ${customTopic}.`,
-        dialogues: [
-          {
-            speaker: "Alex",
-            role: "Inquisitive Host",
-            avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=AlexCustom",
-            voiceGender: "male",
-            text: `Welcome to this special deep dive on ${customTopic}! Maya, why is this topic so crucial for students to master?`,
-            durationEst: 8
-          },
-          {
-            speaker: "Maya",
-            role: "Expert Explainer",
-            avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=MayaCustom",
-            voiceGender: "female",
-            text: `Great question, Alex! ${customTopic} connects core theoretical principles to practical applications in science and technology. Once you grasp the intuition, the formulas and derivations become second nature.`,
-            durationEst: 12
-          },
-          {
-            speaker: "Alex",
-            role: "Inquisitive Host",
-            avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=AlexCustom",
-            voiceGender: "male",
-            text: `What's the one golden takeaway or common mistake students make during board exams on this?`,
-            durationEst: 7
-          },
-          {
-            speaker: "Maya",
-            role: "Expert Explainer",
-            avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=MayaCustom",
-            voiceGender: "female",
-            text: `Students often memorize definitions without picturing the mechanism! Always draw a quick schematic or mental model when solving problems on ${customTopic}.`,
-            durationEst: 11
-          }
-        ]
-      };
+    
+    try {
+      const res = await fetch('/api/podcast/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic: customTopic })
+      });
+      
+      if (!res.ok) throw new Error("API call failed");
+      
+      const data = await res.json();
+      
+      if (data && data.dialogues) {
+        const mappedDialogues: PodcastDialogue[] = data.dialogues.map((d: any) => ({
+          speaker: d.speaker,
+          role: d.role,
+          avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${d.avatarSeed || d.speaker}`,
+          voiceGender: d.speaker === "Maya" ? "female" : "male",
+          text: d.text,
+          durationEst: Math.max(3, Math.round(d.text.split(" ").length / 2.5))
+        }));
 
-      setSelectedPodcast(newEp);
-      setCurrentLineIndex(0);
-      setIsGenerating(false);
-      setCustomTopic("");
-      awardXp(40, "Generated AI Study Podcast");
-    }, 1200);
+        const newEp: PodcastEpisode = {
+          id: `pod-custom-${Date.now()}`,
+          title: `${customTopic} Deep Dive`,
+          subject: "Custom Topic",
+          duration: `${Math.max(1, Math.round(mappedDialogues.reduce((acc, d) => acc + d.durationEst, 0) / 60))} min`,
+          summary: `Alex and Maya explore key concepts, real-life applications, and exam strategies for ${customTopic}.`,
+          dialogues: mappedDialogues
+        };
+
+        setSelectedPodcast(newEp);
+        setCurrentLineIndex(0);
+        setIsGenerating(false);
+        setCustomTopic("");
+        awardXp(40, "Generated AI Study Podcast");
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
+    // Fallback template if API fails
+    const fallbackEp: PodcastEpisode = {
+      id: `pod-custom-${Date.now()}`,
+      title: `${customTopic} Deep Dive`,
+      subject: "Custom Topic",
+      duration: "3 min",
+      summary: `Alex and Maya explore key concepts, real-life applications, and exam strategies for ${customTopic}.`,
+      dialogues: [
+        {
+          speaker: "Alex",
+          role: "Inquisitive Host",
+          avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=AlexCustom",
+          voiceGender: "male",
+          text: `Welcome to this special deep dive on ${customTopic}! Maya, why is this topic so crucial for students to master?`,
+          durationEst: 8
+        },
+        {
+          speaker: "Maya",
+          role: "Expert Explainer",
+          avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=MayaCustom",
+          voiceGender: "female",
+          text: `Great question, Alex! ${customTopic} connects core theoretical principles to practical applications in science and technology. Once you grasp the intuition, the formulas and derivations become second nature.`,
+          durationEst: 12
+        },
+        {
+          speaker: "Alex",
+          role: "Inquisitive Host",
+          avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=AlexCustom",
+          voiceGender: "male",
+          text: `What's the one golden takeaway or common mistake students make during board exams on this?`,
+          durationEst: 7
+        },
+        {
+          speaker: "Maya",
+          role: "Expert Explainer",
+          avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=MayaCustom",
+          voiceGender: "female",
+          text: `Students often memorize definitions without picturing the mechanism! Always draw a quick schematic or mental model when solving problems on ${customTopic}.`,
+          durationEst: 11
+        }
+      ]
+    };
+
+    setSelectedPodcast(fallbackEp);
+    setCurrentLineIndex(0);
+    setIsGenerating(false);
+    setCustomTopic("");
+    awardXp(40, "Generated AI Study Podcast");
   };
 
   return (

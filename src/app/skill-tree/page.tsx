@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   GitFork, Lock, CheckCircle2, Zap, Trophy, Sparkles, BookOpen, 
@@ -11,6 +11,8 @@ import { awardXp } from "@/lib/xp";
 import { cn } from "@/lib/utils";
 import katex from "katex";
 import "katex/dist/katex.min.css";
+import { getDecks } from "@/lib/flashcards";
+import { getVaultMistakes } from "@/lib/error-vault";
 
 const MathEquation = ({ formula, displayMode = false }: { formula: string; displayMode?: boolean }) => {
   try {
@@ -304,13 +306,78 @@ const SKILL_TREES: { [key: string]: SubjectTree } = {
 };
 
 export default function SkillTreePage() {
+  const [skillTrees, setSkillTrees] = useState<{ [key: string]: SubjectTree }>(SKILL_TREES);
   const [selectedSubject, setSelectedSubject] = useState<string>("Physics");
-  const [activeNode, setActiveNode] = useState<SkillNode | null>(SKILL_TREES["Physics"].nodes[3]);
+  const [activeNodeId, setActiveNodeId] = useState<string>("p4");
 
-  const tree = SKILL_TREES[selectedSubject];
+  useEffect(() => {
+    const cached = localStorage.getItem("edutrack_skill_tree_progress");
+    if (cached) {
+      try {
+        setSkillTrees(JSON.parse(cached));
+      } catch (e) {}
+    }
+
+    const decks = getDecks();
+    const mistakes = getVaultMistakes();
+
+    const newTrees = JSON.parse(JSON.stringify(SKILL_TREES));
+
+    Object.values(newTrees).forEach((t: any) => {
+      const subjectDecks = decks.filter(d => d.subject.toLowerCase() === t.subject.toLowerCase());
+      const subjectMistakes = mistakes.filter(m => m.subject.toLowerCase() === t.subject.toLowerCase());
+
+      t.nodes.forEach((node: any) => {
+        const nodeName = node.name.toLowerCase();
+        
+        const isMastered = subjectDecks.some(deck => {
+          const hasMasteredCard = deck.cards.some(c => c.status === "mastered");
+          if (!hasMasteredCard) return false;
+          
+          const titleMatch = deck.title.toLowerCase().includes(nodeName);
+          const cardMatch = deck.cards.some(c => 
+            c.status === "mastered" && 
+            (c.front.toLowerCase().includes(nodeName) || c.back.toLowerCase().includes(nodeName))
+          );
+          return titleMatch || cardMatch;
+        });
+
+        if (isMastered) {
+          node.status = "mastered";
+        } else {
+          const prereqsMet = node.prerequisites.length > 0 && node.prerequisites.every((prereqId: string) => {
+            const prereqNode = t.nodes.find((n: any) => n.id === prereqId);
+            return prereqNode && prereqNode.status === "mastered";
+          });
+
+          const hasRelatedDeck = subjectDecks.some(deck => 
+            deck.title.toLowerCase().includes(nodeName) || 
+            deck.cards.some(c => c.front.toLowerCase().includes(nodeName) || c.back.toLowerCase().includes(nodeName))
+          );
+          
+          const hasRelatedMistake = subjectMistakes.some(m => 
+            m.chapter.toLowerCase().includes(nodeName) || 
+            m.question.toLowerCase().includes(nodeName)
+          );
+
+          if (prereqsMet || hasRelatedDeck || hasRelatedMistake) {
+            node.status = "unlocked";
+          } else {
+            node.status = "locked";
+          }
+        }
+      });
+    });
+
+    setSkillTrees(newTrees);
+    localStorage.setItem("edutrack_skill_tree_progress", JSON.stringify(newTrees));
+  }, []);
+
+  const tree = skillTrees[selectedSubject];
+  const activeNode = tree.nodes.find(n => n.id === activeNodeId) || tree.nodes[0];
 
   const handleNodeClick = (node: SkillNode) => {
-    setActiveNode(node);
+    setActiveNodeId(node.id);
   };
 
   const handleUnlockNode = (nodeId: string) => {
@@ -360,7 +427,7 @@ export default function SkillTreePage() {
                   key={subj}
                   onClick={() => {
                     setSelectedSubject(subj);
-                    setActiveNode(SKILL_TREES[subj].nodes[0]);
+                    setActiveNodeId(skillTrees[subj].nodes[0].id);
                   }}
                   className={cn(
                     "flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black transition-all border",

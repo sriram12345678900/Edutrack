@@ -22,90 +22,7 @@ import { cn } from "@/lib/utils";
 import { useGamificationStore } from "@/store/useGamificationStore";
 import { useProfileStore } from "@/store/useProfileStore";
 
-// Draggable Swiper Card Sub-component
-interface SwiperCardProps {
-  card: { id: string; front: string; back: string };
-  index: number;
-  activeIndex: number;
-  totalCards: number;
-  onSwipeLeft: () => void;
-  onSwipeRight: () => void;
-}
 
-function SwiperCard({ card, index, activeIndex, totalCards, onSwipeLeft, onSwipeRight }: SwiperCardProps) {
-  const isTop = index === activeIndex;
-  const dragX = useMotionValue(0);
-  
-  const rotate = useTransform(dragX, [-150, 150], [-20, 20]);
-  const cardOpacity = useTransform(dragX, [-150, -80, 0, 80, 150], [0.6, 1, 1, 1, 0.6]);
-  const studyLabelOpacity = useTransform(dragX, [-100, -20], [1, 0]);
-  const masterLabelOpacity = useTransform(dragX, [20, 100], [0, 1]);
-
-  if (index < activeIndex) return null;
-
-  return (
-    <motion.div
-      style={{
-        zIndex: 10 - index,
-        x: dragX,
-        rotate: isTop ? rotate : 0,
-        opacity: isTop ? cardOpacity : Math.max(0, 0.95 - (index - activeIndex) * 0.1),
-        y: isTop ? 0 : (index - activeIndex) * 10,
-        scale: isTop ? 1 : Math.max(0.85, 1 - (index - activeIndex) * 0.04),
-      }}
-      drag={isTop ? "x" : false}
-      dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.65}
-      whileDrag={{ scale: 1.03, cursor: "grabbing" }}
-      onDragEnd={(e, info) => {
-        if (!isTop) return;
-        if (info.offset.x > 110) {
-          onSwipeRight();
-        } else if (info.offset.x < -110) {
-          onSwipeLeft();
-        }
-      }}
-      className={cn(
-        "!absolute inset-0 premium-glass-panel p-5 flex flex-col justify-between cursor-grab select-none rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-lg",
-        !isTop && "pointer-events-none"
-      )}
-    >
-      {isTop && (
-        <>
-          <motion.div 
-            style={{ opacity: studyLabelOpacity }}
-            className="absolute top-3.5 left-3.5 bg-rose-500/20 border border-rose-500/40 px-2.5 py-0.5 rounded-full text-rose-400 text-[9px] font-black uppercase tracking-wider pointer-events-none"
-          >
-            Review Later
-          </motion.div>
-          <motion.div 
-            style={{ opacity: masterLabelOpacity }}
-            className="absolute top-3.5 right-3.5 bg-emerald-500/20 border border-emerald-500/40 px-2.5 py-0.5 rounded-full text-emerald-400 text-[9px] font-black uppercase tracking-wider pointer-events-none"
-          >
-            Mastered! +50 XP
-          </motion.div>
-        </>
-      )}
-
-      <div className="flex justify-between items-center relative z-10">
-        <span className="text-[9px] font-black uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/20">
-          Flashcard
-        </span>
-        <span className="text-[10px] text-slate-400 font-bold">{index + 1} / {totalCards}</span>
-      </div>
-      
-      <p className="text-center font-extrabold text-sm dark:text-white text-slate-800 px-2 my-auto leading-relaxed relative z-10">
-        {card.front}
-      </p>
-      
-      <div className="text-[9px] text-slate-400 font-black tracking-wider uppercase text-center border-t border-slate-200/60 dark:border-white/5 pt-2 flex justify-between items-center relative z-10">
-        <span className="text-rose-400/80">← Swipe Left</span>
-        <span className="text-slate-500">Active Recall</span>
-        <span className="text-emerald-400/80">Swipe Right →</span>
-      </div>
-    </motion.div>
-  );
-}
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -123,7 +40,6 @@ export default function Dashboard() {
   const [confettiActive, setConfettiActive] = useState<boolean>(false);
   const [showQuestCelebration, setShowQuestCelebration] = useState<boolean>(false);
   const [selectedNode, setSelectedNode] = useState<any>(null);
-  const [swiperIndex, setSwiperIndex] = useState<number>(0);
   const [activeMissionGuide, setActiveMissionGuide] = useState<string | null>(null);
 
   useEffect(() => {
@@ -202,11 +118,7 @@ export default function Dashboard() {
     { id: "life", label: "Life Processes", status: "locked", percent: 0, x: 90, y: 55, desc: "Nutrition, respiration, circulation, and excretion.", keyPoints: ["Prerequisite: Unlock Carbon Compounds first.", "Autotrophic vs Heterotrophic nutrition.", "Double circulation in humans prevents mixing of blood."] }
   ];
 
-  const swiperCards = [
-    { id: "card_1", front: "Why do copper vessels lose their shine?", back: "Due to basic copper carbonate formation from reaction with moist CO2 and O2." },
-    { id: "card_2", front: "What is the pH scale?", back: "A logarithmic scale measuring hydrogen ion concentration, running from 0 (acidic) to 14 (basic)." },
-    { id: "card_3", front: "What is double circulation in humans?", back: "Blood passes through the heart twice per body cycle, separating oxygenated and deoxygenated blood." }
-  ];
+
 
   const getRankBadge = (rank: number) => {
     if (rank === 1) return <span className="text-[10px] font-black text-amber-400 bg-amber-400/15 border border-amber-400/30 px-1.5 py-0.5 rounded-full shrink-0">#1</span>;
@@ -406,78 +318,7 @@ export default function Dashboard() {
                   {/* Daily Question */}
                   <DailyQuestionWidget />
 
-                  {/* 2-Minute Active Recall Swiper */}
-                  <div id="tour-flashcards-deck" className="premium-glass-panel p-6 rounded-3xl border border-pink-500/20 relative">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-pink-400" />
-                          Quick Active Recall Warmup
-                        </h3>
-                        <p className="text-xs text-slate-400 mt-0.5">Drag card right if you know the answer (+50 XP)</p>
-                      </div>
-                      <Link href="/flashcards" className="text-[11px] font-bold text-pink-400 hover:underline">
-                        Open Full Deck →
-                      </Link>
-                    </div>
 
-                    <div className="relative flex flex-col items-center justify-center min-h-[190px] bg-black/20 rounded-2xl border border-white/5 p-4 overflow-hidden">
-                      {swiperIndex < swiperCards.length ? (
-                        <div className="relative w-full max-w-sm flex flex-col items-center">
-                          <div className="relative w-full h-32 flex items-center justify-center">
-                            {swiperCards.map((card, idx) => (
-                              <SwiperCard
-                                key={card.id}
-                                card={card}
-                                index={idx}
-                                activeIndex={swiperIndex}
-                                totalCards={swiperCards.length}
-                                onSwipeLeft={() => setSwiperIndex(prev => prev + 1)}
-                                onSwipeRight={() => {
-                                  handleAwardXP(50);
-                                  setConfettiActive(true);
-                                  setSwiperIndex(prev => prev + 1);
-                                }}
-                              />
-                            ))}
-                          </div>
-
-                          <div className="flex items-center justify-between gap-3 w-full mt-3 z-20">
-                            <button
-                              type="button"
-                              onClick={() => setSwiperIndex(prev => prev + 1)}
-                              className="flex-1 py-1.5 px-3 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all text-center"
-                            >
-                              ← Review Later
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                handleAwardXP(50);
-                                setConfettiActive(true);
-                                setSwiperIndex(prev => prev + 1);
-                              }}
-                              className="flex-1 py-1.5 px-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all text-center"
-                            >
-                              Mastered (+50 XP) →
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="text-center py-4">
-                          <Trophy className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
-                          <h4 className="text-sm font-black text-white">Recall Warmup Complete!</h4>
-                          <p className="text-xs text-slate-400 mt-0.5">Bonus XP added to your daily progress.</p>
-                          <button 
-                            onClick={() => setSwiperIndex(0)}
-                            className="mt-3 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all"
-                          >
-                            Restart Warmup
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
 
                 </div>
 

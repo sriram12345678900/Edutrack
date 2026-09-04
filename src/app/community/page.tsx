@@ -13,6 +13,8 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { awardXp } from "@/lib/xp";
 import { cn } from "@/lib/utils";
+import { db } from "@/lib/firebase";
+import { collection, doc, onSnapshot, setDoc, updateDoc, increment, arrayUnion, query, orderBy, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
 
 const SUBJECTS = ["All", "Physics", "Mathematics", "Chemistry", "Biology", "Computer Science", "English"] as const;
 const GRADES = ["All Grades", "Class 9", "Class 10", "Class 11", "Class 12", "College"];
@@ -45,63 +47,66 @@ export default function CommunityPage() {
   const [askAiInstant, setAskAiInstant] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    const loaded = getStoredDoubts();
-    setDoubts(loaded);
+    useEffect(() => {
+    const q = query(collection(db, "doubts"), orderBy("createdAtTimestamp", "desc"));
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      const fetchedDoubts = await Promise.all(snapshot.docs.map(async (docSnap) => {
+        const doubtData = docSnap.data();
+        const answersSnap = await getDocs(collection(db, "doubts", docSnap.id, "answers"));
+        const answers = answersSnap.docs.map(a => ({ id: a.id, ...a.data() } as DoubtAnswer));
+        return { id: docSnap.id, ...doubtData, answers } as DoubtQuery;
+      }));
+      setDoubts(fetchedDoubts);
+    });
+    return () => unsubscribe();
   }, []);
 
-  const handleUpvoteDoubt = (id: string) => {
-    const updated = doubts.map(d => {
-      if (d.id === id) {
-        return { ...d, views: d.views + 1 };
-      }
-      return d;
+  const handleUpvoteDoubt = async (id: string) => {
+    if (!user) return;
+    const docRef = doc(db, "doubts", id);
+    await updateDoc(docRef, {
+      views: increment(1)
     });
-    setDoubts(updated);
-    saveStoredDoubts(updated);
   };
 
-  const handleUpvoteAnswer = (doubtId: string, answerId: string) => {
-    const updated = doubts.map(d => {
-      if (d.id === doubtId) {
-        const answers = d.answers.map(ans => {
-          if (ans.id === answerId) {
-            return { ...ans, upvotes: ans.upvotes + 1 };
-          }
-          return ans;
-        });
-        return { ...d, answers };
-      }
-      return d;
+  const handleUpvoteAnswer = async (doubtId: string, answerId: string) => {
+    if (!user) return;
+    const ansRef = doc(db, "doubts", doubtId, "answers", answerId);
+    await updateDoc(ansRef, {
+      upvotes: increment(1)
     });
-    setDoubts(updated);
-    saveStoredDoubts(updated);
+    
+    // Minor hack to trigger onSnapshot on the parent doubt so the UI updates
+    const doubtRef = doc(db, "doubts", doubtId);
+    await updateDoc(doubtRef, { _lastUpdate: Date.now() });
+    
     awardXp(5, "Community Upvote");
   };
 
-  const handleAcceptAnswer = (doubtId: string, answerId: string) => {
-    const updated = doubts.map(d => {
-      if (d.id === doubtId) {
-        const answers = d.answers.map(ans => ({
-          ...ans,
-          isAccepted: ans.id === answerId ? !ans.isAccepted : false
-        }));
-        const hasAccepted = answers.some(a => a.isAccepted);
-        return { ...d, status: hasAccepted ? "solved" : "open", answers } as DoubtQuery;
-      }
-      return d;
+  const handleAcceptAnswer = async (doubtId: string, answerId: string) => {
+    if (!user) return;
+    const doubtRef = doc(db, "doubts", doubtId);
+    const ansRef = doc(db, "doubts", doubtId, "answers", answerId);
+    
+    // In a real app we might use a batch here
+    await updateDoc(ansRef, {
+      isAccepted: true
     });
-    setDoubts(updated);
-    saveStoredDoubts(updated);
+    
+    await updateDoc(doubtRef, {
+      status: "solved",
+      _lastUpdate: Date.now()
+    });
+    
     awardXp(25, "Accepted Answer Reward");
   };
 
-  const handlePostAnswer = (doubtId: string) => {
+  const handlePostAnswer = async (doubtId: string) => {
+    if (!user) return;
     const text = replyText[doubtId]?.trim();
     if (!text) return;
 
-    const newAnswer: DoubtAnswer = {
-      id: `ans-${Date.now()}`,
+    const newAnswer = {
       authorName: user?.displayName || "Global Student",
       authorAvatar: user?.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.uid || "EduScholar"}`,
       authorRole: "Student",
@@ -109,21 +114,19 @@ export default function CommunityPage() {
       content: text,
       createdAt: "Just now",
       upvotes: 1,
-      isAccepted: false
+      isAccepted: false,
+      createdAtTimestamp: Date.now()
     };
 
-    const updated = doubts.map(d => {
-      if (d.id === doubtId) {
-        return {
-          ...d,
-          answers: [...d.answers, newAnswer]
-        };
-      }
-      return d;
+    const ansRef = collection(db, "doubts", doubtId, "answers");
+    await addDoc(ansRef, newAnswer);
+
+    const doubtRef = doc(db, "doubts", doubtId);
+    await updateDoc(doubtRef, {
+      _lastUpdate: Date.now(),
+      interactors: arrayUnion(user.uid)
     });
 
-    setDoubts(updated);
-    saveStoredDoubts(updated);
     setReplyText(prev => ({ ...prev, [doubtId]: "" }));
     awardXp(50, "Answered Community Doubt");
   };
@@ -134,10 +137,41 @@ export default function CommunityPage() {
 
     setIsAnsweringAi(prev => ({ ...prev, [doubtId]: true }));
 
-    // Simulate AI synthesis with high-value academic breakdown
-    setTimeout(() => {
-      const aiResponse: DoubtAnswer = {
-        id: `ai-${Date.now()}`,
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{
+            role: 'user',
+            content: `Please provide a step-by-step solution and explanation for this ${targetDoubt.subject} question: "${targetDoubt.title}". Description: ${targetDoubt.description}${targetDoubt.mathFormula ? ` Formula: ${targetDoubt.mathFormula}` : ''}`
+          }]
+        })
+      });
+      const data = await response.json();
+      
+      const aiResponse = {
+        authorName: "EduTrack AI Co-Pilot",
+        authorAvatar: "https://api.dicebear.com/7.x/bottts/svg?seed=EduAI",
+        authorRole: "AI Assistant",
+        authorCountry: "Global AI",
+        content: data.reply || "I couldn't generate a specific response.",
+        createdAt: "Just now",
+        upvotes: 5,
+        isAccepted: false,
+        isAiGenerated: true,
+        createdAtTimestamp: Date.now()
+      };
+
+      const ansRef = collection(db, "doubts", doubtId, "answers");
+      await addDoc(ansRef, aiResponse);
+      
+      const doubtRef = doc(db, "doubts", doubtId);
+      await updateDoc(doubtRef, { _lastUpdate: Date.now() });
+
+    } catch (error) {
+      console.error(error);
+      const aiResponse = {
         authorName: "EduTrack AI Co-Pilot",
         authorAvatar: "https://api.dicebear.com/7.x/bottts/svg?seed=EduAI",
         authorRole: "AI Assistant",
@@ -146,30 +180,27 @@ export default function CommunityPage() {
         createdAt: "Just now",
         upvotes: 5,
         isAccepted: false,
-        isAiGenerated: true
+        isAiGenerated: true,
+        createdAtTimestamp: Date.now()
       };
-
-      const updated = doubts.map(d => {
-        if (d.id === doubtId) {
-          return { ...d, answers: [...d.answers, aiResponse] };
-        }
-        return d;
-      });
-
-      setDoubts(updated);
-      saveStoredDoubts(updated);
+      
+      const ansRef = collection(db, "doubts", doubtId, "answers");
+      await addDoc(ansRef, aiResponse);
+      
+      const doubtRef = doc(db, "doubts", doubtId);
+      await updateDoc(doubtRef, { _lastUpdate: Date.now() });
+    } finally {
       setIsAnsweringAi(prev => ({ ...prev, [doubtId]: false }));
-    }, 1200);
+    }
   };
 
-  const handleCreateDoubt = (e: React.FormEvent) => {
+  const handleCreateDoubt = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle.trim() || !newDescription.trim()) return;
+    if (!newTitle.trim() || !newDescription.trim() || !user) return;
 
     setSubmitting(true);
 
-    const createdDoubt: DoubtQuery = {
-      id: `doubt-${Date.now()}`,
+    const newDoubtData = {
       title: newTitle.trim(),
       description: newDescription.trim(),
       subject: newSubject,
@@ -180,33 +211,52 @@ export default function CommunityPage() {
       authorAvatar: user?.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${Date.now()}`,
       authorCountry: "Global",
       authorCountryFlag: "🌐",
-      mathFormula: newMath.trim() || undefined,
+      mathFormula: newMath.trim() || "",
       bountyXp: newBounty,
       views: 1,
       createdAt: "Just now",
+      createdAtTimestamp: Date.now(),
       status: "open",
-      answers: []
+      _lastUpdate: Date.now(),
+      interactors: arrayUnion(user.uid)
     };
 
+    const doubtRef = doc(collection(db, "doubts"));
+    await setDoc(doubtRef, newDoubtData);
+
     if (askAiInstant) {
-      createdDoubt.answers.push({
-        id: `ai-inst-${Date.now()}`,
-        authorName: "EduTrack AI Co-Pilot",
-        authorAvatar: "https://api.dicebear.com/7.x/bottts/svg?seed=EduAI",
-        authorRole: "AI Assistant",
-        authorCountry: "Global AI",
-        content: `**Instant AI Hint & Primer**: Great question! To begin solving this, recall the fundamental relations in ${newSubject}. Check key formula definitions and diagram symmetries. Human peers and teachers from around the world will also review and post detailed derivations shortly!`,
-        createdAt: "Just now",
-        upvotes: 3,
-        isAccepted: false,
-        isAiGenerated: true
-      });
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [{
+              role: 'user',
+              content: `Give a brief hint and primer to start solving this ${newSubject} problem: "${newDoubtData.title}". Context: ${newDoubtData.description}`
+            }]
+          })
+        });
+        const data = await response.json();
+        
+        const aiInstResponse = {
+          authorName: "EduTrack AI Co-Pilot",
+          authorAvatar: "https://api.dicebear.com/7.x/bottts/svg?seed=EduAI",
+          authorRole: "AI Assistant",
+          authorCountry: "Global AI",
+          content: data.reply || `**Instant AI Hint & Primer**: Great question! To begin solving this, recall the fundamental relations in ${newSubject}. Check key formula definitions and diagram symmetries. Human peers and teachers from around the world will also review and post detailed derivations shortly!`,
+          createdAt: "Just now",
+          upvotes: 3,
+          isAccepted: false,
+          isAiGenerated: true,
+          createdAtTimestamp: Date.now()
+        };
+        await addDoc(collection(db, "doubts", doubtRef.id, "answers"), aiInstResponse);
+      } catch (error) {
+        console.error(error);
+      }
     }
 
-    const updated = [createdDoubt, ...doubts];
-    setDoubts(updated);
-    saveStoredDoubts(updated);
-    setExpandedDoubtId(createdDoubt.id);
+    setExpandedDoubtId(doubtRef.id);
 
     // Reset Form
     setNewTitle("");

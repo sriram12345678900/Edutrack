@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -14,30 +14,22 @@ interface Question {
 }
 
 export default function MockTestPage() {
-  const [subject, setSubject] = useState<"Science" | "Mathematics">("Science");
+  const [subject, setSubject] = useState<"Science" | "Mathematics" | "Social Science" | "English">("Science");
+  const [grade, setGrade] = useState("10");
+  const [difficulty, setDifficulty] = useState<"Easy" | "Medium" | "Hard">("Medium");
+  const [maxMarks, setMaxMarks] = useState<number>(20);
+  const [chapters, setChapters] = useState("");
+
   const [testStarted, setTestStarted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [paper, setPaper] = useState<any>(null);
+
+  const [timeLeft, setTimeLeft] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [scorecard, setScorecard] = useState<any[] | null>(null);
+  const [scorecard, setScorecard] = useState<any>(null);
   const [confettiActive, setConfettiActive] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Subject Questions Bank
-  const questionsBank = {
-    Science: [
-      { id: 1, text: "State the laws of refraction of light. Define refractive index.", maxMarks: 5, officialAnswer: "1. The incident ray, the refracted ray and the normal at the point of incidence, all lie in the same plane. 2. The ratio of sine of angle of incidence to the sine of angle of refraction is a constant (Snell's Law). Refractive index is the ratio of speed of light in vacuum to speed of light in medium." },
-      { id: 2, text: "Explain why is respiration considered an exothermic reaction?", maxMarks: 3, officialAnswer: "Respiration is considered an exothermic reaction because glucose combines with oxygen in our body cells to produce carbon dioxide, water, and energy is released in the form of heat/ATP." },
-      { id: 3, text: "Write the balanced chemical equation for the reaction of iron with steam. Identify the type of reaction.", maxMarks: 2, officialAnswer: "3Fe(s) + 4H2O(g) -> Fe3O4(s) + 4H2(g). This is a metal-steam reaction resulting in oxidation of iron (or a redox/displacement reaction)." }
-    ],
-    Mathematics: [
-      { id: 1, text: "Find the roots of the quadratic equation: 2x² - 5x + 3 = 0 using factorization method.", maxMarks: 3, officialAnswer: "2x² - 3x - 2x + 3 = 0 -> x(2x - 3) - 1(2x - 3) = 0 -> (x-1)(2x-3) = 0 -> Roots are x = 1 and x = 1.5." },
-      { id: 2, text: "State and prove Basic Proportionality Theorem (BPT/Thales Theorem) briefly.", maxMarks: 5, officialAnswer: "BPT: If a line is drawn parallel to one side of a triangle intersecting the other two sides, then it divides the two sides in the same ratio. Proof involves area ratios of triangles sharing heights." },
-      { id: 3, text: "Find the HCF and LCM of 96 and 404 using prime factorization method.", maxMarks: 2, officialAnswer: "96 = 2^5 * 3, 404 = 2^2 * 101. HCF = 2^2 = 4. LCM = 2^5 * 3 * 101 = 9696." }
-    ]
-  };
-
-  const activeQuestions = questionsBank[subject];
 
   // Timer effect
   useEffect(() => {
@@ -54,11 +46,34 @@ export default function MockTestPage() {
     };
   }, [testStarted, timeLeft, scorecard]);
 
-  const handleStart = () => {
-    setTestStarted(true);
-    setTimeLeft(600);
-    setAnswers({});
-    setScorecard(null);
+  const handleStart = async () => {
+    setIsGenerating(true);
+    try {
+      const res = await fetch("/api/exam/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classLevel: grade,
+          subject,
+          maxMarks,
+          difficulty,
+          chapters: chapters.split(",").map(c => c.trim()).filter(Boolean),
+          board: "CBSE"
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to generate exam");
+      
+      setPaper(data.paper);
+      setTestStarted(true);
+      setTimeLeft(data.paper.durationHours * 3600);
+      setAnswers({});
+    } catch (err: any) {
+      alert("Failed to generate exam: " + err.message);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleAnswerChange = (qId: number, val: string) => {
@@ -70,42 +85,23 @@ export default function MockTestPage() {
     if (timerRef.current) clearTimeout(timerRef.current);
 
     try {
-      const evaluationPromises = activeQuestions.map(async (q) => {
-        const studentAns = answers[q.id] || "";
-        const res = await fetch("/api/pyq-evaluate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            question: q.text,
-            maxMarks: q.maxMarks,
-            officialAnswer: q.officialAnswer,
-            textAnswer: studentAns
-          })
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed to grade question");
-        
-        return {
-          questionId: q.id,
-          questionText: q.text,
-          maxMarks: q.maxMarks,
-          studentAnswer: studentAns,
-          marksGained: data.marksGained ?? 0,
-          errors: data.errors ?? "None",
-          improvements: data.improvements ?? "",
-          feedback: data.feedback ?? ""
-        };
+      const res = await fetch("/api/exam/evaluate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          paper,
+          studentAnswers: answers
+        })
       });
 
-      const results = await Promise.all(evaluationPromises);
-      setScorecard(results);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to grade paper");
+      
+      setScorecard(data.evaluation);
       setConfettiActive(true);
 
       // Award XP
-      const totalGained = results.reduce((sum, item) => sum + item.marksGained, 0);
-      const totalPossible = results.reduce((sum, item) => sum + item.maxMarks, 0);
-      const xpEarned = Math.round((totalGained / totalPossible) * 200);
+      const xpEarned = Math.round((data.evaluation.marksAwarded / data.evaluation.totalMarks) * 200);
 
       const localXp = localStorage.getItem("edutrack_xp");
       const currentXp = localXp ? parseInt(localXp, 10) : 0;
@@ -158,33 +154,75 @@ export default function MockTestPage() {
             </div>
             <div>
               <h2 className="text-2xl font-black text-slate-900 dark:text-white">Configure Your Mock Exam</h2>
-              <p className="text-slate-500 dark:text-slate-455 text-xs font-bold leading-relaxed mt-1">10-minute short test. 3 board questions graded by Gemini.</p>
+              <p className="text-slate-500 dark:text-slate-455 text-xs font-bold leading-relaxed mt-1">Full-length and customized board papers generated by AI.</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 p-1.5 dark:bg-[#050812] bg-[#eef1f9] border border-white/5 rounded-2xl max-w-sm mx-auto">
-              {(["Science", "Mathematics"] as const).map(sub => (
-                <button
-                  key={sub}
-                  onClick={() => setSubject(sub)}
-                  className={`py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
-                    subject === sub
-                      ? "bg-indigo-600 text-white shadow-md"
-                      : "text-slate-500 dark:text-slate-400 hover:text-white bg-transparent"
-                  }`}
-                >
-                  {sub}
-                </button>
-              ))}
+            <div className="space-y-4 text-left">
+              <div>
+                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1 block">Subject</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(["Science", "Mathematics", "Social Science", "English"] as const).map(sub => (
+                    <button
+                      key={sub}
+                      onClick={() => setSubject(sub)}
+                      className={`py-2 rounded-xl text-xs font-bold transition-all ${
+                        subject === sub
+                          ? "bg-indigo-600 text-white shadow-md"
+                          : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
+                      }`}
+                    >
+                      {sub}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1 block">Difficulty</label>
+                  <select
+                    value={difficulty}
+                    onChange={(e) => setDifficulty(e.target.value as any)}
+                    className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  >
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1 block">Max Marks</label>
+                  <select
+                    value={maxMarks}
+                    onChange={(e) => setMaxMarks(parseInt(e.target.value, 10))}
+                    className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  >
+                    <option value={20}>20 Marks (Short Test)</option>
+                    <option value={40}>40 Marks (Half Paper)</option>
+                    <option value={80}>80 Marks (Full Board)</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1 block">Chapters (Optional, comma separated)</label>
+                <input
+                  type="text"
+                  value={chapters}
+                  onChange={(e) => setChapters(e.target.value)}
+                  placeholder="e.g. Life Processes, Light..."
+                  className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                />
+              </div>
             </div>
 
             <button
               onClick={handleStart}
-              className="group flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-650 text-white font-extrabold text-sm uppercase tracking-wider px-10 py-4.5 rounded-full hover:scale-105 transition-all shadow-xl shadow-indigo-500/20 border border-white/10 mx-auto"
+              disabled={isGenerating}
+              className="group flex w-full items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-650 text-white font-extrabold text-sm uppercase tracking-wider px-10 py-4 rounded-xl hover:scale-[1.02] transition-all shadow-xl shadow-indigo-500/20 disabled:opacity-70 disabled:pointer-events-none"
             >
-              Start Exam <Play className="w-4 h-4" />
+              {isGenerating ? <><Loader2 className="w-5 h-5 animate-spin" /> Generating Paper...</> : <><Play className="w-5 h-5" /> Start Exam</>}
             </button>
           </motion.div>
-        ) : testStarted && !scorecard ? (
+        ) : testStarted && !scorecard && paper ? (
           /* Active Exam Paper */
           <div className="space-y-6">
             <div className="bg-slate-950/80 border border-white/10 rounded-2xl p-5 flex items-center justify-between shadow-md">
@@ -198,20 +236,32 @@ export default function MockTestPage() {
               </div>
             </div>
 
+            <div className="bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 p-6 rounded-2xl text-center space-y-2">
+              <h2 className="text-xl font-black text-indigo-900 dark:text-indigo-300">{paper.title}</h2>
+              <p className="text-sm font-bold text-indigo-700 dark:text-indigo-400">{paper.grade} | {paper.maxMarks} Marks | {paper.durationHours} Hours</p>
+            </div>
+
             <div className="space-y-5">
-              {activeQuestions.map((q, idx) => (
-                <div key={q.id} className="bg-white/60 dark:bg-[#040612] bg-[#eef1f9] border border-slate-200/50 dark:border-white/5 p-6 rounded-[2rem] shadow-sm space-y-4">
+              {paper.questions.map((q: any) => (
+                <div key={q.num} className="bg-white/60 dark:bg-[#040612] bg-[#eef1f9] border border-slate-200/50 dark:border-white/5 p-6 rounded-[2rem] shadow-sm space-y-4">
                   <div className="flex justify-between items-start">
-                    <span className="text-xs font-black text-indigo-650 dark:text-indigo-455 uppercase tracking-widest bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/15">Question {idx + 1}</span>
-                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider bg-slate-100 dark:bg-white/5 px-2.5 py-1 rounded-full border border-slate-200/50 dark:border-white/5">{q.maxMarks} Marks</span>
+                    <span className="text-xs font-black text-indigo-650 dark:text-indigo-455 uppercase tracking-widest bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/15">Question {q.num} (Section {q.section})</span>
+                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider bg-slate-100 dark:bg-white/5 px-2.5 py-1 rounded-full border border-slate-200/50 dark:border-white/5">{q.marks} Marks</span>
                   </div>
                   <h3 className="text-lg font-black text-slate-900 dark:text-white leading-snug">{q.text}</h3>
+                  {q.options && q.options.length > 0 && (
+                    <div className="space-y-1.5 pl-2 pt-2">
+                      {q.options.map((opt: string, i: number) => (
+                        <p key={i} className="text-sm font-medium text-slate-700 dark:text-slate-300">{opt}</p>
+                      ))}
+                    </div>
+                  )}
                   <textarea
-                    rows={4}
-                    value={answers[q.id] || ""}
-                    onChange={(e) => handleAnswerChange(q.id, e.target.value)}
-                    placeholder="Write your explanation or step-by-step methodology here..."
-                    className="w-full dark:bg-[#050813] bg-[#eef1f9] border border-slate-200 dark:border-slate-800 focus:border-indigo-500 rounded-2xl p-4 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 placeholder:text-slate-500 text-slate-900 dark:text-slate-200"
+                    rows={q.marks > 2 ? 6 : 3}
+                    value={answers[q.num] || ""}
+                    onChange={(e) => handleAnswerChange(q.num, e.target.value)}
+                    placeholder={q.options ? "Type your selected option here (e.g. (a) or (b))" : "Write your explanation or step-by-step methodology here..."}
+                    className="w-full dark:bg-[#050813] bg-[#eef1f9] border border-slate-200 dark:border-slate-800 focus:border-indigo-500 rounded-2xl p-4 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 placeholder:text-slate-500 text-slate-900 dark:text-slate-200 mt-2"
                   />
                 </div>
               ))}
@@ -241,7 +291,7 @@ export default function MockTestPage() {
               </button>
             </div>
           </div>
-        ) : (
+        ) : scorecard ? (
           /* Scorecard / Report Card */
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
@@ -257,86 +307,75 @@ export default function MockTestPage() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-black dark:text-white text-slate-900">CBSE Mock Test Scorecard</h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1">AI Evaluator Graded Report Card</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1">{scorecard.verdict}</p>
                 </div>
                 
                 {/* Total Marks Gauge */}
                 <div className="text-4xl font-black dark:text-white text-slate-900 tracking-tight pt-2">
                   Total Score:{" "}
                   <span className="dark:text-emerald-400 text-emerald-700">
-                    {scorecard?.reduce((sum, item) => sum + item.marksGained, 0)}
+                    {scorecard.marksAwarded}
                   </span>
                   <span className="text-slate-600">
-                    /{scorecard?.reduce((sum, item) => sum + item.maxMarks, 0)}
+                    /{scorecard.totalMarks}
                   </span>
                 </div>
                 <p className="text-slate-500 text-xs font-bold leading-normal px-6">
-                  You gained a matching **+{Math.round((scorecard?.reduce((sum, item) => sum + item.marksGained, 0) / scorecard?.reduce((sum, item) => sum + item.maxMarks, 1)) * 200)} XP** addition to your profile!
+                  You gained a matching **+{Math.round((scorecard.marksAwarded / scorecard.totalMarks) * 200)} XP** addition to your profile!
                 </p>
+                
+                {/* Overall Remarks */}
+                <div className="mt-4 p-4 bg-white/5 border border-white/10 rounded-xl text-left">
+                  <h4 className="text-xs font-black text-indigo-400 uppercase tracking-widest mb-1">Overall Remarks</h4>
+                  <p className="text-sm font-medium text-slate-300">{scorecard.overallRemarks}</p>
+                </div>
               </div>
             </div>
 
             {/* Detailed Question Review Cards */}
             <div className="space-y-5">
-              {scorecard?.map((item, idx) => (
-                <div key={idx} className="bg-white/60 dark:bg-[#040612] bg-[#eef1f9] border border-slate-200/50 dark:border-white/5 p-6 rounded-[2rem] shadow-sm space-y-4 text-left">
-                  <div className="flex justify-between items-start border-b border-white/5 pb-3">
-                    <span className="text-xs font-black dark:text-indigo-400 text-indigo-700 uppercase tracking-widest">Question {idx + 1} Review</span>
-                    <span className="text-sm font-black dark:text-white text-slate-900">
-                      Score: <span className="dark:text-emerald-400 text-emerald-700">{item.marksGained}</span>/{item.maxMarks} Marks
-                    </span>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-500">Question Text</h4>
-                    <p className="text-sm font-extrabold text-slate-800 dark:text-slate-250 mt-1">{item.questionText}</p>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="bg-slate-950/40 dark:bg-black/35 border border-slate-200/10 dark:border-white/5 p-4 rounded-xl">
-                      <h4 className="text-[9px] font-black uppercase tracking-widest text-slate-550">Your Answer</h4>
-                      <p className="text-xs text-slate-350 mt-1 leading-relaxed italic">{item.studentAnswer || "(No answer provided)"}</p>
+              {scorecard.questionEvaluations?.map((item: any) => {
+                const qRef = paper?.questions?.find((q: any) => q.num === item.num);
+                return (
+                  <div key={item.num} className="bg-white/60 dark:bg-[#040612] bg-[#eef1f9] border border-slate-200/50 dark:border-white/5 p-6 rounded-[2rem] shadow-sm space-y-4 text-left">
+                    <div className="flex justify-between items-start border-b border-white/5 pb-3">
+                      <span className="text-xs font-black dark:text-indigo-400 text-indigo-700 uppercase tracking-widest">Question {item.num} Review</span>
+                      <span className="text-sm font-black dark:text-white text-slate-900">
+                        Score: <span className="dark:text-emerald-400 text-emerald-700">{item.marksAwarded}</span>/{item.marksMax} Marks
+                      </span>
                     </div>
-                    <div className="bg-emerald-500/[0.02] border border-emerald-500/10 p-4 rounded-xl">
-                      <h4 className="text-[9px] font-black uppercase tracking-widest dark:text-emerald-400 text-emerald-700">CBSE Baseline Reference</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{activeQuestions[idx].officialAnswer}</p>
-                    </div>
-                  </div>
-
-                  {/* Corrections & Feedback */}
-                  <div className="space-y-3 pt-2">
-                    {item.errors !== "None" && (
-                      <div className="flex items-start gap-3 bg-red-500/5 p-3.5 rounded-xl border border-red-500/10 text-xs">
-                        <ShieldAlert className="w-4.5 h-4.5 text-red-400 shrink-0 mt-0.5" />
-                        <div>
-                          <h5 className="font-black text-red-400 uppercase tracking-wider text-[9px] mb-1">Identified Errors & Gap Analyses</h5>
-                          <p className="text-slate-600 dark:text-slate-300 font-bold leading-normal">{item.errors}</p>
-                        </div>
+                    
+                    {qRef && (
+                      <div>
+                        <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-500">Question Text</h4>
+                        <p className="text-sm font-extrabold text-slate-800 dark:text-slate-250 mt-1">{qRef.text}</p>
                       </div>
                     )}
 
-                    {item.improvements && (
-                      <div className="flex items-start gap-3 bg-indigo-500/5 p-3.5 rounded-xl border border-indigo-500/10 text-xs">
-                        <Sparkles className="w-4.5 h-4.5 dark:text-indigo-400 text-indigo-700 shrink-0 mt-0.5" />
-                        <div>
-                          <h5 className="font-black dark:text-indigo-400 text-indigo-700 uppercase tracking-wider text-[9px] mb-1">Board-Pattern Layout Recommendations</h5>
-                          <p className="text-slate-600 dark:text-slate-300 font-bold leading-normal">{item.improvements}</p>
-                        </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="bg-slate-950/40 dark:bg-black/35 border border-slate-200/10 dark:border-white/5 p-4 rounded-xl">
+                        <h4 className="text-[9px] font-black uppercase tracking-widest text-slate-550">Your Answer</h4>
+                        <p className="text-xs text-slate-350 mt-1 leading-relaxed italic">{answers[item.num] || "(No answer provided)"}</p>
                       </div>
-                    )}
+                      <div className="bg-emerald-500/[0.02] border border-emerald-500/10 p-4 rounded-xl">
+                        <h4 className="text-[9px] font-black uppercase tracking-widest dark:text-emerald-400 text-emerald-700">CBSE Baseline Reference</h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{item.markingSchemeUsed || (qRef ? qRef.markingScheme : "")}</p>
+                      </div>
+                    </div>
 
-                    {item.feedback && (
+                    {/* Feedback */}
+                    <div className="space-y-3 pt-2">
                       <div className="flex items-start gap-3 bg-slate-100/50 dark:bg-white/5 p-3.5 rounded-xl border border-slate-200/50 dark:border-white/5 text-xs">
                         <CheckCircle className="w-4.5 h-4.5 dark:text-emerald-400 text-emerald-700 shrink-0 mt-0.5" />
                         <div>
-                          <h5 className="font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[9px] mb-1">AI Evaluator Feedback</h5>
+                          <h5 className="font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[9px] mb-1">Evaluator Feedback</h5>
                           <p className="text-slate-600 dark:text-slate-300 font-bold leading-normal">{item.feedback}</p>
                         </div>
                       </div>
-                    )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="flex justify-center pt-4">
@@ -344,6 +383,8 @@ export default function MockTestPage() {
                 onClick={() => {
                   setTestStarted(false);
                   setScorecard(null);
+                  setPaper(null);
+                  setAnswers({});
                 }}
                 className="group flex items-center justify-center gap-2.5 px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-650 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl hover:scale-105 transition-all shadow-xl border border-white/10"
               >
@@ -351,7 +392,7 @@ export default function MockTestPage() {
               </button>
             </div>
           </motion.div>
-        )}
+        ) : null}
       </main>
 
       <Confetti active={confettiActive} onComplete={() => setConfettiActive(false)} />

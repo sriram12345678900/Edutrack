@@ -12,6 +12,11 @@ import { awardXp } from "@/lib/xp";
 import { playArcadeSound } from "@/lib/arcadeAudio";
 import { cn } from "@/lib/utils";
 
+import { db } from "@/lib/firebase";
+import { doc, setDoc, onSnapshot, updateDoc, getDoc, runTransaction } from "firebase/firestore";
+import { useAuth } from "@/context/AuthContext";
+
+
 interface ArenaQuestion {
   id: number;
   question: string;
@@ -81,6 +86,7 @@ interface Competitor {
 }
 
 export default function ArenaPage() {
+  const { user } = useAuth();
   const [gameState, setGameState] = useState<"lobby" | "waiting" | "playing" | "results">("lobby");
   const [roomCode, setRoomCode] = useState<string>("");
   const [inputCode, setInputCode] = useState<string>("");
@@ -92,6 +98,7 @@ export default function ArenaPage() {
   const [userScore, setUserScore] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isHost, setIsHost] = useState(false);
 
   // Power-ups
   const [power5050Used, setPower5050Used] = useState(false);
@@ -99,68 +106,149 @@ export default function ArenaPage() {
   const [doubleScoreActive, setDoubleScoreActive] = useState(false);
 
   // Competitors Leaderboard
-  const [competitors, setCompetitors] = useState<Competitor[]>([
-    { id: "comp-user", name: "You (Champion)", avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Champion", countryFlag: "🇮🇳", score: 0, streak: 0, isUser: true },
-    { id: "comp-1", name: "Liam Miller", avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Liam", countryFlag: "🇺🇸", score: 0, streak: 0 },
-    { id: "comp-2", name: "Yuki Tanaka", avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Yuki", countryFlag: "🇯🇵", score: 0, streak: 0 },
-    { id: "comp-3", name: "Emma Watson", avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Emma", countryFlag: "🇬🇧", score: 0, streak: 0 },
-    { id: "comp-4", name: "Carlos Santos", avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Carlos", countryFlag: "🇧🇷", score: 0, streak: 0 }
-  ]);
+  const [competitors, setCompetitors] = useState<Competitor[]>([]);
 
-  const currentQuestion = ARENA_QUESTIONS[currentQIndex];
+  useEffect(() => {
+    if (!roomCode) return;
+    
+    const unsub = onSnapshot(doc(db, "arena_rooms", roomCode), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setGameState(data.status);
+        setCurrentQIndex(data.currentQIndex);
+        
+        // Timer sync
+        if (data.status === "playing" && data.questionStartTime) {
+          const elapsed = Math.floor((Date.now() - data.questionStartTime) / 1000);
+          const remaining = Math.max(0, 15 - elapsed);
+          setTimeLeft(remaining);
+        }
 
-  // Timer countdown
+        const players = data.players || {};
+        const comps = Object.values(players).map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          avatar: p.avatar,
+          countryFlag: p.countryFlag,
+          score: p.score,
+          streak: p.streak,
+          isUser: p.id === user?.uid
+        }));
+        
+        comps.sort((a: any, b: any) => b.score - a.score);
+        setCompetitors(comps);
+
+        const me = players[user?.uid || ""];
+        if (me) {
+          setUserScore(me.score);
+          setStreak(me.streak);
+        }
+      }
+    });
+
+    return () => unsub();
+  }, [roomCode, user]);
+  
   useEffect(() => {
     let timer: any;
     if (gameState === "playing" && !isAnswered && timeLeft > 0) {
       timer = setInterval(() => {
-        setTimeLeft(prev => prev - 1);
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+             clearInterval(timer);
+             return 0;
+          }
+          return prev - 1;
+        });
       }, 1000);
     } else if (timeLeft === 0 && !isAnswered && gameState === "playing") {
       handleTimeout();
     }
     return () => clearInterval(timer);
-  }, [gameState, isAnswered, timeLeft]);
+  }, [gameState, isAnswered, timeLeft, isHost]);
 
-  const handleCreateRoom = () => {
+  const currentQuestion = ARENA_QUESTIONS[currentQIndex];
+
+  const handleCreateRoom = async () => {
+    if (!user) return;
     const code = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    await setDoc(doc(db, "arena_rooms", code), {
+      status: "waiting",
+      currentQIndex: 0,
+      hostId: user.uid,
+      players: {
+        [user.uid]: {
+          id: user.uid,
+          name: user.displayName || "You (Host)",
+          avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=" + user.uid,
+          countryFlag: "🌍",
+          score: 0,
+          streak: 0
+        }
+      }
+    });
+
     setRoomCode(code);
-    setGameState("waiting");
+    setIsHost(true);
     playArcadeSound("game_start");
   };
 
-  const handleJoinRoom = (e: React.FormEvent) => {
+  const handleJoinRoom = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputCode.trim()) return;
-    setRoomCode(inputCode.trim());
-    setGameState("waiting");
-    playArcadeSound("game_start");
+    if (!inputCode.trim() || !user) return;
+    
+    const code = inputCode.trim();
+    const roomRef = doc(db, "arena_rooms", code);
+    const snap = await getDoc(roomRef);
+    
+    if (snap.exists()) {
+      await updateDoc(roomRef, {
+        [`players.${user.uid}`]: {
+          id: user.uid,
+          name: user.displayName || "Player",
+          avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=" + user.uid,
+          countryFlag: "🌍",
+          score: 0,
+          streak: 0
+        }
+      });
+      setRoomCode(code);
+      setIsHost(false);
+      playArcadeSound("game_start");
+    } else {
+      alert("Room not found");
+    }
   };
 
-  const handleStartBattle = () => {
-    setGameState("playing");
-    setCurrentQIndex(0);
-    setTimeLeft(15);
+  const handleStartBattle = async () => {
+    if (!isHost) return;
+    await updateDoc(doc(db, "arena_rooms", roomCode), {
+      status: "playing",
+      currentQIndex: 0,
+      questionStartTime: Date.now()
+    });
+    
+    // Reset local states
     setSelectedOption(null);
     setIsAnswered(false);
-    setStreak(0);
-    setUserScore(0);
     setPower5050Used(false);
     setDisabledOptions([]);
     setDoubleScoreActive(false);
     setShowConfetti(false);
-
-    // Reset competitors
-    setCompetitors(prev => prev.map(c => ({ ...c, score: 0, streak: 0 })));
   };
 
   const handleTimeout = () => {
     setIsAnswered(true);
     setStreak(0);
-    simulateOpponents(false);
+    if (user && roomCode) {
+        updateDoc(doc(db, "arena_rooms", roomCode), {
+          [`players.${user.uid}.streak`]: 0
+        });
+    }
   };
 
-  const handleSelectOption = (idx: number) => {
+  const handleSelectOption = async (idx: number) => {
     if (isAnswered || disabledOptions.includes(idx)) return;
     setSelectedOption(idx);
     setIsAnswered(true);
@@ -174,56 +262,57 @@ export default function ArenaPage() {
       const streakBonus = streak * 100;
       earned = currentQuestion.points + speedBonus + streakBonus;
       if (doubleScoreActive) earned *= 2;
-      setStreak(prev => prev + 1);
-      setUserScore(prev => prev + earned);
     } else {
       playArcadeSound("wrong");
-      setStreak(0);
     }
-
-    // Simulate competitor responses
-    simulateOpponents(isCorrect);
-  };
-
-  const simulateOpponents = (userWasCorrect: boolean) => {
-    setCompetitors(prev => {
-      return prev.map(c => {
-        if (c.isUser) {
-          return {
-            ...c,
-            score: userWasCorrect ? c.score + (currentQuestion.points + timeLeft * 40) : c.score,
-            streak: userWasCorrect ? c.streak + 1 : 0
-          };
+    
+    if (user && roomCode) {
+      const roomRef = doc(db, "arena_rooms", roomCode);
+      await runTransaction(db, async (transaction) => {
+        const sfDoc = await transaction.get(roomRef);
+        if (!sfDoc.exists()) return;
+        
+        const players = sfDoc.data().players;
+        const me = players[user.uid];
+        if (me) {
+           const newScore = me.score + earned;
+           const newStreak = isCorrect ? me.streak + 1 : 0;
+           transaction.update(roomRef, {
+             [`players.${user.uid}.score`]: newScore,
+             [`players.${user.uid}.streak`]: newStreak
+           });
         }
-        // AI rivals have 75% accuracy
-        const aiCorrect = Math.random() > 0.25;
-        const aiSpeed = Math.floor(Math.random() * 12) + 2;
-        const pts = aiCorrect ? currentQuestion.points + aiSpeed * 35 : 0;
-        return {
-          ...c,
-          score: c.score + pts,
-          streak: aiCorrect ? c.streak + 1 : 0
-        };
-      }).sort((a, b) => b.score - a.score);
-    });
+      });
+    }
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
+    if (!isHost) return;
     if (currentQIndex + 1 < ARENA_QUESTIONS.length) {
-      setCurrentQIndex(prev => prev + 1);
-      setTimeLeft(15);
+      await updateDoc(doc(db, "arena_rooms", roomCode), {
+        currentQIndex: currentQIndex + 1,
+        questionStartTime: Date.now()
+      });
+    } else {
+      await updateDoc(doc(db, "arena_rooms", roomCode), {
+        status: "results"
+      });
+    }
+  };
+  
+  useEffect(() => {
+    if (gameState === "playing") {
       setSelectedOption(null);
       setIsAnswered(false);
       setDisabledOptions([]);
       setDoubleScoreActive(false);
-    } else {
-      setGameState("results");
-      setShowConfetti(true);
-      playArcadeSound("game_win");
-      awardXp(150, "Quiz Battle Arena Victory");
     }
-  };
-
+    if (gameState === "results") {
+       setShowConfetti(true);
+       playArcadeSound("game_win");
+       awardXp(150, "Quiz Battle Arena Victory");
+    }
+  }, [currentQIndex, gameState]);
   // Powerup 1: 50-50
   const usePower5050 = () => {
     if (power5050Used || isAnswered) return;
@@ -367,7 +456,7 @@ export default function ArenaPage() {
 
             {/* Players Joined */}
             <div className="space-y-3 pt-4 border-t border-slate-800">
-              <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Combatants Ready in Lobby (5)</h3>
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Combatants Ready in Lobby ({competitors.length})</h3>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                 {competitors.map(c => (
                   <div key={c.id} className="p-3 bg-slate-950 rounded-2xl border border-slate-800 flex flex-col items-center gap-2">
@@ -385,13 +474,19 @@ export default function ArenaPage() {
               >
                 Leave Lobby
               </button>
-              <button
-                onClick={handleStartBattle}
-                className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-red-500 hover:from-amber-400 hover:to-red-400 text-white font-black text-sm shadow-xl shadow-amber-500/30 flex items-center gap-2"
-              >
-                <Play className="w-4 h-4 fill-white" />
-                Launch Battle!
-              </button>
+              {isHost ? (
+                <button
+                  onClick={handleStartBattle}
+                  className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-red-500 hover:from-amber-400 hover:to-red-400 text-white font-black text-sm shadow-xl shadow-amber-500/30 flex items-center gap-2"
+                >
+                  <Play className="w-4 h-4 fill-white" />
+                  Launch Battle!
+                </button>
+              ) : (
+                <div className="px-8 py-3.5 rounded-2xl bg-slate-800 text-slate-400 font-black text-sm flex items-center gap-2">
+                  Waiting for host...
+                </div>
+              )}
             </div>
           </motion.div>
         )}
@@ -502,12 +597,16 @@ export default function ArenaPage() {
                   <span className="text-xs text-slate-400">
                     💡 <strong>Hint:</strong> {currentQuestion.hint}
                   </span>
-                  <button
-                    onClick={handleNextQuestion}
-                    className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black flex items-center gap-1.5 shadow-lg shadow-indigo-600/30"
-                  >
-                    Next Question <ArrowRight className="w-4 h-4" />
-                  </button>
+                  {isHost ? (
+                    <button
+                      onClick={handleNextQuestion}
+                      className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black flex items-center gap-1.5 shadow-lg shadow-indigo-600/30"
+                    >
+                      Next Question <ArrowRight className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <div className="text-xs text-slate-400">Waiting for host...</div>
+                  )}
                 </div>
               )}
             </div>

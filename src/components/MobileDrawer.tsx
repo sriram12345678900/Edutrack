@@ -8,7 +8,7 @@ import {
   Home, BookOpen, GraduationCap, Compass, MessageSquare, Camera, Calendar, 
   Sparkles, Palette, Timer, Zap, Users, Award, Target, Trophy, Settings, 
   LogOut, X, Search, ChevronRight, Shield, Moon, Sun, CheckCircle2, User, Video, Gamepad2,
-  Globe, Mic, Radio, GitFork, Sliders, FileText, Brain
+  Globe, Mic, Radio, GitFork, Sliders, FileText, Brain, CheckSquare
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ADMIN_PORTAL_ROUTE } from "@/lib/admin";
@@ -61,6 +61,7 @@ const ALL_TOOLS: NavItem[] = [
   { href: "/tutor", label: "AI Tutor", description: "NCERT & Socratic AI Mentor", icon: MessageSquare, badge: "AI", color: "from-cyan-500 to-blue-600", category: "AI Study Lab" },
   { href: "/lens", label: "Doubt Lens", description: "Instant Camera Scanner", icon: Camera, badge: "Live", color: "from-emerald-500 to-teal-600", category: "AI Study Lab" },
   { href: "/plan", label: "Study Planner", description: "AI Timetable & Exam Prep", icon: Calendar, color: "from-blue-600 to-indigo-700", category: "AI Study Lab" },
+  { href: "/habits", label: "Habit Tracker", description: "Habit check grids & metrics", icon: CheckSquare, color: "from-indigo-600 to-purple-700", category: "AI Study Lab" },
   { href: "/flashcards", label: "AI Flashcards", description: "Active recall Leitner boxes", icon: Sparkles, color: "from-fuchsia-500 to-pink-600", category: "AI Study Lab" },
   { href: "/whiteboard", label: "Whiteboard", description: "Smart Pen & AI Solver Canvas", icon: Palette, color: "from-violet-500 to-purple-700", category: "AI Study Lab" },
   { href: "/pomodoro", label: "Pomodoro Timer", description: "Focus sessions & Forest growth", icon: Timer, color: "from-rose-500 to-red-600", category: "AI Study Lab" },
@@ -93,10 +94,10 @@ export default function MobileDrawer({
 
   const filteredTools = useMemo(() => {
     let tools = ALL_TOOLS.filter(item => {
+      if (userRole === "admin") return true; // Admin has access to all features
       if (item.href === "/teacher" && userRole !== "teacher") return false;
       if (item.href === "/classroom" && userRole === "teacher") return false;
       if (item.href === ADMIN_PORTAL_ROUTE && userRole !== "admin") return false;
-      if (userRole === "admin" && item.href !== ADMIN_PORTAL_ROUTE) return false;
       return true;
     });
 

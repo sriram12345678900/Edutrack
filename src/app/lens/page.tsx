@@ -4,12 +4,13 @@ import React, { useState, useEffect, useRef } from "react";
 import { 
   Home, Camera, Upload, Sparkles, MessageSquare, ArrowRight, 
   Zap, Bot, User, Check, Loader2, Mic, Volume2, 
-  VolumeX, FileText, Copy, X, Eye, HelpCircle, BookOpen, Compass, Crosshair
+  VolumeX, FileText, Copy, X, Eye, HelpCircle, BookOpen, Compass, Crosshair, Globe
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { SUPPORTED_LANGUAGES, getSpeechLanguageCode } from "@/lib/languages";
 
 interface SampleDoubt {
   id: string;
@@ -99,7 +100,7 @@ export default function LensPage() {
       const rec = new SpeechRecognition();
       rec.continuous = false;
       rec.interimResults = false;
-      rec.lang = userLanguage === "Hindi" ? "hi-IN" : "en-IN";
+      rec.lang = getSpeechLanguageCode(userLanguage);
 
       rec.onstart = () => setIsListening(true);
       rec.onend = () => setIsListening(false);
@@ -514,12 +515,54 @@ export default function LensPage() {
           </div>
         </div>
 
-        <Link href="/dashboard">
-          <button className="px-4.5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 dark:text-slate-300 text-slate-700 hover:dark:text-white text-slate-900 text-xs font-extrabold transition-all flex items-center gap-2 shadow-sm">
-            <Home className="w-4 h-4" />
-            Back to Dashboard
-          </button>
-        </Link>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 bg-black/40 border border-white/10 rounded-xl px-2.5 py-1 text-xs">
+            <Globe className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <select
+              value={userLanguage}
+              onChange={(e) => {
+                const newLang = e.target.value;
+                setUserLanguage(newLang);
+                localStorage.setItem("edutrack_language", newLang);
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new CustomEvent("edutrack_profile_updated", {
+                    detail: { language: newLang }
+                  }));
+                }
+              }}
+              className="bg-transparent dark:text-white text-slate-900 font-extrabold focus:outline-none cursor-pointer text-xs pr-1 max-w-[140px]"
+            >
+              <optgroup label="Standard" className="dark:bg-[#080b18] bg-[#eef1f9] text-emerald-400 font-bold">
+                {SUPPORTED_LANGUAGES.filter(l => l.category === "standard").map(l => (
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                    {l.label}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Conversational Blends (-ish)" className="dark:bg-[#080b18] bg-[#eef1f9] text-amber-400 font-bold">
+                {SUPPORTED_LANGUAGES.filter(l => l.category === "bilingual").map(l => (
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                    {l.label}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Regional Languages (Native)" className="dark:bg-[#080b18] bg-[#eef1f9] text-purple-400 font-bold">
+                {SUPPORTED_LANGUAGES.filter(l => l.category === "regional").map(l => (
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                    {l.label}
+                  </option>
+                ))}
+              </optgroup>
+            </select>
+          </div>
+
+          <Link href="/dashboard">
+            <button className="px-4.5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 dark:text-slate-300 text-slate-700 hover:dark:text-white text-slate-900 text-xs font-extrabold transition-all flex items-center gap-2 shadow-sm">
+              <Home className="w-4 h-4" />
+              Back to Dashboard
+            </button>
+          </Link>
+        </div>
       </header>
 
       {/* ── DOUBLE-COLUMN SCANNER WORKSPACE ── */}

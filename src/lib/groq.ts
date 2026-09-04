@@ -1,6 +1,7 @@
 import Groq from "groq-sdk";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { queryPythonServer } from "./python-ai";
+import { getLanguagePromptInstruction } from "./languages";
 
 export interface ChatMessage {
   role: string;
@@ -25,13 +26,8 @@ export async function getChatResponse(messages: ChatMessage[], languagePreferenc
   if (pythonRes && pythonRes.reply) {
     return pythonRes.reply;
   }
-  const isIshLanguage = languagePreference.endsWith("ish") && languagePreference !== "English";
   
-  const languageInstruction = isIshLanguage
-    ? `Respond in ${languagePreference}. You MUST strictly use the English alphabet (Roman script) to write words. DO NOT use native scripts (like Devanagari, Telugu, Tamil, etc.). Example: 'Science chala interesting subject. Dintlo manam atoms gurinchi chaduvutham.' Keep technical terms in English.`
-    : languagePreference === "English"
-    ? "Respond strictly in clear, simple English."
-    : `Respond in ${languagePreference} language. Keep technical/mathematical/scientific terms in English but explain everything else in ${languagePreference}.`;
+  const languageInstruction = getLanguagePromptInstruction(languagePreference);
 
   const systemContent = `You are EduTrack AI, a friendly personal tutor for Indian students in Class 6-10 following NCERT/CBSE curriculum.
 ${bookInfo ? `\n\n--- CURRENT BOOK INFO ---\nThe student is currently studying: **${bookInfo}**.\nBase your answers entirely on this subject and chapter.\n--- END BOOK INFO ---\n` : ""}

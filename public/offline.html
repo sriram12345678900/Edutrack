@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTrack - Offline</title>
+    <style>
+        :root {
+            --primary: #f59e0b;
+            --bg: #070b13;
+            --text: #f1f5f9;
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-sizing: border-box;
+        }
+        h1 { margin-top: 0; color: var(--primary); }
+        button {
+            background-color: var(--primary);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+        button:hover { transform: scale(1.05); }
+        .game-area {
+            margin-top: 40px;
+            padding: 30px 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+        }
+        #target {
+            width: 100px;
+            height: 100px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            margin: 20px auto;
+            cursor: pointer;
+            display: none;
+            transition: background-color 0.1s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>You are offline</h1>
+        <p>You are offline, but you can still access local reviews.</p>
+        <button onclick="window.location.reload()">Try Reconnecting</button>
+
+        <div class="game-area">
+            <h2>Offline Mini-Game: Reaction Tester</h2>
+            <p id="game-status">Click "Start" and wait for the circle to turn green!</p>
+            <button id="start-btn" onclick="startGame()">Start Game</button>
+            <div id="target" onclick="hitTarget()"></div>
+            <h3 id="result"></h3>
+        </div>
+    </div>
+
+    <script>
+        let startTime;
+        let timeout;
+        const target = document.getElementById('target');
+        const status = document.getElementById('game-status');
+        const startBtn = document.getElementById('start-btn');
+        const result = document.getElementById('result');
+
+        function startGame() {
+            startBtn.style.display = 'none';
+            result.innerText = '';
+            target.style.display = 'block';
+            target.style.backgroundColor = '#ef4444'; // Red
+            status.innerText = 'Wait for green...';
+            
+            const delay = Math.random() * 3000 + 1000;
+            timeout = setTimeout(() => {
+                target.style.backgroundColor = '#22c55e'; // Green
+                startTime = Date.now();
+                status.innerText = 'CLICK NOW!';
+            }, delay);
+        }
+
+        function hitTarget() {
+            if (target.style.backgroundColor === 'rgb(239, 68, 68)' || target.style.backgroundColor === '#ef4444') {
+                clearTimeout(timeout);
+                status.innerText = 'Too early! You clicked before it turned green.';
+                resetGame();
+            } else {
+                const reactionTime = Date.now() - startTime;
+                result.innerText = `Your reaction time: ${reactionTime} ms!`;
+                status.innerText = 'Good job!';
+                resetGame();
+            }
+        }
+
+        function resetGame() {
+            target.style.display = 'none';
+            startBtn.style.display = 'inline-block';
+            startBtn.innerText = 'Play Again';
+        }
+    </script>
+</body>
+</html>

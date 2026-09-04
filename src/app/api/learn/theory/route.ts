@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import OpenAI from "openai";
 import { queryPythonServer } from "@/lib/python-ai";
+import { getLanguagePromptInstruction } from "@/lib/languages";
 
 export async function POST(req: Request) {
   let subject = "Science";
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
     chapter = body.chapter || "NCERT Topic";
     const language = body.language || "Hinglish";
     const chemFormattingInstruction = "Please format chemical formulas using standard subscripts and superscripts in markdown where appropriate.";
-    const langInstruction = `Please write the content entirely in ${language}.`;
+    const langInstruction = getLanguagePromptInstruction(language);
 
     const forceLocal = process.env.USE_LOCAL_AI === "true";
     const apiKey = process.env.GEMINI_API_KEY_SUMMARY || process.env.GEMINI_API_KEY;

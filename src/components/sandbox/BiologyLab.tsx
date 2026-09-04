@@ -204,6 +204,39 @@ const NEPHRON_HOTSPOTS: HotspotInfo[] = [
   }
 ];
 
+
+const QUIZ_QUESTIONS = [
+  {
+    question: "Which of the following describes the role of the Sinoatrial (SA) Node in the human heart?",
+    options: ["Filters blood in the right atrium", "Generates rhythmic electrical action potentials", "Prevents backflow from ventricles", "Pumps oxygenated blood to the body"],
+    correctAnswer: 1,
+    explanation: "The SA Node, located in the right atrium, generates rhythmic electrical action potentials (approx 72/min) and acts as the heart's natural pacemaker."
+  },
+  {
+    question: "In the Nephron, where does the majority of selective reabsorption (100% of glucose and most water/salts) take place?",
+    options: ["Bowman's Capsule", "Distal Convoluted Tubule (DCT)", "Proximal Convoluted Tubule (PCT)", "Loop of Henle"],
+    correctAnswer: 2,
+    explanation: "The PCT is lined with microvilli to maximize surface area, actively reabsorbing 100% of glucose and amino acids, plus a majority of water and salts."
+  },
+  {
+    question: "What regulates the opening and closing of stomatal pores in leaves?",
+    options: ["The concentration of chlorophyll", "Turgor pressure inside the guard cells", "The thickness of the cell wall", "Transpiration pull from the xylem"],
+    correctAnswer: 1,
+    explanation: "When guard cells take up water and become turgid, the stoma opens. When they lose water and become flaccid, the stoma closes."
+  },
+  {
+    question: "During the starch test on a leaf, what color change occurs when iodine solution is added to regions where starch is present?",
+    options: ["It turns bright red", "It becomes completely transparent", "It changes to a blue-black color", "It remains brown"],
+    correctAnswer: 2,
+    explanation: "Iodine reacts with the complex carbohydrate structure of starch to form a deep blue-black colored complex."
+  },
+  {
+    question: "Why is the muscle wall of the left ventricle significantly thicker than that of the right ventricle?",
+    options: ["It holds a larger volume of blood", "It must pump blood to the entire systemic circulation at high pressure", "It contains more pacemaker cells", "It needs to push blood only to the lungs"],
+    correctAnswer: 1,
+    explanation: "The left ventricle pumps blood against high systemic vascular resistance to the entire body, whereas the right ventricle only pumps to the nearby lungs."
+  }
+];
 export default function BiologyLab() {
   const [lab, setLab] = useState<LabSpecimen>("heart");
   const [activeHotspot, setActiveHotspot] = useState<HotspotInfo>(HEART_HOTSPOTS[0]);
@@ -250,6 +283,52 @@ export default function BiologyLab() {
   const [quizScore, setQuizScore] = useState<number>(0);
   const [confettiActive, setConfettiActive] = useState<boolean>(false);
 
+  // AI Lab Report
+  const [isGeneratingReport, setIsGeneratingReport] = useState<boolean>(false);
+  const [aiReportContent, setAiReportContent] = useState<string | null>(null);
+
+  // Quiz Additions
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+  const [quizCompleted, setQuizCompleted] = useState<boolean>(false);
+  const [quizAnswers, setQuizAnswers] = useState<boolean[]>([]);
+
+  const generateLabReport = async () => {
+    setIsGeneratingReport(true);
+    try {
+      const settings = {
+        lab,
+        heartBpm,
+        bloodPressure,
+        focusKnob,
+        lightLux,
+        co2Ppm,
+        starchTestBoiled,
+        starchTestIodineAdded
+      };
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [{
+            role: "user",
+            content: `You are an expert biology lab assistant. Generate a structured, highly professional, scientific lab report for the virtual "${lab}" lab based on these current live settings: ${JSON.stringify(settings)}. Include sections for Observation, Inference, and Conclusion. Format entirely in Markdown. Keep it concise but detailed.`
+          }]
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAiReportContent(data.reply || "No report generated.");
+      } else {
+        setAiReportContent("Failed to generate report.");
+      }
+    } catch (e) {
+      setAiReportContent("Error generating report. Please try again.");
+    } finally {
+      setIsGeneratingReport(false);
+    }
+  };
+
+  
   const audioCtxRef = useRef<AudioContext | null>(null);
 
   // ─────────────────────────────────────────────────────────────
@@ -554,6 +633,60 @@ export default function BiologyLab() {
   return (
     <div className="space-y-6">
       <Confetti active={confettiActive} />
+      {/* AI Lab Report Modal */}
+      <AnimatePresence>
+        {aiReportContent && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ y: 20, scale: 0.95 }}
+              animate={{ y: 0, scale: 1 }}
+              exit={{ y: 20, scale: 0.95 }}
+              className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+            >
+              <div className="p-4 border-b border-white/10 flex items-center justify-between bg-slate-950/50">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30">
+                    <span className="text-lg">📋</span>
+                  </div>
+                  <h3 className="font-black text-white text-lg">AI Generated Lab Report</h3>
+                </div>
+                <button
+                  onClick={() => setAiReportContent(null)}
+                  className="p-2 text-slate-400 hover:text-white transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="p-6 overflow-y-auto flex-1 prose prose-invert max-w-none text-sm">
+                <div style={{ whiteSpace: "pre-wrap" }} className="text-slate-300">{aiReportContent}</div>
+              </div>
+              <div className="p-4 border-t border-white/10 bg-slate-950/50 flex justify-end gap-3">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(aiReportContent);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-xs hover:bg-white/10 transition-colors"
+                >
+                  Copy to Clipboard
+                </button>
+                <button
+                  onClick={() => setAiReportContent(null)}
+                  className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 transition-colors"
+                >
+                  Close Report
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
 
       {/* Top Banner & Mode Selector */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl">
@@ -844,6 +977,14 @@ export default function BiologyLab() {
 
           {/* Right: Physiological & CBSE Board Inspector (5 cols) */}
           <div className="lg:col-span-5 space-y-4">
+            <button
+              onClick={generateLabReport}
+              disabled={isGeneratingReport}
+              className="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-600/50 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2"
+            >
+              {isGeneratingReport ? <RotateCcw className="w-4 h-4 animate-spin" /> : "📋 Generate AI Lab Report"}
+            </button>
+
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeHotspot.id}
@@ -1147,6 +1288,14 @@ export default function BiologyLab() {
           </div>
 
           <div className="lg:col-span-5 space-y-4">
+            <button
+              onClick={generateLabReport}
+              disabled={isGeneratingReport}
+              className="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-600/50 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2"
+            >
+              {isGeneratingReport ? <RotateCcw className="w-4 h-4 animate-spin" /> : "📋 Generate AI Lab Report"}
+            </button>
+
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeHotspot.id}
@@ -1385,6 +1534,14 @@ export default function BiologyLab() {
           </div>
 
           <div className="lg:col-span-5 space-y-4">
+            <button
+              onClick={generateLabReport}
+              disabled={isGeneratingReport}
+              className="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-600/50 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2"
+            >
+              {isGeneratingReport ? <RotateCcw className="w-4 h-4 animate-spin" /> : "📋 Generate AI Lab Report"}
+            </button>
+
             {selectedOrganelle && getOrganelleDetails(cellType, selectedOrganelle) ? (
               // Selected Organelle Details
               (() => {
@@ -1680,6 +1837,14 @@ export default function BiologyLab() {
           </div>
 
           <div className="lg:col-span-5 space-y-4">
+            <button
+              onClick={generateLabReport}
+              disabled={isGeneratingReport}
+              className="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-600/50 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2"
+            >
+              {isGeneratingReport ? <RotateCcw className="w-4 h-4 animate-spin" /> : "📋 Generate AI Lab Report"}
+            </button>
+
             <div className="p-6 rounded-3xl bg-slate-900 border border-white/10 shadow-2xl space-y-5">
               <div className="border-b border-white/10 pb-4">
                 <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -1921,6 +2086,14 @@ export default function BiologyLab() {
 
           {/* Controls Column (5 Cols) */}
           <div className="lg:col-span-5 space-y-4">
+            <button
+              onClick={generateLabReport}
+              disabled={isGeneratingReport}
+              className="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-600/50 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2"
+            >
+              {isGeneratingReport ? <RotateCcw className="w-4 h-4 animate-spin" /> : "📋 Generate AI Lab Report"}
+            </button>
+
             
             <div className="p-6 rounded-3xl dark:bg-slate-900 bg-white border dark:border-white/10 border-slate-200 shadow-2xl space-y-5">
               <div className="border-b dark:border-white/10 border-slate-200 pb-3">
@@ -2043,23 +2216,94 @@ export default function BiologyLab() {
       {/* ───────────────────────────────────────────────────────────── */}
       {/*  BIOLOGY DIAGRAM MASTERY & ACTIVE RECALL CHALLENGE             */}
       {/* ───────────────────────────────────────────────────────────── */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-950/40 via-teal-950/30 to-indigo-950/40 border border-emerald-500/30 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-2xl">
-            🏆
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-950/40 via-teal-950/30 to-indigo-950/40 border border-emerald-500/30 shadow-xl flex flex-col gap-4">
+        {!quizActive && !quizCompleted ? (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-2xl">
+                🏆
+              </div>
+              <div>
+                <h3 className="text-base font-black text-white">Class 10 Biology 5-Mark Mastery Challenge</h3>
+                <p className="text-xs text-slate-400">Complete the quick diagram identification to claim +50 XP!</p>
+              </div>
+            </div>
+            <button
+              onClick={() => { setQuizActive(true); setCurrentQuestionIndex(0); setQuizAnswers([]); setQuizScore(0); }}
+              className="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2 shrink-0"
+            >
+              <Sparkles className="w-4 h-4" /> Start Challenge
+            </button>
           </div>
-          <div>
-            <h3 className="text-base font-black text-white">Class 10 Biology 5-Mark Mastery Challenge</h3>
-            <p className="text-xs text-slate-400">Complete the quick diagram identification to claim +50 XP!</p>
+        ) : quizActive && !quizCompleted ? (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-black text-white">
+                Question {currentQuestionIndex + 1} of {QUIZ_QUESTIONS.length}
+              </h3>
+              <span className="text-xs font-bold text-slate-400">Score: {quizScore}</span>
+            </div>
+            <p className="text-sm text-slate-200 font-medium">{QUIZ_QUESTIONS[currentQuestionIndex].question}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {QUIZ_QUESTIONS[currentQuestionIndex].options.map((opt, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    const isCorrect = idx === QUIZ_QUESTIONS[currentQuestionIndex].correctAnswer;
+                    if (isCorrect) setQuizScore(prev => prev + 1);
+                    setQuizAnswers(prev => [...prev, isCorrect]);
+                    
+                    if (currentQuestionIndex < QUIZ_QUESTIONS.length - 1) {
+                      setCurrentQuestionIndex(prev => prev + 1);
+                    } else {
+                      setQuizCompleted(true);
+                      setQuizActive(false);
+                      awardUserXP(50);
+                      setConfettiActive(true);
+                      setTimeout(() => setConfettiActive(false), 3000);
+                    }
+                  }}
+                  className="p-3 text-left rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs text-slate-300 transition-colors"
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-
-        <button
-          onClick={handleClaimQuiz}
-          className="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2 shrink-0"
-        >
-          <Sparkles className="w-4 h-4" /> Claim Mastery (+50 XP)
-        </button>
+        ) : (
+          <div className="space-y-4 w-full">
+            <div className="flex items-center gap-4 border-b border-white/10 pb-4">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-2xl shrink-0">
+                🎉
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-white">Challenge Completed!</h3>
+                <p className="text-sm text-slate-400">You scored {quizScore} / {QUIZ_QUESTIONS.length}. <span className="text-emerald-400 font-bold">+50 XP Awarded!</span></p>
+              </div>
+            </div>
+            <div className="space-y-3 mt-4 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
+              <h4 className="text-sm font-bold text-white mb-2 sticky top-0 bg-slate-950 py-1">Review your answers:</h4>
+              {QUIZ_QUESTIONS.map((q, idx) => (
+                <div key={idx} className="p-4 rounded-xl bg-white/5 border border-white/10 text-xs space-y-2">
+                  <p className="font-bold text-slate-200 mb-1">{idx + 1}. {q.question}</p>
+                  <p className="text-slate-400 mb-1">
+                    Correct Answer: <span className="text-emerald-400 font-bold">{q.options[q.correctAnswer]}</span>
+                  </p>
+                  <p className="text-slate-500 italic border-l-2 border-emerald-500/50 pl-2">{q.explanation}</p>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => {
+                setQuizCompleted(false);
+                setQuizActive(false);
+              }}
+              className="mt-4 px-6 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all"
+            >
+              Close Review
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ export default function FlashcardsHub() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"recent" | "mastery" | "name">("recent");
+  const [sortBy, setSortBy] = useState<"recent" | "mastery" | "name" | "due">("recent");
 
   // Form State
   const [topic, setTopic] = useState("");
@@ -21,6 +21,10 @@ export default function FlashcardsHub() {
   const [sourceText, setSourceText] = useState("");
 
   const [boxCounts, setBoxCounts] = useState<number[]>([0, 0, 0, 0, 0]);
+
+  const cardsDueToday = decks.reduce((total, deck) => {
+    return total + deck.cards.filter(c => !c.nextReviewDate || c.nextReviewDate <= Date.now()).length;
+  }, 0);
 
   useEffect(() => {
     setDecks(getDecks());
@@ -111,6 +115,11 @@ export default function FlashcardsHub() {
         const pb = b.cards.filter(c => c.status === "mastered").length / b.cards.length;
         return pb - pa;
       }
+      if (sortBy === "due") {
+        const dueA = a.cards.filter(c => !c.nextReviewDate || c.nextReviewDate <= Date.now()).length;
+        const dueB = b.cards.filter(c => !c.nextReviewDate || c.nextReviewDate <= Date.now()).length;
+        return dueB - dueA;
+      }
       return a.title.localeCompare(b.title);
     });
 
@@ -155,6 +164,21 @@ export default function FlashcardsHub() {
           </button>
         </div>
       </header>
+
+      {/* ── DUE CARDS BANNER ── */}
+      {cardsDueToday > 0 && (
+        <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-[2rem] p-6 text-white shadow-lg flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="bg-white/20 p-3 rounded-2xl">
+              <Clock className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold">Time to Review!</h2>
+              <p className="text-white/80 text-sm font-medium">You have {cardsDueToday} card{cardsDueToday !== 1 ? 's' : ''} due for review today.</p>
+            </div>
+          </div>
+        </div>
+      )}
 
           {/* ✨ BENTO BOX DASHBOARD ✨ */}
       {decks.length > 0 && (
@@ -252,15 +276,15 @@ export default function FlashcardsHub() {
               className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 text-slate-900 dark:text-white"
             />
           </div>
-          <div className="flex gap-2">
-            {(["recent", "mastery", "name"] as const).map(s => (
+          <div className="flex flex-wrap gap-2">
+            {(["recent", "mastery", "name", "due"] as const).map(s => (
               <button key={s} onClick={() => setSortBy(s)}
                 className={`px-4 py-2 rounded-xl text-sm font-bold capitalize transition-all ${
                   sortBy === s
                     ? "bg-fuchsia-600 text-white shadow-md"
                     : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-fuchsia-400"
                 }`}>
-                {s === "recent" ? "⏱ Recent" : s === "mastery" ? " Mastery" : " A–Z"}
+                {s === "recent" ? "⏱ Recent" : s === "mastery" ? " Mastery" : s === "due" ? "⏳ Due" : " A–Z"}
               </button>
             ))}
           </div>

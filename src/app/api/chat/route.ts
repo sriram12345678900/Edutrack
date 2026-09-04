@@ -48,10 +48,11 @@ export async function POST(req: Request) {
 
     // 1. Try Local LLM (Ollama / LM Studio / Python Server) First
     const { queryLocalLLM } = await import("@/lib/local-llm");
+    const { getLanguagePromptInstruction } = await import("@/lib/languages");
     const localLLMResponse = await queryLocalLLM([
       {
         role: "system",
-        content: `You are EduTrack AI, an expert personal tutor for Indian CBSE Class 6-10 students.${bookInfo ? `\nThe student is currently studying: ${bookInfo}. Base your answers directly on this NCERT curriculum and chapter.` : ""}\nReply in ${language || "English"} with clear step-by-step points, proper mathematical identities or chemical formulas, and key NCERT terms.`
+        content: `You are EduTrack AI, an expert personal tutor for Indian CBSE Class 6-10 students.${bookInfo ? `\nThe student is currently studying: ${bookInfo}. Base your answers directly on this NCERT curriculum and chapter.` : ""}\n${getLanguagePromptInstruction(language || "English")}\nUse clear step-by-step points, proper mathematical identities or chemical formulas, and key NCERT terms.`
       },
       ...messages.map((m: any) => ({
         role: (m.role === "assistant" ? "assistant" : "user") as "assistant" | "user",

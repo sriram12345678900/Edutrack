@@ -194,7 +194,7 @@ export default function VivaPage() {
     }
   };
 
-  const handleEvaluateAnswer = () => {
+  const handleEvaluateAnswer = async () => {
     if (isListening && recognitionRef.current) {
       recognitionRef.current.stop();
       setIsListening(false);
@@ -207,7 +207,40 @@ export default function VivaPage() {
 
     setIsEvaluating(true);
 
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/viva/evaluate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: currentQuestion.question,
+          expectedAnswer: currentQuestion.idealAnswerSummary,
+          studentTranscript: transcript,
+          topic: selectedTopic
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('API failed');
+      }
+
+      const data = await response.json();
+      
+      const newEval = {
+        questionId: currentQuestion.id,
+        score: data.score,
+        feedback: data.feedback,
+        detectedKeywords: data.strengths || [],
+        missingKeywords: data.missedConcepts || []
+      };
+
+      setEvaluations(prev => [...prev, newEval]);
+      setIsEvaluating(false);
+
+      // Voice examiner verdict
+      speakText(`Thank you. You scored ${data.score} out of 10. ${data.feedback}`);
+    } catch (error) {
+      console.warn("AI evaluation failed, falling back to local evaluation", error);
+      
       const lowerTranscript = transcript.toLowerCase();
       const detected = currentQuestion.expectedKeywords.filter(k => 
         lowerTranscript.includes(k.toLowerCase()) || 
@@ -240,7 +273,7 @@ export default function VivaPage() {
 
       // Voice examiner verdict
       speakText(`Thank you. You scored ${calculatedScore} out of 10. ${evalFeedback}`);
-    }, 1000);
+    }
   };
 
   const handleNextQuestion = () => {

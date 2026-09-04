@@ -5,8 +5,11 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Bot, X, Send, Sparkles, Map, MessageSquare, 
-  ChevronRight, Play, Loader2
+  ChevronRight, Play, Loader2, Volume2, VolumeX
 } from "lucide-react";
+import Link from "next/link";
+import { useProfileStore } from "@/store/useProfileStore";
+import { getSpeechLanguageCode } from "@/lib/languages";
 
 interface GuideMessage {
   role: "user" | "assistant";
@@ -20,7 +23,9 @@ export default function InteractiveAiGuide() {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
-  
+  const [activeSpeakingIdx, setActiveSpeakingIdx] = useState<number | null>(null);
+
+  const { userLanguage } = useProfileStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll chat
@@ -53,6 +58,53 @@ export default function InteractiveAiGuide() {
     }
   }, [pathname, isOpen]);
 
+  // Speech cancel hooks
+  useEffect(() => {
+    return () => {
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      setActiveSpeakingIdx(null);
+    }
+  }, [pathname, isOpen]);
+
+  const speakMessage = (text: string, index: number) => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
+
+    if (activeSpeakingIdx === index) {
+      window.speechSynthesis.cancel();
+      setActiveSpeakingIdx(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    // Clean text of markdown formatting before speaking
+    const cleanedText = text
+      .replace(/\*\*([^*]+)\*\*/g, "$1") // Remove bold formatting
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1"); // Remove markdown links, keep labels
+
+    const utterance = new SpeechSynthesisUtterance(cleanedText);
+    const speechCode = getSpeechLanguageCode(userLanguage);
+    utterance.lang = speechCode;
+
+    utterance.onend = () => {
+      setActiveSpeakingIdx(null);
+    };
+    utterance.onerror = () => {
+      setActiveSpeakingIdx(null);
+    };
+
+    setActiveSpeakingIdx(index);
+    window.speechSynthesis.speak(utterance);
+  };
+
   const handleOpenTour = () => {
     if (typeof window !== "undefined") {
       window.dispatchEvent(new CustomEvent("edutrack_open_feature_tour", { detail: { stepIndex: 0 } }));
@@ -75,7 +127,8 @@ export default function InteractiveAiGuide() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: newMessages,
-          pathname
+          pathname,
+          language: userLanguage
         })
       });
       const data = await res.json();
@@ -90,6 +143,64 @@ export default function InteractiveAiGuide() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const parseSparkyMessage = (text: string) => {
+    const parts = [];
+    let currentIdx = 0;
+    const tokenRegex = /(\*\*([^*]+)\*\*|\[([^\]]+)\]\(([^)]+)\))/g;
+    let match;
+
+    while ((match = tokenRegex.exec(text)) !== null) {
+      const matchIdx = match.index;
+      if (matchIdx > currentIdx) {
+        parts.push(text.substring(currentIdx, matchIdx));
+      }
+
+      if (match[2]) {
+        // Bold formatting
+        parts.push(
+          <strong key={matchIdx} className="font-extrabold text-indigo-600 dark:text-indigo-400">
+            {match[2]}
+          </strong>
+        );
+      } else if (match[3] && match[4]) {
+        // Markdown Link
+        const label = match[3];
+        const href = match[4];
+        
+        if (href.startsWith("/")) {
+          parts.push(
+            <Link 
+              key={matchIdx} 
+              href={href} 
+              className="text-indigo-600 dark:text-indigo-400 font-bold underline hover:text-indigo-500 transition-colors mx-0.5 inline-block"
+            >
+              {label}
+            </Link>
+          );
+        } else {
+          parts.push(
+            <a 
+              key={matchIdx} 
+              href={href} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-indigo-600 dark:text-indigo-400 font-bold underline hover:text-indigo-500 transition-colors mx-0.5 inline-block"
+            >
+              {label}
+            </a>
+          );
+        }
+      }
+      currentIdx = tokenRegex.lastIndex;
+    }
+
+    if (currentIdx < text.length) {
+      parts.push(text.substring(currentIdx));
+    }
+
+    return parts.length > 0 ? parts : text;
   };
 
   // Quick Action Prompts based on pathname
@@ -152,13 +263,30 @@ export default function InteractiveAiGuide() {
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
               {messages.map((m, idx) => (
-                <div key={idx} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm ${
-                    m.role === "user" 
-                      ? "bg-indigo-600 text-white rounded-br-sm" 
-                      : "bg-slate-100 dark:bg-white/5 text-slate-800 dark:text-slate-200 rounded-bl-sm border border-slate-200 dark:border-white/10"
-                  }`}>
-                    {m.content}
+                <div key={idx} className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}>
+                  <div className="flex items-center gap-2 max-w-[85%] group">
+                    <div className={`rounded-2xl px-3.5 py-2.5 text-sm ${
+                      m.role === "user" 
+                        ? "bg-indigo-600 text-white rounded-br-sm" 
+                        : "bg-slate-100 dark:bg-white/5 text-slate-800 dark:text-slate-200 rounded-bl-sm border border-slate-200 dark:border-white/10"
+                    }`}>
+                      <div className="whitespace-pre-line leading-relaxed">
+                        {m.role === "assistant" ? parseSparkyMessage(m.content) : m.content}
+                      </div>
+                    </div>
+                    {m.role === "assistant" && (
+                      <button
+                        onClick={() => speakMessage(m.content, idx)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 shrink-0"
+                        title={activeSpeakingIdx === idx ? "Stop speaking" : "Speak message"}
+                      >
+                        {activeSpeakingIdx === idx ? (
+                          <VolumeX className="w-3.5 h-3.5 text-indigo-500" />
+                        ) : (
+                          <Volume2 className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

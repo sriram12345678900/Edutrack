@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import Confetti from "./Confetti";
 import { useAuth } from "@/context/AuthContext";
+import { SUPPORTED_LANGUAGES } from "@/lib/languages";
 
 interface AppTourProps {
   forcedOpen?: boolean;
@@ -376,24 +377,24 @@ export default function AppTour({ forcedOpen, onClose, initialStep = 0 }: AppTou
 
                   {/* Study Language */}
                   <div className="space-y-3">
-                    <label className="block text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                      <Globe className="w-4 h-4 text-indigo-400" /> Default AI Explanation Language
+                    <label className="block text-xs font-black uppercase tracking-wider text-slate-300 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5"><Globe className="w-4 h-4 text-indigo-400" /> Default AI Explanation Language</span>
+                      <span className="text-[10px] text-indigo-300 font-normal">24 Regional & Blended Options</span>
                     </label>
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                      {[
-                        "English", "Hinglish", "Telugu", "Telgish", "Tamil", "Tanglish", "Hindi", "Marathi"
-                      ].map((lang) => (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[160px] overflow-y-auto pr-1 custom-scrollbar">
+                      {SUPPORTED_LANGUAGES.map((lang) => (
                         <button
-                          key={lang}
+                          key={lang.code}
                           type="button"
-                          onClick={() => setLanguage(lang)}
-                          className={`py-2 px-3 rounded-xl border font-bold text-xs transition-all text-center ${
-                            language === lang
-                              ? "bg-indigo-500/20 border-indigo-400 text-indigo-300"
-                              : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white"
+                          onClick={() => setLanguage(lang.code)}
+                          className={`py-2 px-2.5 rounded-xl border text-left transition-all flex flex-col gap-0.5 ${
+                            language === lang.code
+                              ? "bg-indigo-500/25 border-indigo-400 text-white shadow-md shadow-indigo-500/20"
+                              : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white"
                           }`}
                         >
-                          {lang}
+                          <span className="text-xs font-bold leading-tight">{lang.code}</span>
+                          <span className="text-[10px] text-slate-400 truncate">{lang.nativeName}</span>
                         </button>
                       ))}
                     </div>

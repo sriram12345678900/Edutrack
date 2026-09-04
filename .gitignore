@@ -57,3 +57,16 @@ recovered.json
 startDrawing_matches.json
 views.json
 antigravity.json
+
+# Presentation & helper scripts
+*.ps1
+temp_pptx/
+read_pptx.py
+rewrite_arena.*
+edit_biolab.js
+update_page.js
+slide7_elements.txt
+slides_clean.txt
+slides_extracted.txt
+Submission/*.txt
+

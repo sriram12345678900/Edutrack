@@ -1,24 +1,33 @@
-import { Sparkles, Flame } from "lucide-react";
+import { Sparkles, Flame, Globe } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { getLanguageConfig } from "@/lib/languages";
 
 export function DashboardHeader({ firstName, userClass, userLanguage, streak, itemVariants }: any) {
+  const langConfig = getLanguageConfig(userLanguage);
+
   return (
     <motion.header 
       variants={itemVariants} 
       className="flex flex-col md:flex-row justify-between md:items-center gap-6 border-b border-slate-200/50 dark:border-slate-200/60 dark:border-white/5 pb-8"
     >
       <div>
-        <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/15">
-          Premium Academic Space
-        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/15">
+            Premium Academic Space
+          </span>
+          <Link href="/setup" className="inline-flex items-center gap-1.5 text-[10px] font-black text-purple-600 dark:text-purple-300 bg-purple-500/10 hover:bg-purple-500/20 px-3 py-1.5 rounded-full border border-purple-500/20 transition-colors" title="Click to change study language in Settings">
+            <Globe className="w-3 h-3 text-purple-500" />
+            <span>{langConfig.label}</span>
+          </Link>
+        </div>
         <h1 className="text-4xl md:text-5xl font-black mt-3.5 tracking-tight">
           <span className="premium-text-gradient-accent">
             Welcome back, {firstName}!
           </span>
         </h1>
         <p className="text-slate-500 dark:text-slate-400 mt-2.5 font-bold text-xs">
-          {userClass ? `Class ${userClass}` : "Class 10"} | Language Preference: {userLanguage}
+          {userClass ? `Class ${userClass}` : "Class 10"} | Studying in {langConfig.label} ({langConfig.nativeName})
         </p>
       </div>
       <div className="flex items-center gap-3 shrink-0">

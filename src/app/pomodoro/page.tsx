@@ -207,6 +207,36 @@ export default function PomodoroPage() {
     setTimeLeft(getModeDuration(mode));
   };
 
+  // Listen for Voice Assistant custom events
+  useEffect(() => {
+    const handleVoiceStart = () => {
+      setIsRunning(true);
+    };
+    const handleVoicePause = () => {
+      setIsRunning(false);
+    };
+    const handleVoiceReset = () => {
+      resetTimer();
+    };
+    const handleVoiceMode = (e: any) => {
+      if (e.detail?.mode) {
+        changeMode(e.detail.mode);
+      }
+    };
+
+    window.addEventListener("edutrack_pomodoro_start", handleVoiceStart);
+    window.addEventListener("edutrack_pomodoro_pause", handleVoicePause);
+    window.addEventListener("edutrack_pomodoro_reset", handleVoiceReset);
+    window.addEventListener("edutrack_pomodoro_mode", handleVoiceMode);
+
+    return () => {
+      window.removeEventListener("edutrack_pomodoro_start", handleVoiceStart);
+      window.removeEventListener("edutrack_pomodoro_pause", handleVoicePause);
+      window.removeEventListener("edutrack_pomodoro_reset", handleVoiceReset);
+      window.removeEventListener("edutrack_pomodoro_mode", handleVoiceMode);
+    };
+  }, [mode]);
+
   // Formatter for MM:SS
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);

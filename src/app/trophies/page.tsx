@@ -9,9 +9,10 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Confetti from "@/components/Confetti";
 import { awardUserXP } from "@/lib/xp";
+import { getGamificationState, GamificationState } from "@/lib/plans";
 
 interface Achievement {
-  id: number;
+  id: string;
   title: string;
   desc: string;
   icon: string;
@@ -21,12 +22,12 @@ interface Achievement {
 }
 
 const ACHIEVEMENTS: Achievement[] = [
-  { id: 1, title: "Speed Reader", desc: "Finished 5 chapters in one day", icon: "⚡", color: "from-orange-500 to-red-600", shadow: "shadow-orange-500/50", unlocked: true },
-  { id: 2, title: "Quiz Champion", desc: "Won 10 multiplayer duels", icon: "👑", color: "from-yellow-400 to-amber-600", shadow: "shadow-yellow-500/50", unlocked: true },
-  { id: 3, title: "Science Whiz", desc: "Mastered 3 Science subjects", icon: "🔬", color: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/50", unlocked: true },
-  { id: 4, title: "Error Vault Master", desc: "Cleared 10 tricky questions in active recall", icon: "🛡️", color: "from-purple-500 to-indigo-600", shadow: "shadow-purple-500/50", unlocked: true },
-  { id: 5, title: "Perfect Streak", desc: "Study for 30 consecutive days", icon: "🔥", color: "from-slate-700 to-slate-900", shadow: "shadow-none", unlocked: false },
-  { id: 6, title: "All-India Board Ranker", desc: "Score 95%+ across 5 full mock tests", icon: "🏆", color: "from-slate-700 to-slate-900", shadow: "shadow-none", unlocked: false }
+  { id: "first_step", title: "First Step", desc: "Completed your first study day!", icon: "🏆", color: "from-amber-400 to-orange-500", shadow: "shadow-amber-500/50", unlocked: false },
+  { id: "streak_3", title: "High Voltage", desc: "Maintained a 3-day study streak!", icon: "⚡", color: "from-yellow-400 to-amber-600", shadow: "shadow-yellow-500/50", unlocked: false },
+  { id: "streak_7", title: "Relentless", desc: "Maintained a 7-day study streak!", icon: "🔥", color: "from-orange-500 to-red-600", shadow: "shadow-orange-500/50", unlocked: false },
+  { id: "complete_plan", title: "Plan Conqueror", desc: "Completed 100% of an AI plan!", icon: "⭐", color: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/50", unlocked: false },
+  { id: "night_owl", title: "Night Owl", desc: "Studied after 8:00 PM local time!", icon: "🌙", color: "from-purple-500 to-indigo-600", shadow: "shadow-purple-500/50", unlocked: false },
+  { id: "all_india", title: "All-India Board Ranker", desc: "Score 95%+ across 5 full mock tests", icon: "👑", color: "from-slate-700 to-slate-900", shadow: "shadow-none", unlocked: false }
 ];
 
 const LEADERBOARD_DATA = {
@@ -54,6 +55,9 @@ export default function TrophiesPage() {
   const [leaderboardFilter, setLeaderboardFilter] = useState<"national" | "school" | "weekly">("national");
   const [confettiActive, setConfettiActive] = useState<boolean>(false);
   
+  const [gamificationState, setGamificationState] = useState<GamificationState | null>(null);
+  const [achievements, setAchievements] = useState<Achievement[]>(ACHIEVEMENTS);
+
   // Daily Crate state
   const [crateOpened, setCrateOpened] = useState<boolean>(false);
   const [isOpeningCrate, setIsOpeningCrate] = useState<boolean>(false);
@@ -61,6 +65,15 @@ export default function TrophiesPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      const state = getGamificationState();
+      setGamificationState(state);
+      
+      const updatedAchievements = ACHIEVEMENTS.map(ach => ({
+        ...ach,
+        unlocked: state.unlockedAchievements.includes(ach.id)
+      }));
+      setAchievements(updatedAchievements);
+
       const today = new Date().toDateString();
       const lastOpened = localStorage.getItem("edutrack_crate_date");
       if (lastOpened === today) {
@@ -115,6 +128,18 @@ export default function TrophiesPage() {
               <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium mt-0.5">
                 Showcase your board achievements, open daily mystery crates, and climb national school rankings.
               </p>
+              {gamificationState && (
+                <div className="mt-2 flex items-center gap-3">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-500 text-xs font-bold border border-amber-500/20">
+                    <Star className="w-3.5 h-3.5" />
+                    Level {gamificationState.level}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-500/10 text-indigo-500 text-xs font-bold border border-indigo-500/20">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    {gamificationState.totalXP} XP
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -148,7 +173,7 @@ export default function TrophiesPage() {
               activeTab === "trophies" ? "bg-amber-500 text-slate-950 font-black shadow-md" : "text-slate-500"
             }`}
           >
-            <Trophy className="w-3.5 h-3.5" /> Badges ({ACHIEVEMENTS.filter(a => a.unlocked).length})
+            <Trophy className="w-3.5 h-3.5" /> Badges ({achievements.filter(a => a.unlocked).length})
           </button>
           <button
             onClick={() => setActiveTab("crate")}
@@ -171,7 +196,7 @@ export default function TrophiesPage() {
         {/* TAB 1: TROPHIES ROOM */}
         {activeTab === "trophies" && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ACHIEVEMENTS.map((item, index) => (
+            {achievements.map((item, index) => (
               <motion.div
                 key={item.id}
                 initial={{ opacity: 0, y: 30 }}

@@ -17,6 +17,7 @@ import {
   ACHIEVEMENTS,
   GamificationState
 } from "@/lib/plans";
+import { getVaultMistakes } from "@/lib/error-vault";
 
 export default function StudyPlanner() {
   const [activePlan, setActivePlan] = useState<StudyPlan | null>(null);
@@ -29,6 +30,7 @@ export default function StudyPlanner() {
   const [dailyHours, setDailyHours] = useState("3");
   const [weakAreas, setWeakAreas] = useState("");
   const [examName, setExamName] = useState("CBSE Board Exams");
+  const [detectedWeaknesses, setDetectedWeaknesses] = useState<string[]>([]);
 
   // Gamification State
   const [gamification, setGamification] = useState<GamificationState>({
@@ -45,6 +47,76 @@ export default function StudyPlanner() {
     setActivePlan(getActivePlan());
     setGamification(getGamificationState());
   }, []);
+
+  useEffect(() => {
+    if (subject) {
+      const mistakes = getVaultMistakes();
+      const activeWeaknesses = mistakes
+        .filter(m => m.subject === subject && m.status === "active")
+        .map(m => m.chapter);
+      
+      const uniqueChapters = Array.from(new Set(activeWeaknesses));
+      setDetectedWeaknesses(uniqueChapters);
+    } else {
+      setDetectedWeaknesses([]);
+    }
+  }, [subject]);
+
+  const toggleWeakness = (chapter: string) => {
+    const currentAreas = weakAreas.split(",").map(s => s.trim()).filter(Boolean);
+    if (currentAreas.includes(chapter)) {
+      setWeakAreas(currentAreas.filter(a => a !== chapter).join(", "));
+    } else {
+      setWeakAreas([...currentAreas, chapter].join(", "));
+    }
+  };
+
+  const exportToCalendar = () => {
+    if (!activePlan) return;
+    
+    let icsContent = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//EduTrack//Study Plan//EN"
+    ];
+
+    const today = new Date();
+    
+    activePlan.schedule.forEach((day, index) => {
+      const eventDate = new Date(today);
+      eventDate.setDate(today.getDate() + index);
+      
+      const formatIcsDate = (date: Date) => {
+        return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+      };
+
+      const start = new Date(eventDate);
+      start.setHours(17, 0, 0);
+      const end = new Date(start);
+      end.setMinutes(start.getMinutes() + (day.durationMins || 60));
+
+      icsContent.push(
+        "BEGIN:VEVENT",
+        `UID:${activePlan.id}-day${day.day}@edutrack`,
+        `DTSTAMP:${formatIcsDate(new Date())}`,
+        `DTSTART:${formatIcsDate(start)}`,
+        `DTEND:${formatIcsDate(end)}`,
+        `SUMMARY:Study: ${day.topic}`,
+        `DESCRIPTION:Activities: ${Array.isArray(day.activities) ? day.activities.join(", ") : day.activities}\\nDuration: ${day.durationMins}m`,
+        "END:VEVENT"
+      );
+    });
+
+    icsContent.push("END:VCALENDAR");
+
+    const blob = new Blob([icsContent.join("\\r\\n")], { type: "text/calendar;charset=utf-8" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "study-plan.ics";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const getLevelTitle = (lvl: number) => {
     if (lvl === 1) return "Novice Scholar";
@@ -281,6 +353,12 @@ export default function StudyPlanner() {
         {activePlan && (
           <div className="relative z-10 flex items-center gap-3 print:hidden">
             <button 
+              onClick={exportToCalendar}
+              className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 px-5 py-3 rounded-xl transition-all border border-emerald-200 dark:border-emerald-800 shadow-sm font-bold w-fit"
+            >
+              📅 Export to Calendar
+            </button>
+            <button 
               onClick={() => window.print()}
               className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 px-5 py-3 rounded-xl transition-all border border-indigo-200 dark:border-indigo-800 shadow-sm font-bold w-fit"
             >
@@ -384,6 +462,28 @@ export default function StudyPlanner() {
 
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300">What are you weak at? (Optional)</label>
+              {detectedWeaknesses.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-2">
+                  <span className="text-xs text-slate-500 flex items-center">Detected weaknesses:</span>
+                  {detectedWeaknesses.map(chapter => {
+                    const isSelected = weakAreas.split(",").map(s => s.trim()).includes(chapter);
+                    return (
+                      <button
+                        key={chapter}
+                        type="button"
+                        onClick={() => toggleWeakness(chapter)}
+                        className={`text-xs px-2 py-1 rounded-full border transition-colors ${
+                          isSelected
+                            ? 'bg-emerald-100 border-emerald-500 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                            : 'bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300'
+                        }`}
+                      >
+                        {chapter}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
               <input 
                 placeholder="e.g. Light reflection, Trigonometry formulas"
                 value={weakAreas}

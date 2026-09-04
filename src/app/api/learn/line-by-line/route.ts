@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import OpenAI from "openai";
 import { queryPythonServer } from "@/lib/python-ai";
+import { getLanguagePromptInstruction } from "@/lib/languages";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,7 @@ export async function POST(req: Request) {
     subject = body.subject || "Science";
     chapter = body.chapter || "NCERT Topic";
     const language = body.language || "Hinglish";
-    const prompt = `Provide the response in ${language} language.`;
+    const prompt = getLanguagePromptInstruction(language);
 
     // 1. Try Local LLM (Ollama / LM Studio / Python Server) First
     const { queryLocalLLM } = await import("@/lib/local-llm");

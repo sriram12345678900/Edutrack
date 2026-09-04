@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import Groq from "groq-sdk";
+import { getLanguagePromptInstruction } from "@/lib/languages";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    const { messages, pathname } = await req.json();
+    const { messages, pathname, language } = await req.json();
 
     const systemPrompt = `You are Sparky, the friendly AI Guide and study coach for the EduTrack app.
 Your goal is to guide the user, explain the app's features, and help them study effectively.
@@ -22,7 +23,9 @@ Here is a summary of key app features you can refer to:
 - Whiteboard (/whiteboard): Collaborative canvas for drawing diagrams and solving equations.
 - Formula Hub (/formulas): Quick lookup of mathematical and scientific formulas.
 
-Keep your answers very brief (2-3 sentences), encouraging, friendly, and use emojis! Do not write long essays.`;
+Keep your answers very brief (2-3 sentences), encouraging, friendly, and use emojis! Do not write long essays.
+
+${getLanguagePromptInstruction(language)}`;
 
     const apiKey = process.env.GEMINI_API_KEY || "";
     

@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { BookOpen, Moon, Sun, Monitor, ArrowRight, ArrowLeft, CheckCircle2, Sparkles, GraduationCap, Globe } from "lucide-react";
-
+import { BookOpen, Moon, Sun, Monitor, ArrowRight, ArrowLeft, CheckCircle2, Sparkles, GraduationCap, Globe, Search } from "lucide-react";
+import { SUPPORTED_LANGUAGES } from "@/lib/languages";
 import { useAuth } from "@/context/AuthContext";
 
 export default function SignupWizard() {
@@ -20,6 +20,8 @@ export default function SignupWizard() {
   const [englishCurr, setEnglishCurr] = useState<string>("");
   const [sanskritCurr, setSanskritCurr] = useState<string>("");
   const [language, setLanguage] = useState<string>("English");
+  const [langCategory, setLangCategory] = useState<"all" | "bilingual" | "regional">("all");
+  const [langSearch, setLangSearch] = useState<string>("");
   const [theme, setTheme] = useState<string>("system");
   const [parentPin, setParentPin] = useState<string>("");
 
@@ -319,39 +321,94 @@ export default function SignupWizard() {
                 animate="center"
                 exit="exit"
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="w-full"
+                className="w-full space-y-4"
               >
-                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2">
-                  <Globe className="w-5 h-5 text-indigo-500" /> Choose Your Default Study Language
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-[280px] overflow-y-auto pr-2 scrollbar-thin">
-                  {[
-                    { code: "English", label: "English", flag: "" },
-                    { code: "Hinglish", label: "Hinglish (Hindi+Eng)", flag: "" },
-                    { code: "Telgish", label: "Telgish (Telugu+Eng)", flag: "" },
-                    { code: "Tanglish", label: "Tanglish (Tamil+Eng)", flag: "" },
-                    { code: "Marathish", label: "Marathish (Marathi+Eng)", flag: "" },
-                    { code: "Benglish", label: "Benglish (Bengali+Eng)", flag: "" },
-                    { code: "Hindi", label: "Hindi (हिंदी)", flag: "" },
-                    { code: "Telugu", label: "Telugu (తెలుగు)", flag: "" },
-                    { code: "Tamil", label: "Tamil (தமிழ்)", flag: "" },
-                    { code: "Marathi", label: "Marathi (मराठी)", flag: "" },
-                    { code: "Bengali", label: "Bengali (বাংলা)", flag: "" },
-                    { code: "Kannada", label: "Kannada (ಕನ್ನಡ)", flag: "" }
-                  ].map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => setLanguage(lang.code)}
-                      className={`p-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-1.5 ${
-                        language === lang.code 
-                          ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 scale-[1.02]' 
-                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:shadow-md'
-                      }`}
-                    >
-                      <span className="text-2xl">{lang.flag}</span>
-                      <span className="text-xs font-bold text-center leading-tight">{lang.label}</span>
-                    </button>
-                  ))}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-indigo-500" /> Choose Your Study Language
+                  </h2>
+                  <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-full w-fit">
+                    {SUPPORTED_LANGUAGES.length} Regional & Bilingual Options
+                  </span>
+                </div>
+
+                {/* Filter and Search */}
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="relative flex-1">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={langSearch}
+                      onChange={(e) => setLangSearch(e.target.value)}
+                      placeholder="Search language, e.g. Telugu, Tamil, Hinglish..."
+                      className="w-full pl-9 pr-3 py-2 text-xs bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-indigo-500 dark:text-white"
+                    />
+                  </div>
+                  <div className="flex p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 text-xs shrink-0">
+                    {[
+                      { id: "all", label: "All" },
+                      { id: "bilingual", label: "Bilingual (-ish)" },
+                      { id: "regional", label: "Regional Scripts" }
+                    ].map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setLangCategory(cat.id as any)}
+                        className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all ${
+                          langCategory === cat.id
+                            ? "bg-indigo-600 text-white shadow-sm"
+                            : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                        }`}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Language Cards Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin">
+                  {SUPPORTED_LANGUAGES.filter((item) => {
+                    const matchCategory = langCategory === "all" || (langCategory === "bilingual" ? item.category === "bilingual" : item.category === "regional" || item.category === "standard");
+                    const matchQuery = !langSearch.trim() || 
+                      item.label.toLowerCase().includes(langSearch.toLowerCase()) || 
+                      item.nativeName.toLowerCase().includes(langSearch.toLowerCase()) ||
+                      item.code.toLowerCase().includes(langSearch.toLowerCase());
+                    return matchCategory && matchQuery;
+                  }).map((lang) => {
+                    const isSelected = language === lang.code;
+                    return (
+                      <button
+                        key={lang.code}
+                        type="button"
+                        onClick={() => setLanguage(lang.code)}
+                        className={`p-3 rounded-2xl border-2 transition-all duration-200 flex flex-col items-start justify-between text-left gap-1 relative overflow-hidden ${
+                          isSelected 
+                            ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/15 text-indigo-900 dark:text-indigo-200 shadow-md shadow-indigo-500/10 scale-[1.02]' 
+                            : 'border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 hover:border-indigo-300 hover:shadow-sm'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <span className="text-xs font-black tracking-tight">{lang.code}</span>
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase ${
+                            lang.category === "bilingual" 
+                              ? "bg-amber-500/15 text-amber-600 dark:text-amber-400" 
+                              : lang.category === "regional"
+                              ? "bg-purple-500/15 text-purple-600 dark:text-purple-400"
+                              : "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                          }`}>
+                            {lang.category === "bilingual" ? "Bilingual" : lang.category === "regional" ? "Native" : "Standard"}
+                          </span>
+                        </div>
+                        <div className="text-[13px] font-bold text-slate-900 dark:text-white leading-tight">
+                          {lang.nativeName}
+                        </div>
+                        <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate w-full">
+                          {lang.description}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </motion.div>
             )}

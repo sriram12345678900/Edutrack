@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { 
   Home, BookOpen, MessageSquare, Target, Settings, LogOut, Menu, X, 
-  GraduationCap, Moon, Sun, Calendar, Sparkles, Users, Award, Palette, Timer, Brain, Camera, Zap, Trophy, Shield, Compass, Video, Gamepad2, Globe, Mic, Radio, GitFork, Sliders, FileText
+  GraduationCap, Moon, Sun, Calendar, Sparkles, Users, Award, Palette, Timer, Brain, Camera, Zap, Trophy, Shield, Compass, Video, Gamepad2, Globe, Mic, Radio, GitFork, Sliders, FileText,
+  CheckSquare
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,8 @@ import MobileHeader from "./MobileHeader";
 import MobileBottomNav from "./MobileBottomNav";
 import MobileDrawer from "./MobileDrawer";
 import InteractiveAiGuide from "./InteractiveAiGuide";
+import EduTrackVoiceAssistant from "./EduTrackVoiceAssistant";
+import DivyangjanAccessibilitySuite from "./DivyangjanAccessibilitySuite";
 
 // Categorized premium sidebar links for desktop
 const categories = [
@@ -27,6 +30,18 @@ const categories = [
       { href: "/classroom", label: "Student Classroom", icon: GraduationCap, badge: "School" },
       { href: "/teacher", label: "Teacher Command", icon: Video, badge: "Portal" },
       { href: "/parent", label: "Parent AI Digest", icon: Shield, badge: "Parent" },
+    ]
+  },
+  {
+    title: "Self-Guided & Tools",
+    items: [
+      { href: "/ncert", label: "AI Study Hub", icon: BookOpen, badge: "NCERT" },
+      { href: "/sandbox", label: "Simulations Lab", icon: Sliders, badge: "Lab" },
+      { href: "/tutor", label: "AI Tutor", icon: MessageSquare, badge: "AI" },
+      { href: "/lens", label: "Doubt-Solver Lens", icon: Camera, badge: "Live" },
+      { href: "/plan", label: "Study Planner", icon: Calendar },
+      { href: "/habits", label: "Habit Tracker", icon: CheckSquare },
+      { href: "/flashcards", label: "AI Flashcards", icon: Sparkles },
     ]
   },
   {
@@ -45,11 +60,6 @@ const categories = [
       { href: "/viva", label: "AI Voice Viva", icon: Mic, badge: "Voice" },
       { href: "/feynman", label: "Feynman Lab", icon: Brain, badge: "Teach" },
       { href: "/podcast", label: "AI Podcasts", icon: Radio, badge: "Audio" },
-      { href: "/sandbox", label: "Simulations Lab", icon: Sliders, badge: "Lab" },
-      { href: "/tutor", label: "AI Tutor", icon: MessageSquare, badge: "AI" },
-      { href: "/lens", label: "Doubt-Solver Lens", icon: Camera, badge: "Live" },
-      { href: "/plan", label: "Study Planner", icon: Calendar },
-      { href: "/flashcards", label: "AI Flashcards", icon: Sparkles },
       { href: "/whiteboard", label: "Whiteboard", icon: Palette },
       { href: "/pomodoro", label: "Pomodoro Timer", icon: Timer },
     ]
@@ -76,6 +86,11 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   const [userLevel, setUserLevel] = useState<number>(1);
   const [nickname, setNickname] = useState<string>("");
   const [friendCode, setFriendCode] = useState<string>("");
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const { user, loading, logout } = useAuth();
   const router = useRouter();
 
@@ -84,7 +99,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     if (!loading) {
       if (!user) {
         router.push("/login");
-      } else if (!user.isOrg && !user.emailVerified) {
+      } else if (!user.isOrg && !user.isGuest && user.emailVerified === false) {
         router.push("/verify-email");
       }
     }
@@ -313,9 +328,9 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           
           {categories.map((category, catIdx) => {
             const filteredItems = category.items.filter(item => {
+              if (user?.role === "admin") return true; // Admin has access to all features
               if (item.href === "/teacher" && user?.role !== "teacher") return false;
               if (item.href === "/classroom" && user?.role === "teacher") return false;
-              if (user?.role === "admin") return false; // Admin sees nothing else but Admin panel for now to keep it clean
               return true;
             });
             if (filteredItems.length === 0) return null;
@@ -340,18 +355,19 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                       title={!isExpanded ? link.label : undefined}
                       className={cn(
                         "flex items-center justify-between px-3 py-2.5 rounded-xl font-extrabold text-xs transition-all relative group",
-                        isActive
+                        (mounted && isActive)
                           ? "bg-indigo-500/15 text-indigo-650 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-500/30 shadow-sm"
                           : "hover:bg-slate-100/70 dark:hover:bg-white/[0.05] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                       )}
                     >
-                      {isActive && (
-                        <div className="absolute left-0 top-2 bottom-2 w-1 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-r-full shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
-                      )}
+                      <div className={cn(
+                        "absolute left-0 top-2 bottom-2 w-1 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-r-full shadow-[0_0_10px_rgba(99,102,241,0.8)] transition-opacity duration-200",
+                        (mounted && isActive) ? "opacity-100" : "opacity-0 pointer-events-none"
+                      )} />
                       <div className="flex items-center gap-3">
                         <Icon className={cn(
                           "w-4.5 h-4.5 shrink-0 transition-transform group-hover:scale-110",
-                          isActive ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-500 group-hover:text-indigo-500"
+                          (mounted && isActive) ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-500 group-hover:text-indigo-500"
                         )} /> 
                         <span className={cn(
                           "transition-all duration-300 whitespace-nowrap",
@@ -487,6 +503,12 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           onOpenTour={openAppTour}
           onLogout={logout}
         />
+
+        {/* Global Wake-Word Voice Assistant ('Hey EduTrack') */}
+        <EduTrackVoiceAssistant />
+
+        {/* Global Divyangjan Accessibility Suite */}
+        <DivyangjanAccessibilitySuite />
       </div>
     </div>
   );

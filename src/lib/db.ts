@@ -11,6 +11,8 @@ export interface UserProfile {
   language?: string;
   theme?: string;
   parentPin?: string;
+  role?: "student" | "parent" | "teacher";
+  linkedStudentId?: string;
   weakSubjects: string[];
   createdAt: number;
 }

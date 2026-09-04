@@ -16,7 +16,8 @@ const PRECACHE_URLS = [
   "/simulations",
   "/exam-generator",
   "/manifest.json",
-  "/favicon.ico"
+  "/favicon.ico",
+  "/offline.html"
 ];
 
 // Install Event
@@ -68,9 +69,9 @@ self.addEventListener("fetch", (event) => {
           if (cachedResponse) {
             return cachedResponse;
           }
-          // Fallback to dashboard if route not found
+          // Fallback to offline page if route not found
           if (event.request.headers.get("accept")?.includes("text/html")) {
-            return caches.match("/dashboard");
+            return caches.match("/offline.html");
           }
         });
       })
