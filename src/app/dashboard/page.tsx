@@ -41,10 +41,19 @@ export default function Dashboard() {
   const [showQuestCelebration, setShowQuestCelebration] = useState<boolean>(false);
   const [selectedNode, setSelectedNode] = useState<any>(null);
   const [activeMissionGuide, setActiveMissionGuide] = useState<string | null>(null);
+  const [equippedTitle, setEquippedTitle] = useState<string | null>(null);
+  const [equippedFrame, setEquippedFrame] = useState<string | null>(null);
 
   useEffect(() => {
     initializeMissions();
     
+    if (typeof window !== "undefined") {
+      const storedTitle = localStorage.getItem("edutrack_equipped_title");
+      const storedFrame = localStorage.getItem("edutrack_equipped_frame");
+      if (storedTitle) setEquippedTitle(storedTitle);
+      if (storedFrame) setEquippedFrame(storedFrame);
+    }
+
     const handleProfileUpdate = (e: any) => {
       if (e.detail?.nickname) setNickname(e.detail.nickname);
       if (e.detail?.className) setUserClass(Number(e.detail.className));
@@ -60,9 +69,16 @@ export default function Dashboard() {
     };
     window.addEventListener("edutrack_xp_updated", handleXpUpdate);
 
+    const handleShopUpdate = (e: any) => {
+      if (e.detail?.equippedTitle !== undefined) setEquippedTitle(e.detail.equippedTitle);
+      if (e.detail?.equippedFrame !== undefined) setEquippedFrame(e.detail.equippedFrame);
+    };
+    window.addEventListener("edutrack_shop_updated", handleShopUpdate);
+
     return () => {
       window.removeEventListener("edutrack_profile_updated", handleProfileUpdate);
       window.removeEventListener("edutrack_xp_updated", handleXpUpdate);
+      window.removeEventListener("edutrack_shop_updated", handleShopUpdate);
     };
   }, []);
 
@@ -273,8 +289,14 @@ export default function Dashboard() {
                       L{level}
                     </div>
                     <div>
-                      <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">
-                        {level <= 1 ? "Study Novice" : level <= 3 ? "Elite Scholar" : "Grandmaster"}
+                      <h4 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                        {equippedTitle ? (
+                          equippedTitle === "title-topper" ? "🏆 CBSE All-India Topper" :
+                          equippedTitle === "title-prodigy" ? "⚛️ Quantum Prodigy" :
+                          equippedTitle === "title-wizard" ? "📐 Math Olympiad Wizard" :
+                          equippedTitle === "title-feynman" ? "🧠 Feynman Master" :
+                          equippedTitle === "title-polyglot" ? "🗣️ Linguistic Polyglot" : "📜 NCERT Grand Archivist"
+                        ) : (level <= 1 ? "Study Novice" : level <= 3 ? "Elite Scholar" : "Grandmaster")}
                       </h4>
                       <p className="text-[11px] text-indigo-400 font-bold mt-0.5">
                         {xp} / {level * 200} XP to Level {level + 1}

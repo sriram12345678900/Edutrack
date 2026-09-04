@@ -44,10 +44,20 @@ export function getOrInitializeMissions(): DailyMission[] {
 }
 
 /**
- * Core function to award XP to the user. Handles leveling logic.
+ * Core function to award XP to the user. Handles leveling logic and 2x boosters.
  */
-export function awardUserXP(amount: number): { newXp: number; newLevel: number; leveledUp: boolean } {
-  if (typeof window === "undefined") return { newXp: 0, newLevel: 1, leveledUp: false };
+export function awardUserXP(amount: number): { newXp: number; newLevel: number; leveledUp: boolean; isBoosted: boolean } {
+  if (typeof window === "undefined") return { newXp: 0, newLevel: 1, leveledUp: false, isBoosted: false };
+
+  // Check if 2x XP Booster is active
+  let isBoosted = false;
+  try {
+    const boosterUntil = localStorage.getItem("edutrack_xp_booster_until");
+    if (boosterUntil && parseInt(boosterUntil, 10) > Date.now()) {
+      amount = amount * 2;
+      isBoosted = true;
+    }
+  } catch (_) {}
 
   const storedXp = localStorage.getItem("edutrack_xp") || "0";
   const storedLevel = localStorage.getItem("edutrack_level") || "1";
@@ -70,6 +80,19 @@ export function awardUserXP(amount: number): { newXp: number; newLevel: number; 
   localStorage.setItem("edutrack_xp", newXp.toString());
   localStorage.setItem("edutrack_level", newLvl.toString());
 
+  // Also update Zustand gamification storage if present
+  try {
+    const rawGami = localStorage.getItem("edutrack-gamification-storage");
+    if (rawGami) {
+      const parsed = JSON.parse(rawGami);
+      if (parsed.state) {
+        parsed.state.xp = newXp;
+        parsed.state.level = newLvl;
+        localStorage.setItem("edutrack-gamification-storage", JSON.stringify(parsed));
+      }
+    }
+  } catch (_) {}
+
   // Also add to cumulative total XP
   const storedTotalXp = localStorage.getItem("edutrack_total_xp") || "0";
   const newTotalXp = parseInt(storedTotalXp, 10) + amount;
@@ -77,10 +100,10 @@ export function awardUserXP(amount: number): { newXp: number; newLevel: number; 
 
   // Broadcast change event
   window.dispatchEvent(new CustomEvent("edutrack_xp_updated", {
-    detail: { xp: newXp, level: newLvl, leveledUp, amount }
+    detail: { xp: newXp, level: newLvl, leveledUp, amount, isBoosted }
   }));
 
-  return { newXp, newLevel: newLvl, leveledUp };
+  return { newXp, newLevel: newLvl, leveledUp, isBoosted };
 }
 
 /**

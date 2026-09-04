@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Brain, Flame, Trophy, Moon, Sun, Sparkles, Menu, Compass } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useGamificationStore } from "@/store/useGamificationStore";
+import UserAvatar from "./UserAvatar";
 
 interface MobileHeaderProps {
   displayName: string;
@@ -117,18 +118,13 @@ export default function MobileHeader({
           title="Open menu & tools"
           aria-label="Open menu"
         >
-          {photoURL ? (
-            <img
-              src={photoURL}
-              alt={displayName}
-              className="w-8 h-8 rounded-full object-cover border-2 border-indigo-500/40 shadow-sm"
-            />
-          ) : (
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white font-black text-[11px] shadow-sm border border-white/20">
-              {initials}
-            </div>
-          )}
-          <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-indigo-600 rounded-full flex items-center justify-center border border-white dark:border-[#040614]">
+          <UserAvatar
+            src={photoURL}
+            name={displayName}
+            initials={initials}
+            size="sm"
+          />
+          <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-indigo-600 rounded-full flex items-center justify-center border border-white dark:border-[#040614] z-10">
             <Menu className="w-2 h-2 text-white" />
           </div>
         </button>

@@ -56,6 +56,11 @@ export default function RootLayout({
                 } else {
                   document.documentElement.classList.remove('dark');
                 }
+
+                let equippedTheme = localStorage.getItem('edutrack_equipped_theme');
+                if (equippedTheme) {
+                  document.documentElement.setAttribute('data-theme', equippedTheme.replace('theme-', ''));
+                }
               } catch (_) {}
             `,
           }}

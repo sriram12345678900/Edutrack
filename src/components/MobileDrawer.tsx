@@ -8,10 +8,11 @@ import {
   Home, BookOpen, GraduationCap, Compass, MessageSquare, Camera, Calendar, 
   Sparkles, Palette, Timer, Zap, Users, Award, Target, Trophy, Settings, 
   LogOut, X, Search, ChevronRight, Shield, Moon, Sun, CheckCircle2, User, Video, Gamepad2,
-  Globe, Mic, Radio, GitFork, Sliders, FileText, Brain, CheckSquare
+  Globe, Mic, Radio, GitFork, Sliders, FileText, Brain, CheckSquare, ShoppingBag
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ADMIN_PORTAL_ROUTE } from "@/lib/admin";
+import UserAvatar from "./UserAvatar";
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -67,6 +68,7 @@ const ALL_TOOLS: NavItem[] = [
   { href: "/pomodoro", label: "Pomodoro Timer", description: "Focus sessions & Forest growth", icon: Timer, color: "from-rose-500 to-red-600", category: "AI Study Lab" },
 
   // Testing & Analytics
+  { href: "/shop", label: "Rewards Shop", description: "Avatar frames, themes, titles & power-ups", icon: ShoppingBag, badge: "XP", color: "from-amber-500 to-yellow-600", category: "Testing & Analytics" },
   { href: "/exam-generator", label: "Exam Generator", description: "1-Click CBSE Question Paper & Rubric", icon: FileText, badge: "Print", color: "from-emerald-600 to-teal-600", category: "Testing & Analytics" },
   { href: "/games", label: "EduArcade", description: "Periodic blitz, formula rush & speed math", icon: Gamepad2, badge: "XP", color: "from-pink-500 to-rose-600", category: "Testing & Analytics" },
   { href: "/groups", label: "StudyCircles", description: "Multiplayer audio & live duels", icon: Users, color: "from-emerald-600 to-cyan-600", category: "Testing & Analytics" },
@@ -169,18 +171,14 @@ export default function MobileDrawer({
               {/* User Profile Card */}
               <div className="p-3.5 bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent border border-indigo-500/20 dark:border-white/10 rounded-2xl flex items-center justify-between gap-3 shadow-sm">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="relative shrink-0">
-                    {photoURL ? (
-                      <img src={photoURL} alt={displayName} className="w-11 h-11 rounded-full object-cover border-2 border-indigo-500/50 shadow" />
-                    ) : (
-                      <div className="w-11 h-11 rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white font-black text-sm shadow-md border border-white/20">
-                        {initials}
-                      </div>
-                    )}
-                    <div className="absolute -bottom-1 -right-1 bg-indigo-600 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full border border-black shadow">
-                      L{userLevel}
-                    </div>
-                  </div>
+                  <UserAvatar
+                    src={photoURL}
+                    name={displayName}
+                    initials={initials}
+                    size="md"
+                    showLevel={true}
+                    level={userLevel}
+                  />
 
                   <div className="min-w-0 flex-1">
                     <p className="font-black text-sm text-slate-900 dark:text-white truncate">{displayName}</p>

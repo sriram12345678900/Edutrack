@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { 
   Home, BookOpen, MessageSquare, Target, Settings, LogOut, Menu, X, 
   GraduationCap, Moon, Sun, Calendar, Sparkles, Users, Award, Palette, Timer, Brain, Camera, Zap, Trophy, Shield, Compass, Video, Gamepad2, Globe, Mic, Radio, GitFork, Sliders, FileText,
-  CheckSquare
+  CheckSquare, ShoppingBag
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,7 @@ import MobileDrawer from "./MobileDrawer";
 import InteractiveAiGuide from "./InteractiveAiGuide";
 import EduTrackVoiceAssistant from "./EduTrackVoiceAssistant";
 import DivyangjanAccessibilitySuite from "./DivyangjanAccessibilitySuite";
+import UserAvatar from "./UserAvatar";
 
 // Categorized premium sidebar links for desktop
 const categories = [
@@ -67,6 +68,7 @@ const categories = [
   {
     title: "Testing & Examination",
     items: [
+      { href: "/shop", label: "Rewards Shop", icon: ShoppingBag, badge: "XP" },
       { href: "/exam-generator", label: "Exam Generator", icon: FileText, badge: "Print" },
       { href: "/games", label: "EduArcade", icon: Gamepad2, badge: "XP" },
       { href: "/groups", label: "StudyCircles", icon: Users },
@@ -86,6 +88,8 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   const [userLevel, setUserLevel] = useState<number>(1);
   const [nickname, setNickname] = useState<string>("");
   const [friendCode, setFriendCode] = useState<string>("");
+  const [equippedTitle, setEquippedTitle] = useState<string | null>(null);
+  const [equippedFrame, setEquippedFrame] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   
   useEffect(() => {
@@ -118,12 +122,16 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       const pinnedState = localStorage.getItem("edutrack_sidebar_pinned");
       const storedNick = localStorage.getItem("edutrack_nickname");
       const storedCode = localStorage.getItem("edutrack_friend_code");
+      const storedTitle = localStorage.getItem("edutrack_equipped_title");
+      const storedFrame = localStorage.getItem("edutrack_equipped_frame");
       
       if (xpVal) setUserXp(parseInt(xpVal, 10));
       if (lvlVal) setUserLevel(parseInt(lvlVal, 10));
       if (pinnedState) setIsPinned(pinnedState === "true");
       if (storedNick) setNickname(storedNick);
       if (storedCode) setFriendCode(storedCode);
+      if (storedTitle) setEquippedTitle(storedTitle);
+      if (storedFrame) setEquippedFrame(storedFrame);
 
       // Listen for profile updates from Tour or Settings
       const handleProfileUpdate = (e: any) => {
@@ -135,11 +143,18 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         if (e.detail?.xp !== undefined) setUserXp(e.detail.xp);
       };
 
+      const handleShopUpdate = (e: any) => {
+        if (e.detail?.equippedTitle !== undefined) setEquippedTitle(e.detail.equippedTitle);
+        if (e.detail?.equippedFrame !== undefined) setEquippedFrame(e.detail.equippedFrame);
+      };
+
       window.addEventListener("edutrack_profile_updated", handleProfileUpdate);
       window.addEventListener("edutrack_xp_updated", handleXpUpdate);
+      window.addEventListener("edutrack_shop_updated", handleShopUpdate);
       return () => {
         window.removeEventListener("edutrack_profile_updated", handleProfileUpdate);
         window.removeEventListener("edutrack_xp_updated", handleXpUpdate);
+        window.removeEventListener("edutrack_shop_updated", handleShopUpdate);
       };
     }
   }, []);
@@ -252,27 +267,40 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           "p-2.5 mx-2.5 mt-3 bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent border border-indigo-500/20 dark:border-white/10 rounded-2xl flex flex-col gap-2 shrink-0 relative overflow-hidden transition-all duration-300",
           !isExpanded && "items-center"
         )}>
-          <div className="flex items-center gap-2.5 w-full">
-            <div className="relative shrink-0">
-              {user?.photoURL ? (
-                <img src={user.photoURL} alt={displayName} className="w-9 h-9 rounded-full object-cover border-2 border-indigo-500/40 shadow-sm" />
-              ) : (
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white font-black text-xs flex-shrink-0 shadow-lg shadow-indigo-500/20 border border-white/20">
-                  {initials}
-                </div>
-              )}
-              <div className="absolute -bottom-1 -right-1 bg-indigo-600 text-white text-[7px] font-black px-1 rounded-full border border-black" title={`Level ${userLevel}`}>
-                L{userLevel}
-              </div>
-            </div>
+            <UserAvatar
+              src={user?.photoURL}
+              name={displayName}
+              initials={initials}
+              size="sm"
+              frameId={equippedFrame}
+              showLevel={true}
+              level={userLevel}
+            />
 
             <div className={cn(
               "overflow-hidden transition-all duration-300 flex-1",
               isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden"
             )}>
-              <p className="font-black text-xs text-slate-900 dark:text-white truncate" title={displayName}>{displayName}</p>
+              <div className="flex items-center gap-1 overflow-hidden">
+                <p className="font-black text-xs text-slate-900 dark:text-white truncate" title={displayName}>{displayName}</p>
+                {equippedTitle && (
+                  <span className="text-[11px] shrink-0" title={equippedTitle.replace("title-", "").toUpperCase()}>
+                    {equippedTitle === "title-topper" ? "🏆" :
+                     equippedTitle === "title-prodigy" ? "⚛️" :
+                     equippedTitle === "title-wizard" ? "📐" :
+                     equippedTitle === "title-feynman" ? "🧠" :
+                     equippedTitle === "title-polyglot" ? "🗣️" : "📜"}
+                  </span>
+                )}
+              </div>
               <p className="text-[8px] text-indigo-500 dark:text-indigo-400 font-mono font-bold truncate leading-none mt-0.5 uppercase tracking-wider">
-                {friendCode || (effectiveUser.email ? effectiveUser.email.split("@")[0] : "Student")}
+                {equippedTitle ? (
+                  equippedTitle === "title-topper" ? "CBSE Topper" :
+                  equippedTitle === "title-prodigy" ? "Quantum Prodigy" :
+                  equippedTitle === "title-wizard" ? "Math Wizard" :
+                  equippedTitle === "title-feynman" ? "Feynman Master" :
+                  equippedTitle === "title-polyglot" ? "Polyglot" : "NCERT Archivist"
+                ) : (friendCode || (effectiveUser.email ? effectiveUser.email.split("@")[0] : "Student"))}
               </p>
             </div>
             
@@ -295,19 +323,18 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                 <Sun className="w-3.5 h-3.5 block dark:hidden text-amber-500" />
               </button>
             )}
-          </div>
 
-          {isExpanded && (
-            <div className="pt-2 w-full flex justify-center">
-               <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest ${
-                 user?.role === 'admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400' :
-                 user?.role === 'teacher' ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400' :
-                 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
-               }`}>
-                 {user?.role || 'student'}
-               </span>
-            </div>
-          )}
+            {isExpanded && (
+              <div className="pt-2 w-full flex justify-center">
+                 <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest ${
+                   user?.role === 'admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400' :
+                   user?.role === 'teacher' ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400' :
+                   'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
+                 }`}>
+                   {user?.role || 'student'}
+                 </span>
+              </div>
+            )}
         </div>
 
         {/* Scrollable Navigation Groups */}
