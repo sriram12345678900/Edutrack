@@ -230,11 +230,11 @@ export default function Dashboard() {
         <div className="space-y-6">
           
           {/* ── CLEAN TAB NAVIGATOR ── */}
-          <div className="flex items-center gap-2 p-1.5 bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl w-fit">
+          <div className="flex items-center gap-2 p-1.5 bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl w-full sm:w-fit overflow-x-auto snap-x snap-mandatory hide-scrollbar">
             <button
               onClick={() => setActiveTab("focus")}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all",
+                "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all shrink-0 snap-center",
                 activeTab === "focus" 
                   ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30" 
                   : "text-slate-400 hover:text-white hover:bg-white/5"
@@ -247,7 +247,7 @@ export default function Dashboard() {
             <button
               onClick={() => setActiveTab("tools")}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all",
+                "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all shrink-0 snap-center",
                 activeTab === "tools" 
                   ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30" 
                   : "text-slate-400 hover:text-white hover:bg-white/5"
@@ -260,7 +260,7 @@ export default function Dashboard() {
             <button
               onClick={() => setActiveTab("social")}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all",
+                "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all shrink-0 snap-center",
                 activeTab === "social" 
                   ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30" 
                   : "text-slate-400 hover:text-white hover:bg-white/5"
@@ -310,7 +310,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Quick 4 Core Shortcuts */}
-                <div className="md:col-span-2 grid grid-cols-4 gap-2.5">
+                <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-2.5">
                   <Link href="/lens" id="tour-quick-lens" className="premium-glass-panel p-3.5 rounded-2xl flex flex-col items-center justify-center text-center hover:border-emerald-500/40 transition-all group">
                     <Camera className="w-5 h-5 text-emerald-400 mb-1 group-hover:scale-110 transition-transform" />
                     <span className="text-[11px] font-black text-slate-200">AI Lens</span>

@@ -76,11 +76,11 @@ export default function MobileHeader({
       </div>
 
       {/* Right Stats & Quick Actions */}
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1">
         {/* Streak Pill */}
         <Link
           href="/dashboard"
-          className="flex items-center gap-1 bg-amber-500/10 border border-amber-500/25 px-2 py-1 rounded-full text-amber-600 dark:text-amber-400 active:scale-95 transition-transform"
+          className="flex items-center gap-1 bg-amber-500/10 border border-amber-500/25 px-1.5 py-1 rounded-full text-amber-600 dark:text-amber-400 active:scale-95 transition-transform"
           title={`Daily Study Streak: ${streakDays} days`}
         >
           <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500 animate-bounce" style={{ animationDuration: "2s" }} />
@@ -90,7 +90,7 @@ export default function MobileHeader({
         {/* Level Pill */}
         <Link
           href="/trophies"
-          className="flex items-center gap-1 bg-indigo-500/10 border border-indigo-500/25 px-2 py-1 rounded-full text-indigo-600 dark:text-indigo-400 active:scale-95 transition-transform"
+          className="flex items-center gap-1 bg-indigo-500/10 border border-indigo-500/25 px-1.5 py-1 rounded-full text-indigo-600 dark:text-indigo-400 active:scale-95 transition-transform"
           title={`Level ${userLevel} (${userXp} XP)`}
         >
           <Trophy className="w-3 h-3 text-indigo-500" />

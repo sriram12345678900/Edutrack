@@ -2058,7 +2058,7 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
                   </button>
                   <button onClick={clearCanvas}
                     className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-500/10 text-sm font-medium text-rose-600 dark:text-rose-400 transition-colors">
-                    <Trash2 className="w-4 h-4" /> Clear Canvas
+                    <Trash2 className="w-4 h-4 text-rose-500" /> Clear Canvas
                   </button>
                 </motion.div>
               )}
@@ -2066,6 +2066,17 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
           </div>
         </div>
       </header>
+
+      {/* ── Mobile Floating Zoom Pill ── */}
+      <div className="md:hidden absolute top-[60px] right-3 z-40 pointer-events-none">
+        <button 
+          onClick={() => setZoomLevel(1)} 
+          className="pointer-events-auto px-2.5 py-1 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 shadow-md rounded-full text-[10px] font-bold text-indigo-600 dark:text-indigo-400 backdrop-blur-xl flex items-center gap-1 active:scale-95 transition-transform"
+        >
+          <ZoomIn className="w-3 h-3" />
+          {Math.round(zoomLevel * 100)}%
+        </button>
+      </div>
 
       {/* Main Canvas Scroll Viewport */}
       <div
@@ -2422,43 +2433,45 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
       {/* ════════════════════════════════════════════════════════════════
           MOBILE — Compact Bottom Bar (visible only on mobile)
       ════════════════════════════════════════════════════════════════ */}
-      <div className="md:hidden absolute bottom-0 left-0 right-0 z-50 dark:bg-slate-900/98 bg-white/98 backdrop-blur-2xl border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-between safe-area-bottom shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
-        {/* Current tool indicator */}
-        <button onClick={() => { setMobileDrawerOpen(true); setMobileDrawerTab(activeTab); }}
-          className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors">
-          {(() => {
-            const allTools = [...toolGroups.draw, ...toolGroups.shapes, ...toolGroups.select, ...toolGroups.insert];
-            const current = allTools.find(t => t.id === tool);
-            const Icon = current?.icon || PenTool;
-            return <><Icon className="w-4 h-4" /><span className="text-xs font-semibold">{current?.label || 'Pen'}</span></>;
-          })()}
-        </button>
-
-        {/* Center controls */}
-        <div className="flex items-center gap-1">
-          {/* Color */}
-          <label className="relative w-10 h-10 rounded-xl overflow-hidden cursor-pointer border-2 border-slate-200 dark:border-slate-700" title="Color">
-            <div className="w-full h-full rounded-xl" style={{ backgroundColor: color }} />
-            <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
-          </label>
-          {/* Undo */}
+      <div className="md:hidden absolute bottom-0 left-0 right-0 z-50 dark:bg-slate-900/98 bg-white/98 backdrop-blur-2xl border-t border-slate-200 dark:border-slate-800 px-4 py-2 flex items-center justify-between safe-area-bottom shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
+        
+        {/* Left: Undo / Redo */}
+        <div className="flex items-center gap-1 w-1/3 justify-start">
           <button onClick={handleUndo} disabled={historyStep <= 0}
             className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all">
             <Undo2 className="w-5 h-5 dark:text-slate-300 text-slate-600" />
           </button>
-          {/* Redo */}
           <button onClick={handleRedo} disabled={historyStep >= history.length - 1}
             className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all">
             <Redo2 className="w-5 h-5 dark:text-slate-300 text-slate-600" />
           </button>
         </div>
 
-        {/* Expand tool drawer */}
-        <button onClick={() => setMobileDrawerOpen(v => !v)}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all ${mobileDrawerOpen ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200'}`}>
-          <ChevronUp className={`w-4 h-4 transition-transform ${mobileDrawerOpen ? 'rotate-180' : ''}`} />
-          <span className="text-xs font-semibold">Tools</span>
-        </button>
+        {/* Center: Tools FAB */}
+        <div className="w-1/3 flex justify-center relative">
+          <button onClick={() => { setMobileDrawerOpen(v => !v); setMobileDrawerTab(getActiveTab()); }}
+            className={`absolute bottom-1 w-14 h-14 rounded-full flex flex-col items-center justify-center shadow-lg transition-all ${mobileDrawerOpen ? 'bg-indigo-600 text-white shadow-indigo-500/40' : 'bg-slate-800 dark:bg-white text-white dark:text-slate-900 shadow-slate-900/20'}`}>
+            <ChevronUp className={`w-4 h-4 transition-transform ${mobileDrawerOpen ? 'rotate-180' : ''}`} />
+            <span className="text-[9px] font-black uppercase tracking-wider mt-0.5">Tools</span>
+          </button>
+        </div>
+
+        {/* Right: Current Tool & Color */}
+        <div className="flex items-center gap-2 w-1/3 justify-end">
+          <label className="relative w-8 h-8 rounded-full overflow-hidden cursor-pointer border-2 border-slate-200 dark:border-slate-700 shadow-sm" title="Color">
+            <div className="w-full h-full rounded-full" style={{ backgroundColor: color }} />
+            <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
+          </label>
+          <button onClick={() => { setMobileDrawerOpen(true); setMobileDrawerTab(getActiveTab()); }}
+            className="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 transition-colors">
+            {(() => {
+              const allTools = [...toolGroups.draw, ...toolGroups.shapes, ...toolGroups.select, ...toolGroups.insert];
+              const current = allTools.find(t => t.id === tool);
+              const Icon = current?.icon || PenTool;
+              return <Icon className="w-5 h-5" />;
+            })()}
+          </button>
+        </div>
       </div>
 
       {/* ════════════════════════════════════════════════════════════════
@@ -2484,23 +2497,28 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
               </div>
 
               {/* Tab bar */}
-              <div className="flex items-center gap-1 px-4 pt-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-1 px-2 pt-2 pb-3 border-b border-slate-100 dark:border-slate-800">
                 {(["draw", "shapes", "select", "insert"] as const).map(tab => (
                   <button key={tab} onClick={() => setMobileDrawerTab(tab)}
-                    className={`flex-1 py-2 rounded-xl text-xs font-bold capitalize transition-all ${mobileDrawerTab === tab ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                    className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl text-[10px] font-bold capitalize transition-all ${mobileDrawerTab === tab ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                    {tab === "draw" && <PenTool className="w-4 h-4" />}
+                    {tab === "shapes" && <Square className="w-4 h-4" />}
+                    {tab === "select" && <MousePointer2 className="w-4 h-4" />}
+                    {tab === "insert" && <Plus className="w-4 h-4" />}
                     {tab}
                   </button>
                 ))}
               </div>
 
               {/* Tools grid */}
-              <div className="grid grid-cols-4 gap-2 p-4">
+              <div className="grid grid-cols-4 gap-3 p-4">
                 {toolGroups[mobileDrawerTab].map(t => {
                   const isActive = tool === t.id;
                   return (
                     <button key={t.id}
                       onClick={() => { if (t.id === 'image') { imageUploadInputRef.current?.click(); } else { setTool(t.id); } setMobileDrawerOpen(false); if (typeof window !== 'undefined' && navigator.vibrate) navigator.vibrate(8); }}
-                      className={`flex flex-col items-center gap-2 py-3.5 px-2 rounded-2xl transition-all ${isActive ? 'bg-indigo-600 text-white shadow-lg scale-105' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
+                      className={`relative flex flex-col items-center gap-2 py-3.5 px-2 rounded-2xl transition-all ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-slate-900 shadow-md scale-105' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
+                      {isActive && <div className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 bg-indigo-500 rounded-full flex items-center justify-center text-white shadow-sm"><Check className="w-3 h-3" /></div>}
                       <t.icon className="w-5 h-5" />
                       <span className="text-[10px] font-semibold leading-tight text-center">{t.label}</span>
                     </button>
@@ -2509,11 +2527,11 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
               </div>
 
               {/* Quick style controls */}
-              <div className="px-4 pt-1 pb-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="px-4 pt-1 pb-4 border-t border-slate-100 dark:border-slate-800">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Style</p>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col gap-4">
                   {/* Color palette */}
-                  <div className="flex items-center gap-1.5 flex-wrap flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
                     {paletteColors.slice(0, 8).map(c => (
                       <button key={c} onClick={() => setColor(c)}
                         className={`w-7 h-7 rounded-full border-2 transition-all ${color === c ? 'border-indigo-500 scale-125 shadow-md' : 'border-transparent hover:scale-110'}`}
@@ -2524,14 +2542,32 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
                       <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="absolute inset-0 opacity-0 w-full h-full" />
                     </label>
                   </div>
-                  {/* Brush size */}
-                  <div className="flex items-center gap-1">
-                    {[2, 6, 14, 28].map(sz => (
-                      <button key={sz} onClick={() => setBrushSize(sz)}
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${brushSize === sz ? 'bg-indigo-100 dark:bg-indigo-900/50 scale-110' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
-                        <div className="bg-slate-700 dark:bg-slate-300 rounded-full" style={{ width: `${Math.min(18, Math.max(4, sz / 1.5))}px`, height: `${Math.min(18, Math.max(4, sz / 1.5))}px` }} />
-                      </button>
-                    ))}
+                  
+                  {/* Size and Opacity Sliders */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1 w-full">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                          {tool === "eraser" || tool === "stroke_eraser" ? "Eraser Size" : "Brush Size"}
+                        </span>
+                        <span className="text-[10px] font-mono font-medium text-slate-600 dark:text-slate-300">{brushSize}px</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <input type="range" min="1" max="48" value={brushSize} onChange={(e) => setBrushSize(parseInt(e.target.value))} className="w-full accent-indigo-500 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer" />
+                        <div className="w-7 h-7 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0">
+                          <div className="rounded-full bg-slate-800 dark:bg-slate-200" style={{ width: `${Math.min(22, Math.max(4, brushSize / 1.5))}px`, height: `${Math.min(22, Math.max(4, brushSize / 1.5))}px` }} />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1 w-full">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">Opacity</span>
+                        <span className="text-[10px] font-mono font-medium text-slate-600 dark:text-slate-300">{strokeOpacity}%</span>
+                      </div>
+                      <div className="flex items-center gap-3 h-7">
+                        <input type="range" min="10" max="100" value={strokeOpacity} onChange={(e) => setStrokeOpacity(parseInt(e.target.value))} className="w-full accent-indigo-500 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

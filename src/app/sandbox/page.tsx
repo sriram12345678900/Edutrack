@@ -411,10 +411,10 @@ export default function SandboxPage() {
 
         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
           {/* Subject Navigation Bar */}
-          <div className="flex p-1 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md overflow-x-auto max-w-full gap-0.5">
+          <div className="flex p-1 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md overflow-x-auto max-w-full gap-0.5 snap-x snap-mandatory hide-scrollbar">
             <button
               onClick={() => setActiveTab('chemistry')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 snap-center ${
                 activeSubject === 'chemistry'
                   ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                   : 'text-slate-400 hover:text-white'
@@ -424,7 +424,7 @@ export default function SandboxPage() {
             </button>
             <button
               onClick={() => setActiveTab('optics')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 snap-center ${
                 activeSubject === 'physics'
                   ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                   : 'text-slate-400 hover:text-white'
@@ -434,7 +434,7 @@ export default function SandboxPage() {
             </button>
             <button
               onClick={() => setActiveTab('biology')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 snap-center ${
                 activeSubject === 'biology'
                   ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                   : 'text-slate-400 hover:text-white'
@@ -462,12 +462,12 @@ export default function SandboxPage() {
       {/* Secondary Sub-Tabs for Chemistry and Physics */}
       {activeSubject !== 'biology' && (
         <div className="max-w-7xl mx-auto flex justify-start mb-6 relative z-10">
-          <div className="flex p-1 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md overflow-x-auto max-w-full gap-1">
+          <div className="flex p-1 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md overflow-x-auto max-w-full gap-1 snap-x snap-mandatory hide-scrollbar">
             {activeSubject === 'chemistry' && (
               <>
                 <button
                   onClick={() => setActiveTab('chemistry')}
-                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all shrink-0 snap-center ${
                     activeTab === 'chemistry'
                       ? 'bg-indigo-600/80 text-white shadow-sm'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -477,7 +477,7 @@ export default function SandboxPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab('periodictable')}
-                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all shrink-0 snap-center ${
                     activeTab === 'periodictable'
                       ? 'bg-indigo-600/80 text-white shadow-sm'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -487,7 +487,7 @@ export default function SandboxPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab('compendium')}
-                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all shrink-0 snap-center ${
                     activeTab === 'compendium'
                       ? 'bg-indigo-600/80 text-white shadow-sm'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -497,7 +497,7 @@ export default function SandboxPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab('titration')}
-                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all shrink-0 snap-center ${
                     activeTab === 'titration'
                       ? 'bg-indigo-600/80 text-white shadow-sm'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -511,7 +511,7 @@ export default function SandboxPage() {
               <>
                 <button
                   onClick={() => setActiveTab('optics')}
-                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all shrink-0 snap-center ${
                     activeTab === 'optics'
                       ? 'bg-pink-600/80 text-white shadow-sm'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -521,23 +521,23 @@ export default function SandboxPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab('circuits')}
-                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all shrink-0 snap-center ${
                     activeTab === 'circuits'
-                      ? 'bg-pink-600/80 text-white shadow-sm'
+                      ? 'bg-blue-600/80 text-white shadow-sm'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  Electric Circuit Builder
+                  Circuit Builder
                 </button>
                 <button
                   onClick={() => setActiveTab('projectile')}
-                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all shrink-0 snap-center ${
                     activeTab === 'projectile'
-                      ? 'bg-pink-600/80 text-white shadow-sm'
+                      ? 'bg-amber-600/80 text-white shadow-sm'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  Projectile Launcher
+                  Projectile Kinematics
                 </button>
               </>
             )}
@@ -1031,7 +1031,7 @@ export default function SandboxPage() {
           </div>
 
           {/* Periodic Table 18-Column Interactive Grid Canvas */}
-          <div className="dark:bg-[#070916] bg-white dark:border-white/10 border-slate-200 rounded-3xl p-5 shadow-2xl backdrop-blur-xl overflow-x-auto">
+          <div className="hidden md:block dark:bg-[#070916] bg-white dark:border-white/10 border-slate-200 rounded-3xl p-5 shadow-2xl backdrop-blur-xl overflow-x-auto">
             <div 
               className="min-w-[1020px] grid gap-1.5"
               style={{ gridTemplateColumns: 'repeat(18, minmax(0, 1fr))' }}
@@ -1121,6 +1121,32 @@ export default function SandboxPage() {
                 });
               })}
             </div>
+          </div>
+
+          {/* Mobile Periodic Table Card List */}
+          <div className="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-3 pb-8">
+            {periodicTableElements.map(el => {
+              const catDetail = CATEGORY_DETAILS[el.category] || CATEGORY_DETAILS.unknown;
+              return (
+                <button
+                  key={`el_card_${el.number}`}
+                  onClick={() => setSelectedElement(el)}
+                  className={`p-3 rounded-2xl border flex items-center justify-between text-left transition-all hover:scale-[1.02] active:scale-95 shadow-md ${catDetail.bg} ${catDetail.border}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-black/20 flex flex-col items-center justify-center border border-white/10 shrink-0">
+                      <span className="text-[10px] font-mono text-slate-300 font-bold leading-none">{el.number}</span>
+                      <span className="text-xl font-black text-white leading-none mt-0.5">{el.symbol}</span>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-black text-white">{el.name}</h4>
+                      <p className={`text-[10px] font-bold mt-0.5 ${catDetail.text} uppercase tracking-wider`}>{catDetail.name}</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-white/50" />
+                </button>
+              );
+            })}
           </div>
 
           {/* Element Inspector Drawer / Modal */}

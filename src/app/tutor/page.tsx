@@ -993,7 +993,7 @@ export default function TutorPage() {
             </div>
 
             {/* Fixed Input Dock Inside Box */}
-            <div className="p-3 sm:p-4 pb-4 sm:pb-5 dark:bg-[#040616] bg-[#eef1f9] border-t border-cyan-500/20 backdrop-blur-2xl shrink-0 z-20 shadow-[0_-15px_40px_rgba(0,0,0,0.5)]">
+            <div className="p-3 sm:p-4 pb-20 sm:pb-5 dark:bg-[#040616] bg-[#eef1f9] border-t border-cyan-500/20 backdrop-blur-2xl shrink-0 z-20 shadow-[0_-15px_40px_rgba(0,0,0,0.5)]">
               <div className="max-w-5xl mx-auto">
                 
                 {attachedImage && (
@@ -1023,11 +1023,11 @@ export default function TutorPage() {
                     onChange={(e) => setChatInputValue(e.target.value)}
                     onPaste={handleChatPaste}
                     placeholder={isListening ? "Listening closely to your voice..." : "Ask your doubt (e.g. solve 2x² - 5x + 3 = 0, or upload photo)..."}
-                    className={`w-full dark:bg-[#030514] bg-[#eef1f9] border ${
+                    className={`w-full dark:bg-[#030514] bg-white border ${
                       isListening 
                         ? "border-red-500/60 focus:ring-red-500" 
-                        : "border-white/10 focus:border-cyan-500/60 focus:ring-2 focus:ring-cyan-500/25"
-                    } rounded-full pl-13 pr-24 py-3.5 text-sm focus:outline-none text-slate-100 placeholder:text-slate-500 transition-all font-semibold shadow-inner`}
+                        : "border-slate-300 dark:border-white/10 focus:border-cyan-500/60 focus:ring-2 focus:ring-cyan-500/25"
+                    } rounded-full pl-13 pr-24 py-3.5 text-sm focus:outline-none dark:text-slate-100 text-slate-900 placeholder:text-slate-500 transition-all font-semibold shadow-inner`}
                   />
 
                   <button 

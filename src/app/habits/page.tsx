@@ -94,6 +94,7 @@ export default function HabitTrackerPage() {
   const [activeCategoryFilter, setActiveCategoryFilter] = useState<'all' | HabitCategory>('all');
   const [todayFilter, setTodayFilter] = useState<'all' | 'pending' | 'done'>('all');
   const [chartViewMode, setChartViewMode] = useState<'donut' | 'weekday' | 'gauge' | 'heatmap'>('donut');
+  const [mobileView, setMobileView] = useState<'matrix' | 'cards'>('cards');
   
   // Modals & UI States
   const [showAddModal, setShowAddModal] = useState(false);
@@ -1339,37 +1340,91 @@ export default function HabitTrackerPage() {
               </h3>
             </div>
 
-            {/* Category Filter Chips */}
-            <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-850 text-xs font-bold">
-              <button
-                onClick={() => setActiveCategoryFilter('all')}
-                className={`px-3 py-1 rounded-lg transition-all ${activeCategoryFilter === 'all' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
-              >
-                All Categories
-              </button>
-              <button
-                onClick={() => setActiveCategoryFilter('academic')}
-                className={`px-3 py-1 rounded-lg transition-all ${activeCategoryFilter === 'academic' ? 'bg-indigo-600/30 text-indigo-300 border border-indigo-500/40' : 'text-slate-400 hover:text-slate-200'}`}
-              >
-                Academic
-              </button>
-              <button
-                onClick={() => setActiveCategoryFilter('wellness')}
-                className={`px-3 py-1 rounded-lg transition-all ${activeCategoryFilter === 'wellness' ? 'bg-emerald-600/30 text-emerald-300 border border-emerald-500/40' : 'text-slate-400 hover:text-slate-200'}`}
-              >
-                Wellness
-              </button>
-              <button
-                onClick={() => setActiveCategoryFilter('focus')}
-                className={`px-3 py-1 rounded-lg transition-all ${activeCategoryFilter === 'focus' ? 'bg-amber-600/30 text-amber-300 border border-amber-500/40' : 'text-slate-400 hover:text-slate-200'}`}
-              >
-                Focus
-              </button>
+            {/* Category Filter & Mobile View Switcher */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+              <div className="flex sm:hidden p-1 bg-slate-950 rounded-xl border border-slate-850 w-full">
+                <button
+                  onClick={() => setMobileView('cards')}
+                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${mobileView === 'cards' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
+                >
+                  Today's Cards
+                </button>
+                <button
+                  onClick={() => setMobileView('matrix')}
+                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${mobileView === 'matrix' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
+                >
+                  Matrix View
+                </button>
+              </div>
+
+              <div className="flex overflow-x-auto pb-1 sm:pb-0 hide-scrollbar bg-slate-950 p-1 rounded-xl border border-slate-850 text-xs font-bold shrink-0">
+                <button
+                  onClick={() => setActiveCategoryFilter('all')}
+                  className={`px-3 py-1 rounded-lg transition-all whitespace-nowrap ${activeCategoryFilter === 'all' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+                >
+                  All Categories
+                </button>
+                <button
+                  onClick={() => setActiveCategoryFilter('academic')}
+                  className={`px-3 py-1 rounded-lg transition-all whitespace-nowrap ${activeCategoryFilter === 'academic' ? 'bg-indigo-600/30 text-indigo-300 border border-indigo-500/40' : 'text-slate-400 hover:text-slate-200'}`}
+                >
+                  Academic
+                </button>
+                <button
+                  onClick={() => setActiveCategoryFilter('wellness')}
+                  className={`px-3 py-1 rounded-lg transition-all whitespace-nowrap ${activeCategoryFilter === 'wellness' ? 'bg-emerald-600/30 text-emerald-300 border border-emerald-500/40' : 'text-slate-400 hover:text-slate-200'}`}
+                >
+                  Wellness
+                </button>
+                <button
+                  onClick={() => setActiveCategoryFilter('focus')}
+                  className={`px-3 py-1 rounded-lg transition-all whitespace-nowrap ${activeCategoryFilter === 'focus' ? 'bg-amber-600/30 text-amber-300 border border-amber-500/40' : 'text-slate-400 hover:text-slate-200'}`}
+                >
+                  Focus
+                </button>
+              </div>
             </div>
           </div>
 
+          {/* Mobile Card View (Today only) */}
+          {mobileView === 'cards' && (
+            <div className="sm:hidden grid grid-cols-1 gap-3">
+              {filteredHabits.map(h => {
+                const isChecked = getLog(h.id, realYear, realMonthIndex, realDay);
+                return (
+                  <div key={h.id} className="p-4 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between shadow-sm hover:border-slate-700 transition-colors">
+                    <div className="flex items-center gap-3 overflow-hidden mr-3">
+                      <div className={`w-12 h-12 flex shrink-0 items-center justify-center rounded-2xl text-2xl transition-colors ${isChecked ? 'bg-emerald-500/20 border border-emerald-500/30' : 'bg-slate-800 border border-slate-700'}`}>
+                        {h.emoji}
+                      </div>
+                      <div className="overflow-hidden">
+                        <h4 className="text-sm font-black text-white truncate">{h.name}</h4>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className={`w-2 h-2 rounded-full ${h.category === 'academic' ? 'bg-indigo-400' : h.category === 'wellness' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{h.category}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        toggleLog(h.id, realYear, realMonthIndex, realDay);
+                        if (!isChecked) {
+                          playVictoryFanfare();
+                          triggerConfetti();
+                        }
+                      }}
+                      className={`w-12 h-12 shrink-0 rounded-xl flex items-center justify-center transition-all ${isChecked ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-105' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-300'}`}
+                    >
+                      <Check className="w-6 h-6" />
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
           {/* Matrix Scrollable Table */}
-          <div className="overflow-x-auto">
+          <div className={`overflow-x-auto ${mobileView === 'cards' ? 'hidden sm:block' : 'block'}`}>
             <div className="min-w-[840px]">
               <table className="w-full border-collapse">
                 <thead>

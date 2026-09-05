@@ -438,7 +438,7 @@ export default function EduTrackVoiceAssistant() {
   return (
     <>
       {/* ── TOP-RIGHT / SIDEBAR FLOATING VOICE PILL ── */}
-      <div className="fixed top-3 right-20 sm:right-24 z-[130] flex items-center gap-2">
+      <div className="fixed top-14 right-4 sm:top-4 sm:right-24 z-[130] flex items-center gap-2">
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

@@ -208,6 +208,11 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     pathname === "/groups" || pathname.startsWith("/groups/") ||
     pathname === "/whiteboard" || pathname.startsWith("/whiteboard/") ||
     pathname === "/tutor" || pathname.startsWith("/tutor/") ||
+    pathname === "/arena" || pathname.startsWith("/arena/") ||
+    pathname === "/sandbox" || pathname.startsWith("/sandbox/") ||
+    pathname === "/habits" || pathname.startsWith("/habits/") ||
+    pathname === "/podcast" || pathname.startsWith("/podcast/") ||
+    pathname === "/viva" || pathname.startsWith("/viva/") ||
     pathname === "/lens" || pathname.startsWith("/lens/");
 
   return (

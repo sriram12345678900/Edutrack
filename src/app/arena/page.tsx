@@ -495,15 +495,30 @@ export default function ArenaPage() {
         {gameState === "playing" && (
           <div className="space-y-6">
             
-            {/* Top Battle HUD */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-lg">
-              <div className="flex items-center gap-4">
-                <span className="text-xs font-black text-indigo-400">Q {currentQIndex + 1}/{ARENA_QUESTIONS.length}</span>
-                <span className="text-xs px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 font-bold">{currentQuestion.subject}</span>
+            {/* Top Battle HUD (2-Tier on Mobile) */}
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
+              
+              {/* Top tier (Mobile) / Left (Desktop) */}
+              <div className="flex items-center justify-between md:justify-start w-full md:w-auto gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-black text-indigo-400">Q {currentQIndex + 1}/{ARENA_QUESTIONS.length}</span>
+                  <span className="text-xs px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 font-bold hidden sm:inline-block truncate max-w-[120px]">{currentQuestion.subject}</span>
+                </div>
+                
+                {/* Timer Dial (Mobile) */}
+                <div className="flex md:hidden items-center gap-2 bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-700/50">
+                  <Timer className={cn("w-4 h-4", timeLeft <= 5 ? "text-red-500 animate-ping" : "text-amber-400")} />
+                  <span className={cn(
+                    "text-lg font-black font-mono",
+                    timeLeft <= 5 ? "text-red-400 animate-pulse" : "text-white"
+                  )}>
+                    {timeLeft}s
+                  </span>
+                </div>
               </div>
 
-              {/* Timer Dial */}
-              <div className="flex items-center gap-2">
+              {/* Center (Desktop only Timer) */}
+              <div className="hidden md:flex items-center gap-2">
                 <Timer className={cn("w-5 h-5", timeLeft <= 5 ? "text-red-500 animate-ping" : "text-amber-400")} />
                 <span className={cn(
                   "text-xl font-black font-mono",
@@ -513,39 +528,50 @@ export default function ArenaPage() {
                 </span>
               </div>
 
-              <div className="flex items-center gap-3">
-                <span className="text-xs font-bold text-slate-400">Streak:</span>
-                <span className="text-xs font-black text-amber-400 flex items-center gap-1">
-                  <Flame className="w-4 h-4 fill-amber-400" /> {streak}x
-                </span>
-                <span className="text-sm font-black text-emerald-400">Score: {userScore}</span>
+              {/* Bottom tier (Mobile) / Right (Desktop) */}
+              <div className="flex items-center justify-between md:justify-end w-full md:w-auto gap-3 pt-3 md:pt-0 border-t border-slate-800 md:border-t-0">
+                <span className="text-xs px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 font-bold sm:hidden truncate max-w-[120px]">{currentQuestion.subject}</span>
+                
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1.5 bg-slate-800/50 px-2 py-1 rounded-lg">
+                    <Flame className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    <span className="text-xs font-black text-amber-400">{streak}x</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-lg">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Score</span>
+                    <span className="text-sm font-black text-emerald-400">{userScore}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Power-up toolbar */}
-            <div className="flex items-center justify-center gap-3">
+            {/* Power-up toolbar (Responsive Grid on Mobile) */}
+            <div className="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:justify-center sm:gap-3">
               <button
                 onClick={usePower5050}
                 disabled={power5050Used || isAnswered}
-                className="px-4 py-2 rounded-xl bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 disabled:opacity-30 text-purple-300 text-xs font-black flex items-center gap-1.5 transition-all"
+                className="col-span-1 p-2 sm:px-4 sm:py-2 rounded-xl bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 disabled:opacity-30 text-purple-300 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 transition-all"
               >
-                <Zap className="w-3.5 h-3.5" /> 50:50 ({power5050Used ? "Used" : "Ready"})
+                <Zap className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> 
+                <span className="text-[9px] sm:text-xs font-black text-center leading-tight">50:50<br className="sm:hidden" />{power5050Used ? "(Used)" : ""}</span>
               </button>
 
               <button
                 onClick={useTimeFreeze}
                 disabled={isAnswered}
-                className="px-4 py-2 rounded-xl bg-blue-600/20 border border-blue-500/40 hover:bg-blue-600/30 disabled:opacity-30 text-blue-300 text-xs font-black flex items-center gap-1.5 transition-all"
+                className="col-span-1 p-2 sm:px-4 sm:py-2 rounded-xl bg-blue-600/20 border border-blue-500/40 hover:bg-blue-600/30 disabled:opacity-30 text-blue-300 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 transition-all"
               >
-                <Timer className="w-3.5 h-3.5" /> +10s Time Freeze
+                <Timer className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> 
+                <span className="text-[9px] sm:text-xs font-black text-center leading-tight">+10s<br className="sm:hidden" />Freeze</span>
               </button>
 
               <button
                 onClick={useDoubleScore}
                 disabled={doubleScoreActive || isAnswered}
-                className="px-4 py-2 rounded-xl bg-amber-600/20 border border-amber-500/40 hover:bg-amber-600/30 disabled:opacity-30 text-amber-300 text-xs font-black flex items-center gap-1.5 transition-all"
+                className="col-span-1 p-2 sm:px-4 sm:py-2 rounded-xl bg-amber-600/20 border border-amber-500/40 hover:bg-amber-600/30 disabled:opacity-30 text-amber-300 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 transition-all"
               >
-                <Flame className="w-3.5 h-3.5" /> 2x Score Multiplier {doubleScoreActive && "(Active)"}
+                <Flame className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> 
+                <span className="text-[9px] sm:text-xs font-black text-center leading-tight">2x<br className="sm:hidden" />Score</span>
               </button>
             </div>
 

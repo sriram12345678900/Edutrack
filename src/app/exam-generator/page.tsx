@@ -429,7 +429,7 @@ ${q.markingScheme}
                     {/* Question Answering Area */}
                     {q.options ? (
                       /* Section A MCQs */
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pl-10 max-w-2xl">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pl-0 sm:pl-10 mt-3 sm:mt-0 max-w-2xl">
                         {q.options.map((opt) => {
                           const optLabel = opt.match(/^\([a-d]\)/)?.[0] || opt.substring(0, 3);
                           const isSelected = answer === optLabel || answer === opt;
@@ -452,7 +452,7 @@ ${q.markingScheme}
                       </div>
                     ) : (
                       /* Descriptive questions */
-                      <div className="pl-10">
+                      <div className="pl-0 sm:pl-10 mt-3 sm:mt-0">
                         <textarea
                           value={answer}
                           onChange={(e) => setStudentAnswers({ ...studentAnswers, [q.num]: e.target.value })}
@@ -673,37 +673,37 @@ ${q.markingScheme}
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:flex md:flex-wrap items-center gap-2 md:gap-3 w-full md:w-auto mt-4 md:mt-0">
                   <button
                     onClick={startExam}
-                    className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-indigo-600/30 transition-all"
+                    className="px-3 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition-all w-full"
                   >
-                    <Sparkles className="w-4 h-4 text-white animate-pulse" />
-                    Start Exam Mode
+                    <Sparkles className="w-4 h-4 text-white animate-pulse shrink-0" />
+                    <span>Start Exam</span>
                   </button>
 
                   <button
                     onClick={() => setShowMarkingScheme(!showMarkingScheme)}
-                    className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-2 transition-all"
+                    className="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 transition-all w-full"
                   >
-                    {showMarkingScheme ? <EyeOff className="w-4 h-4 text-amber-400" /> : <Eye className="w-4 h-4 text-emerald-400" />}
-                    {showMarkingScheme ? "Hide Solutions" : "Show Marking Scheme"}
+                    {showMarkingScheme ? <EyeOff className="w-4 h-4 text-amber-400 shrink-0" /> : <Eye className="w-4 h-4 text-emerald-400 shrink-0" />}
+                    <span>{showMarkingScheme ? "Hide Rubric" : "Show Rubric"}</span>
                   </button>
 
                   <button
                     onClick={handleCopyMarkdown}
-                    className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-2 transition-all"
+                    className="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 transition-all w-full md:w-auto"
                   >
-                    {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                    {copied ? "Copied!" : "Copy Paper"}
+                    {copied ? <Check className="w-4 h-4 text-emerald-400 shrink-0" /> : <Copy className="w-4 h-4 shrink-0" />}
+                    <span>{copied ? "Copied!" : "Copy"}</span>
                   </button>
 
                   <button
                     onClick={handlePrint}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-emerald-600/30 transition-all"
+                    className="px-3 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition-all w-full md:w-auto"
                   >
-                    <Printer className="w-4 h-4" />
-                    Print / Save PDF
+                    <Printer className="w-4 h-4 shrink-0" />
+                    <span>Print PDF</span>
                   </button>
                 </div>
               </div>
