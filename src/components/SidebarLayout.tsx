@@ -70,6 +70,7 @@ const categories = [
     items: [
       { href: "/shop", label: "Rewards Shop", icon: ShoppingBag, badge: "XP" },
       { href: "/exam-generator", label: "Exam Generator", icon: FileText, badge: "Print" },
+      { href: "/generator", label: "Question Generator", icon: Target, badge: "AI" },
       { href: "/games", label: "EduArcade", icon: Gamepad2, badge: "XP" },
       { href: "/groups", label: "StudyCircles", icon: Users },
       { href: "/pyq", label: "PYQs Hub", icon: Award },

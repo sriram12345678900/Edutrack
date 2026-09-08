@@ -12,6 +12,11 @@ export default function Error({
   useEffect(() => {
     // Log the error to an error reporting service
     console.error("Caught in error.tsx:", error);
+    
+    // Automatically reload the page if it's a chunk load error (usually means a new deployment happened)
+    if (error.name === 'ChunkLoadError' || error.message.includes('Loading chunk') || error.message.includes('ChunkLoadError')) {
+      window.location.reload();
+    }
   }, [error]);
 
   return (

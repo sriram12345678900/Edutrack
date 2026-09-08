@@ -73,7 +73,7 @@ export default function DivyangjanAccessibilitySuite() {
   return (
     <>
       {/* ── FLOATING ACCESSIBILITY WIDGET ICON ── */}
-      <div className="fixed bottom-24 right-3 md:bottom-8 md:right-6 z-[130]">
+      <div className="fixed bottom-44 right-4 md:bottom-28 md:right-8 z-[130]">
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

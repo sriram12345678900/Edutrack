@@ -72,6 +72,12 @@ export default function UserAvatar({
 }: UserAvatarProps) {
   const [activeFrame, setActiveFrame] = useState<string | null>(frameId !== undefined ? frameId : null);
   const [activeCompanion, setActiveCompanion] = useState<string | null>(companionIcon || null);
+  const [robloxAvatar, setRobloxAvatar] = useState<any>({
+    bodyColor: "#f1f3f6",
+    face: "classic",
+    hat: "scholar",
+    outfit: "default",
+  });
 
   useEffect(() => {
     // If explicit frameId is provided, respect it
@@ -83,6 +89,13 @@ export default function UserAvatar({
     if (typeof window !== "undefined") {
       const storedFrame = localStorage.getItem("edutrack_equipped_frame");
       setActiveFrame(storedFrame || "frame-gold");
+
+      const rawRoblox = localStorage.getItem("edutrack_roblox_avatar");
+      if (rawRoblox) {
+        try {
+          setRobloxAvatar(JSON.parse(rawRoblox));
+        } catch (_) {}
+      }
 
       const storedCompanion = localStorage.getItem("edutrack_equipped_companion");
       if (!companionIcon && storedCompanion) {
@@ -99,6 +112,9 @@ export default function UserAvatar({
       const handleShopUpdate = (e: any) => {
         if (frameId === undefined) {
           setActiveFrame(e.detail?.equippedFrame || null);
+        }
+        if (e.detail?.robloxAvatar) {
+          setRobloxAvatar(e.detail.robloxAvatar);
         }
         if (!companionIcon) {
           const compId = e.detail?.equippedCompanion;
@@ -121,6 +137,16 @@ export default function UserAvatar({
   const sizeConfig = SIZE_MAP[size] || SIZE_MAP.md;
   const frameConfig = activeFrame ? FRAME_DECORATIONS[activeFrame] : null;
 
+  const hatEmojis: Record<string, string> = {
+    scholar: "🎓",
+    crown: "👑",
+    cyber: "⚡",
+    astro: "🧑‍🚀",
+    headphones: "🎧",
+    halo: "😇",
+    wizard: "🧙",
+  };
+
   return (
     <div
       className={cn("relative inline-flex shrink-0 items-center justify-center select-none", className)}
@@ -141,13 +167,45 @@ export default function UserAvatar({
             alt={name}
             className="w-full h-full object-cover rounded-full"
             onError={(e) => {
-              // Fallback to initials on broken image link
               (e.target as HTMLElement).style.display = "none";
             }}
           />
         ) : (
-          <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white font-black shadow-inner">
-            <span className={sizeConfig.text}>{displayInitials}</span>
+          /* 3D Scholar Head Avatar */
+          <div
+            className="w-full h-full rounded-full flex flex-col items-center justify-center relative overflow-hidden transition-all shadow-inner"
+            style={{ backgroundColor: robloxAvatar?.bodyColor || "#f1f3f6" }}
+          >
+            {/* Equipped Hat */}
+            {robloxAvatar?.hat && robloxAvatar.hat !== "none" && hatEmojis[robloxAvatar.hat] && (
+              <span className="absolute -top-0.5 inset-x-0 flex justify-center text-[10px] z-10 filter drop-shadow-sm">
+                {hatEmojis[robloxAvatar.hat]}
+              </span>
+            )}
+
+            {/* Classic Smile Face */}
+            <div className="flex flex-col items-center justify-center mt-1">
+              <div className="flex items-center gap-1 mb-0.5">
+                <div className="w-1 h-1.5 bg-slate-950 rounded-full" />
+                <div className="w-1 h-1.5 bg-slate-950 rounded-full" />
+              </div>
+              <div className="w-2.5 h-1 border-b-[1.5px] border-slate-950 rounded-full" />
+            </div>
+
+            {/* Torso glimpse */}
+            <div
+              className="absolute bottom-0 inset-x-0 h-1"
+              style={{
+                backgroundColor:
+                  robloxAvatar?.outfit === "noob"
+                    ? "#0055bf"
+                    : robloxAvatar?.outfit === "suit"
+                    ? "#1e293b"
+                    : robloxAvatar?.outfit === "labcoat"
+                    ? "#38bdf8"
+                    : "#94a3b8",
+              }}
+            />
           </div>
         )}
       </div>

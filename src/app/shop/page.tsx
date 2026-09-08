@@ -6,11 +6,20 @@ import {
   Palette, Flame, ShieldCheck, Zap, Star, Award, RotateCcw,
   Volume2, VolumeX, Search, Filter, ArrowUpDown, Gift, Eye,
   Clock, CheckCircle2, AlertCircle, RefreshCw, X, ChevronRight,
-  Wand2, Info, ArrowRight, Layers
+  Wand2, Info, ArrowRight, Layers, RotateCw, Save, Smile, Shirt
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Confetti from "@/components/Confetti";
 import UserAvatar from "@/components/UserAvatar";
+import RobloxAvatar, { 
+  RobloxAvatarConfig, 
+  DEFAULT_ROBLOX_CONFIG,
+  RobloxFaceType,
+  RobloxHatType,
+  RobloxOutfitType,
+  RobloxGearType,
+  RobloxPoseType
+} from "@/components/RobloxAvatar";
 import {
   SHOP_ITEMS,
   ShopItem,
@@ -25,8 +34,27 @@ import {
   isBoosterActive,
   getBoosterTimeRemaining,
   playShopSound,
-  applyTheme
+  applyTheme,
+  saveRobloxAvatarConfig
 } from "@/lib/shop";
+
+const SKIN_TONES = [
+  { id: "#f1f3f6", label: "Studio White", color: "#f1f3f6", ring: "ring-slate-400" },
+  { id: "#f5cd2f", label: "Classic Noob Yellow", color: "#f5cd2f", ring: "ring-amber-400" },
+  { id: "#d4a373", label: "Warm Bronze", color: "#d4a373", ring: "ring-amber-700" },
+  { id: "#38bdf8", label: "Cyber Cyan", color: "#38bdf8", ring: "ring-cyan-400" },
+  { id: "#34d399", label: "Emerald Matrix", color: "#34d399", ring: "ring-emerald-400" },
+  { id: "#a855f7", label: "Void Violet", color: "#a855f7", ring: "ring-purple-400" },
+  { id: "#fbbf24", label: "Imperial Gold", color: "#fbbf24", ring: "ring-yellow-400" },
+  { id: "#1e293b", label: "Dark Knight", color: "#1e293b", ring: "ring-slate-600" },
+];
+
+const POSES: { id: RobloxPoseType; label: string; icon: string }[] = [
+  { id: "idle", label: "Idle Stance", icon: "🧍" },
+  { id: "wave", label: "Wave", icon: "👋" },
+  { id: "cheer", label: "Cheer", icon: "🎉" },
+  { id: "levitate", label: "Float", icon: "✨" },
+];
 
 export default function ShopPage() {
   // Core user state
@@ -35,13 +63,21 @@ export default function ShopPage() {
   const [displayName, setDisplayName] = useState<string>("Scholar");
   const [userPhoto, setUserPhoto] = useState<string | null>(null);
   
+  // Showroom View Mode: "roblox" (3D Studio) vs "classic" (2D Mirror)
+  const [showroomMode, setShowroomMode] = useState<"roblox" | "classic">("roblox");
+  const [autoRotate3D, setAutoRotate3D] = useState<boolean>(false);
+
+  // 3D Avatar Studio Preview State
+  const [previewRoblox, setPreviewRoblox] = useState<RobloxAvatarConfig>(DEFAULT_ROBLOX_CONFIG);
+
   // UI & interactive state
   const [activeTab, setActiveTab] = useState<"all" | ShopCategory>("all");
+  const [avatarSubTab, setAvatarSubTab] = useState<"all" | "hat" | "outfit" | "face" | "gear">("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<"all" | "owned" | "affordable" | "locked">("all");
   const [sortBy, setSortBy] = useState<"recommended" | "price-asc" | "price-desc" | "rarity">("recommended");
   
-  // Fitting Room / Wardrobe Try-On state
+  // Classic Fitting Room / Wardrobe Try-On state
   const [previewFrame, setPreviewFrame] = useState<string | null>(null);
   const [previewTitle, setPreviewTitle] = useState<string | null>(null);
   const [previewTheme, setPreviewTheme] = useState<string | null>(null);
@@ -49,7 +85,6 @@ export default function ShopPage() {
 
   // Purchase modal & celebrations
   const [pendingPurchaseItem, setPendingPurchaseItem] = useState<ShopItem | null>(null);
-  const [autoEquipOnBuy, setAutoEquipOnBuy] = useState<boolean>(true);
   const [confettiActive, setConfettiActive] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<{ text: string; type: "success" | "error" | "info" } | null>(null);
   const [isMuted, setIsMuted] = useState<boolean>(false);
@@ -73,6 +108,7 @@ export default function ShopPage() {
       setPreviewTitle(state.equippedTitle);
       setPreviewTheme(state.equippedTheme);
       setPreviewCompanion(state.equippedCompanion);
+      setPreviewRoblox(state.robloxAvatar);
 
       setBoosterTimeRemaining(getBoosterTimeRemaining());
 
@@ -85,6 +121,9 @@ export default function ShopPage() {
       const handleShopUpdate = (e: any) => {
         if (e.detail) {
           setShopState(e.detail);
+          if (e.detail.robloxAvatar) {
+            setPreviewRoblox(e.detail.robloxAvatar);
+          }
         }
       };
 
@@ -120,7 +159,7 @@ export default function ShopPage() {
   const handleOpenPurchase = (item: ShopItem) => {
     if (userXp < item.cost) {
       playShopSound("error");
-      showToast(`You need ${item.cost - userXp} more XP for ${item.name}! Complete quizzes or daily quests to earn XP.`, "error");
+      showToast(`You need ${item.cost - userXp} more XP for ${item.name}! Complete quizzes or study flashcards to earn XP.`, "error");
       return;
     }
     setPendingPurchaseItem(item);
@@ -141,6 +180,10 @@ export default function ShopPage() {
       if (item.category === "title") setPreviewTitle(item.id);
       if (item.category === "theme") setPreviewTheme(item.id);
       if (item.category === "companion") setPreviewCompanion(item.id);
+      if (item.category === "avatar_item" && item.robloxSlot && item.robloxValue) {
+        setPreviewRoblox((prev) => ({ ...prev, [item.robloxSlot!]: item.robloxValue }));
+        setShowroomMode("roblox");
+      }
 
       setTimeout(() => setConfettiActive(false), 3000);
     } else {
@@ -151,6 +194,22 @@ export default function ShopPage() {
 
   // ── Equip / Unequip Handling ──
   const handleEquipToggle = (item: ShopItem) => {
+    if (item.category === "avatar_item" && item.robloxSlot && item.robloxValue) {
+      const isCurrentlyEquipped = (shopState.robloxAvatar as any)[item.robloxSlot] === item.robloxValue;
+      if (isCurrentlyEquipped) {
+        unequipShopItem("avatar_item", item.robloxSlot);
+        const fallbackVal = item.robloxSlot === "hat" ? "none" : item.robloxSlot === "gear" ? "none" : item.robloxSlot === "outfit" ? "default" : "classic";
+        setPreviewRoblox(prev => ({ ...prev, [item.robloxSlot!]: fallbackVal }));
+        showToast(`Unequipped ${item.name}`, "info");
+      } else {
+        equipShopItem(item.id, "avatar_item");
+        setPreviewRoblox(prev => ({ ...prev, [item.robloxSlot!]: item.robloxValue }));
+        setShowroomMode("roblox");
+        showToast(`Equipped ${item.name} on 3D Character!`, "success");
+      }
+      return;
+    }
+
     const isEquipped =
       (item.category === "frame" && shopState.equippedFrame === item.id) ||
       (item.category === "title" && shopState.equippedTitle === item.id) ||
@@ -177,6 +236,17 @@ export default function ShopPage() {
   // ── Wardrobe Try-On Handling ──
   const handleTryOn = (item: ShopItem) => {
     playShopSound("equip");
+    if (item.category === "avatar_item" && item.robloxSlot && item.robloxValue) {
+      setShowroomMode("roblox");
+      setPreviewRoblox((prev) => ({
+        ...prev,
+        [item.robloxSlot!]: item.robloxValue,
+      }));
+      showToast(`Trying on ${item.name} in 3D Studio! Drag character to rotate 360°`, "info");
+      window.scrollTo({ top: 180, behavior: "smooth" });
+      return;
+    }
+
     if (item.category === "frame") setPreviewFrame(item.id);
     if (item.category === "title") setPreviewTitle(item.id);
     if (item.category === "theme") {
@@ -187,13 +257,25 @@ export default function ShopPage() {
     showToast(`Trying on ${item.name} in Wardrobe`, "info");
   };
 
-  const handleResetPreview = () => {
+  const handleResetClassicPreview = () => {
     setPreviewFrame(shopState.equippedFrame);
     setPreviewTitle(shopState.equippedTitle);
     setPreviewTheme(shopState.equippedTheme);
     setPreviewCompanion(shopState.equippedCompanion);
     applyTheme(shopState.equippedTheme);
     showToast("Reverted preview to currently equipped loadout", "info");
+  };
+
+  // ── 3D Avatar Studio Handlers ──
+  const handleSaveRobloxAvatar = () => {
+    saveRobloxAvatarConfig(previewRoblox);
+    playShopSound("buy");
+    showToast("💾 Saved 3D Avatar! Displaying across your profile and sidebar.", "success");
+  };
+
+  const handleResetRobloxAvatar = () => {
+    setPreviewRoblox(shopState.robloxAvatar);
+    showToast("Reverted 3D avatar to equipped look.", "info");
   };
 
   // ── Daily Mystery Chest ──
@@ -223,8 +305,13 @@ export default function ShopPage() {
   // ── Filtering & Sorting ──
   const filteredItems = useMemo(() => {
     return SHOP_ITEMS.filter((item) => {
-      // Category filter
+      // Main category filter
       if (activeTab !== "all" && item.category !== activeTab) return false;
+
+      // Sub-filter for 3D avatar gear
+      if (activeTab === "avatar_item" && avatarSubTab !== "all") {
+        if (item.robloxSlot !== avatarSubTab) return false;
+      }
 
       // Search query
       if (searchQuery.trim()) {
@@ -260,13 +347,21 @@ export default function ShopPage() {
       }
       return 0; // recommended order
     });
-  }, [activeTab, searchQuery, statusFilter, sortBy, shopState, userXp]);
+  }, [activeTab, avatarSubTab, searchQuery, statusFilter, sortBy, shopState, userXp]);
 
-  const isPreviewDifferent =
+  const isClassicPreviewDifferent =
     previewFrame !== shopState.equippedFrame ||
     previewTitle !== shopState.equippedTitle ||
     previewTheme !== shopState.equippedTheme ||
     previewCompanion !== shopState.equippedCompanion;
+
+  const isRobloxPreviewModified =
+    previewRoblox.bodyColor !== shopState.robloxAvatar.bodyColor ||
+    previewRoblox.face !== shopState.robloxAvatar.face ||
+    previewRoblox.hat !== shopState.robloxAvatar.hat ||
+    previewRoblox.outfit !== shopState.robloxAvatar.outfit ||
+    previewRoblox.gear !== shopState.robloxAvatar.gear ||
+    previewRoblox.pose !== shopState.robloxAvatar.pose;
 
   const isDailyChestClaimed = shopState.lastDailyRewardDate === new Date().toDateString();
 
@@ -311,11 +406,11 @@ export default function ShopPage() {
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
               Scholar Rewards Shop
               <span className="text-sm font-black px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border border-indigo-500/20">
-                v2.0
+                3D Studio v2.5
               </span>
             </h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm max-w-2xl leading-relaxed">
-              Unlock exclusive animated avatar frames, academic honorifics, UI color themes, study companions, and functional XP multipliers.
+              Unlock blocky 3D Scholar Avatars, animated avatar frames, academic honorifics, UI themes, companions, and functional XP boosters.
             </p>
           </div>
 
@@ -332,7 +427,7 @@ export default function ShopPage() {
               </div>
             </div>
 
-            {/* Active 2x Booster Pill (if active) */}
+            {/* Active 2x Booster Pill */}
             {boosterTimeRemaining && (
               <div className="px-4 py-3 rounded-2xl bg-indigo-500/15 border border-indigo-500/30 flex items-center gap-2.5 animate-pulse">
                 <RocketIcon className="w-4 h-4 text-indigo-400" />
@@ -363,95 +458,360 @@ export default function ShopPage() {
           </div>
         </div>
 
-        {/* ── 2. INTERACTIVE WARDROBE & FITTING ROOM ("THE MIRROR") ── */}
+        {/* ── 2. INTERACTIVE FITTING ROOM & SHOWROOM ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Fitting Room Mirror Card */}
-          <div className="lg:col-span-2 bg-gradient-to-br from-indigo-900/30 via-slate-900/90 to-purple-900/30 p-6 sm:p-7 rounded-3xl border border-indigo-500/30 shadow-xl relative overflow-hidden backdrop-blur-2xl">
+          {/* Main Fitting Room Card */}
+          <div className="lg:col-span-2 bg-gradient-to-br from-indigo-900/40 via-slate-900/90 to-purple-950/40 p-5 sm:p-7 rounded-3xl border border-indigo-500/30 shadow-xl relative overflow-hidden backdrop-blur-2xl flex flex-col justify-between">
             <div className="absolute -top-24 -right-24 w-72 h-72 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="relative flex flex-col sm:flex-row items-center sm:items-start gap-6">
-              {/* Live Preview Avatar */}
-              <div className="flex flex-col items-center gap-2 shrink-0">
-                <div className="p-3 rounded-3xl bg-white/5 border border-white/10 shadow-inner">
-                  <UserAvatar
-                    src={userPhoto}
-                    name={displayName}
-                    size="xl"
-                    frameId={previewFrame}
-                    companionIcon={previewItemCompanionObj ? previewItemCompanionObj.icon : undefined}
-                  />
+            {/* Card Header & Mode Switcher */}
+            <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center font-black text-base shadow-[0_0_12px_rgba(99,102,241,0.35)] border border-indigo-500/30">
+                  {showroomMode === "roblox" ? "🎮" : "👑"}
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Live Mirror</span>
+                <div>
+                  <h2 className="text-base font-extrabold bg-gradient-to-r from-white to-indigo-200 bg-clip-text text-transparent">
+                    {showroomMode === "roblox" ? "3D Scholar Avatar Studio" : "Scholar Portrait Mirror"}
+                  </h2>
+                  <p className="text-[11px] text-slate-400">
+                    {showroomMode === "roblox"
+                      ? "Interactive 360° Studio Turntable • Drag character to rotate • Try on gear below"
+                      : "Live preview of equipped animated avatar frames, titles, and companions"}
+                  </p>
+                </div>
               </div>
 
-              {/* Loadout Details */}
-              <div className="flex-1 text-center sm:text-left space-y-3">
-                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                  <span className="text-xs font-black text-white">{displayName}</span>
-                  {previewTitle && previewItemTitleObj && (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-300 bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 rounded-lg">
-                      <span>{previewItemTitleObj.icon}</span>
-                      <span>{previewItemTitleObj.name}</span>
-                    </span>
-                  )}
-                  {isPreviewDifferent ? (
-                    <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse">
-                      🔍 Previewing Try-On
-                    </span>
-                  ) : (
-                    <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                      🟢 Currently Equipped
-                    </span>
-                  )}
-                </div>
-
-                <p className="text-xs text-slate-300 dark:text-slate-300 leading-relaxed">
-                  Interactive fitting room: Click <strong className="text-white">"Try On"</strong> on any frame, title, theme, or companion in the catalog below to test how it looks before unlocking!
-                </p>
-
-                {/* Equipped Badges Row */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
-                  <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-left">
-                    <span className="text-[9px] font-bold text-slate-400 block uppercase">Frame</span>
-                    <span className="text-xs font-black text-white truncate block">
-                      {previewFrame ? SHOP_ITEMS.find(i => i.id === previewFrame)?.name || "Default" : "None"}
-                    </span>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-left">
-                    <span className="text-[9px] font-bold text-slate-400 block uppercase">Title</span>
-                    <span className="text-xs font-black text-white truncate block">
-                      {previewTitle ? SHOP_ITEMS.find(i => i.id === previewTitle)?.name || "None" : "None"}
-                    </span>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-left">
-                    <span className="text-[9px] font-bold text-slate-400 block uppercase">Theme</span>
-                    <span className="text-xs font-black text-white truncate block">
-                      {previewTheme ? SHOP_ITEMS.find(i => i.id === previewTheme)?.name.replace(" Theme", "") : "Default Dark"}
-                    </span>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-left">
-                    <span className="text-[9px] font-bold text-slate-400 block uppercase">Companion</span>
-                    <span className="text-xs font-black text-white truncate block">
-                      {previewCompanion ? SHOP_ITEMS.find(i => i.id === previewCompanion)?.name || "None" : "None"}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Reset / Action Buttons */}
-                {isPreviewDifferent && (
-                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-2">
-                    <button
-                      onClick={handleResetPreview}
-                      className="px-3 py-1.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-white transition-all flex items-center gap-1.5"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" /> Revert Preview
-                    </button>
-                  </div>
-                )}
+              {/* View Switcher Pills */}
+              <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/10 self-start sm:self-auto">
+                <button
+                  onClick={() => setShowroomMode("roblox")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+                    showroomMode === "roblox"
+                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <span>🎮</span>
+                  <span>3D Avatar Studio</span>
+                </button>
+                <button
+                  onClick={() => setShowroomMode("classic")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+                    showroomMode === "classic"
+                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <span>👑</span>
+                  <span>Classic Mirror</span>
+                </button>
               </div>
             </div>
+
+            {/* ── SHOWROOM MODE: 3D AVATAR STUDIO ── */}
+            {showroomMode === "roblox" ? (
+              <div className="relative pt-4 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                
+                {/* 3D Character Viewport Column (Generous 450px Height) */}
+                <div className="md:col-span-7 flex flex-col items-center justify-center">
+                  <div className="relative w-full h-[450px] rounded-3xl overflow-hidden shadow-2xl flex items-center justify-center" style={{ background: "#06080f", boxShadow: "0 0 0 1px rgba(99,102,241,0.25), 0 0 30px rgba(99,102,241,0.12), 0 25px 50px -12px rgba(0,0,0,0.8)" }}>
+                    
+                    {/* Top Floating Drag Cue & Auto-Spin Toolbar */}
+                    <div className="absolute top-3 inset-x-3 z-30 flex items-center justify-between pointer-events-none">
+                      <span className="text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-black/60 text-indigo-300 border border-indigo-500/30 backdrop-blur-md flex items-center gap-1.5 shadow-md">
+                        <RotateCw className="w-2.5 h-2.5 text-indigo-400" />
+                        <span>Drag 360° to Inspect</span>
+                      </span>
+
+                      <button
+                        onClick={() => setAutoRotate3D(!autoRotate3D)}
+                        className="pointer-events-auto text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-black/60 hover:bg-white/20 text-white border border-white/15 backdrop-blur-md transition-all flex items-center gap-1.5 shadow-md active:scale-95"
+                      >
+                        {autoRotate3D ? "🌀 Spinning" : "🔄 Auto-Spin"}
+                      </button>
+                    </div>
+
+                    {/* The 3D Scholar Avatar */}
+                    <RobloxAvatar
+                      size="full"
+                      interactive={true}
+                      showControls={false}
+                      config={{ ...previewRoblox, autoRotate: autoRotate3D }}
+                      className="w-full h-full"
+                    />
+
+                    {/* Bottom Emote/Pose Selector Bar (Clean Glass Pill) */}
+                    <div className="absolute bottom-3 inset-x-4 z-30 flex items-center justify-center gap-2 bg-black/70 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 shadow-xl">
+                      {POSES.map((p) => (
+                        <button
+                          key={p.id}
+                          onClick={() => setPreviewRoblox((prev) => ({ ...prev, pose: p.id }))}
+                          className={`px-3 py-1.5 rounded-xl text-[11px] font-black transition-all flex items-center gap-1.5 ${
+                            previewRoblox.pose === p.id
+                              ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30 scale-105"
+                              : "text-slate-400 hover:text-white hover:bg-white/10"
+                          }`}
+                          title={p.label}
+                        >
+                          <span>{p.icon}</span>
+                          <span className="hidden sm:inline">{p.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Character Customization & Studio Controls Column */}
+                <div className="md:col-span-5 space-y-4 text-left">
+                  
+                  {/* Title & Status */}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-black text-white flex items-center gap-2">
+                        {displayName}
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                          R6 Humanoid
+                        </span>
+                      </h3>
+                      <span className="text-xs text-slate-400">Scholar Avatar Studio</span>
+                    </div>
+
+                    {isRobloxPreviewModified ? (
+                      <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse">
+                        Unsaved Changes
+                      </span>
+                    ) : (
+                      <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        Saved & Active
+                      </span>
+                    )}
+                  </div>
+
+                  {/* 1. Skin Tone Swatches (With Crisp White Borders) */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-300 block">
+                      Body & Skin Tone Finish
+                    </label>
+                    <div className="flex flex-wrap items-center gap-2.5 bg-white/5 p-3 rounded-2xl border border-white/10">
+                      {SKIN_TONES.map((tone) => {
+                        const isSelected = previewRoblox.bodyColor?.toLowerCase() === tone.color.toLowerCase();
+                        return (
+                          <button
+                            key={tone.id}
+                            onClick={() => setPreviewRoblox((prev) => ({ ...prev, bodyColor: tone.color }))}
+                            className={`w-9 h-9 rounded-full border-2 border-white/30 transition-all flex items-center justify-center shadow-md relative ${
+                              isSelected
+                                ? `ring-2 ring-offset-2 ring-offset-slate-900 ring-white scale-125 shadow-lg shadow-white/20`
+                                : "hover:scale-110 opacity-85 hover:opacity-100 hover:border-white/60"
+                            }`}
+                            style={{ backgroundColor: tone.color }}
+                            title={tone.label}
+                          >
+                            {isSelected && (
+                              <Check className={`w-4 h-4 ${tone.id === "#f1f3f6" || tone.id === "#f5cd2f" ? "text-slate-950" : "text-white"} stroke-[3]`} />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 2. Equipped Slots Summary (With Instant Remove Buttons) */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+                      <div>
+                        <span className="text-[9px] font-bold text-slate-400 block uppercase">3D Hat</span>
+                        <span className="text-xs font-black text-white truncate block max-w-[90px]">
+                          {previewRoblox.hat && previewRoblox.hat !== "none"
+                            ? previewRoblox.hat.charAt(0).toUpperCase() + previewRoblox.hat.slice(1)
+                            : "None"}
+                        </span>
+                      </div>
+                      {previewRoblox.hat && previewRoblox.hat !== "none" && (
+                        <button
+                          onClick={() => setPreviewRoblox((prev) => ({ ...prev, hat: "none" }))}
+                          className="p-1 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-md transition-colors text-[10px]"
+                          title="Take off Hat"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+                      <div>
+                        <span className="text-[9px] font-bold text-slate-400 block uppercase">Outfit</span>
+                        <span className="text-xs font-black text-white truncate block max-w-[90px]">
+                          {previewRoblox.outfit && previewRoblox.outfit !== "default"
+                            ? previewRoblox.outfit.charAt(0).toUpperCase() + previewRoblox.outfit.slice(1)
+                            : "Studio Dummy"}
+                        </span>
+                      </div>
+                      {previewRoblox.outfit && previewRoblox.outfit !== "default" && (
+                        <button
+                          onClick={() => setPreviewRoblox((prev) => ({ ...prev, outfit: "default" }))}
+                          className="p-1 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-md transition-colors text-[10px]"
+                          title="Reset to Studio Dummy"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+                      <div>
+                        <span className="text-[9px] font-bold text-slate-400 block uppercase">Face Print</span>
+                        <span className="text-xs font-black text-white truncate block max-w-[90px]">
+                          {previewRoblox.face && previewRoblox.face !== "classic"
+                            ? previewRoblox.face.charAt(0).toUpperCase() + previewRoblox.face.slice(1)
+                            : "Classic Smile : )"}
+                        </span>
+                      </div>
+                      {previewRoblox.face && previewRoblox.face !== "classic" && (
+                        <button
+                          onClick={() => setPreviewRoblox((prev) => ({ ...prev, face: "classic" }))}
+                          className="p-1 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-md transition-colors text-[10px]"
+                          title="Reset to Classic Smile"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+                      <div>
+                        <span className="text-[9px] font-bold text-slate-400 block uppercase">Handheld Gear</span>
+                        <span className="text-xs font-black text-white truncate block max-w-[90px]">
+                          {previewRoblox.gear && previewRoblox.gear !== "none"
+                            ? previewRoblox.gear.charAt(0).toUpperCase() + previewRoblox.gear.slice(1)
+                            : "None"}
+                        </span>
+                      </div>
+                      {previewRoblox.gear && previewRoblox.gear !== "none" && (
+                        <button
+                          onClick={() => setPreviewRoblox((prev) => ({ ...prev, gear: "none" }))}
+                          className="p-1 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-md transition-colors text-[10px]"
+                          title="Put away Gear"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 3. Actions Row */}
+                  <div className="flex flex-wrap items-center gap-2 pt-2">
+                    <button
+                      onClick={handleSaveRobloxAvatar}
+                      className="flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 active:scale-95"
+                      style={{ boxShadow: "0 0 20px rgba(16,185,129,0.35), 0 4px 15px rgba(16,185,129,0.2)" }}
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Save Avatar</span>
+                    </button>
+
+                    {isRobloxPreviewModified && (
+                      <button
+                        onClick={handleResetRobloxAvatar}
+                        className="px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all flex items-center gap-1.5"
+                        title="Revert preview back to equipped avatar"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>Revert</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            ) : (
+              /* ── SHOWROOM MODE: CLASSIC MIRROR ── */
+              <div className="relative pt-4 flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                {/* Live Preview Avatar */}
+                <div className="flex flex-col items-center gap-2 shrink-0">
+                  <div className="p-3 rounded-3xl bg-white/5 border border-white/10 shadow-inner">
+                    <UserAvatar
+                      src={userPhoto}
+                      name={displayName}
+                      size="xl"
+                      frameId={previewFrame}
+                      companionIcon={previewItemCompanionObj ? previewItemCompanionObj.icon : undefined}
+                    />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Portrait Mirror</span>
+                </div>
+
+                {/* Loadout Details */}
+                <div className="flex-1 text-center sm:text-left space-y-3">
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                    <span className="text-xs font-black text-white">{displayName}</span>
+                    {previewTitle && previewItemTitleObj && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-300 bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 rounded-lg">
+                        <span>{previewItemTitleObj.icon}</span>
+                        <span>{previewItemTitleObj.name}</span>
+                      </span>
+                    )}
+                    {isClassicPreviewDifferent ? (
+                      <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse">
+                        🔍 Previewing Try-On
+                      </span>
+                    ) : (
+                      <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        🟢 Currently Equipped
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Preview your 2D portrait card with active animated laurel frames, academic honorifics, themes, and study companions.
+                  </p>
+
+                  {/* Equipped Badges Row */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-left">
+                      <span className="text-[9px] font-bold text-slate-400 block uppercase">Frame</span>
+                      <span className="text-xs font-black text-white truncate block">
+                        {previewFrame ? SHOP_ITEMS.find(i => i.id === previewFrame)?.name || "Default" : "None"}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-left">
+                      <span className="text-[9px] font-bold text-slate-400 block uppercase">Title</span>
+                      <span className="text-xs font-black text-white truncate block">
+                        {previewTitle ? SHOP_ITEMS.find(i => i.id === previewTitle)?.name || "None" : "None"}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-left">
+                      <span className="text-[9px] font-bold text-slate-400 block uppercase">Theme</span>
+                      <span className="text-xs font-black text-white truncate block">
+                        {previewTheme ? SHOP_ITEMS.find(i => i.id === previewTheme)?.name.replace(" Theme", "") : "Default Dark"}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-left">
+                      <span className="text-[9px] font-bold text-slate-400 block uppercase">Companion</span>
+                      <span className="text-xs font-black text-white truncate block">
+                        {previewCompanion ? SHOP_ITEMS.find(i => i.id === previewCompanion)?.name || "None" : "None"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Reset Preview Button */}
+                  {isClassicPreviewDifferent && (
+                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-2">
+                      <button
+                        onClick={handleResetClassicPreview}
+                        className="px-3 py-1.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-white transition-all flex items-center gap-1.5"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" /> Revert Preview
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
           </div>
 
           {/* Daily Scholar Mystery Chest Card */}
@@ -511,10 +871,11 @@ export default function ShopPage() {
 
         {/* ── 3. SEARCH, CATEGORIES & FILTER TOOLBAR ── */}
         <div className="space-y-4">
-          {/* Category Tabs */}
+          {/* Main Category Tabs */}
           <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-sm">
             {[
               { id: "all", label: "🌟 All Items", count: SHOP_ITEMS.length },
+              { id: "avatar_item", label: "🎮 3D Avatar Gear", count: SHOP_ITEMS.filter(i => i.category === "avatar_item").length },
               { id: "frame", label: "👑 Avatar Frames", count: SHOP_ITEMS.filter(i => i.category === "frame").length },
               { id: "title", label: "🏆 Titles & Badges", count: SHOP_ITEMS.filter(i => i.category === "title").length },
               { id: "theme", label: "🎨 UI Themes", count: SHOP_ITEMS.filter(i => i.category === "theme").length },
@@ -523,7 +884,12 @@ export default function ShopPage() {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => {
+                  setActiveTab(tab.id as any);
+                  if (tab.id === "avatar_item") {
+                    setShowroomMode("roblox");
+                  }
+                }}
                 className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${
                   activeTab === tab.id
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
@@ -540,6 +906,35 @@ export default function ShopPage() {
             ))}
           </div>
 
+          {/* Sub-tabs for 3D Avatar Gear when selected */}
+          {activeTab === "avatar_item" && (
+            <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-xl bg-indigo-500/5 border border-indigo-500/20">
+              <span className="text-[10px] font-black uppercase tracking-wider text-indigo-400 px-2 flex items-center gap-1">
+                <Shirt className="w-3 h-3" /> Slot:
+              </span>
+              {[
+                { id: "all", label: "All 3D Gear", icon: "✨" },
+                { id: "hat", label: "Hats & Headgear", icon: "🎓" },
+                { id: "outfit", label: "Outfits & Uniforms", icon: "👔" },
+                { id: "face", label: "Faces & Prints", icon: "🙂" },
+                { id: "gear", label: "Handheld Items", icon: "🏆" },
+              ].map((sub) => (
+                <button
+                  key={sub.id}
+                  onClick={() => setAvatarSubTab(sub.id as any)}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                    avatarSubTab === sub.id
+                      ? "bg-indigo-600 text-white shadow-sm"
+                      : "text-slate-500 dark:text-slate-400 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  <span>{sub.icon}</span>
+                  <span>{sub.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Search, Status & Sort Filter Bar */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white dark:bg-slate-900/60 p-3 rounded-2xl border border-slate-200 dark:border-white/10">
             {/* Search Input */}
@@ -547,7 +942,7 @@ export default function ShopPage() {
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search rewards, perks, titles..."
+                placeholder="Search hats, outfits, frames, titles..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-8 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 transition-colors"
@@ -617,6 +1012,7 @@ export default function ShopPage() {
             <button
               onClick={() => {
                 setActiveTab("all");
+                setAvatarSubTab("all");
                 setSearchQuery("");
                 setStatusFilter("all");
               }}
@@ -632,10 +1028,12 @@ export default function ShopPage() {
               const canAfford = userXp >= item.cost;
               
               const isEquipped =
-                (item.category === "frame" && shopState.equippedFrame === item.id) ||
-                (item.category === "title" && shopState.equippedTitle === item.id) ||
-                (item.category === "theme" && shopState.equippedTheme === item.id) ||
-                (item.category === "companion" && shopState.equippedCompanion === item.id);
+                item.category === "avatar_item"
+                  ? item.robloxSlot && (shopState.robloxAvatar as any)[item.robloxSlot] === item.robloxValue
+                  : (item.category === "frame" && shopState.equippedFrame === item.id) ||
+                    (item.category === "title" && shopState.equippedTitle === item.id) ||
+                    (item.category === "theme" && shopState.equippedTheme === item.id) ||
+                    (item.category === "companion" && shopState.equippedCompanion === item.id);
 
               const isCosmetic = item.category !== "powerup";
 
@@ -679,9 +1077,16 @@ export default function ShopPage() {
                       </div>
 
                       <div className="flex flex-col items-end gap-1.5">
-                        <span className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${rCfg.bg} ${rCfg.text} ${rCfg.border}`}>
-                          {rCfg.label}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          {item.robloxSlot && (
+                            <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                              3D {item.robloxSlot}
+                            </span>
+                          )}
+                          <span className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${rCfg.bg} ${rCfg.text} ${rCfg.border}`}>
+                            {rCfg.label}
+                          </span>
+                        </div>
 
                         {isUnlocked && isCosmetic ? (
                           <span className="text-[10px] font-black uppercase text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md flex items-center gap-1">
@@ -721,11 +1126,11 @@ export default function ShopPage() {
                         className="w-full py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200 dark:border-white/10 transition-all flex items-center justify-center gap-1.5 active:scale-98"
                       >
                         <Eye className="w-3.5 h-3.5 text-indigo-400" />
-                        <span>Try On in Wardrobe</span>
+                        <span>{item.category === "avatar_item" ? "Try On in 3D Studio" : "Try On in Wardrobe"}</span>
                       </button>
                     )}
 
-                    {/* Primary Button */}
+                    {/* Primary Equip / Purchase Button */}
                     {isUnlocked && isCosmetic ? (
                       <button
                         onClick={() => handleEquipToggle(item)}
@@ -860,7 +1265,7 @@ export default function ShopPage() {
               💡
             </div>
             <div>
-              <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">How do I earn more Academic XP?</h4>
+              <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">Need XP for more Avatar Gear?</h4>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Earn XP by reading NCERT chapters, reviewing spaced-repetition flashcards, solving PYQs, and competing in the Arena!
               </p>
@@ -869,9 +1274,10 @@ export default function ShopPage() {
 
           <button
             onClick={handleClaimStarterBonus}
-            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-wider shadow-sm transition-all shrink-0 active:scale-95"
+            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-wider shadow-sm transition-all shrink-0 active:scale-95 flex items-center gap-1.5"
           >
-            +300 Explorer XP
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>+300 Explorer XP</span>
           </button>
         </div>
 

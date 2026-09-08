@@ -1,15 +1,18 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
-import { BookOpen, ChevronRight, Brain, Trophy, Book, ArrowLeft } from "lucide-react";
+import { BookOpen, ChevronRight, Brain, Trophy, Book, ArrowLeft, Layers } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ncertLibrary, subjectColors } from "@/lib/ncert-books";
 import { motion } from "framer-motion";
+import SelfStudyHotkeyListener from "@/components/pyq/SelfStudyHotkeyListener";
+import SelfStudyExtractorModal from "@/components/pyq/SelfStudyExtractorModal";
 
 export default function SubjectHubPage() {
   const router = useRouter();
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [isExtractorOpen, setIsExtractorOpen] = useState(false);
 
   useEffect(() => {
     const storedClass = localStorage.getItem("edutrack_class");
@@ -36,12 +39,24 @@ export default function SubjectHubPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-8">
+      <SelfStudyHotkeyListener />
+      {isExtractorOpen && <SelfStudyExtractorModal onClose={() => setIsExtractorOpen(false)} />}
       <motion.div variants={container} initial="hidden" animate="show" className="max-w-5xl mx-auto space-y-8">
         <motion.header variants={item} className="space-y-4">
-          {/* Back to Dashboard */}
-          <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-indigo-600 dark:hover:dark:text-indigo-400 text-indigo-700 transition-colors mb-2">
-            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-          </Link>
+          {/* Back to Dashboard & Header actions */}
+          <div className="flex items-center justify-between mb-2">
+            <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+              <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+            </Link>
+            
+            <button 
+              onClick={() => setIsExtractorOpen(true)}
+              className="inline-flex items-center gap-2 text-sm font-semibold bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 px-4 py-2 rounded-full hover:scale-105 transition-transform shadow-lg"
+              title="Shortcut: Ctrl+Shift+I"
+            >
+              <Layers className="w-4 h-4" /> Extract Web PYQs (Ctrl+Shift+I)
+            </button>
+          </div>
           <div className="text-center space-y-4">
             <div className="inline-flex items-center gap-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-4 py-2 rounded-full font-bold w-fit mx-auto">
               <Brain className="w-5 h-5" /> PYQ Subject Hub

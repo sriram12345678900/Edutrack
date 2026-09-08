@@ -1,5 +1,7 @@
 "use client";
 
+  import { useEffect } from "react";
+
 export default function GlobalError({
   error,
   reset,
@@ -7,6 +9,13 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    console.error("Caught in global-error.tsx:", error);
+    if (error.name === 'ChunkLoadError' || error.message.includes('Loading chunk') || error.message.includes('ChunkLoadError')) {
+      window.location.reload();
+    }
+  }, [error]);
+
   return (
     <html>
       <body>

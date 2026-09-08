@@ -84,3 +84,31 @@ export async function fetchFullPapersFromWeb(subject: string): Promise<QuestionP
     return [];
   }
 }
+
+export async function extractPYQsFromUrl(url: string): Promise<{ title: string, text: string }> {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch URL: ${response.statusText}`);
+    }
+
+    const html = await response.text();
+    const $ = cheerio.load(html);
+
+    // Remove unwanted elements
+    $('script, style, nav, footer, header, iframe, noscript, .sidebar, .ad, .menu').remove();
+    
+    const title = $('title').text().trim() || $('h1').first().text().trim() || 'Extracted PYQs';
+    const text = $('body').text().replace(/\s+/g, ' ').trim();
+
+    return { title, text: text.slice(0, 30000) }; // Send reasonable amount of text to AI
+  } catch (error: any) {
+    console.error("Extraction failed:", error);
+    throw new Error(error.message || "Failed to extract content from URL");
+  }
+}

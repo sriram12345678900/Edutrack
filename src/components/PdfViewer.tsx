@@ -340,7 +340,7 @@ export default function PdfViewer({
   };
 
   // The Dark Mode CSS filter
-  const filterStyle = isDarkMode ? "invert(90%) hue-rotate(180deg) contrast(110%)" : "none";
+  const filterStyle = isDarkMode ? "invert(92%) hue-rotate(180deg) contrast(115%) brightness(1.1)" : "none";
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-[500px] w-full" style={{ filter: filterStyle }}>
@@ -359,7 +359,7 @@ export default function PdfViewer({
       )}
       
       {/* Wrapper for canvases to layer them perfectly */}
-      <div className="relative" style={{ filter: "drop-shadow(0 25px 50px rgba(0,0,0,0.25))" }}>
+      <div className="relative" style={{ filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.5))" }}>
         <canvas 
           ref={canvasRef} 
           className={`bg-white transition-opacity duration-300 ${loading ? 'opacity-0' : 'opacity-100'}`}

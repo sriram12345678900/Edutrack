@@ -1,6 +1,6 @@
 "use client";
 
-export type ShopCategory = "frame" | "title" | "theme" | "companion" | "powerup";
+export type ShopCategory = "frame" | "title" | "theme" | "companion" | "powerup" | "avatar_item";
 export type ItemRarity = "common" | "rare" | "epic" | "legendary" | "mythic";
 
 export interface ShopItem {
@@ -14,6 +14,8 @@ export interface ShopItem {
   perk: string;
   previewClass?: string;
   accentColor?: string;
+  robloxSlot?: "hat" | "outfit" | "face" | "gear" | "skin";
+  robloxValue?: string;
 }
 
 export const SHOP_ITEMS: ShopItem[] = [
@@ -295,8 +297,312 @@ export const SHOP_ITEMS: ShopItem[] = [
     rarity: "legendary",
     perk: "+20% bonus XP chance for 7 days",
     accentColor: "from-emerald-400 to-green-600"
+  },
+
+  // ── 6. 3D ROBLOX AVATAR ACCESSORIES & SKINS ──
+  // HATS
+  {
+    id: "rhat-scholar",
+    name: "Scholar Mortarboard Cap",
+    category: "avatar_item",
+    cost: 150,
+    icon: "🎓",
+    desc: "Academic graduation cap with golden hanging tassel for your 3D Scholar Avatar.",
+    rarity: "rare",
+    perk: "Equips 3D Scholar Cap on avatar",
+    robloxSlot: "hat",
+    robloxValue: "scholar",
+    accentColor: "from-indigo-600 to-slate-900"
+  },
+  {
+    id: "rhat-crown",
+    name: "24K Imperial Scholar Crown",
+    category: "avatar_item",
+    cost: 250,
+    icon: "👑",
+    desc: "Gleaming royal gold crown encrusted with ruby gems that sits atop your character's head.",
+    rarity: "legendary",
+    perk: "Equips 3D Golden Crown on avatar",
+    robloxSlot: "hat",
+    robloxValue: "crown",
+    accentColor: "from-amber-400 to-yellow-600"
+  },
+  {
+    id: "rhat-cyber",
+    name: "Cyberpunk Neon HUD Visor",
+    category: "avatar_item",
+    cost: 200,
+    icon: "⚡",
+    desc: "Futuristic neon cyan & magenta glowing visor that covers your character's eyes.",
+    rarity: "epic",
+    perk: "Equips glowing neon visor on avatar",
+    robloxSlot: "hat",
+    robloxValue: "cyber",
+    accentColor: "from-cyan-400 to-fuchsia-500"
+  },
+  {
+    id: "rhat-astro",
+    name: "Cosmic Astronaut Helmet",
+    category: "avatar_item",
+    cost: 250,
+    icon: "🧑‍🚀",
+    desc: "Translucent bubble spacesuit helmet with starlight reflections.",
+    rarity: "legendary",
+    perk: "Equips 3D Space Helmet on avatar",
+    robloxSlot: "hat",
+    robloxValue: "astro",
+    accentColor: "from-sky-400 to-blue-600"
+  },
+  {
+    id: "rhat-headphones",
+    name: "RGB Gaming Study Headset",
+    category: "avatar_item",
+    cost: 200,
+    icon: "🎧",
+    desc: "High-fidelity glowing RGB ear cups designed for listening to lo-fi study podcasts.",
+    rarity: "rare",
+    perk: "Equips 3D Gaming Headphones on avatar",
+    robloxSlot: "hat",
+    robloxValue: "headphones",
+    accentColor: "from-purple-500 to-pink-500"
+  },
+  {
+    id: "rhat-halo",
+    name: "Saint of 99th Percentile Halo",
+    category: "avatar_item",
+    cost: 250,
+    icon: "😇",
+    desc: "A floating celestial golden ring hovering softly above your character's head.",
+    rarity: "mythic",
+    perk: "Equips floating animated Halo on avatar",
+    robloxSlot: "hat",
+    robloxValue: "halo",
+    accentColor: "from-yellow-300 to-amber-500"
+  },
+  {
+    id: "rhat-wizard",
+    name: "Arcane Olympiad Wizard Hat",
+    category: "avatar_item",
+    cost: 200,
+    icon: "🧙",
+    desc: "Conical purple wizard hat adorned with silver constellations and equation runes.",
+    rarity: "epic",
+    perk: "Equips 3D Wizard Hat on avatar",
+    robloxSlot: "hat",
+    robloxValue: "wizard",
+    accentColor: "from-purple-600 to-indigo-800"
+  },
+
+  // OUTFITS
+  {
+    id: "routfit-white",
+    name: "Pristine Studio Body",
+    category: "avatar_item",
+    cost: 100,
+    icon: "⚪",
+    desc: "The clean, minimalist studio-lighting white Scholar dummy from the classic character editor.",
+    rarity: "common",
+    perk: "Default studio white humanoid appearance",
+    robloxSlot: "outfit",
+    robloxValue: "default",
+    accentColor: "from-slate-100 to-slate-300"
+  },
+  {
+    id: "routfit-noob",
+    name: "Classic Blocky Noob Outfit",
+    category: "avatar_item",
+    cost: 150,
+    icon: "🟦",
+    desc: "The iconic yellow skin, blue shirt, and green pants worn by millions of blocky avatar legends.",
+    rarity: "rare",
+    perk: "Equips classic blue torso & green legs",
+    robloxSlot: "outfit",
+    robloxValue: "noob",
+    accentColor: "from-blue-500 to-green-500"
+  },
+  {
+    id: "routfit-suit",
+    name: "Oxford Scholar Blazer & Tie",
+    category: "avatar_item",
+    cost: 200,
+    icon: "👔",
+    desc: "Tailored navy school blazer with a white collared shirt and crimson red tie.",
+    rarity: "rare",
+    perk: "Equips formal scholar uniform & tie",
+    robloxSlot: "outfit",
+    robloxValue: "suit",
+    accentColor: "from-slate-800 to-rose-700"
+  },
+  {
+    id: "routfit-labcoat",
+    name: "Chemistry Lab Coat & ID",
+    category: "avatar_item",
+    cost: 200,
+    icon: "🥼",
+    desc: "Protective white scientist lab coat with pockets, pens, and an EduTrack research badge.",
+    rarity: "epic",
+    perk: "Equips scientist lab coat on avatar",
+    robloxSlot: "outfit",
+    robloxValue: "labcoat",
+    accentColor: "from-emerald-500 to-teal-700"
+  },
+  {
+    id: "routfit-cyber",
+    name: "Midnight Cyberpunk Techwear",
+    category: "avatar_item",
+    cost: 250,
+    icon: "🌆",
+    desc: "Carbon-fiber black armor reinforced with glowing neon cyan circuit lines.",
+    rarity: "legendary",
+    perk: "Equips glowing cyber armor on avatar",
+    robloxSlot: "outfit",
+    robloxValue: "cyber",
+    accentColor: "from-cyan-400 to-fuchsia-600"
+  },
+  {
+    id: "routfit-golden",
+    name: "Grandmaster Ceremonial Robes",
+    category: "avatar_item",
+    cost: 300,
+    icon: "✨",
+    desc: "Regal ceremonial robes woven with liquid gold threads for top leaderboard scholars.",
+    rarity: "mythic",
+    perk: "Equips gilded master robes on avatar",
+    robloxSlot: "outfit",
+    robloxValue: "golden",
+    accentColor: "from-amber-400 to-yellow-600"
+  },
+
+  // HANDHELD GEAR
+  {
+    id: "rgear-trophy",
+    name: "CBSE Gold 1st Place Trophy",
+    category: "avatar_item",
+    cost: 200,
+    icon: "🏆",
+    desc: "Held proudly in your character's hand to showcase board examination excellence.",
+    rarity: "legendary",
+    perk: "Avatar holds 3D Golden Trophy",
+    robloxSlot: "gear",
+    robloxValue: "trophy",
+    accentColor: "from-amber-400 to-yellow-500"
+  },
+  {
+    id: "rgear-flask",
+    name: "Luminescent Chemistry Flask",
+    category: "avatar_item",
+    cost: 150,
+    icon: "🧪",
+    desc: "Bubbling emerald bio-chemical compound flask held during revision.",
+    rarity: "rare",
+    perk: "Avatar holds glowing Science Flask",
+    robloxSlot: "gear",
+    robloxValue: "flask",
+    accentColor: "from-emerald-400 to-teal-600"
+  },
+  {
+    id: "rgear-wand",
+    name: "Cosmic Equation Wand",
+    category: "avatar_item",
+    cost: 200,
+    icon: "🪄",
+    desc: "Star-crested magic wand that channels calculus formulas into sparkling spells.",
+    rarity: "epic",
+    perk: "Avatar holds Star Magic Wand",
+    robloxSlot: "gear",
+    robloxValue: "wand",
+    accentColor: "from-purple-400 to-pink-500"
+  },
+  {
+    id: "rgear-sword",
+    name: "Laser Plasma Energy Blade",
+    category: "avatar_item",
+    cost: 250,
+    icon: "🗡️",
+    desc: "High-frequency glowing energy katana for slicing through tough physics derivations.",
+    rarity: "mythic",
+    perk: "Avatar holds glowing Laser Katana",
+    robloxSlot: "gear",
+    robloxValue: "sword",
+    accentColor: "from-cyan-400 to-blue-600"
+  },
+  {
+    id: "rgear-book",
+    name: "NCERT Master Grimoire",
+    category: "avatar_item",
+    cost: 150,
+    icon: "📖",
+    desc: "Heavy leatherbound textbook packed with key definitions, diagrams, and formulas.",
+    rarity: "common",
+    perk: "Avatar holds hardbound NCERT Book",
+    robloxSlot: "gear",
+    robloxValue: "book",
+    accentColor: "from-amber-800 to-yellow-900"
+  },
+
+  // FACES
+  {
+    id: "rface-classic",
+    name: "Classic Scholar Smile Face",
+    category: "avatar_item",
+    cost: 50,
+    icon: "🙂",
+    desc: "The iconic, original curved smile and oval black eyes — the timeless blocky avatar expression.",
+    rarity: "common",
+    perk: "Equips classic blocky smiling face",
+    robloxSlot: "face",
+    robloxValue: "classic",
+    accentColor: "from-slate-300 to-slate-500"
+  },
+  {
+    id: "rface-chill",
+    name: "Chill Sunglasses Face",
+    category: "avatar_item",
+    cost: 100,
+    icon: "😎",
+    desc: "Dark rectangular shades and a knowing smirk for effortless exam preparation.",
+    rarity: "rare",
+    perk: "Equips cool sunglasses face print",
+    robloxSlot: "face",
+    robloxValue: "chill",
+    accentColor: "from-slate-700 to-slate-950"
+  },
+  {
+    id: "rface-genius",
+    name: "Genius Scholar Spectacles",
+    category: "avatar_item",
+    cost: 100,
+    icon: "🧐",
+    desc: "Round academic wireframe glasses with a studious, analytical expression.",
+    rarity: "epic",
+    perk: "Equips round intellectual glasses face",
+    robloxSlot: "face",
+    robloxValue: "genius",
+    accentColor: "from-indigo-400 to-purple-600"
+  },
+  {
+    id: "rface-laser",
+    name: "Starstruck Focus Eyes",
+    category: "avatar_item",
+    cost: 150,
+    icon: "🤩",
+    desc: "Animated sparkling star pupils beaming with enthusiasm for new concepts.",
+    rarity: "legendary",
+    perk: "Equips sparkling star focus face",
+    robloxSlot: "face",
+    robloxValue: "laser",
+    accentColor: "from-yellow-400 to-amber-500"
   }
 ];
+
+export interface RobloxAvatarConfig {
+  bodyColor?: string;
+  face?: "classic" | "chill" | "genius" | "laser" | "laugh";
+  hat?: "none" | "scholar" | "crown" | "cyber" | "astro" | "headphones" | "halo" | "wizard";
+  outfit?: "default" | "noob" | "suit" | "labcoat" | "cyber" | "golden";
+  gear?: "none" | "trophy" | "flask" | "wand" | "sword" | "book";
+  pose?: "idle" | "wave" | "cheer" | "levitate";
+}
 
 export interface ShopState {
   unlockedItems: string[];
@@ -304,6 +610,7 @@ export interface ShopState {
   equippedTitle: string | null;
   equippedTheme: string | null;
   equippedCompanion: string | null;
+  robloxAvatar: RobloxAvatarConfig;
   streakFreezes: number;
   boosterExpiresAt: number | null;
   luckyCloverExpiresAt: number | null;
@@ -312,11 +619,19 @@ export interface ShopState {
 }
 
 const DEFAULT_SHOP_STATE: ShopState = {
-  unlockedItems: ["frame-gold"],
+  unlockedItems: ["frame-gold", "rface-classic", "rhat-scholar", "routfit-white"],
   equippedFrame: "frame-gold",
   equippedTitle: null,
   equippedTheme: null,
   equippedCompanion: null,
+  robloxAvatar: {
+    bodyColor: "#f1f3f6", // Studio White Dummy like user image!
+    face: "classic",
+    hat: "scholar",
+    outfit: "default",
+    gear: "none",
+    pose: "idle",
+  },
   streakFreezes: 1,
   boosterExpiresAt: null,
   luckyCloverExpiresAt: null,
@@ -336,27 +651,36 @@ export function getShopState(): ShopState {
     const equippedTitle = localStorage.getItem("edutrack_equipped_title");
     const equippedTheme = localStorage.getItem("edutrack_equipped_theme");
     const equippedCompanion = localStorage.getItem("edutrack_equipped_companion");
+    const rawRoblox = localStorage.getItem("edutrack_roblox_avatar");
     const streakFreezes = localStorage.getItem("edutrack_streak_freezes");
     const boosterExpiresAt = localStorage.getItem("edutrack_xp_booster_until");
     const luckyCloverExpiresAt = localStorage.getItem("edutrack_lucky_clover_until");
     const lastDailyRewardDate = localStorage.getItem("edutrack_last_daily_reward");
     const hintsCount = localStorage.getItem("edutrack_hints_count");
 
-    let unlockedItems: string[] = ["frame-gold"];
+    let unlockedItems: string[] = ["frame-gold", "rface-classic", "rhat-scholar", "routfit-white"];
     if (rawUnlocked) {
       try {
         unlockedItems = JSON.parse(rawUnlocked);
       } catch {
-        unlockedItems = ["frame-gold"];
+        unlockedItems = ["frame-gold", "rface-classic", "rhat-scholar", "routfit-white"];
       }
     }
 
+    let robloxAvatar: RobloxAvatarConfig = DEFAULT_SHOP_STATE.robloxAvatar;
+    if (rawRoblox) {
+      try {
+        robloxAvatar = { ...DEFAULT_SHOP_STATE.robloxAvatar, ...JSON.parse(rawRoblox) };
+      } catch (_) {}
+    }
+
     return {
-      unlockedItems: Array.isArray(unlockedItems) ? unlockedItems : ["frame-gold"],
+      unlockedItems: Array.isArray(unlockedItems) ? unlockedItems : ["frame-gold", "rface-classic", "rhat-scholar", "routfit-white"],
       equippedFrame: equippedFrame || "frame-gold",
       equippedTitle: equippedTitle || null,
       equippedTheme: equippedTheme || null,
       equippedCompanion: equippedCompanion || null,
+      robloxAvatar,
       streakFreezes: streakFreezes ? parseInt(streakFreezes, 10) : 1,
       boosterExpiresAt: boosterExpiresAt ? parseInt(boosterExpiresAt, 10) : null,
       luckyCloverExpiresAt: luckyCloverExpiresAt ? parseInt(luckyCloverExpiresAt, 10) : null,
@@ -376,6 +700,7 @@ export function saveShopState(state: ShopState): void {
 
   try {
     localStorage.setItem("edutrack_shop_unlocked", JSON.stringify(state.unlockedItems));
+    localStorage.setItem("edutrack_roblox_avatar", JSON.stringify(state.robloxAvatar));
     
     if (state.equippedFrame) {
       localStorage.setItem("edutrack_equipped_frame", state.equippedFrame);
@@ -548,6 +873,9 @@ export function buyShopItem(item: ShopItem): { success: boolean; message: string
     if (item.category === "title") state.equippedTitle = item.id;
     if (item.category === "theme") state.equippedTheme = item.id;
     if (item.category === "companion") state.equippedCompanion = item.id;
+    if (item.category === "avatar_item" && item.robloxSlot && item.robloxValue) {
+      state.robloxAvatar = { ...state.robloxAvatar, [item.robloxSlot]: item.robloxValue };
+    }
   }
 
   saveShopState(state);
@@ -575,6 +903,12 @@ export function equipShopItem(itemId: string, category: ShopCategory): boolean {
   if (category === "title") state.equippedTitle = itemId;
   if (category === "theme") state.equippedTheme = itemId;
   if (category === "companion") state.equippedCompanion = itemId;
+  if (category === "avatar_item") {
+    const itm = SHOP_ITEMS.find(i => i.id === itemId);
+    if (itm && itm.robloxSlot && itm.robloxValue) {
+      state.robloxAvatar = { ...state.robloxAvatar, [itm.robloxSlot]: itm.robloxValue };
+    }
+  }
 
   saveShopState(state);
   playShopSound("equip");
@@ -584,17 +918,32 @@ export function equipShopItem(itemId: string, category: ShopCategory): boolean {
 /**
  * Unequip an item in a category
  */
-export function unequipShopItem(category: ShopCategory): boolean {
+export function unequipShopItem(category: ShopCategory, robloxSlot?: "hat" | "outfit" | "face" | "gear"): boolean {
   const state = getShopState();
 
   if (category === "frame") state.equippedFrame = null;
   if (category === "title") state.equippedTitle = null;
   if (category === "theme") state.equippedTheme = null;
   if (category === "companion") state.equippedCompanion = null;
+  if (category === "avatar_item" && robloxSlot) {
+    if (robloxSlot === "hat") state.robloxAvatar.hat = "none";
+    if (robloxSlot === "gear") state.robloxAvatar.gear = "none";
+    if (robloxSlot === "outfit") state.robloxAvatar.outfit = "default";
+    if (robloxSlot === "face") state.robloxAvatar.face = "classic";
+  }
 
   saveShopState(state);
   playShopSound("equip");
   return true;
+}
+
+/**
+ * Save Scholar Avatar custom config
+ */
+export function saveRobloxAvatarConfig(newConfig: Partial<RobloxAvatarConfig>): void {
+  const state = getShopState();
+  state.robloxAvatar = { ...state.robloxAvatar, ...newConfig };
+  saveShopState(state);
 }
 
 /**

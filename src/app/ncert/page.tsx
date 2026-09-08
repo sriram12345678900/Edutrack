@@ -1220,7 +1220,7 @@ export default function NcertViewer() {
 
       {/* ── FULLSCREEN PDF VIEWER ── */}
       {openBook && openChapter && (
-        <div className="fixed inset-0 z-[100] flex flex-col bg-slate-950">
+        <div className="fixed inset-0 z-[99999] flex flex-col bg-[#07090e]">
 
           {/* ── Attractive Loading Overlay ── */}
           <div 
@@ -1282,7 +1282,7 @@ export default function NcertViewer() {
 
           {/* ── Top Bar (Premium Header) ── */}
           {isHeaderVisible ? (
-            <div className="relative z-[105] shrink-0 w-full dark:bg-[#0b0f19] bg-[#eef1f9] shadow-[0_10px_40px_rgba(0,0,0,0.5)] border-b border-white/5 transition-all duration-300">
+            <div className="relative z-[105] shrink-0 w-full bg-[#090d16]/90 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] border-b border-white/10 transition-all duration-300">
               {/* Background with Subject Gradient */}
               <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-15 mix-blend-screen`} />
               
@@ -1290,21 +1290,21 @@ export default function NcertViewer() {
                 {/* Back button */}
                 <button
                   onClick={handleCloseViewer}
-                  className="group flex items-center gap-2 bg-white/5 hover:bg-white/10 dark:text-white text-slate-900 px-4 py-2 rounded-2xl shadow-lg backdrop-blur-md transition-all border border-white/10 hover:border-white/20 hover:scale-105"
+                  className="group flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white px-4 py-2 rounded-2xl shadow-lg backdrop-blur-md transition-all border border-white/10 hover:border-white/20 hover:scale-105"
                 >
                   <div className="bg-white/10 rounded-full p-1 group-hover:-translate-x-1 transition-transform">
-                    <ArrowLeft className="w-4 h-4" />
+                    <ArrowLeft className="w-4 h-4 text-white" />
                   </div>
-                  <span className="font-bold text-sm tracking-wide pr-1">Back</span>
+                  <span className="font-bold text-sm tracking-wide pr-1 text-white">Back</span>
                 </button>
 
                 {/* Book info (Center) */}
                 <div className="hidden sm:flex items-center gap-4 bg-white/5 pr-6 pl-2 py-1.5 rounded-full border border-white/10 backdrop-blur-md shadow-inner">
                   <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg ring-2 ring-white/20`}>
-                    <BookOpen className="w-4 h-4 dark:text-white text-slate-900 drop-shadow-md" />
+                    <BookOpen className="w-4 h-4 text-white drop-shadow-md" />
                   </div>
                   <div className="flex flex-col justify-center">
-                    <h2 className="dark:text-white text-slate-900 text-sm font-extrabold tracking-wide leading-tight drop-shadow-md">
+                    <h2 className="text-white text-sm font-extrabold tracking-wide leading-tight drop-shadow-md">
                       {openBook.title}
                     </h2>
                     <div className="flex items-center gap-2 mt-0.5">
@@ -1320,20 +1320,20 @@ export default function NcertViewer() {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setIsHeaderVisible(false)}
-                    className="group flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white/90 hover:dark:text-white text-slate-900 px-3.5 py-2 rounded-2xl backdrop-blur-md transition-all border border-white/10 hover:border-white/20 hover:scale-105"
+                    className="group flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white/90 hover:text-white px-3.5 py-2 rounded-2xl backdrop-blur-md transition-all border border-white/10 hover:border-white/20 hover:scale-105"
                     title="Hide Header Bar for Full-Screen View"
                   >
-                    <EyeOff className="w-4 h-4 dark:text-indigo-400 text-indigo-700 group-hover:scale-110 transition-transform" />
-                    <span className="hidden sm:inline font-bold text-sm">Hide Header</span>
+                    <EyeOff className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform" />
+                    <span className="hidden sm:inline font-bold text-sm text-white">Hide Header</span>
                   </button>
                   <a
                     href={getProxyUrl(openChapter.pdfUrl, openBook, openChapter.num)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white/90 hover:dark:text-white text-slate-900 px-4 py-2 rounded-2xl backdrop-blur-md transition-all border border-white/10 hover:border-white/20 hover:scale-105"
+                    className="group flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white/90 hover:text-white px-4 py-2 rounded-2xl backdrop-blur-md transition-all border border-white/10 hover:border-white/20 hover:scale-105"
                   >
-                    <ExternalLink className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                    <span className="hidden sm:inline font-bold text-sm">New Tab</span>
+                    <ExternalLink className="w-4 h-4 text-white group-hover:rotate-12 transition-transform" />
+                    <span className="hidden sm:inline font-bold text-sm text-white">New Tab</span>
                   </a>
                   <a
                     href={getProxyUrl(openChapter.pdfUrl, openBook, openChapter.num)}
@@ -1351,18 +1351,18 @@ export default function NcertViewer() {
             <div className="absolute top-4 left-4 right-4 z-[115] flex items-center justify-between pointer-events-none">
               <button
                 onClick={handleCloseViewer}
-                className="pointer-events-auto flex items-center gap-2 dark:bg-slate-900/90 bg-slate-200/90 hover:bg-slate-800 dark:text-white text-slate-900 px-4 py-2 rounded-2xl shadow-2xl backdrop-blur-md transition-all border border-slate-700/80 hover:scale-105"
+                className="pointer-events-auto flex items-center gap-2 bg-slate-900/90 hover:bg-slate-800 text-white px-4 py-2 rounded-2xl shadow-2xl backdrop-blur-md transition-all border border-slate-700/80 hover:scale-105"
               >
-                <ArrowLeft className="w-4 h-4 dark:text-indigo-400 text-indigo-700" />
-                <span className="font-bold text-sm">Back</span>
+                <ArrowLeft className="w-4 h-4 text-indigo-400" />
+                <span className="font-bold text-sm text-white">Back</span>
               </button>
               <button
                 onClick={() => setIsHeaderVisible(true)}
-                className="pointer-events-auto flex items-center gap-2 dark:bg-slate-900/90 bg-slate-200/90 hover:bg-slate-800 dark:text-white text-slate-900 px-4 py-2 rounded-2xl shadow-2xl backdrop-blur-md transition-all border border-slate-700/80 hover:scale-105"
+                className="pointer-events-auto flex items-center gap-2 bg-slate-900/90 hover:bg-slate-800 text-white px-4 py-2 rounded-2xl shadow-2xl backdrop-blur-md transition-all border border-slate-700/80 hover:scale-105"
                 title="Show Header Bar"
               >
-                <Eye className="w-4 h-4 dark:text-emerald-400 text-emerald-700" />
-                <span className="font-bold text-sm">Show Header</span>
+                <Eye className="w-4 h-4 text-emerald-400" />
+                <span className="font-bold text-sm text-white">Show Header</span>
               </button>
             </div>
           )}
@@ -1371,9 +1371,9 @@ export default function NcertViewer() {
           <div className="flex-1 w-full flex overflow-hidden relative">
             
             {/* Left Column: PDF Renderer */}
-            <div id="pdf-render-container" className={`flex-1 relative dark:bg-slate-900 bg-slate-100 overflow-auto flex justify-center py-8 transition-all duration-300 ${showSideTheory ? 'w-[55%] md:w-[60%] border-r border-slate-200 dark:border-slate-800' : 'w-full'}`}>
+            <div id="pdf-render-container" className={`flex-1 relative bg-[#07090e] overflow-auto flex justify-center py-8 transition-all duration-300 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)] ${showSideTheory ? 'w-[55%] md:w-[60%] border-r border-slate-800' : 'w-full'}`}>
             {pdfLoading && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center dark:bg-slate-900 bg-slate-100 z-10">
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#07090e] z-10">
                 <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
                 <span className="text-white/70 font-medium animate-pulse">Loading PDF...</span>
               </div>
@@ -1400,69 +1400,75 @@ export default function NcertViewer() {
             />
             
             {/* Custom PDF Controls (Floating Bottom) */}
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800/90 backdrop-blur-md px-4 py-2 rounded-full shadow-2xl shadow-black/50 border border-slate-700 flex items-center gap-4 z-[110]">
-              <div className="flex items-center gap-1">
-                <button onClick={() => fetchLineByLine()} disabled={lineByLineLoading} className="p-2 rounded-full hover:bg-slate-700 dark:text-amber-400 text-amber-700 hover:dark:text-amber-300 text-amber-700 transition-colors flex items-center gap-1" title="Generate Side-by-Side Line-by-Line Study Guide (PDF)">
-                  {lineByLineLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 text-amber-450" />}
-                  <span className="text-[10px] font-extrabold pr-1 hidden md:inline dark:text-amber-300 text-amber-700">NCERT Guide</span>
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#1e293b]/90 backdrop-blur-2xl px-6 py-3 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.6)] border border-white/10 flex items-center gap-5 z-[110] transition-all hover:shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
+              {/* Tool Group 1: AI Insights */}
+              <div className="flex items-center gap-1.5 bg-white/5 rounded-full p-1.5">
+                <button onClick={() => fetchLineByLine()} disabled={lineByLineLoading} className="px-4 py-2 rounded-full hover:bg-white/10 text-amber-400 hover:text-amber-300 transition-all flex items-center gap-2" title="Generate Side-by-Side Line-by-Line Study Guide (PDF)">
+                  {lineByLineLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                  <span className="text-xs font-bold hidden md:inline tracking-wide">NCERT Guide</span>
                 </button>
-                <div className="w-px h-6 bg-slate-600 mx-1"></div>
-                <button onClick={() => fetchTheory()} disabled={theoryLoading} className="p-2 rounded-full hover:bg-slate-700 dark:text-indigo-400 text-indigo-700 hover:dark:text-indigo-300 text-indigo-700 transition-colors flex items-center gap-1" title="Generate Premium NCERT Textbook Draft / Exhaustive Study Guide">
-                  {theoryLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <BookOpen className="w-4 h-4 dark:text-indigo-400 text-indigo-700" />}
-                  <span className="text-[10px] font-extrabold pr-1 hidden md:inline dark:text-indigo-300 text-indigo-700">Study Guide</span>
+                <div className="w-px h-6 bg-white/10 mx-1"></div>
+                <button onClick={() => fetchTheory()} disabled={theoryLoading} className="px-4 py-2 rounded-full hover:bg-white/10 text-indigo-400 hover:text-indigo-300 transition-all flex items-center gap-2" title="Generate Premium NCERT Textbook Draft / Exhaustive Study Guide">
+                  {theoryLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <BookOpen className="w-4 h-4" />}
+                  <span className="text-xs font-bold hidden md:inline tracking-wide">Study Guide</span>
                 </button>
-                <div className="w-px h-6 bg-slate-600 mx-1"></div>
-                <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 rounded-full transition-colors ${isDarkMode ? 'bg-indigo-500 text-white' : 'hover:bg-slate-700 text-slate-300'}`} title="Dark Mode">
+              </div>
+
+              {/* Tool Group 2: View & Capture */}
+              <div className="flex items-center gap-1 bg-white/5 rounded-full p-1.5">
+                <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 rounded-full transition-all hover:scale-105 ${isDarkMode ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'hover:bg-white/10 text-slate-300'}`} title="Dark Mode">
                   {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                 </button>
-                <div className="w-px h-6 bg-slate-600 mx-1"></div>
-                <button onClick={() => setDownloadSignal(s => s + 1)} className="p-2 rounded-full hover:bg-slate-700 dark:text-slate-300 text-slate-700 transition-colors" title="Download Page as Image">
+                <div className="w-px h-5 bg-white/10 mx-1"></div>
+                <button onClick={() => setDownloadSignal(s => s + 1)} className="p-2.5 rounded-full hover:bg-white/10 text-slate-300 transition-all hover:scale-105 hover:text-white" title="Download Page as Image">
                   <Download className="w-4 h-4" />
                 </button>
-                <button onClick={() => setCaptureSignal(s => s + 1)} className="p-2 rounded-full hover:bg-slate-700 dark:text-slate-300 text-slate-700 transition-colors" title="Send Page to AI Tutor">
+                <button onClick={() => setCaptureSignal(s => s + 1)} className="p-2.5 rounded-full hover:bg-white/10 text-slate-300 transition-all hover:scale-105 hover:text-white" title="Send Page to AI Tutor">
                   <Camera className="w-4 h-4" />
                 </button>
-                <div className="w-px h-6 bg-slate-600 mx-1"></div>
-                <button onClick={toggleAudioPlayback} className={`p-2 rounded-full transition-colors ${isPlaying ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/50 flex gap-2 items-center px-3' : 'hover:bg-slate-700 text-purple-400'}`} title="AI Professor Audiobook">
-                  {isPlaying ? (
-                    <>
-                      <Activity className="w-4 h-4 animate-pulse" />
-                      <span className="text-[10px] font-bold uppercase tracking-widest hidden md:inline">Playing</span>
-                    </>
-                  ) : (
-                    <Volume2 className="w-4 h-4" />
-                  )}
-                </button>
-                <div className="w-px h-6 bg-slate-600 mx-1"></div>
-                <div className="flex items-center bg-slate-700/50 rounded-full p-1 border border-slate-600/50">
-                  <button onClick={() => setIsDrawMode(!isDrawMode)} className={`p-1.5 rounded-full transition-colors ${isDrawMode ? 'bg-amber-500 text-slate-900 shadow-lg' : 'hover:bg-slate-600 text-slate-300'}`}>
+              </div>
+
+              {/* Audiobook Toggle */}
+              <button onClick={toggleAudioPlayback} className={`p-2.5 rounded-full transition-all hover:scale-105 ${isPlaying ? 'bg-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.5)] flex gap-2 items-center px-4' : 'hover:bg-white/10 text-purple-400 bg-white/5'}`} title="AI Professor Audiobook">
+                {isPlaying ? (
+                  <>
+                    <Activity className="w-4 h-4 animate-pulse" />
+                    <span className="text-xs font-bold uppercase tracking-widest hidden md:inline">Playing</span>
+                  </>
+                ) : (
+                  <Volume2 className="w-4 h-4" />
+                )}
+              {/* Tool Group 3: Draw & Annotate */}
+              <div className="flex items-center gap-1 bg-white/5 rounded-full p-1.5 transition-all">
+                <div className="flex items-center">
+                  <button onClick={() => setIsDrawMode(!isDrawMode)} className={`p-2.5 rounded-full transition-all ${isDrawMode ? 'bg-amber-500 text-slate-900 shadow-[0_0_15px_rgba(245,158,11,0.6)]' : 'hover:bg-white/10 text-slate-300'}`}>
                     <Pen className="w-4 h-4" />
                   </button>
                   {isDrawMode && (
-                    <div className="flex items-center gap-1 px-2 animate-in fade-in slide-in-from-left-2 duration-200">
+                    <div className="flex items-center gap-2 px-3 animate-in fade-in slide-in-from-left-2 duration-300">
                       {/* Tool Type Selectors */}
-                      <div className="flex bg-slate-800 rounded-lg p-0.5 border border-slate-600">
-                        <button onClick={() => setDrawTool('highlighter')} className={`p-1 rounded-md transition-colors ${drawTool === 'highlighter' ? 'bg-indigo-500 text-white' : 'text-slate-400 hover:text-white'}`} title="Highlighter">
+                      <div className="flex bg-slate-900/50 rounded-lg p-1 border border-white/10">
+                        <button onClick={() => setDrawTool('highlighter')} className={`p-1.5 rounded-md transition-all ${drawTool === 'highlighter' ? 'bg-indigo-500 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`} title="Highlighter">
                           <Highlighter className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={() => setDrawTool('pen')} className={`p-1 rounded-md transition-colors ${drawTool === 'pen' ? 'bg-indigo-500 text-white' : 'text-slate-400 hover:text-white'}`} title="Solid Pen">
+                        <button onClick={() => setDrawTool('pen')} className={`p-1.5 rounded-md transition-all ${drawTool === 'pen' ? 'bg-indigo-500 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`} title="Solid Pen">
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={() => setDrawTool('eraser')} className={`p-1 rounded-md transition-colors ${drawTool === 'eraser' ? 'bg-indigo-500 text-white' : 'text-slate-400 hover:text-white'}`} title="Eraser">
+                        <button onClick={() => setDrawTool('eraser')} className={`p-1.5 rounded-md transition-all ${drawTool === 'eraser' ? 'bg-indigo-500 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`} title="Eraser">
                           <Eraser className="w-3.5 h-3.5" />
                         </button>
                       </div>
 
-                      <div className="w-px h-4 bg-slate-600 mx-1"></div>
+                      <div className="w-px h-5 bg-white/10 mx-1"></div>
 
-                      {/* Color Palette (Disabled if Eraser is active) */}
-                      <div className={`flex items-center gap-1 transition-opacity ${drawTool === 'eraser' ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
-                        <button onClick={() => setDrawColorHex("#ffeb3b")} className={`w-4 h-4 rounded-full bg-yellow-400 ${drawColorHex === "#ffeb3b" ? "ring-2 ring-white scale-110" : ""}`} />
-                        <button onClick={() => setDrawColorHex("#ef4444")} className={`w-4 h-4 rounded-full bg-red-500 ${drawColorHex === "#ef4444" ? "ring-2 ring-white scale-110" : ""}`} />
-                        <button onClick={() => setDrawColorHex("#3b82f6")} className={`w-4 h-4 rounded-full bg-blue-500 ${drawColorHex === "#3b82f6" ? "ring-2 ring-white scale-110" : ""}`} />
-                        <button onClick={() => setDrawColorHex("#22c55e")} className={`w-4 h-4 rounded-full bg-green-500 ${drawColorHex === "#22c55e" ? "ring-2 ring-white scale-110" : ""}`} />
-                        <button onClick={() => setDrawColorHex("#a855f7")} className={`w-4 h-4 rounded-full bg-purple-500 ${drawColorHex === "#a855f7" ? "ring-2 ring-white scale-110" : ""}`} />
-                        <div className="relative w-5 h-5 rounded-full overflow-hidden border border-slate-500 hover:scale-110 transition-transform ml-1">
+                      {/* Color Palette */}
+                      <div className={`flex items-center gap-1.5 transition-opacity ${drawTool === 'eraser' ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
+                        <button onClick={() => setDrawColorHex("#ffeb3b")} className={`w-5 h-5 rounded-full bg-yellow-400 shadow-sm ${drawColorHex === "#ffeb3b" ? "ring-2 ring-white scale-110" : "hover:scale-110"}`} />
+                        <button onClick={() => setDrawColorHex("#ef4444")} className={`w-5 h-5 rounded-full bg-red-500 shadow-sm ${drawColorHex === "#ef4444" ? "ring-2 ring-white scale-110" : "hover:scale-110"}`} />
+                        <button onClick={() => setDrawColorHex("#3b82f6")} className={`w-5 h-5 rounded-full bg-blue-500 shadow-sm ${drawColorHex === "#3b82f6" ? "ring-2 ring-white scale-110" : "hover:scale-110"}`} />
+                        <button onClick={() => setDrawColorHex("#22c55e")} className={`w-5 h-5 rounded-full bg-green-500 shadow-sm ${drawColorHex === "#22c55e" ? "ring-2 ring-white scale-110" : "hover:scale-110"}`} />
+                        <button onClick={() => setDrawColorHex("#a855f7")} className={`w-5 h-5 rounded-full bg-purple-500 shadow-sm ${drawColorHex === "#a855f7" ? "ring-2 ring-white scale-110" : "hover:scale-110"}`} />
+                        <div className="relative w-6 h-6 rounded-full overflow-hidden border-2 border-white/20 hover:scale-110 transition-transform ml-1">
                           <input 
                             type="color" 
                             value={drawColorHex} 
@@ -1477,19 +1483,19 @@ export default function NcertViewer() {
                         </div>
                       </div>
 
-                      <div className="w-px h-4 bg-slate-600 mx-1"></div>
+                      <div className="w-px h-5 bg-white/10 mx-1"></div>
                       
                       {/* Thickness */}
                       <input 
                         type="range" min="2" max="40" value={drawThickness} onChange={(e) => setDrawThickness(parseInt(e.target.value))}
-                        className="w-16 h-1 bg-slate-500 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full"
+                        className="w-20 h-1.5 bg-slate-600 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-md"
                         title="Size"
                       />
 
                       {/* Clear Button */}
                       <button 
                         onClick={() => setClearDrawingsSignal(s => s + 1)} 
-                        className="p-1 ml-1 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded-md transition-colors"
+                        className="p-1.5 ml-1 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded-md transition-all"
                         title="Clear Page"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1498,27 +1504,30 @@ export default function NcertViewer() {
                   )}
                 </div>
               </div>
-              <div className="w-px h-6 bg-slate-600"></div>
-              <div className="flex items-center gap-1">
-                <button onClick={() => setPdfScale(s => Math.max(0.5, s - 0.2))} className="p-2 hover:bg-slate-700 rounded-full dark:text-slate-300 text-slate-700 transition-colors">
-                  <ZoomOut className="w-4 h-4" />
-                </button>
-                <span className="text-xs font-bold w-12 text-center dark:text-slate-300 text-slate-700">{Math.round(pdfScale * 100)}%</span>
-                <button onClick={() => setPdfScale(s => Math.min(3, s + 0.2))} className="p-2 hover:bg-slate-700 rounded-full dark:text-slate-300 text-slate-700 transition-colors">
-                  <ZoomIn className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="w-px h-6 bg-slate-600"></div>
-              <div className="flex items-center gap-2">
-                <button onClick={() => setPageNumber(p => Math.max(1, p - 1))} disabled={pageNumber <= 1} className="p-2 hover:bg-slate-700 rounded-full disabled:opacity-30 dark:text-slate-300 text-slate-700 transition-colors">
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <span className="text-xs font-bold dark:text-slate-300 text-slate-700 w-16 text-center tracking-widest">
-                  {pageNumber} / {numPages}
-                </span>
-                <button onClick={() => setPageNumber(p => Math.min(numPages, p + 1))} disabled={pageNumber >= numPages} className="p-2 hover:bg-slate-700 rounded-full disabled:opacity-30 dark:text-slate-300 text-slate-700 transition-colors">
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+
+              {/* Tool Group 4: Zoom & Navigation */}
+              <div className="flex items-center gap-2 bg-white/5 rounded-full p-1.5">
+                <div className="flex items-center gap-1">
+                  <button onClick={() => setPdfScale(s => Math.max(0.5, s - 0.2))} className="p-2 hover:bg-white/10 rounded-full text-slate-300 transition-all hover:scale-105">
+                    <ZoomOut className="w-4 h-4" />
+                  </button>
+                  <span className="text-xs font-bold w-12 text-center text-slate-200">{Math.round(pdfScale * 100)}%</span>
+                  <button onClick={() => setPdfScale(s => Math.min(3, s + 0.2))} className="p-2 hover:bg-white/10 rounded-full text-slate-300 transition-all hover:scale-105">
+                    <ZoomIn className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="w-px h-5 bg-white/10 mx-1"></div>
+                <div className="flex items-center gap-1">
+                  <button onClick={() => setPageNumber(p => Math.max(1, p - 1))} disabled={pageNumber <= 1} className="p-2 hover:bg-white/10 rounded-full disabled:opacity-30 text-slate-300 transition-all hover:scale-105">
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <span className="text-xs font-bold text-slate-200 w-16 text-center tracking-widest">
+                    {pageNumber} / {numPages}
+                  </span>
+                  <button onClick={() => setPageNumber(p => Math.min(numPages, p + 1))} disabled={pageNumber >= numPages} className="p-2 hover:bg-white/10 rounded-full disabled:opacity-30 text-slate-300 transition-all hover:scale-105">
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
 

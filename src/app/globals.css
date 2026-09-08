@@ -677,4 +677,66 @@ body[data-theme="cosmic"] {
   animation: emerald-matrix-pulse 2.5s infinite ease-in-out;
 }
 
+/* =====================================
+   3D ROBLOX AVATAR ANIMATIONS
+====================================== */
+@keyframes idle-breathe {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-2.5px) scale(1.008);
+  }
+}
+
+.animate-idle-breathe {
+  animation: idle-breathe 3.5s ease-in-out infinite;
+}
+
+@keyframes roblox-wave {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-140deg);
+  }
+  50% {
+    transform: rotate(-110deg);
+  }
+  75% {
+    transform: rotate(-140deg);
+  }
+}
+
+.animate-roblox-wave {
+  animation: roblox-wave 2s ease-in-out infinite;
+}
+
+@keyframes roblox-cheer {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-160deg);
+  }
+}
+
+.animate-roblox-cheer {
+  animation: roblox-cheer 1.2s ease-in-out infinite;
+}
+
+@keyframes levitate {
+  0%, 100% {
+    transform: translateY(-8px);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+.animate-levitate {
+  animation: levitate 3s ease-in-out infinite;
+}
+
+
 
