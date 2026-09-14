@@ -1051,13 +1051,14 @@ export default function ShopPage() {
                 <motion.div
                   key={item.id}
                   layout
-                  whileHover={{ y: -3 }}
-                  className={`p-6 rounded-3xl border transition-all flex flex-col justify-between space-y-5 shadow-sm bg-white dark:bg-slate-900 ${
+                  whileHover={{ y: -6, scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                  className={`p-6 rounded-3xl border transition-all flex flex-col justify-between space-y-5 shadow-md hover:shadow-2xl backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 ${
                     isEquipped
-                      ? "border-emerald-500/50 shadow-emerald-500/10 ring-1 ring-emerald-500/30"
+                      ? "border-emerald-500/50 shadow-emerald-500/15 ring-2 ring-emerald-500/30"
                       : isUnlocked
-                      ? "border-slate-300 dark:border-white/15"
-                      : "border-slate-200 dark:border-white/10"
+                      ? "border-slate-300 dark:border-white/20 hover:border-indigo-400"
+                      : "border-slate-200 dark:border-white/10 hover:border-slate-400"
                   }`}
                 >
                   <div className="space-y-4">

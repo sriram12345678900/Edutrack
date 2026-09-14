@@ -16,7 +16,7 @@ export function DashboardHeader({ firstName, userClass, userLanguage, streak, it
           <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/15">
             Premium Academic Space
           </span>
-          <Link href="/setup" className="inline-flex items-center gap-1.5 text-[10px] font-black text-purple-600 dark:text-purple-300 bg-purple-500/10 hover:bg-purple-500/20 px-3 py-1.5 rounded-full border border-purple-500/20 transition-colors" title="Click to change study language in Settings">
+          <Link href="/settings" className="inline-flex items-center gap-1.5 text-[10px] font-black text-purple-600 dark:text-purple-300 bg-purple-500/10 hover:bg-purple-500/20 px-3 py-1.5 rounded-full border border-purple-500/20 transition-colors" title="Click to change study language in Settings">
             <Globe className="w-3 h-3 text-purple-500" />
             <span>{langConfig.label}</span>
           </Link>
@@ -49,7 +49,7 @@ export function DashboardHeader({ firstName, userClass, userLanguage, streak, it
           <Sparkles className="w-4 h-4 text-indigo-500" />
           <span>Feature Tour</span>
         </button>
-        <Link href="/setup">
+        <Link href="/settings">
           <button className="text-xs font-extrabold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-200/60 dark:border-white/5 bg-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.04] px-4.5 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95">
             Settings
           </button>

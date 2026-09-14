@@ -95,33 +95,36 @@ export function DailyQuestionWidget() {
       className="premium-glass-panel p-6 relative overflow-hidden"
     >
       <Confetti active={showConfetti} />
-      <div className="absolute top-[-20px] right-[-20px] w-24 h-24 bg-amber-500/5 rounded-full blur-xl pointer-events-none" />
+      <div className="absolute top-[-30px] right-[-30px] w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute bottom-[-20px] left-[-20px] w-24 h-24 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
       
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-6 relative z-10">
         <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-3">
-          <div className="p-2 bg-amber-500/10 rounded-xl">
-            <Award className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+          <div className="p-2.5 bg-amber-500/20 rounded-xl border border-amber-500/30 shadow-inner">
+            <Award className="w-5 h-5 text-amber-500" />
           </div>
           Daily Challenge
         </h2>
-        <span className="text-[10px] font-black uppercase tracking-wider text-amber-500 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
-          +30 XP
-        </span>
+        <div className="flex flex-col items-end">
+          <span className="text-xs font-black uppercase tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
+            +30 XP
+          </span>
+        </div>
       </div>
 
-      <p className="font-bold text-slate-800 dark:text-slate-200 mb-4">{questionData.question}</p>
+      <p className="text-lg font-bold text-slate-800 dark:text-white mb-6 leading-relaxed relative z-10">{questionData.question}</p>
 
-      <div className="space-y-2.5">
+      <div className="space-y-3 relative z-10">
         {questionData.options.map((opt: string, idx: number) => {
-          let stateClass = "bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 cursor-pointer";
+          let stateClass = "bg-slate-900/40 border-white/10 hover:border-amber-500/50 hover:bg-amber-500/10 cursor-pointer text-slate-300 hover:text-white";
           
           if (isAnswered) {
             if (idx === questionData.answer) {
-              stateClass = "bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-400 font-bold";
+              stateClass = "bg-emerald-500/10 border-emerald-500/50 text-emerald-400 font-bold shadow-[0_0_15px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/20";
             } else if (idx === selectedOption) {
-              stateClass = "bg-red-500/10 border-red-500 text-red-700 dark:text-red-400 font-bold";
+              stateClass = "bg-red-500/10 border-red-500/50 text-red-400 font-bold shadow-[0_0_15px_rgba(239,68,68,0.15)]";
             } else {
-              stateClass = "bg-slate-100/50 dark:bg-slate-800/30 border-transparent opacity-50 cursor-not-allowed";
+              stateClass = "bg-slate-900/20 border-transparent opacity-40 cursor-not-allowed";
             }
           }
 
@@ -130,11 +133,16 @@ export function DailyQuestionWidget() {
               key={idx}
               onClick={() => handleSelect(idx)}
               disabled={isAnswered}
-              className={`w-full text-left px-4 py-3 rounded-xl border transition-all flex items-center justify-between ${stateClass}`}
+              className={`w-full text-left px-5 py-4 rounded-2xl border-2 transition-all duration-300 flex items-center justify-between group ${stateClass}`}
             >
               <span className="text-sm">{opt}</span>
-              {isAnswered && idx === questionData.answer && <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />}
-              {isAnswered && idx === selectedOption && idx !== questionData.answer && <XCircle className="w-5 h-5 text-red-500 shrink-0" />}
+              <div className="flex items-center">
+                {!isAnswered && (
+                  <div className="w-5 h-5 rounded-full border-2 border-slate-600 group-hover:border-amber-500 transition-colors" />
+                )}
+                {isAnswered && idx === questionData.answer && <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0 drop-shadow-md" />}
+                {isAnswered && idx === selectedOption && idx !== questionData.answer && <XCircle className="w-6 h-6 text-red-500 shrink-0 drop-shadow-md" />}
+              </div>
             </button>
           );
         })}

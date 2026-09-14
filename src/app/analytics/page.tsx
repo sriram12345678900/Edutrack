@@ -195,13 +195,18 @@ export default function AnalyticsPage() {
           { label: 'Flashcard Decks', val: String((() => { try { return getDecks().length; } catch { return 0; } })()), icon: <BookOpen className="w-4 h-4 text-blue-400" /> },
           { label: 'Avg Mastery', val: `${Math.round(subjectMastery.reduce((a, s) => a + s.value, 0) / subjectMastery.length)}%`, icon: <Target className="w-4 h-4 text-purple-400" /> },
         ].map((stat, i) => (
-          <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center gap-3 shadow-md">
-            <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-xl">{stat.icon}</div>
+          <motion.div 
+            key={i} 
+            whileHover={{ y: -4, scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300, damping: 22 }}
+            className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 rounded-2xl p-4 flex items-center gap-3 shadow-md hover:shadow-xl transition-shadow"
+          >
+            <div className="bg-slate-100 dark:bg-slate-800 p-2.5 rounded-xl shadow-inner">{stat.icon}</div>
             <div>
               <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">{stat.label}</p>
-              <p className="text-lg font-extrabold text-slate-900 dark:text-white">{stat.val}</p>
+              <p className="text-lg font-extrabold text-slate-900 dark:text-white font-mono">{stat.val}</p>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 

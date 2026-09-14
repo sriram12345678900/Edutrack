@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, BookOpen, Sparkles, Camera, Compass, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 interface MobileBottomNavProps {
   onOpenDrawer: () => void;
@@ -38,10 +39,9 @@ export default function MobileBottomNav({ onOpenDrawer, isDrawerOpen }: MobileBo
               : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
           )}
         >
-          <span className={cn(
-            "absolute -top-1 w-6 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.8)] transition-opacity duration-200",
-            (mounted && isHome) ? "opacity-100" : "opacity-0 pointer-events-none"
-          )} />
+          {mounted && isHome && (
+            <motion.div layoutId="mobileNavActive" className="absolute -top-1 w-8 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
+          )}
           <Home className={cn("w-5 h-5 transition-transform", (mounted && isHome) && "scale-110")} />
           <span className="text-[10px] tracking-tight mt-0.5 leading-none">Home</span>
         </Link>
@@ -57,10 +57,9 @@ export default function MobileBottomNav({ onOpenDrawer, isDrawerOpen }: MobileBo
               : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
           )}
         >
-          <span className={cn(
-            "absolute -top-1 w-6 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.8)] transition-opacity duration-200",
-            (mounted && isLearn) ? "opacity-100" : "opacity-0 pointer-events-none"
-          )} />
+          {mounted && isLearn && (
+            <motion.div layoutId="mobileNavActive" className="absolute -top-1 w-8 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
+          )}
           <BookOpen className={cn("w-5 h-5 transition-transform", (mounted && isLearn) && "scale-110")} />
           <span className="text-[10px] tracking-tight mt-0.5 leading-none">Learn</span>
         </Link>
@@ -71,12 +70,19 @@ export default function MobileBottomNav({ onOpenDrawer, isDrawerOpen }: MobileBo
           prefetch={true}
           className="flex flex-col items-center justify-center -mt-5 relative group"
         >
-          <div className={cn(
-            "w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-[0_4px_20px_rgba(99,102,241,0.5)] border-2 border-white dark:border-[#060814] transition-all transform group-active:scale-90",
-            (mounted && isTutor) ? "scale-110 ring-4 ring-indigo-500/30" : "group-hover:scale-105"
-          )}>
+          <motion.div 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={cn(
+              "w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-[0_4px_20px_rgba(99,102,241,0.5)] border-2 border-white dark:border-[#060814] transition-all transform",
+              (mounted && isTutor) ? "ring-4 ring-indigo-500/30" : ""
+            )}
+          >
+            {mounted && isTutor && (
+              <motion.div layoutId="mobileNavActive" className="absolute -top-1 w-8 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
+            )}
             <Sparkles className="w-5.5 h-5.5 animate-pulse" />
-          </div>
+          </motion.div>
           <span className={cn(
             "text-[9.5px] font-black tracking-tight mt-1 leading-none",
             (mounted && isTutor) ? "text-indigo-600 dark:text-indigo-400" : "text-slate-600 dark:text-slate-300"
@@ -96,10 +102,9 @@ export default function MobileBottomNav({ onOpenDrawer, isDrawerOpen }: MobileBo
               : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
           )}
         >
-          <span className={cn(
-            "absolute -top-1 w-6 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.8)] transition-opacity duration-200",
-            (mounted && isLens) ? "opacity-100" : "opacity-0 pointer-events-none"
-          )} />
+          {mounted && isLens && (
+            <motion.div layoutId="mobileNavActive" className="absolute -top-1 w-8 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+          )}
           <div className="relative">
             <Camera className={cn("w-5 h-5 transition-transform", (mounted && isLens) && "scale-110")} />
             <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
@@ -108,24 +113,23 @@ export default function MobileBottomNav({ onOpenDrawer, isDrawerOpen }: MobileBo
         </Link>
 
         {/* 5. Explore / Hub Drawer Trigger */}
-        <button
-          type="button"
+        <motion.button
+          whileTap={{ scale: 0.95 }}
           onClick={onOpenDrawer}
           className={cn(
-            "flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all relative active:scale-95",
+            "flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all relative",
             (mounted && isDrawerOpen)
               ? "text-purple-600 dark:text-purple-400 font-extrabold"
               : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
           )}
           aria-label="Open Explore Menu"
         >
-          <span className={cn(
-            "absolute -top-1 w-6 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.8)] transition-opacity duration-200",
-            (mounted && isDrawerOpen) ? "opacity-100" : "opacity-0 pointer-events-none"
-          )} />
+          {mounted && isDrawerOpen && (
+            <motion.div layoutId="mobileNavActive" className="absolute -top-1 w-8 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
+          )}
           <Compass className={cn("w-5 h-5 transition-transform", (mounted && isDrawerOpen) && "rotate-45 scale-110")} />
           <span className="text-[10px] tracking-tight mt-0.5 leading-none">Explore</span>
-        </button>
+        </motion.button>
       </div>
     </div>
   );

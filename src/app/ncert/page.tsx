@@ -1438,6 +1438,7 @@ export default function NcertViewer() {
                 ) : (
                   <Volume2 className="w-4 h-4" />
                 )}
+              </button>
               {/* Tool Group 3: Draw & Annotate */}
               <div className="flex items-center gap-1 bg-white/5 rounded-full p-1.5 transition-all">
                 <div className="flex items-center">

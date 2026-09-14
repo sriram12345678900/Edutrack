@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Home, BookOpen, MessageSquare, Target, Settings, LogOut, Menu, X, 
   GraduationCap, Moon, Sun, Calendar, Sparkles, Users, Award, Palette, Timer, Brain, Camera, Zap, Trophy, Shield, Compass, Video, Gamepad2, Globe, Mic, Radio, GitFork, Sliders, FileText,
@@ -223,12 +224,15 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       <InteractiveAiGuide />
 
       {/* ── DESKTOP UNVEILING SIDEBAR ── */}
-      <aside 
+      <motion.aside 
+        initial={{ width: 80 }}
+        animate={{ width: isExpanded ? 272 : 80 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={cn(
-          "hidden md:flex sticky top-0 h-screen border-r border-slate-200/50 dark:border-white/10 bg-white/95 dark:bg-[#040614] bg-[#eef1f9] backdrop-blur-3xl flex-col z-50 transition-all duration-300 ease-out shadow-2xl shrink-0",
-          isExpanded ? "w-68 shadow-[0_0_40px_rgba(99,102,241,0.2)]" : "w-20 shadow-none"
+          "hidden md:flex sticky top-0 h-screen border-r border-slate-200/50 dark:border-white/10 bg-white/95 dark:bg-[#040614] bg-[#eef1f9] backdrop-blur-3xl flex-col z-50 shadow-2xl shrink-0 overflow-hidden",
+          isExpanded ? "shadow-[0_0_40px_rgba(99,102,241,0.2)]" : "shadow-none"
         )}
       >
         {/* Ambient Top Beam Glow */}
@@ -240,11 +244,14 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         )}
 
         {/* Logo / Header */}
-        <div className="p-4 border-b border-slate-200/40 dark:border-white/5 flex justify-between items-center shrink-0">
+        <div className="p-4 border-b border-slate-200/40 dark:border-white/5 flex justify-between items-center shrink-0 w-68">
           <Link href="/dashboard" className="flex items-center gap-3 group overflow-hidden">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-500 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)] border border-white/10 group-hover:scale-105 transition-transform shrink-0">
+            <motion.div 
+              whileHover={{ rotate: 10, scale: 1.1 }}
+              className="w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-500 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)] border border-white/10 shrink-0"
+            >
               <Brain className="w-5.5 h-5.5 text-white" />
-            </div>
+            </motion.div>
             <div className={cn(
               "flex flex-col transition-all duration-300",
               isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 pointer-events-none"
@@ -435,7 +442,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
             title={!isExpanded ? "Feature Spotlights & Guide" : undefined}
             className="flex items-center justify-between px-3 py-2 rounded-xl font-bold text-xs bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border border-indigo-500/25 transition-all w-full text-left group"
           >
-            <div className="flex items-center gap-3">
+            <span className="flex items-center gap-3">
               <Sparkles className="w-4.5 h-4.5 text-indigo-500 dark:text-indigo-400 group-hover:rotate-12 transition-transform shrink-0" />
               <span className={cn(
                 "transition-all duration-300 whitespace-nowrap",
@@ -443,7 +450,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               )}>
                 Feature Spotlights
               </span>
-            </div>
+            </span>
             {isExpanded && (
               <span className="text-[8px] font-black uppercase bg-indigo-500/25 text-indigo-600 dark:text-indigo-300 px-1.5 py-0.5 rounded-full">
                 Tour
@@ -452,7 +459,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           </button>
 
           <Link 
-            href="/setup" 
+            href="/settings" 
             prefetch={true}
             title={!isExpanded ? "Account Settings" : undefined}
             className="flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-xs hover:bg-slate-100 dark:hover:bg-white/[0.03] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-all"
@@ -480,7 +487,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
             </span>
           </button>
         </div>
-      </aside>
+      </motion.aside>
 
       {/* ── MOBILE CONTAINER & VIEWPORT WRAPPER ── */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative">

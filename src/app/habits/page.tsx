@@ -790,11 +790,13 @@ export default function HabitTrackerPage() {
                       {h.name}
                     </p>
 
-                    <button
+                    <motion.button
+                      whileTap={{ scale: 0.94 }}
+                      whileHover={{ scale: 1.02 }}
                       onClick={() => toggleDateHabit(h.id, todayKey)}
                       className={`w-full py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all ${
                         isChecked 
-                          ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' 
+                          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/30' 
                           : 'bg-slate-900 hover:bg-slate-850 text-slate-300 border border-slate-800 hover:border-slate-700'
                       }`}
                     >
@@ -807,7 +809,7 @@ export default function HabitTrackerPage() {
                           <span className="w-2 h-2 rounded-full border border-slate-600" /> Mark Complete
                         </>
                       )}
-                    </button>
+                    </motion.button>
                   </motion.div>
                 );
               })}

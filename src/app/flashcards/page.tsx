@@ -324,9 +324,10 @@ export default function FlashcardsHub() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                  className="group relative bg-white dark:bg-slate-50 dark:bg-slate-900 bg-slate-100 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-fuchsia-300 dark:hover:border-fuchsia-700/50 transition-all overflow-hidden h-full flex flex-col"
+                  transition={{ delay: i * 0.05, type: "spring", stiffness: 300, damping: 25 }}
+                  whileHover={{ y: -6, scale: 1.02, transition: { duration: 0.2 } }}
+                  whileTap={{ scale: 0.98 }}
+                  className="group relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-slate-200/80 dark:border-white/10 shadow-md hover:shadow-2xl hover:border-fuchsia-400/50 transition-all overflow-hidden h-full flex flex-col"
                 >
                   {/* Color accent top bar */}
                   <div className={`h-1.5 w-full bg-gradient-to-r ${gradient}`} />

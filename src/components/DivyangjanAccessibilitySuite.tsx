@@ -81,7 +81,7 @@ export default function DivyangjanAccessibilitySuite() {
           title="Open Divyangjan Accessibility Menu"
           className="w-13 h-13 rounded-full bg-indigo-600 dark:bg-indigo-600 text-white flex items-center justify-center shadow-[0_8px_24px_rgba(99,102,241,0.4)] border border-indigo-400/40 relative overflow-hidden"
         >
-          <div className="absolute inset-0 bg-white/20 animate-pulse pointer-events-none" />
+          <span className="absolute inset-0 bg-white/20 animate-pulse pointer-events-none" />
           <Accessibility className="w-6 h-6 relative z-10" />
           {udidVerified && (
             <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border border-white dark:border-[#090d1f] flex items-center justify-center">

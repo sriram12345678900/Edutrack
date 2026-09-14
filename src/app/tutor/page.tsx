@@ -894,7 +894,13 @@ export default function TutorPage() {
                     const identifier = `chat-${i}`;
                     const isAi = msg.role === "ai";
                     return (
-                      <div key={i} className={`flex gap-3.5 sm:gap-4 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
+                      <motion.div 
+                        key={i} 
+                        initial={{ opacity: 0, y: 12, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                        className={`flex gap-3.5 sm:gap-4 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
+                      >
                         
                         <div className={`w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 shadow-xl border ${
                           isAi 
@@ -942,13 +948,17 @@ export default function TutorPage() {
 
                         </div>
 
-                      </div>
+                      </motion.div>
                     );
                   })}
 
                   {/* Session Conclusion Card */}
                   {currentSession?.conclusion && (
-                    <div className="bg-gradient-to-br from-cyan-500/15 via-indigo-500/10 to-transparent border border-cyan-500/40 rounded-3xl p-5 shadow-2xl relative overflow-hidden border-l-4 border-l-cyan-400">
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="bg-gradient-to-br from-cyan-500/15 via-indigo-500/10 to-transparent border border-cyan-500/40 rounded-3xl p-5 shadow-2xl relative overflow-hidden border-l-4 border-l-cyan-400"
+                    >
                       <div className="flex items-center justify-between border-b border-cyan-500/20 pb-3 mb-3.5">
                         <div className="flex items-center gap-2.5">
                           <Sparkles className="w-4.5 h-4.5 dark:text-cyan-400 text-cyan-700 animate-pulse" />
@@ -970,12 +980,16 @@ export default function TutorPage() {
                       <div className="space-y-2.5">
                         {formatMessageContent(currentSession.conclusion)}
                       </div>
-                    </div>
+                    </motion.div>
                   )}
 
                   {/* Loading Typing Indicator */}
                   {loading && (
-                    <div className="flex gap-4">
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex gap-4"
+                    >
                       <div className="w-9 h-9 rounded-2xl bg-cyan-950/60 dark:text-cyan-400 text-cyan-700 border border-cyan-500/30 flex items-center justify-center shrink-0 shadow-lg">
                         <Bot className="w-4.5 h-4.5 animate-pulse dark:text-cyan-400 text-cyan-700" />
                       </div>
@@ -984,7 +998,7 @@ export default function TutorPage() {
                         <span className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
                         <span className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                       </div>
-                    </div>
+                    </motion.div>
                   )}
 
                   <div ref={chatEndRef} />
@@ -1015,6 +1029,30 @@ export default function TutorPage() {
                     </button>
                   </div>
                 )}
+
+                <AnimatePresence>
+                  {isListening && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="flex items-center justify-center gap-1.5 mb-3 py-2 px-5 bg-red-500/15 border border-red-500/30 rounded-2xl w-fit mx-auto shadow-lg shadow-red-500/10 backdrop-blur-md"
+                    >
+                      <div className="flex items-center gap-2 mr-3">
+                        <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+                        <span className="text-xs font-black text-red-400 uppercase tracking-widest">Listening</span>
+                      </div>
+                      {[0.3, 0.7, 0.4, 1.0, 0.6, 0.8, 0.4, 0.9, 0.5, 0.7, 0.3].map((h, idx) => (
+                        <motion.div
+                          key={idx}
+                          animate={{ height: ["6px", `${h * 26}px`, "6px"] }}
+                          transition={{ duration: 0.45 + (idx % 3) * 0.15, repeat: Infinity, ease: "easeInOut" }}
+                          className="w-1 bg-gradient-to-t from-red-500 to-rose-300 rounded-full"
+                        />
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 <form onSubmit={handleChatSend} className="relative flex items-center group">
                   <input 

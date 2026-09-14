@@ -352,7 +352,7 @@ export default function InteractiveAiGuide() {
         className="w-14 h-14 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white flex items-center justify-center shadow-[0_10px_25px_rgba(99,102,241,0.4)] border-2 border-indigo-300/30 relative"
       >
         {/* Glow effect */}
-        <div className="absolute inset-0 rounded-full bg-indigo-500 blur-md opacity-40 animate-pulse pointer-events-none" />
+        <span className="absolute inset-0 rounded-full bg-indigo-500 blur-md opacity-40 animate-pulse pointer-events-none" />
         
         {isOpen ? (
           <X className="w-6 h-6 relative z-10" />

@@ -166,29 +166,38 @@ export default function TrophiesPage() {
         </header>
 
         {/* Tab Navigation */}
-        <div className="flex p-1.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm max-w-md">
+        <div className="flex p-1.5 rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 shadow-sm max-w-md relative">
           <button
             onClick={() => setActiveTab("trophies")}
-            className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-              activeTab === "trophies" ? "bg-amber-500 text-slate-950 font-black shadow-md" : "text-slate-500"
+            className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 relative z-10 ${
+              activeTab === "trophies" ? "text-slate-950 dark:text-white font-black" : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
             }`}
           >
+            {activeTab === "trophies" && (
+              <motion.div layoutId="trophiesTab" className="absolute inset-0 bg-amber-500 rounded-xl -z-10 shadow-md shadow-amber-500/30" />
+            )}
             <Trophy className="w-3.5 h-3.5" /> Badges ({achievements.filter(a => a.unlocked).length})
           </button>
           <button
             onClick={() => setActiveTab("crate")}
-            className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-              activeTab === "crate" ? "bg-amber-500 text-slate-950 font-black shadow-md" : "text-slate-500"
+            className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 relative z-10 ${
+              activeTab === "crate" ? "text-slate-950 dark:text-white font-black" : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
             }`}
           >
+            {activeTab === "crate" && (
+              <motion.div layoutId="trophiesTab" className="absolute inset-0 bg-amber-500 rounded-xl -z-10 shadow-md shadow-amber-500/30" />
+            )}
             <Gift className="w-3.5 h-3.5" /> Mystery Crate
           </button>
           <button
             onClick={() => setActiveTab("leaderboard")}
-            className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-              activeTab === "leaderboard" ? "bg-amber-500 text-slate-950 font-black shadow-md" : "text-slate-500"
+            className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 relative z-10 ${
+              activeTab === "leaderboard" ? "text-slate-950 dark:text-white font-black" : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
             }`}
           >
+            {activeTab === "leaderboard" && (
+              <motion.div layoutId="trophiesTab" className="absolute inset-0 bg-amber-500 rounded-xl -z-10 shadow-md shadow-amber-500/30" />
+            )}
             <Crown className="w-3.5 h-3.5" /> Leaderboard
           </button>
         </div>
@@ -201,24 +210,29 @@ export default function TrophiesPage() {
                 key={item.id}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.08 }}
-                whileHover={{ scale: 1.03 }}
-                className={`p-6 rounded-3xl border transition-all flex items-start gap-4 shadow-xl ${
+                transition={{ delay: index * 0.08, type: "spring", stiffness: 300, damping: 25 }}
+                whileHover={{ y: -6, scale: 1.02, transition: { duration: 0.2 } }}
+                className={`group p-6 rounded-3xl border transition-all flex items-start gap-4 shadow-xl relative overflow-hidden backdrop-blur-xl ${
                   item.unlocked
-                    ? "bg-white dark:bg-slate-900 border-amber-500/30"
-                    : "bg-white/40 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 opacity-60"
+                    ? "bg-white/80 dark:bg-slate-900/80 border-amber-500/30 hover:border-amber-400 shadow-amber-500/5"
+                    : "bg-white/30 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800 opacity-60"
                 }`}
               >
+                {/* Holographic shimmer on unlocked items */}
+                {item.unlocked && (
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none rounded-3xl" />
+                )}
+
                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0 shadow-lg ${
-                  item.unlocked ? "bg-gradient-to-br from-amber-500/20 to-yellow-500/20 border border-amber-500/30" : "bg-slate-200 dark:bg-slate-800"
+                  item.unlocked ? "bg-gradient-to-br from-amber-500/20 to-yellow-500/20 border border-amber-500/30 group-hover:scale-110 transition-transform duration-300" : "bg-slate-200 dark:bg-slate-800"
                 }`}>
                   {item.icon}
                 </div>
 
-                <div className="space-y-1 overflow-hidden">
+                <div className="space-y-1 overflow-hidden relative z-10">
                   <div className="flex items-center gap-2">
                     <h3 className="text-base font-black text-slate-900 dark:text-white truncate">{item.title}</h3>
-                    {item.unlocked && <span className="text-[9px] font-black uppercase text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full">Unlocked</span>}
+                    {item.unlocked && <span className="text-[9px] font-black uppercase text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">Unlocked</span>}
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
                 </div>
@@ -298,6 +312,63 @@ export default function TrophiesPage() {
                   {filter.label}
                 </button>
               ))}
+            </div>
+
+            {/* Top 3 Interactive Podium */}
+            <div className="grid grid-cols-3 gap-3 sm:gap-6 max-w-2xl mx-auto pt-6 pb-2 items-end">
+              {/* 2nd Place */}
+              {LEADERBOARD_DATA[leaderboardFilter][1] && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1, type: "spring" }}
+                  className="flex flex-col items-center text-center"
+                >
+                  <div className="text-2xl mb-1">{LEADERBOARD_DATA[leaderboardFilter][1].avatar}</div>
+                  <span className="text-xs font-black truncate max-w-[90px] text-slate-900 dark:text-white">{LEADERBOARD_DATA[leaderboardFilter][1].name}</span>
+                  <span className="text-[10px] font-mono font-bold text-slate-400 mb-2">{LEADERBOARD_DATA[leaderboardFilter][1].xp} XP</span>
+                  <div className="w-full h-24 sm:h-28 bg-gradient-to-t from-slate-400/30 to-slate-300/10 rounded-t-2xl border-t-2 border-slate-300/40 flex items-center justify-center font-black text-2xl text-slate-300 shadow-lg">
+                    🥈
+                  </div>
+                </motion.div>
+              )}
+
+              {/* 1st Place */}
+              {LEADERBOARD_DATA[leaderboardFilter][0] && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05, type: "spring" }}
+                  className="flex flex-col items-center text-center -mt-4"
+                >
+                  <div className="relative">
+                    <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-base animate-bounce">👑</span>
+                    <div className="text-3xl mb-1">{LEADERBOARD_DATA[leaderboardFilter][0].avatar}</div>
+                  </div>
+                  <span className="text-xs sm:text-sm font-black text-amber-400 truncate max-w-[110px]">{LEADERBOARD_DATA[leaderboardFilter][0].name}</span>
+                  <span className="text-[11px] font-mono font-bold text-amber-400/90 mb-2">{LEADERBOARD_DATA[leaderboardFilter][0].xp} XP</span>
+                  <div className="w-full h-32 sm:h-36 bg-gradient-to-t from-amber-500/30 to-yellow-400/10 rounded-t-2xl border-t-2 border-amber-400/60 flex items-center justify-center font-black text-3xl text-amber-400 shadow-xl shadow-amber-500/20">
+                    🥇
+                  </div>
+                </motion.div>
+              )}
+
+              {/* 3rd Place */}
+              {LEADERBOARD_DATA[leaderboardFilter][2] && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15, type: "spring" }}
+                  className="flex flex-col items-center text-center"
+                >
+                  <div className="text-2xl mb-1">{LEADERBOARD_DATA[leaderboardFilter][2].avatar}</div>
+                  <span className="text-xs font-black truncate max-w-[90px] text-slate-900 dark:text-white">{LEADERBOARD_DATA[leaderboardFilter][2].name}</span>
+                  <span className="text-[10px] font-mono font-bold text-amber-600/90 mb-2">{LEADERBOARD_DATA[leaderboardFilter][2].xp} XP</span>
+                  <div className="w-full h-20 sm:h-24 bg-gradient-to-t from-amber-700/30 to-amber-600/10 rounded-t-2xl border-t-2 border-amber-700/40 flex items-center justify-center font-black text-2xl text-amber-600 shadow-lg">
+                    🥉
+                  </div>
+                </motion.div>
+              )}
             </div>
 
             <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-3">
