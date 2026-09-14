@@ -25,7 +25,7 @@ export interface Habit {
   period?: HabitPeriod;
 }
 
-export const getPeriodFromTime = (time?: string): HabitPeriod => {
+const getPeriodFromTime = (time?: string): HabitPeriod => {
   if (!time) return 'morning';
   const hour = parseInt(time.split(':')[0], 10);
   if (isNaN(hour)) return 'morning';
@@ -35,7 +35,7 @@ export const getPeriodFromTime = (time?: string): HabitPeriod => {
   return 'night';
 };
 
-export const formatTime12 = (time24?: string) => {
+const formatTime12 = (time24?: string) => {
   if (!time24) return "Flexible";
   const parts = time24.split(":");
   let h = parseInt(parts[0], 10);
@@ -47,7 +47,7 @@ export const formatTime12 = (time24?: string) => {
   return `${h}:${m} ${ampm}`;
 };
 
-export const getPeriodBadge = (period: HabitPeriod) => {
+const getPeriodBadge = (period: HabitPeriod) => {
   switch (period) {
     case 'morning':
       return { label: 'Morning', icon: '🌅', color: 'bg-amber-500/10 text-amber-400 border-amber-500/30' };
@@ -143,7 +143,7 @@ export default function HabitTrackerPage() {
   const realMonthIndex = now.getMonth();
   const realDay = now.getDate();
   
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const months = useMemo(() => ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], []);
   
   const [selectedYear, setSelectedYear] = useState<number>(realYear);
   const [selectedMonth, setSelectedMonth] = useState<string>(months[realMonthIndex]);
@@ -1662,8 +1662,12 @@ export default function HabitTrackerPage() {
                     <span className="text-base p-1 rounded-lg bg-slate-900 border border-slate-800">{h.emoji}</span>
                     <div className="overflow-hidden">
                       <p className="text-xs font-bold text-slate-200 truncate">{h.name}</p>
-                      <p className="text-[9px] text-slate-500 uppercase font-semibold">
-                        {h.category} &bull; Goal: {h.goalDays}d
+                      <p className="text-[9px] text-slate-500 uppercase font-semibold flex items-center gap-1 mt-0.5">
+                        <span className="text-indigo-400 font-bold">{formatTime12(h.time)}</span>
+                        <span>&bull;</span>
+                        <span>{h.category}</span>
+                        <span>&bull;</span>
+                        <span>{h.goalDays}d</span>
                       </p>
                     </div>
                   </div>
@@ -1895,47 +1899,126 @@ export default function HabitTrackerPage() {
 
       {/* MODAL: Add / Edit Habit */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-md">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-100 animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
+          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-100 animate-in fade-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto hide-scrollbar">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mb-3">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mb-2">
                 {editingHabit ? <Edit3 className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
               </div>
               <h3 className="text-lg font-black uppercase tracking-wide">
                 {editingHabit ? "Edit Habit Routine" : "Create New Habit"}
               </h3>
-              <p className="text-xs text-slate-400 font-semibold mt-1">
-                Customize your personal academic or wellness target.
+              <p className="text-xs text-slate-400 font-semibold mt-0.5">
+                Customize schedule, daily slot, and academic targets.
               </p>
             </div>
 
             <form onSubmit={handleSaveHabit} className="space-y-4">
-              <div className="space-y-1.5">
+              {/* Habit Name */}
+              <div className="space-y-1">
                 <label className="text-[10px] font-black text-slate-400 uppercase block">Habit Name</label>
                 <input
                   type="text"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="e.g. Solve 5 NCERT Math Problems"
-                  maxLength={30}
+                  maxLength={36}
                   required
-                  className="w-full px-4 py-3 bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-2xl text-xs sm:text-sm font-bold text-white transition-all outline-none"
+                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl text-xs sm:text-sm font-bold text-white transition-all outline-none"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase block">Emoji Icon</label>
-                  <input
-                    type="text"
-                    value={formEmoji}
-                    onChange={(e) => setFormEmoji(e.target.value)}
-                    maxLength={2}
-                    className="w-full px-4 py-3 bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-2xl text-xs sm:text-sm font-bold text-center text-white transition-all outline-none"
-                  />
+              {/* Emoji Selector with 1-Tap Tray */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-black text-slate-400 uppercase">Icon</label>
+                  <span className="text-xs text-slate-400">Selected: <strong className="text-base">{formEmoji}</strong></span>
+                </div>
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 hide-scrollbar">
+                  {EMOJI_PRESETS.map((emoji) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      onClick={() => setFormEmoji(emoji)}
+                      className={`text-base p-2 rounded-xl transition-all shrink-0 border ${
+                        formEmoji === emoji
+                          ? 'bg-indigo-600/30 border-indigo-400 shadow-sm scale-110'
+                          : 'bg-slate-950 border-slate-800 hover:border-slate-700'
+                      }`}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* FAST TIME SCHEDULING SECTION */}
+              <div className="space-y-2 p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-black text-indigo-400 uppercase flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" /> Fast Time Schedule
+                  </label>
+                  <span className="text-[11px] font-black text-white bg-indigo-950 px-2 py-0.5 rounded-md border border-indigo-800">
+                    {formatTime12(formTime)}
+                  </span>
                 </div>
 
-                <div className="space-y-1.5">
+                {/* 1-Tap Fast Presets */}
+                <div className="grid grid-cols-3 gap-1.5">
+                  {TIME_PRESETS.map(p => (
+                    <button
+                      key={p.value}
+                      type="button"
+                      onClick={() => {
+                        setFormTime(p.value);
+                        setFormPeriod(p.period);
+                      }}
+                      className={`py-1.5 px-2 rounded-lg text-[10px] font-extrabold flex items-center justify-center gap-1 border transition-all ${
+                        formTime === p.value 
+                          ? 'bg-indigo-600 text-white border-indigo-400 shadow' 
+                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                      }`}
+                    >
+                      <span>{p.icon}</span>
+                      <span>{p.label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Custom Time & Period Input */}
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div>
+                    <label className="text-[9px] font-bold text-slate-500 uppercase block mb-1">Precise Time</label>
+                    <input
+                      type="time"
+                      value={formTime}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setFormTime(val);
+                        setFormPeriod(getPeriodFromTime(val));
+                      }}
+                      className="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl text-xs font-bold text-white outline-none cursor-pointer"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-bold text-slate-500 uppercase block mb-1">Day Period</label>
+                    <select
+                      value={formPeriod}
+                      onChange={(e) => setFormPeriod(e.target.value as HabitPeriod)}
+                      className="w-full px-2 py-1.5 bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl text-xs font-bold text-white outline-none cursor-pointer capitalize"
+                    >
+                      <option value="morning">🌅 Morning (4am - 12pm)</option>
+                      <option value="afternoon">☀️ Afternoon (12pm - 5pm)</option>
+                      <option value="evening">🌆 Evening (5pm - 9pm)</option>
+                      <option value="night">🌙 Night (9pm+)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Goal & Category */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
                   <label className="text-[10px] font-black text-slate-400 uppercase block">Monthly Goal (Days)</label>
                   <input
                     type="number"
@@ -1943,42 +2026,42 @@ export default function HabitTrackerPage() {
                     max={31}
                     value={formGoal}
                     onChange={(e) => setFormGoal(Number(e.target.value))}
-                    className="w-full px-4 py-3 bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-2xl text-xs sm:text-sm font-bold text-center text-white transition-all outline-none"
+                    className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl text-xs font-bold text-center text-white transition-all outline-none"
                   />
                 </div>
-              </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-slate-400 uppercase block">Category</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(['academic', 'wellness', 'focus'] as HabitCategory[]).map(cat => (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => setFormCategory(cat)}
-                      className={`py-2 px-2 rounded-xl text-xs font-black uppercase transition-all border ${
-                        formCategory === cat 
-                          ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm' 
-                          : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-slate-400 uppercase block">Category</label>
+                  <div className="grid grid-cols-3 gap-1">
+                    {(['academic', 'wellness', 'focus'] as HabitCategory[]).map(cat => (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => setFormCategory(cat)}
+                        className={`py-2 px-1 rounded-xl text-[10px] font-black uppercase transition-all border text-center ${
+                          formCategory === cat 
+                            ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm' 
+                            : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700'
+                        }`}
+                      >
+                        {cat.slice(0, 4)}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-3">
+              <div className="flex gap-2.5 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="flex-1 bg-slate-950 hover:bg-slate-850 border border-slate-800 text-slate-400 font-extrabold py-3 rounded-2xl transition-all text-xs"
+                  className="flex-1 bg-slate-950 hover:bg-slate-850 border border-slate-800 text-slate-400 font-extrabold py-2.5 rounded-xl transition-all text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold py-3 rounded-2xl transition-all shadow-md shadow-indigo-600/20 text-xs"
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold py-2.5 rounded-xl transition-all shadow-md shadow-indigo-600/20 text-xs"
                 >
                   {editingHabit ? "Save Changes" : "Create Habit"}
                 </button>
