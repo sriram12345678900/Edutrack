@@ -4,7 +4,8 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   Home, Plus, Trash2, Check, TrendingUp, BarChart2, PieChart, Star, 
   CheckSquare, Award, Flame, Zap, Calendar, Sparkles, Volume2, VolumeX, 
-  Layers, Filter, ChevronRight, Edit3, Compass, ArrowUpRight, Clock, ShieldCheck
+  Layers, Filter, ChevronRight, Edit3, Compass, ArrowUpRight, Clock, ShieldCheck,
+  Sun, Moon, Sunrise, Sunset, ArrowUpDown
 } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,6 +13,7 @@ import Confetti from '@/components/Confetti';
 import { awardXp } from '@/lib/xp';
 
 export type HabitCategory = 'academic' | 'wellness' | 'focus';
+export type HabitPeriod = 'morning' | 'afternoon' | 'evening' | 'night';
 
 export interface Habit {
   id: string;
@@ -19,19 +21,73 @@ export interface Habit {
   emoji: string;
   goalDays: number;
   category: HabitCategory;
+  time?: string; // 24-hour "HH:MM", e.g. "05:30"
+  period?: HabitPeriod;
 }
 
+export const getPeriodFromTime = (time?: string): HabitPeriod => {
+  if (!time) return 'morning';
+  const hour = parseInt(time.split(':')[0], 10);
+  if (isNaN(hour)) return 'morning';
+  if (hour >= 4 && hour < 12) return 'morning';
+  if (hour >= 12 && hour < 17) return 'afternoon';
+  if (hour >= 17 && hour < 21) return 'evening';
+  return 'night';
+};
+
+export const formatTime12 = (time24?: string) => {
+  if (!time24) return "Flexible";
+  const parts = time24.split(":");
+  let h = parseInt(parts[0], 10);
+  const m = parts[1] || "00";
+  if (isNaN(h)) return time24;
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12;
+  if (h === 0) h = 12;
+  return `${h}:${m} ${ampm}`;
+};
+
+export const getPeriodBadge = (period: HabitPeriod) => {
+  switch (period) {
+    case 'morning':
+      return { label: 'Morning', icon: '🌅', color: 'bg-amber-500/10 text-amber-400 border-amber-500/30' };
+    case 'afternoon':
+      return { label: 'Afternoon', icon: '☀️', color: 'bg-orange-500/10 text-orange-400 border-orange-500/30' };
+    case 'evening':
+      return { label: 'Evening', icon: '🌆', color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' };
+    case 'night':
+      return { label: 'Night', icon: '🌙', color: 'bg-purple-500/10 text-purple-400 border-purple-500/30' };
+  }
+};
+
+const TIME_PRESETS = [
+  { label: "05:00 AM", value: "05:00", period: "morning" as HabitPeriod, icon: "🌅" },
+  { label: "06:30 AM", value: "06:30", period: "morning" as HabitPeriod, icon: "🌅" },
+  { label: "08:00 AM", value: "08:00", period: "morning" as HabitPeriod, icon: "☀️" },
+  { label: "12:30 PM", value: "12:30", period: "afternoon" as HabitPeriod, icon: "🌤️" },
+  { label: "03:30 PM", value: "15:30", period: "afternoon" as HabitPeriod, icon: "🌤️" },
+  { label: "06:00 PM", value: "18:00", period: "evening" as HabitPeriod, icon: "🌆" },
+  { label: "08:00 PM", value: "20:00", period: "evening" as HabitPeriod, icon: "🌆" },
+  { label: "09:30 PM", value: "21:30", period: "night" as HabitPeriod, icon: "🌙" },
+  { label: "10:30 PM", value: "22:30", period: "night" as HabitPeriod, icon: "🌙" },
+];
+
+const EMOJI_PRESETS = [
+  "⏰", "💪", "📖", "📐", "🧬", "📵", "💧", "📋", "⚡", "📝", 
+  "🏃", "🧘", "🌙", "🎯", "🧠", "☕", "🚴", "✍️", "🔬", "🍎"
+];
+
 const DEFAULT_HABITS: Habit[] = [
-  { id: '1', name: 'Wake up at 05:00', emoji: '⏰', goalDays: 20, category: 'wellness' },
-  { id: '2', name: 'Gym / Morning Workout', emoji: '💪', goalDays: 16, category: 'wellness' },
-  { id: '3', name: 'NCERT Deep Reading', emoji: '📖', goalDays: 24, category: 'academic' },
-  { id: '4', name: 'Math / Physics PYQs', emoji: '📐', goalDays: 22, category: 'academic' },
-  { id: '5', name: 'Science Concept Notes', emoji: '🧬', goalDays: 20, category: 'academic' },
-  { id: '6', name: 'Social Media Detox', emoji: '📵', goalDays: 25, category: 'focus' },
-  { id: '7', name: 'Hydration (2.5L Water)', emoji: '💧', goalDays: 28, category: 'wellness' },
-  { id: '8', name: 'Daily Priority Planning', emoji: '📋', goalDays: 26, category: 'focus' },
-  { id: '9', name: 'Active Recall Flashcards', emoji: '⚡', goalDays: 22, category: 'academic' },
-  { id: '10', name: 'Night Journal & Tomorrow Plan', emoji: '📝', goalDays: 24, category: 'focus' }
+  { id: '1', name: 'Wake up at 05:00', emoji: '⏰', goalDays: 20, category: 'wellness', time: '05:00', period: 'morning' },
+  { id: '2', name: 'Gym / Morning Workout', emoji: '💪', goalDays: 16, category: 'wellness', time: '06:00', period: 'morning' },
+  { id: '3', name: 'NCERT Deep Reading', emoji: '📖', goalDays: 24, category: 'academic', time: '07:30', period: 'morning' },
+  { id: '4', name: 'Math / Physics PYQs', emoji: '📐', goalDays: 22, category: 'academic', time: '14:00', period: 'afternoon' },
+  { id: '5', name: 'Science Concept Notes', emoji: '🧬', goalDays: 20, category: 'academic', time: '16:00', period: 'afternoon' },
+  { id: '6', name: 'Social Media Detox', emoji: '📵', goalDays: 25, category: 'focus', time: '17:30', period: 'evening' },
+  { id: '7', name: 'Hydration (2.5L Water)', emoji: '💧', goalDays: 28, category: 'wellness', time: '18:30', period: 'evening' },
+  { id: '8', name: 'Daily Priority Planning', emoji: '📋', goalDays: 26, category: 'focus', time: '19:30', period: 'evening' },
+  { id: '9', name: 'Active Recall Flashcards', emoji: '⚡', goalDays: 22, category: 'academic', time: '20:30', period: 'night' },
+  { id: '10', name: 'Night Journal & Tomorrow Plan', emoji: '📝', goalDays: 24, category: 'focus', time: '21:30', period: 'night' }
 ];
 
 const ROUTINE_TEMPLATES = [
@@ -41,11 +97,11 @@ const ROUTINE_TEMPLATES = [
     badge: "Most Popular",
     color: "from-blue-600 to-indigo-700",
     habits: [
-      { name: "05:30 AM Morning Formula Drill", emoji: "📐", goalDays: 26, category: "academic" },
-      { name: "NCERT Active Reading (1 Ch)", emoji: "📖", goalDays: 24, category: "academic" },
-      { name: "Solve 5 Exemplar / PYQ Questions", emoji: "✍️", goalDays: 22, category: "academic" },
-      { name: "Digital Distraction Lockout (2hr)", emoji: "📵", goalDays: 28, category: "focus" },
-      { name: "Evening Error Log Analysis", emoji: "🔍", goalDays: 20, category: "academic" }
+      { name: "Morning Formula Drill", emoji: "📐", goalDays: 26, category: "academic" as HabitCategory, time: "05:30", period: "morning" as HabitPeriod },
+      { name: "NCERT Active Reading (1 Ch)", emoji: "📖", goalDays: 24, category: "academic" as HabitCategory, time: "07:00", period: "morning" as HabitPeriod },
+      { name: "Solve 5 Exemplar / PYQ Questions", emoji: "✍️", goalDays: 22, category: "academic" as HabitCategory, time: "14:30", period: "afternoon" as HabitPeriod },
+      { name: "Digital Distraction Lockout (2hr)", emoji: "📵", goalDays: 28, category: "focus" as HabitCategory, time: "17:00", period: "evening" as HabitPeriod },
+      { name: "Evening Error Log Analysis", emoji: "🔍", goalDays: 20, category: "academic" as HabitCategory, time: "20:00", period: "night" as HabitPeriod }
     ]
   },
   {
@@ -54,11 +110,11 @@ const ROUTINE_TEMPLATES = [
     badge: "Health & Mind",
     color: "from-emerald-600 to-teal-700",
     habits: [
-      { name: "Hydrate: 500ml Water Upon Waking", emoji: "💧", goalDays: 30, category: "wellness" },
-      { name: "20-Min Cardio / Yoga Stretch", emoji: "🏃", goalDays: 20, category: "wellness" },
-      { name: "10-Min Mindfulness Meditation", emoji: "🧘", goalDays: 25, category: "wellness" },
-      { name: "8 Hours Sleep Schedule", emoji: "🌙", goalDays: 26, category: "wellness" },
-      { name: "Outdoor 10k Steps Walk", emoji: "🚶", goalDays: 22, category: "wellness" }
+      { name: "Hydrate: 500ml Water Upon Waking", emoji: "💧", goalDays: 30, category: "wellness" as HabitCategory, time: "05:30", period: "morning" as HabitPeriod },
+      { name: "20-Min Cardio / Yoga Stretch", emoji: "🏃", goalDays: 20, category: "wellness" as HabitCategory, time: "06:15", period: "morning" as HabitPeriod },
+      { name: "Outdoor 10k Steps Walk", emoji: "🚶", goalDays: 22, category: "wellness" as HabitCategory, time: "17:00", period: "evening" as HabitPeriod },
+      { name: "10-Min Mindfulness Meditation", emoji: "🧘", goalDays: 25, category: "wellness" as HabitCategory, time: "20:00", period: "night" as HabitPeriod },
+      { name: "8 Hours Sleep Schedule", emoji: "🌙", goalDays: 26, category: "wellness" as HabitCategory, time: "22:00", period: "night" as HabitPeriod }
     ]
   },
   {
@@ -67,11 +123,11 @@ const ROUTINE_TEMPLATES = [
     badge: "Elite Focus",
     color: "from-purple-600 to-pink-700",
     habits: [
-      { name: "Solve 1 Olympiad Hard Problem", emoji: "🧠", goalDays: 22, category: "academic" },
-      { name: "Science Sandbox Simulation Lab", emoji: "🔬", goalDays: 18, category: "academic" },
-      { name: "EduTrack Viva Voice Practice", emoji: "🗣️", goalDays: 20, category: "academic" },
-      { name: "Deep Focus Pomodoro Block", emoji: "⏱️", goalDays: 25, category: "focus" },
-      { name: "Daily Learning Summary Notes", emoji: "📝", goalDays: 24, category: "focus" }
+      { name: "Solve 1 Olympiad Hard Problem", emoji: "🧠", goalDays: 22, category: "academic" as HabitCategory, time: "06:00", period: "morning" as HabitPeriod },
+      { name: "Science Sandbox Simulation Lab", emoji: "🔬", goalDays: 18, category: "academic" as HabitCategory, time: "14:00", period: "afternoon" as HabitPeriod },
+      { name: "EduTrack Viva Voice Practice", emoji: "🗣️", goalDays: 20, category: "academic" as HabitCategory, time: "16:30", period: "afternoon" as HabitPeriod },
+      { name: "Deep Focus Pomodoro Block", emoji: "⏱️", goalDays: 25, category: "focus" as HabitCategory, time: "18:30", period: "evening" as HabitPeriod },
+      { name: "Daily Learning Summary Notes", emoji: "📝", goalDays: 24, category: "focus" as HabitCategory, time: "21:00", period: "night" as HabitPeriod }
     ]
   }
 ];
@@ -93,6 +149,9 @@ export default function HabitTrackerPage() {
   const [selectedMonth, setSelectedMonth] = useState<string>(months[realMonthIndex]);
   const [activeCategoryFilter, setActiveCategoryFilter] = useState<'all' | HabitCategory>('all');
   const [todayFilter, setTodayFilter] = useState<'all' | 'pending' | 'done'>('all');
+  const [activePeriodFilter, setActivePeriodFilter] = useState<'all' | HabitPeriod | 'next_up'>('all');
+  const [sortByScheduleTime, setSortByScheduleTime] = useState<boolean>(true);
+  const [quickTimePickerId, setQuickTimePickerId] = useState<string | null>(null);
   const [chartViewMode, setChartViewMode] = useState<'donut' | 'weekday' | 'gauge' | 'heatmap'>('donut');
   const [mobileView, setMobileView] = useState<'matrix' | 'cards'>('cards');
   
@@ -109,6 +168,8 @@ export default function HabitTrackerPage() {
   const [formEmoji, setFormEmoji] = useState("⚡");
   const [formGoal, setFormGoal] = useState(22);
   const [formCategory, setFormCategory] = useState<HabitCategory>('academic');
+  const [formTime, setFormTime] = useState("07:00");
+  const [formPeriod, setFormPeriod] = useState<HabitPeriod>('morning');
 
   // Days in current selected month
   const monthIndex = useMemo(() => months.indexOf(selectedMonth), [selectedMonth, months]);
@@ -193,11 +254,17 @@ export default function HabitTrackerPage() {
     if (storedHabits) {
       try {
         const parsed: Habit[] = JSON.parse(storedHabits);
-        // Ensure category defaults if loading older format
-        const upgraded = parsed.map(h => ({
-          ...h,
-          category: h.category || ('academic' as HabitCategory)
-        }));
+        // Ensure category & time schedule defaults if loading older format
+        const defaultTimes = ['05:00', '06:00', '07:30', '14:00', '16:00', '17:30', '18:30', '19:30', '20:30', '21:30'];
+        const upgraded = parsed.map((h, idx) => {
+          const time = h.time || defaultTimes[idx % defaultTimes.length];
+          return {
+            ...h,
+            category: h.category || ('academic' as HabitCategory),
+            time,
+            period: h.period || getPeriodFromTime(time)
+          };
+        });
         setHabits(upgraded);
       } catch {
         setHabits(DEFAULT_HABITS);
@@ -350,6 +417,87 @@ export default function HabitTrackerPage() {
     return habits.filter(h => h.category === activeCategoryFilter);
   }, [habits, activeCategoryFilter]);
 
+  // Current time representation (HH:MM)
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+  const currentTimeStr = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
+
+  // Next up pending habit for today
+  const nextUpHabitId = useMemo(() => {
+    const todayLogs = logs[todayKey] || {};
+    const pendingHabits = habits.filter(h => !todayLogs[h.id]);
+    if (pendingHabits.length === 0) return null;
+    
+    const sorted = [...pendingHabits].sort((a, b) => (a.time || "12:00").localeCompare(b.time || "12:00"));
+    const upcoming = sorted.find(h => (h.time || "00:00") >= currentTimeStr);
+    return (upcoming || sorted[0])?.id || null;
+  }, [habits, logs, todayKey, currentTimeStr]);
+
+  // Today Deck Habits (with status, category, period filter & chronological sorting)
+  const todayDeckHabits = useMemo(() => {
+    let list = [...habits];
+
+    const todayLogs = logs[todayKey] || {};
+    if (todayFilter === 'pending') {
+      list = list.filter(h => !todayLogs[h.id]);
+    } else if (todayFilter === 'done') {
+      list = list.filter(h => !!todayLogs[h.id]);
+    }
+
+    if (activeCategoryFilter !== 'all') {
+      list = list.filter(h => h.category === activeCategoryFilter);
+    }
+
+    if (activePeriodFilter === 'next_up') {
+      if (nextUpHabitId) {
+        list = list.filter(h => h.id === nextUpHabitId);
+      }
+    } else if (activePeriodFilter !== 'all') {
+      list = list.filter(h => (h.period || getPeriodFromTime(h.time)) === activePeriodFilter);
+    }
+
+    if (sortByScheduleTime) {
+      list.sort((a, b) => (a.time || "12:00").localeCompare(b.time || "12:00"));
+    }
+
+    return list;
+  }, [habits, logs, todayKey, todayFilter, activeCategoryFilter, activePeriodFilter, nextUpHabitId, sortByScheduleTime]);
+
+  // Fast inline time reschedule
+  const updateHabitTimeFast = (habitId: string, newTime: string) => {
+    const period = getPeriodFromTime(newTime);
+    const updated = habits.map(h => h.id === habitId ? { ...h, time: newTime, period } : h);
+    saveHabits(updated);
+    setQuickTimePickerId(null);
+    playChime(784);
+    setXpToast({ show: true, msg: `Rescheduled to ${formatTime12(newTime)}`, xp: 0 });
+    setTimeout(() => setXpToast(null), 2000);
+  };
+
+  // Complete specific period block (e.g. morning, afternoon) in 1 tap
+  const completePeriodBlock = (targetPeriod: HabitPeriod) => {
+    const dayLogs = { ...(logs[todayKey] || {}) };
+    let count = 0;
+    habits.forEach(h => {
+      const period = h.period || getPeriodFromTime(h.time);
+      if (period === targetPeriod && !dayLogs[h.id]) {
+        dayLogs[h.id] = true;
+        count++;
+      }
+    });
+
+    if (count > 0) {
+      const newLogs = { ...logs, [todayKey]: dayLogs };
+      saveLogs(newLogs);
+      playVictoryFanfare();
+      setConfettiActive(true);
+      awardXp(count * 10, `${targetPeriod.toUpperCase()} habit block completed!`);
+      setXpToast({ show: true, msg: `${count} ${targetPeriod} habit${count > 1 ? 's' : ''} completed! +${count * 10} XP`, xp: count * 10 });
+      setTimeout(() => setConfettiActive(false), 5000);
+      setTimeout(() => setXpToast(null), 3000);
+    }
+  };
+
   // Today's Routine calculations
   const todayStats = useMemo(() => {
     const todayLogs = logs[todayKey] || {};
@@ -498,6 +646,8 @@ export default function HabitTrackerPage() {
     setFormEmoji("⚡");
     setFormGoal(22);
     setFormCategory('academic');
+    setFormTime("07:00");
+    setFormPeriod('morning');
     setShowAddModal(true);
   };
 
@@ -507,29 +657,49 @@ export default function HabitTrackerPage() {
     setFormEmoji(h.emoji);
     setFormGoal(h.goalDays);
     setFormCategory(h.category || 'academic');
+    const timeVal = h.time || "07:00";
+    setFormTime(timeVal);
+    setFormPeriod(h.period || getPeriodFromTime(timeVal));
     setShowAddModal(true);
   };
 
   const handleSaveHabit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName.trim()) return;
+    const finalPeriod = formPeriod || getPeriodFromTime(formTime);
 
     if (editingHabit) {
       const updated = habits.map(h => 
         h.id === editingHabit.id 
-          ? { ...h, name: formName.trim(), emoji: formEmoji || "⚡", goalDays: formGoal, category: formCategory }
+          ? { 
+              ...h, 
+              name: formName.trim(), 
+              emoji: formEmoji || "⚡", 
+              goalDays: formGoal, 
+              category: formCategory,
+              time: formTime,
+              period: finalPeriod
+            } 
           : h
       );
       saveHabits(updated);
+      setXpToast({ show: true, msg: `Habit "${formName.trim()}" updated!`, xp: 0 });
+      setTimeout(() => setXpToast(null), 2000);
     } else {
       const newHabit: Habit = {
         id: Date.now().toString(),
         name: formName.trim(),
         emoji: formEmoji || "⚡",
         goalDays: Math.min(daysInMonth, Math.max(1, formGoal)),
-        category: formCategory
+        category: formCategory,
+        time: formTime,
+        period: finalPeriod
       };
       saveHabits([...habits, newHabit]);
+      playChime(659.25);
+      awardXp(15, "Created new habit routine!");
+      setXpToast({ show: true, msg: `Habit added! Scheduled for ${formatTime12(formTime)}`, xp: 15 });
+      setTimeout(() => setXpToast(null), 2500);
     }
 
     setShowAddModal(false);
@@ -539,6 +709,8 @@ export default function HabitTrackerPage() {
   const handleDeleteHabit = (id: string) => {
     if (confirm("Remove this habit from tracking?")) {
       saveHabits(habits.filter(h => h.id !== id));
+      setXpToast({ show: true, msg: "Habit removed", xp: 0 });
+      setTimeout(() => setXpToast(null), 1500);
     }
   };
 
@@ -548,7 +720,9 @@ export default function HabitTrackerPage() {
       name: item.name,
       emoji: item.emoji,
       goalDays: item.goalDays,
-      category: item.category as HabitCategory
+      category: item.category as HabitCategory,
+      time: item.time || "07:00",
+      period: item.period || getPeriodFromTime(item.time)
     }));
     saveHabits([...habits, ...newItems]);
     setShowTemplatesModal(false);
@@ -712,6 +886,7 @@ export default function HabitTrackerPage() {
 
             {/* Quick Actions & Filters */}
             <div className="flex flex-wrap items-center gap-2">
+              {/* Status Filters */}
               <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1 text-xs font-bold">
                 <button
                   onClick={() => setTodayFilter('all')}
@@ -733,6 +908,30 @@ export default function HabitTrackerPage() {
                 </button>
               </div>
 
+              {/* Sort by Schedule Time Toggle */}
+              <button
+                onClick={() => setSortByScheduleTime(!sortByScheduleTime)}
+                title="Toggle Chronological Schedule Sorting"
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${
+                  sortByScheduleTime 
+                    ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300 shadow-sm' 
+                    : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Clock className="w-3.5 h-3.5 text-indigo-400" />
+                <span>{sortByScheduleTime ? "Timeline Order" : "Default Order"}</span>
+              </button>
+
+              {/* Quick Batch Actions */}
+              {activePeriodFilter !== 'all' && activePeriodFilter !== 'next_up' && (
+                <button
+                  onClick={() => completePeriodBlock(activePeriodFilter as HabitPeriod)}
+                  className="flex items-center gap-1.5 bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/40 text-amber-300 px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
+                >
+                  <Zap className="w-3.5 h-3.5 text-amber-400" /> Fast Complete {activePeriodFilter.toUpperCase()}
+                </button>
+              )}
+
               {todayStats.pending > 0 && (
                 <button
                   onClick={completeAllToday}
@@ -744,75 +943,234 @@ export default function HabitTrackerPage() {
             </div>
           </div>
 
+          {/* SECONDARY ROW: Fast Time Schedule Period Bar */}
+          <div className="flex items-center justify-between gap-2 overflow-x-auto pb-2 mb-4 pt-1 hide-scrollbar">
+            <div className="flex items-center gap-1.5 bg-slate-950/80 p-1 rounded-2xl border border-slate-850 text-xs font-bold">
+              <button
+                onClick={() => setActivePeriodFilter('all')}
+                className={`px-3 py-1.5 rounded-xl transition-all whitespace-nowrap ${
+                  activePeriodFilter === 'all' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Full Day Schedule
+              </button>
+              <button
+                onClick={() => setActivePeriodFilter('morning')}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-xl transition-all whitespace-nowrap ${
+                  activePeriodFilter === 'morning' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <span>🌅</span> Morning (4am - 12pm)
+              </button>
+              <button
+                onClick={() => setActivePeriodFilter('afternoon')}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-xl transition-all whitespace-nowrap ${
+                  activePeriodFilter === 'afternoon' ? 'bg-orange-500/20 text-orange-300 border border-orange-500/40' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <span>☀️</span> Afternoon (12pm - 5pm)
+              </button>
+              <button
+                onClick={() => setActivePeriodFilter('evening')}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-xl transition-all whitespace-nowrap ${
+                  activePeriodFilter === 'evening' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <span>🌆</span> Evening (5pm - 9pm)
+              </button>
+              <button
+                onClick={() => setActivePeriodFilter('night')}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-xl transition-all whitespace-nowrap ${
+                  activePeriodFilter === 'night' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <span>🌙</span> Night (9pm+)
+              </button>
+              {nextUpHabitId && (
+                <button
+                  onClick={() => setActivePeriodFilter(activePeriodFilter === 'next_up' ? 'all' : 'next_up')}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-xl transition-all whitespace-nowrap ${
+                    activePeriodFilter === 'next_up' 
+                      ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30' 
+                      : 'bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 animate-pulse'
+                  }`}
+                >
+                  <Zap className="w-3.5 h-3.5 fill-current" /> Up Next Now
+                </button>
+              )}
+            </div>
+
+            <div className="hidden md:flex items-center gap-2 text-[11px] font-bold text-slate-400 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-slate-850 shrink-0">
+              <Clock className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Current Time: <strong className="text-white font-black">{formatTime12(currentTimeStr)}</strong></span>
+            </div>
+          </div>
+
           {/* Quick-Toggle Habits Grid for Today */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-            {habits
-              .filter(h => {
-                const isChecked = !!logs[todayKey]?.[h.id];
-                if (todayFilter === 'pending') return !isChecked;
-                if (todayFilter === 'done') return isChecked;
-                return true;
-              })
-              .map(h => {
-                const isChecked = !!logs[todayKey]?.[h.id];
-                const streak = habitStreaks[h.id] || { current: 0, best: 0 };
-                const catColor = 
-                  h.category === 'academic' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' :
-                  h.category === 'wellness' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                  'bg-amber-500/10 text-amber-400 border-amber-500/20';
+            {todayDeckHabits.map(h => {
+              const isChecked = !!logs[todayKey]?.[h.id];
+              const streak = habitStreaks[h.id] || { current: 0, best: 0 };
+              const period = h.period || getPeriodFromTime(h.time);
+              const periodInfo = getPeriodBadge(period);
+              const isNextUp = h.id === nextUpHabitId && !isChecked;
+              const isTimePickerOpen = quickTimePickerId === h.id;
 
-                return (
-                  <motion.div
-                    key={h.id}
-                    whileHover={{ y: -2 }}
-                    className={`relative p-3.5 rounded-2xl border transition-all flex flex-col justify-between ${
-                      isChecked 
-                        ? 'bg-indigo-950/30 border-indigo-500/40 shadow-sm shadow-indigo-500/10' 
-                        : 'bg-slate-950/60 border-slate-800/80 hover:border-slate-700'
-                    }`}
-                  >
+              const catColor = 
+                h.category === 'academic' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' :
+                h.category === 'wellness' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                'bg-amber-500/10 text-amber-400 border-amber-500/20';
+
+              return (
+                <motion.div
+                  key={h.id}
+                  whileHover={{ y: -2 }}
+                  className={`relative p-3.5 rounded-2xl border transition-all flex flex-col justify-between ${
+                    isNextUp 
+                      ? 'bg-gradient-to-b from-indigo-950/70 to-slate-950 border-amber-500/60 ring-2 ring-amber-400/40 shadow-xl shadow-amber-500/10'
+                      : isChecked 
+                      ? 'bg-indigo-950/30 border-indigo-500/40 shadow-sm shadow-indigo-500/10' 
+                      : 'bg-slate-950/60 border-slate-800/80 hover:border-slate-700'
+                  }`}
+                >
+                  {/* Top Header inside Card */}
+                  <div>
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-xl p-1 rounded-xl bg-slate-900 border border-slate-800">{h.emoji}</span>
                         <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md border ${catColor}`}>
                           {h.category || 'academic'}
                         </span>
                       </div>
-                      {streak.current > 0 && (
-                        <div className="flex items-center gap-0.5 text-[10px] font-black text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded-md">
-                          <Flame className="w-3 h-3 fill-amber-400 text-amber-400" />
-                          <span>{streak.current}d</span>
-                        </div>
-                      )}
+
+                      {/* Right Action Icons: Edit & Streak */}
+                      <div className="flex items-center gap-1.5">
+                        {streak.current > 0 && (
+                          <div className="flex items-center gap-0.5 text-[10px] font-black text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded-md">
+                            <Flame className="w-3 h-3 fill-amber-400 text-amber-400" />
+                            <span>{streak.current}d</span>
+                          </div>
+                        )}
+                        <button
+                          onClick={() => openEditModal(h)}
+                          title="Edit Habit (Name, Goal, Time Slot)"
+                          className="p-1 rounded-lg bg-slate-900 hover:bg-indigo-600 text-slate-400 hover:text-white border border-slate-800 hover:border-indigo-500 transition-all"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
 
-                    <p className={`text-xs font-bold truncate mb-3 ${isChecked ? 'text-slate-300 line-through opacity-80' : 'text-slate-100'}`}>
+                    {/* Next Up Tag */}
+                    {isNextUp && (
+                      <div className="inline-flex items-center gap-1 text-[9px] font-black text-amber-300 bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 rounded-md mb-1.5 animate-pulse">
+                        <Zap className="w-2.5 h-2.5 fill-amber-300" />
+                        <span>UP NEXT</span>
+                      </div>
+                    )}
+
+                    <p className={`text-xs font-bold truncate mb-1.5 ${isChecked ? 'text-slate-300 line-through opacity-80' : 'text-slate-100'}`}>
                       {h.name}
                     </p>
 
-                    <motion.button
-                      whileTap={{ scale: 0.94 }}
-                      whileHover={{ scale: 1.02 }}
-                      onClick={() => toggleDateHabit(h.id, todayKey)}
-                      className={`w-full py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all ${
-                        isChecked 
-                          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/30' 
-                          : 'bg-slate-900 hover:bg-slate-850 text-slate-300 border border-slate-800 hover:border-slate-700'
-                      }`}
-                    >
-                      {isChecked ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 stroke-[3]" /> Done Today
-                        </>
-                      ) : (
-                        <>
-                          <span className="w-2 h-2 rounded-full border border-slate-600" /> Mark Complete
-                        </>
+                    {/* Time Slot Chip (Click to fast reschedule inline) */}
+                    <div className="relative mb-3">
+                      <button
+                        type="button"
+                        onClick={() => setQuickTimePickerId(isTimePickerOpen ? null : h.id)}
+                        className={`inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-lg border transition-all ${
+                          isTimePickerOpen 
+                            ? 'bg-indigo-600 text-white border-indigo-400 shadow'
+                            : `${periodInfo.color} hover:brightness-125`
+                        }`}
+                        title="Click for Fast Inline Reschedule"
+                      >
+                        <Clock className="w-3 h-3" />
+                        <span>{formatTime12(h.time)}</span>
+                        <span className="opacity-70">&bull; {periodInfo.icon}</span>
+                      </button>
+
+                      {/* Fast Inline Time Selector Popover */}
+                      {isTimePickerOpen && (
+                        <div className="absolute left-0 top-7 z-30 w-52 bg-slate-900 border border-slate-700 rounded-2xl p-3 shadow-2xl space-y-2 text-slate-100 animate-in fade-in zoom-in-95">
+                          <div className="flex items-center justify-between pb-1.5 border-b border-slate-800">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                              Fast Reschedule
+                            </span>
+                            <button
+                              onClick={() => setQuickTimePickerId(null)}
+                              className="text-slate-500 hover:text-slate-200 text-xs font-bold"
+                            >
+                              ✕
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-1.5">
+                            {TIME_PRESETS.map((preset) => (
+                              <button
+                                key={preset.value}
+                                onClick={() => updateHabitTimeFast(h.id, preset.value)}
+                                className={`text-[10px] font-black py-1 px-1.5 rounded-lg border text-left transition-all ${
+                                  h.time === preset.value
+                                    ? 'bg-indigo-600 text-white border-indigo-400'
+                                    : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-600'
+                                }`}
+                              >
+                                {preset.icon} {preset.label}
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* Custom time input */}
+                          <div className="pt-1 border-t border-slate-800">
+                            <label className="text-[9px] font-black text-slate-500 uppercase block mb-1">Custom Time</label>
+                            <input
+                              type="time"
+                              value={h.time || "07:00"}
+                              onChange={(e) => updateHabitTimeFast(h.id, e.target.value)}
+                              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-2 py-1 text-xs text-white outline-none cursor-pointer"
+                            />
+                          </div>
+                        </div>
                       )}
-                    </motion.button>
-                  </motion.div>
-                );
-              })}
+                    </div>
+                  </div>
+
+                  {/* Completion Toggle Button */}
+                  <motion.button
+                    whileTap={{ scale: 0.94 }}
+                    whileHover={{ scale: 1.02 }}
+                    onClick={() => toggleDateHabit(h.id, todayKey)}
+                    className={`w-full py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all ${
+                      isChecked 
+                        ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/30' 
+                        : isNextUp
+                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
+                        : 'bg-slate-900 hover:bg-slate-850 text-slate-300 border border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    {isChecked ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 stroke-[3]" /> Done Today
+                      </>
+                    ) : isNextUp ? (
+                      <>
+                        <Zap className="w-3.5 h-3.5 fill-current" /> Complete Next Up
+                      </>
+                    ) : (
+                      <>
+                        <span className="w-2 h-2 rounded-full border border-slate-600" /> Mark Complete
+                      </>
+                    )}
+                  </motion.button>
+                </motion.div>
+              );
+            })}
+            {todayDeckHabits.length === 0 && (
+              <div className="col-span-full py-12 text-center text-slate-500 text-xs italic bg-slate-950/40 rounded-2xl border border-slate-850">
+                No habits match the active filter criteria. Select another schedule period or category.
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -1393,6 +1751,9 @@ export default function HabitTrackerPage() {
             <div className="sm:hidden grid grid-cols-1 gap-3">
               {filteredHabits.map(h => {
                 const isChecked = !!logs[todayKey]?.[h.id];
+                const period = h.period || getPeriodFromTime(h.time);
+                const periodBadge = getPeriodBadge(period);
+
                 return (
                   <div key={h.id} className="p-4 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between shadow-sm hover:border-slate-700 transition-colors">
                     <div className="flex items-center gap-3 overflow-hidden mr-3">
@@ -1401,18 +1762,30 @@ export default function HabitTrackerPage() {
                       </div>
                       <div className="overflow-hidden">
                         <h4 className="text-sm font-black text-white truncate">{h.name}</h4>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className={`w-2 h-2 rounded-full ${h.category === 'academic' ? 'bg-indigo-400' : h.category === 'wellness' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{h.category}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border ${periodBadge.color}`}>
+                            {periodBadge.icon} {formatTime12(h.time)}
+                          </span>
+                          <span className="text-[10px] font-bold text-slate-500 uppercase">{h.category}</span>
                         </div>
                       </div>
                     </div>
-                    <button
-                      onClick={() => toggleDateHabit(h.id, todayKey)}
-                      className={`w-12 h-12 shrink-0 rounded-xl flex items-center justify-center transition-all ${isChecked ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-105' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-300'}`}
-                    >
-                      <Check className="w-6 h-6" />
-                    </button>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => openEditModal(h)}
+                        className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 hover:border-indigo-500 text-slate-400 hover:text-white flex items-center justify-center transition-all"
+                        title="Edit Habit"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => toggleDateHabit(h.id, todayKey)}
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${isChecked ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-105' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-300'}`}
+                      >
+                        <Check className="w-6 h-6" />
+                      </button>
+                    </div>
                   </div>
                 );
               })}
@@ -1425,8 +1798,8 @@ export default function HabitTrackerPage() {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b border-slate-800">
-                    <th className="text-left py-2.5 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 w-44">
-                      Habit
+                    <th className="text-left py-2.5 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 w-52">
+                      Habit &amp; Schedule
                     </th>
                     {Array.from({ length: daysInMonth }).map((_, i) => {
                       const dNum = i + 1;
@@ -1450,13 +1823,33 @@ export default function HabitTrackerPage() {
                 <tbody>
                   {filteredHabits.map(h => {
                     const stats = habitCompletionStats.find(s => s.id === h.id);
+                    const period = h.period || getPeriodFromTime(h.time);
+                    const pBadge = getPeriodBadge(period);
+
                     return (
-                      <tr key={h.id} className="border-b border-slate-850/60 hover:bg-slate-950/40 transition-colors">
-                        <td className="py-2.5 px-3 flex items-center gap-2">
-                          <span className="text-base">{h.emoji}</span>
-                          <span className="text-xs font-bold text-slate-200 truncate max-w-[130px]" title={h.name}>
-                            {h.name}
-                          </span>
+                      <tr key={h.id} className="border-b border-slate-850/60 hover:bg-slate-950/40 transition-colors group">
+                        <td className="py-2.5 px-3">
+                          <div className="flex items-center justify-between gap-1.5">
+                            <div className="flex items-center gap-2 overflow-hidden">
+                              <span className="text-base">{h.emoji}</span>
+                              <div className="overflow-hidden">
+                                <span className="text-xs font-bold text-slate-200 truncate block max-w-[120px]" title={h.name}>
+                                  {h.name}
+                                </span>
+                                <span className={`text-[8px] font-black px-1.5 py-0.2 rounded border inline-block mt-0.5 ${pBadge.color}`}>
+                                  {pBadge.icon} {formatTime12(h.time)}
+                                </span>
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => openEditModal(h)}
+                              className="p-1 rounded-md text-slate-500 hover:text-indigo-400 hover:bg-slate-800 transition-all opacity-60 group-hover:opacity-100"
+                              title="Edit Habit & Schedule"
+                            >
+                              <Edit3 className="w-3 h-3" />
+                            </button>
+                          </div>
                         </td>
                         {Array.from({ length: daysInMonth }).map((_, i) => {
                           const dayNum = i + 1;

@@ -5,7 +5,7 @@ import {
   Sparkles, Compass, ArrowUpRight, Users, Award, MessageCircle, 
   Copy, CheckCheck, Camera, Activity, Palette, Timer, Star, Zap, Lock, RefreshCw,
   GraduationCap, Video, Shield, Globe, Mic, Radio, GitFork, Sliders, FileText, Gamepad2,
-  CheckCircle2, Sun, Moon, LayoutGrid, Eye, Maximize2
+  CheckCircle2, Sun, Moon, LayoutGrid, Eye, Maximize2, AlarmClock
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
@@ -819,6 +819,20 @@ export default function Dashboard() {
                       <div className="relative z-10">
                         <h4 className="font-black text-base text-white group-hover/card:text-cyan-400 transition-colors">Formula Vault</h4>
                         <p className="text-slate-400 text-xs mt-1">High-yield equations, periodic trends, math theorems, and quick revision cards.</p>
+                      </div>
+                    </TiltCard>
+
+                    {/* 7. Smart Study Alarm Clock */}
+                    <TiltCard href="/alarm" className="premium-glass-panel p-6 rounded-3xl border border-amber-500/20 hover:border-amber-500/50 transition-colors flex flex-col justify-between h-48">
+                      <div className="flex justify-between items-start">
+                        <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-400 group-hover/card:scale-110 group-hover/card:bg-amber-500 group-hover/card:text-white transition-all duration-300">
+                          <AlarmClock className="w-6 h-6" />
+                        </div>
+                        <span className="text-[9px] font-black uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">MCQ Dismiss</span>
+                      </div>
+                      <div className="relative z-10">
+                        <h4 className="font-black text-base text-white group-hover/card:text-amber-400 transition-colors">Study Alarm Clock</h4>
+                        <p className="text-slate-400 text-xs mt-1">Wake up & study on time. Alarm will only silence once you solve a curriculum MCQ correctly!</p>
                       </div>
                     </TiltCard>
 

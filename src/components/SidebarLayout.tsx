@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Home, BookOpen, MessageSquare, Target, Settings, LogOut, Menu, X, 
   GraduationCap, Moon, Sun, Calendar, Sparkles, Users, Award, Palette, Timer, Brain, Camera, Zap, Trophy, Shield, Compass, Video, Gamepad2, Globe, Mic, Radio, GitFork, Sliders, FileText,
-  CheckSquare, ShoppingBag
+  CheckSquare, ShoppingBag, AlarmClock
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -62,6 +62,7 @@ const categories = [
       { href: "/viva", label: "AI Voice Viva", icon: Mic, badge: "Voice" },
       { href: "/feynman", label: "Feynman Lab", icon: Brain, badge: "Teach" },
       { href: "/podcast", label: "AI Podcasts", icon: Radio, badge: "Audio" },
+      { href: "/alarm", label: "Study Alarm Clock", icon: AlarmClock, badge: "MCQ" },
       { href: "/whiteboard", label: "Whiteboard", icon: Palette },
       { href: "/pomodoro", label: "Pomodoro Timer", icon: Timer },
     ]
