@@ -1392,7 +1392,7 @@ export default function HabitTrackerPage() {
           {mobileView === 'cards' && (
             <div className="sm:hidden grid grid-cols-1 gap-3">
               {filteredHabits.map(h => {
-                const isChecked = getLog(h.id, realYear, realMonthIndex, realDay);
+                const isChecked = !!logs[todayKey]?.[h.id];
                 return (
                   <div key={h.id} className="p-4 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between shadow-sm hover:border-slate-700 transition-colors">
                     <div className="flex items-center gap-3 overflow-hidden mr-3">
@@ -1408,19 +1408,13 @@ export default function HabitTrackerPage() {
                       </div>
                     </div>
                     <button
-                      onClick={() => {
-                        toggleLog(h.id, realYear, realMonthIndex, realDay);
-                        if (!isChecked) {
-                          playVictoryFanfare();
-                          triggerConfetti();
-                        }
-                      }}
+                      onClick={() => toggleDateHabit(h.id, todayKey)}
                       className={`w-12 h-12 shrink-0 rounded-xl flex items-center justify-center transition-all ${isChecked ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-105' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-300'}`}
                     >
                       <Check className="w-6 h-6" />
                     </button>
                   </div>
-                )
+                );
               })}
             </div>
           )}
