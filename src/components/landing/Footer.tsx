@@ -8,7 +8,8 @@ export default function Footer() {
   return (
     <>
       {/* CTA Banner */}
-      <section className="px-6 pb-20 relative z-20" aria-label="Call to action">
+      <section id="pricing" className="px-6 pb-20 relative z-20 scroll-mt-24" aria-label="Call to action">
+        <div id="about" className="sr-only" />
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}

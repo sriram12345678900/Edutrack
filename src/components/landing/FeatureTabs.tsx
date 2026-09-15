@@ -63,6 +63,7 @@ export default function FeatureTabs() {
       className="w-full max-w-6xl mx-auto px-6 mb-32 relative z-20 scroll-mt-24"
       aria-label="Core features"
     >
+      <div id="solutions" className="sr-only" />
       {/* Section header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

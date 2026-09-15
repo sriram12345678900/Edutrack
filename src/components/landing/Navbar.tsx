@@ -8,8 +8,9 @@ import { useAuth } from "@/context/AuthContext";
 
 const NAV_LINKS = [
   { label: "Features", href: "#features" },
-  { label: "Tools", href: "#tools" },
-  { label: "FAQ", href: "#faq" },
+  { label: "Solutions", href: "#solutions" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "About", href: "#about" },
 ];
 
 export default function Navbar() {
@@ -19,7 +20,13 @@ export default function Navbar() {
   const scrollTo = (href: string) => {
     setMobileOpen(false);
     const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      // Fallback for sections on page
+      const feat = document.querySelector("#features");
+      if (feat) feat.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   };
 
   return (
@@ -27,56 +34,53 @@ export default function Navbar() {
       <motion.nav
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-        className="fixed top-4 left-4 right-4 z-50 backdrop-blur-xl bg-white/[0.03] border border-white/[0.08] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+        transition={{ duration: 0.35, ease: "easeOut" }}
+        className="fixed top-5 left-1/2 -translate-x-1/2 w-[92%] max-w-5xl z-50 backdrop-blur-2xl bg-[#0b0f24]/80 border border-white/10 rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.6)] px-4 py-2.5 sm:px-6 sm:py-3"
         role="navigation"
         aria-label="Main navigation"
       >
-        <div className="flex items-center justify-between px-5 py-3 max-w-7xl mx-auto">
-          {/* Logo */}
+        <div className="flex items-center justify-between">
+          {/* Logo matching mockup */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-            <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/25 group-hover:shadow-indigo-500/40 transition-shadow">
-              <Brain className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-0.5 flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+              <div className="w-full h-full bg-[#0a0d20] rounded-[7px] flex items-center justify-center">
+                <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-base">E</span>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <span className="text-lg font-black tracking-tight text-white leading-none">
-                EduTrack
-              </span>
-              <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-indigo-400/70 leading-none mt-0.5 hidden sm:block">
-                AI Learning OS
-              </span>
-            </div>
+            <span className="text-lg font-black tracking-tight text-white leading-none">
+              EduTrack
+            </span>
           </Link>
 
-          {/* Desktop Links */}
+          {/* Desktop Centered Links */}
           <div className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map((link) => (
               <button
-                key={link.href}
+                key={link.label}
                 onClick={() => scrollTo(link.href)}
-                className="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-white/[0.05]"
+                className="px-4 py-1.5 text-xs font-semibold text-slate-300 hover:text-white transition-colors rounded-full hover:bg-white/[0.06]"
               >
                 {link.label}
               </button>
             ))}
           </div>
 
-          {/* Right side */}
+          {/* Right Action Button */}
           <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center gap-2">
               {loading ? (
-                <div className="w-20 h-8 animate-pulse bg-white/10 rounded-full" />
+                <div className="w-24 h-9 animate-pulse bg-white/10 rounded-full" />
               ) : user ? (
                 <>
                   <button
                     onClick={logout}
-                    className="text-sm font-medium text-slate-400 hover:text-white transition-colors px-3 py-2"
+                    className="text-xs font-medium text-slate-400 hover:text-white transition-colors px-3 py-1.5"
                   >
                     Log Out
                   </button>
                   <Link
                     href="/dashboard"
-                    className="group inline-flex items-center gap-2 px-5 py-2 bg-white text-zinc-950 font-bold text-sm rounded-full hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-shadow"
+                    className="group inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-bold text-xs rounded-full shadow-[0_0_25px_rgba(217,70,239,0.35)] hover:shadow-[0_0_35px_rgba(217,70,239,0.5)] transition-all hover:scale-105"
                   >
                     Dashboard
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -86,16 +90,15 @@ export default function Navbar() {
                 <>
                   <Link
                     href="/login"
-                    className="text-sm font-medium text-slate-400 hover:text-white transition-colors px-3 py-2"
+                    className="text-xs font-medium text-slate-400 hover:text-white transition-colors px-3 py-1.5"
                   >
                     Log In
                   </Link>
                   <Link
                     href="/signup"
-                    className="group inline-flex items-center gap-2 px-5 py-2 bg-white text-zinc-950 font-bold text-sm rounded-full hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-shadow"
+                    className="group inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-bold text-xs rounded-full shadow-[0_0_25px_rgba(217,70,239,0.35)] hover:shadow-[0_0_35px_rgba(217,70,239,0.5)] transition-all hover:scale-105"
                   >
                     Get Started
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </Link>
                 </>
               )}
