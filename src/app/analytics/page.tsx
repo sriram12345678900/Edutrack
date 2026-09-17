@@ -171,19 +171,19 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0b0f19] bg-[#eef1f9] text-slate-700 dark:text-slate-200 font-sans p-6 pb-20">
-      <header className="max-w-6xl mx-auto flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <div className="bg-indigo-500/20 p-3 rounded-2xl border border-indigo-500/30">
-            <Activity className="w-8 h-8 dark:text-indigo-400 text-indigo-700" />
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0b0f19] bg-[#eef1f9] text-slate-700 dark:text-slate-200 font-sans p-3 xs:p-4 sm:p-6 pb-24 md:pb-12">
+      <header className="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="bg-indigo-500/20 p-2.5 sm:p-3 rounded-2xl border border-indigo-500/30 shrink-0">
+            <Activity className="w-6 h-6 sm:w-8 sm:h-8 dark:text-indigo-400 text-indigo-700" />
           </div>
           <div>
-            <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Mastery Dashboard</h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">AI-driven analytics of your learning journey.</p>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Mastery Dashboard</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium">AI-driven analytics of your learning journey.</p>
           </div>
         </div>
-        <Link href="/dashboard" className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-sm font-bold transition-colors border border-slate-200 dark:border-slate-700 shadow-lg">
-          <Home className="w-4 h-4" /> Back
+        <Link href="/dashboard" className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-colors border border-slate-200 dark:border-slate-700 shadow-sm min-h-[38px] self-end sm:self-auto">
+          <Home className="w-4 h-4" /> Back to Home
         </Link>
       </header>
 

@@ -35,7 +35,7 @@ export default function Navbar() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
-        className="fixed top-5 left-1/2 -translate-x-1/2 w-[92%] max-w-5xl z-50 backdrop-blur-2xl bg-[#0b0f24]/80 border border-white/10 rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.6)] px-4 py-2.5 sm:px-6 sm:py-3"
+        className="fixed top-5 left-1/2 -translate-x-1/2 w-[94%] max-w-5xl z-50 backdrop-blur-3xl bg-[#0a0d20]/90 border border-white/15 rounded-full shadow-[0_15px_45px_rgba(0,0,0,0.7)] px-4 py-2.5 sm:px-6 sm:py-3 ring-1 ring-white/10"
         role="navigation"
         aria-label="Main navigation"
       >
@@ -135,7 +135,7 @@ export default function Navbar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="fixed top-20 left-4 right-4 z-50 md:hidden bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl"
+              className="fixed top-20 left-4 right-4 z-50 md:hidden bg-[#0a0d24]/98 backdrop-blur-3xl border border-white/15 rounded-3xl p-6 shadow-[0_25px_60px_rgba(0,0,0,0.85)]"
               role="dialog"
               aria-label="Mobile navigation"
             >

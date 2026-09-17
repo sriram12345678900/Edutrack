@@ -8,7 +8,7 @@ import {
   Home, BookOpen, GraduationCap, Compass, MessageSquare, Camera, Calendar, 
   Sparkles, Palette, Timer, Zap, Users, Award, Target, Trophy, Settings, 
   LogOut, X, Search, ChevronRight, Shield, Moon, Sun, CheckCircle2, User, Video, Gamepad2,
-  Globe, Mic, Radio, GitFork, Sliders, FileText, Brain, CheckSquare, ShoppingBag
+  Globe, Mic, Radio, GitFork, Sliders, FileText, Brain, CheckSquare, ShoppingBag, Download
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ADMIN_PORTAL_ROUTE } from "@/lib/admin";
@@ -110,7 +110,8 @@ export default function MobileDrawer({
     );
   }, [searchQuery, userRole]);
 
-  const categories: ("Core Space" | "AI Study Lab" | "Testing & Analytics")[] = [
+  const categories: ("Virtual School" | "Core Space" | "AI Study Lab" | "Testing & Analytics")[] = [
+    "Virtual School",
     "Core Space",
     "AI Study Lab",
     "Testing & Analytics",
@@ -226,15 +227,21 @@ export default function MobileDrawer({
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search all 12+ AI tools, books & features..."
-                  className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-xs font-semibold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                  onFocus={(e) => {
+                    setTimeout(() => {
+                      e.target.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }, 300);
+                  }}
+                  placeholder="Search all tools, labs & features..."
+                  className="w-full pl-10 pr-9 py-2.5 min-h-[44px] rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-xs font-semibold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                    aria-label="Clear search"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
@@ -281,6 +288,7 @@ export default function MobileDrawer({
               ) : (
                 categories.map((catName) => {
                   const toolsInCat = ALL_TOOLS.filter(t => t.category === catName);
+                  if (toolsInCat.length === 0) return null;
                   return (
                     <div key={catName} className="space-y-2">
                       <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 px-1">
@@ -325,12 +333,27 @@ export default function MobileDrawer({
                 })
               )}
 
+              {/* Install App Quick Action */}
+              <button
+                onClick={() => {
+                  onClose();
+                  if (typeof window !== "undefined") {
+                    window.dispatchEvent(new CustomEvent("edutrack_trigger_install"));
+                  }
+                }}
+                className="w-full min-h-[44px] py-2.5 px-3 rounded-2xl bg-gradient-to-r from-indigo-600/20 via-purple-600/20 to-pink-600/20 hover:from-indigo-600/30 hover:to-pink-600/30 border border-indigo-500/30 font-black text-xs text-indigo-600 dark:text-indigo-300 flex items-center justify-center gap-2 active:scale-98 transition-all shadow-sm"
+              >
+                <Download className="w-4 h-4 text-indigo-500" />
+                <span>Install EduTrack App</span>
+                <span className="text-[8px] uppercase font-black px-1.5 py-0.5 bg-indigo-500/20 text-indigo-400 rounded-full border border-indigo-500/30">Free</span>
+              </button>
+
               {/* Bottom Quick Logout Action */}
-              <div className="pt-2 border-t border-slate-200/60 dark:border-white/5 flex gap-2">
+              <div className="pt-2 pb-[max(env(safe-area-inset-bottom),12px)] border-t border-slate-200/60 dark:border-white/5 flex gap-2">
                 <Link
                   href="/setup"
                   onClick={onClose}
-                  className="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 font-bold text-xs text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2 active:scale-98 transition-all"
+                  className="flex-1 min-h-[44px] py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 font-bold text-xs text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2 active:scale-98 transition-all"
                 >
                   <Settings className="w-4 h-4 text-slate-500" />
                   <span>Account Setup</span>
@@ -340,7 +363,7 @@ export default function MobileDrawer({
                     onClose();
                     onLogout();
                   }}
-                  className="py-2.5 px-4 rounded-xl bg-red-500/10 border border-red-500/20 font-bold text-xs text-red-600 dark:text-red-400 flex items-center justify-center gap-1.5 active:scale-98 transition-all"
+                  className="min-h-[44px] py-2.5 px-4 rounded-xl bg-red-500/10 border border-red-500/20 font-bold text-xs text-red-600 dark:text-red-400 flex items-center justify-center gap-1.5 active:scale-98 transition-all"
                 >
                   <LogOut className="w-4 h-4 text-red-500" />
                   <span>Sign Out</span>

@@ -14,13 +14,13 @@
       "type": "image/x-icon"
     },
     {
-      "src": "/ai_lens_scanner.jpg",
+      "src": "/edutrack_app_logo.jpg",
       "sizes": "192x192",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "/ai_tutor_avatar.jpg",
+      "src": "/edutrack_app_logo.jpg",
       "sizes": "512x512",
       "type": "image/jpeg",
       "purpose": "any maskable"

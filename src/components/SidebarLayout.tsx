@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import { 
   Home, BookOpen, MessageSquare, Target, Settings, LogOut, Menu, X, 
   GraduationCap, Moon, Sun, Calendar, Sparkles, Users, Award, Palette, Timer, Brain, Camera, Zap, Trophy, Shield, Compass, Video, Gamepad2, Globe, Mic, Radio, GitFork, Sliders, FileText,
@@ -21,6 +21,7 @@ import InteractiveAiGuide from "./InteractiveAiGuide";
 import EduTrackVoiceAssistant from "./EduTrackVoiceAssistant";
 import DivyangjanAccessibilitySuite from "./DivyangjanAccessibilitySuite";
 import UserAvatar from "./UserAvatar";
+import { PwaInstallPrompt } from "./PwaInstallPrompt";
 
 // Categorized premium sidebar links for desktop
 const categories = [
@@ -216,13 +217,19 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     pathname === "/habits" || pathname.startsWith("/habits/") ||
     pathname === "/podcast" || pathname.startsWith("/podcast/") ||
     pathname === "/viva" || pathname.startsWith("/viva/") ||
-    pathname === "/lens" || pathname.startsWith("/lens/");
+    pathname === "/lens" || pathname.startsWith("/lens/") ||
+    pathname === "/mindmap" || pathname.startsWith("/mindmap/") ||
+    pathname === "/feynman" || pathname.startsWith("/feynman/") ||
+    pathname === "/grader" || pathname.startsWith("/grader/") ||
+    pathname === "/mocktest" || pathname.startsWith("/mocktest/") ||
+    pathname === "/exam-generator" || pathname.startsWith("/exam-generator/");
 
   return (
-    <div className="min-h-screen h-screen max-h-screen bg-slate-50 dark:bg-[#06080f] bg-[#eef1f9] text-slate-900 dark:text-slate-100 flex flex-col md:flex-row overflow-hidden grid-bg-overlay selection:bg-indigo-500/30 selection:text-indigo-200">
-      {/* Global Interactive App Tour */}
-      <AppTour />
-      <InteractiveAiGuide />
+    <MotionConfig reducedMotion="user">
+      <div className="min-h-screen h-screen max-h-screen bg-slate-50 dark:bg-[#06080f] bg-[#eef1f9] text-slate-900 dark:text-slate-100 flex flex-col md:flex-row overflow-hidden grid-bg-overlay selection:bg-indigo-500/30 selection:text-indigo-200">
+        {/* Global Interactive App Tour */}
+        <AppTour />
+        <InteractiveAiGuide />
 
       {/* ── DESKTOP UNVEILING SIDEBAR ── */}
       <motion.aside 
@@ -550,7 +557,11 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
         {/* Global Divyangjan Accessibility Suite */}
         <DivyangjanAccessibilitySuite />
+
+        {/* In-App PWA Install Banner & Native Prompt Handler */}
+        <PwaInstallPrompt />
       </div>
     </div>
+    </MotionConfig>
   );
 }

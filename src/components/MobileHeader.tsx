@@ -56,10 +56,14 @@ export default function MobileHeader({
   };
 
   return (
-    <header className="md:hidden sticky top-0 left-0 right-0 z-30 bg-white/90 dark:bg-[#040614]/90 backdrop-blur-2xl border-b border-slate-200/60 dark:border-white/10 px-3.5 py-2.5 flex items-center justify-between transition-colors shadow-sm">
+    <header className="md:hidden sticky top-0 left-0 right-0 z-30 bg-white/90 dark:bg-[#040614]/90 backdrop-blur-2xl border-b border-slate-200/60 dark:border-white/10 px-3 py-2 pt-[max(env(safe-area-inset-top),8px)] flex items-center justify-between transition-colors shadow-sm">
       {/* Brand & Class Badge */}
-      <div className="flex items-center gap-2.5">
-        <Link href="/dashboard" className="flex items-center gap-2 group">
+      <div className="flex items-center gap-2">
+        <Link 
+          href="/dashboard" 
+          className="flex items-center gap-2 group min-h-[40px] py-1"
+          aria-label="EduTrack Dashboard"
+        >
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center shadow-md shadow-indigo-500/30 border border-white/20 shrink-0 group-active:scale-95 transition-transform">
             <Brain className="w-4.5 h-4.5 text-white" />
           </div>
@@ -76,12 +80,13 @@ export default function MobileHeader({
       </div>
 
       {/* Right Stats & Quick Actions */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1.5">
         {/* Streak Pill */}
         <Link
           href="/dashboard"
-          className="flex items-center gap-1 bg-amber-500/10 border border-amber-500/25 px-1.5 py-1 rounded-full text-amber-600 dark:text-amber-400 active:scale-95 transition-transform"
+          className="flex items-center gap-1 bg-amber-500/10 border border-amber-500/25 px-2 py-1.5 min-h-[36px] rounded-full text-amber-600 dark:text-amber-400 active:scale-95 transition-transform"
           title={`Daily Study Streak: ${streakDays} days`}
+          aria-label={`Study streak: ${streakDays} days`}
         >
           <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500 animate-bounce" style={{ animationDuration: "2s" }} />
           <span className="text-[10px] font-black">{streakDays}d</span>
@@ -90,33 +95,34 @@ export default function MobileHeader({
         {/* Level Pill */}
         <Link
           href="/trophies"
-          className="flex items-center gap-1 bg-indigo-500/10 border border-indigo-500/25 px-1.5 py-1 rounded-full text-indigo-600 dark:text-indigo-400 active:scale-95 transition-transform"
+          className="flex items-center gap-1 bg-indigo-500/10 border border-indigo-500/25 px-2 py-1.5 min-h-[36px] rounded-full text-indigo-600 dark:text-indigo-400 active:scale-95 transition-transform"
           title={`Level ${userLevel} (${userXp} XP)`}
+          aria-label={`Current level: ${userLevel}, with ${userXp} XP`}
         >
-          <Trophy className="w-3 h-3 text-indigo-500" />
+          <Trophy className="w-3.5 h-3.5 text-indigo-500" />
           <span className="text-[10px] font-black">L{userLevel}</span>
         </Link>
 
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-1.5 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-slate-600 dark:text-slate-300 active:scale-90 transition-transform"
+          className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-slate-600 dark:text-slate-300 active:scale-90 transition-transform"
           title="Toggle theme"
-          aria-label="Toggle theme"
+          aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
         >
           {isDarkMode ? (
-            <Moon className="w-3.5 h-3.5 text-indigo-400" />
+            <Moon className="w-4 h-4 text-indigo-400" />
           ) : (
-            <Sun className="w-3.5 h-3.5 text-amber-500" />
+            <Sun className="w-4 h-4 text-amber-500" />
           )}
         </button>
 
         {/* Profile Avatar / Menu Trigger */}
         <button
           onClick={onOpenDrawer}
-          className="relative shrink-0 active:scale-95 transition-transform ml-0.5"
+          className="relative shrink-0 p-0.5 min-h-[36px] min-w-[36px] flex items-center justify-center active:scale-95 transition-transform"
           title="Open menu & tools"
-          aria-label="Open menu"
+          aria-label="Open navigation menu"
         >
           <UserAvatar
             src={photoURL}
@@ -124,7 +130,7 @@ export default function MobileHeader({
             initials={initials}
             size="sm"
           />
-          <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-indigo-600 rounded-full flex items-center justify-center border border-white dark:border-[#040614] z-10">
+          <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-indigo-600 rounded-full flex items-center justify-center border border-white dark:border-[#040614] z-10 shadow-sm">
             <Menu className="w-2 h-2 text-white" />
           </div>
         </button>

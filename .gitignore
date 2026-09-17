@@ -70,3 +70,8 @@ slides_clean.txt
 slides_extracted.txt
 Submission/*.txt
 
+# IDE
+.idea/
+.idea
+
+

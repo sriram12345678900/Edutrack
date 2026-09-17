@@ -21,19 +21,19 @@ export function DashboardHeader({ firstName, userClass, userLanguage, streak, it
             <span>{langConfig.label}</span>
           </Link>
         </div>
-        <h1 className="text-4xl md:text-5xl font-black mt-3.5 tracking-tight">
+        <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-black mt-2.5 sm:mt-3.5 tracking-tight">
           <span className="premium-text-gradient-accent">
             Welcome back, {firstName}!
           </span>
         </h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-2.5 font-bold text-xs">
+        <p className="text-slate-500 dark:text-slate-400 mt-1.5 sm:mt-2.5 font-bold text-xs">
           {userClass ? `Class ${userClass}` : "Class 10"} | Studying in {langConfig.label} ({langConfig.nativeName})
         </p>
       </div>
-      <div className="flex items-center gap-3 shrink-0">
-        <div id="tour-streak-header" className="inline-flex items-center gap-2 bg-orange-500/5 dark:bg-orange-500/5 text-orange-600 dark:text-orange-400 px-4.5 py-3 rounded-2xl border border-orange-500/15 font-black text-sm shadow-sm relative overflow-hidden group">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
+        <div id="tour-streak-header" className="inline-flex items-center gap-2 bg-orange-500/5 dark:bg-orange-500/5 text-orange-600 dark:text-orange-400 px-3.5 sm:px-4.5 py-2 sm:py-3 rounded-2xl border border-orange-500/15 font-black text-xs sm:text-sm shadow-sm relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-orange-500/10 to-orange-500/0 -translate-x-full group-hover:animate-shimmer" />
-          <Flame className="w-5 h-5 text-orange-500 animate-flame-glow" /> 
+          <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500 animate-flame-glow" /> 
           <span>{streak} Day Streak</span>
         </div>
         <button
@@ -43,14 +43,14 @@ export function DashboardHeader({ firstName, userClass, userLanguage, streak, it
               window.dispatchEvent(new CustomEvent("edutrack_open_feature_tour", { detail: { stepIndex: 0 } }));
             }
           }}
-          className="text-xs font-black text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 px-4.5 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-2"
+          className="text-xs font-black text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 px-3.5 sm:px-4.5 py-2 sm:py-3 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-1.5 sm:gap-2 min-h-[40px]"
           title="Explore interactive feature callouts"
         >
-          <Sparkles className="w-4 h-4 text-indigo-500" />
+          <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-500" />
           <span>Feature Tour</span>
         </button>
         <Link href="/settings">
-          <button className="text-xs font-extrabold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-200/60 dark:border-white/5 bg-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.04] px-4.5 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95">
+          <button className="text-xs font-extrabold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-200/60 dark:border-white/5 bg-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.04] px-3.5 sm:px-4.5 py-2 sm:py-3 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95 min-h-[40px]">
             Settings
           </button>
         </Link>

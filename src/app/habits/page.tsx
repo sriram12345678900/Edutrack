@@ -741,7 +741,7 @@ export default function HabitTrackerPage() {
   }, [totals.progressPercent]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans p-4 sm:p-6 pb-24 relative overflow-x-hidden selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans p-3 xs:p-4 sm:p-6 pb-28 md:pb-24 relative overflow-x-hidden selection:bg-indigo-500/30">
       <Confetti active={confettiActive} />
 
       {/* Floating XP Toast */}
@@ -769,13 +769,13 @@ export default function HabitTrackerPage() {
 
       {/* Header Bar */}
       <header className="max-w-[1600px] mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3.5">
-          <div className="bg-gradient-to-tr from-indigo-600 to-purple-600 p-3 rounded-2xl shadow-lg shadow-indigo-600/20 border border-indigo-400/30">
-            <CheckSquare className="w-7 h-7 text-white" />
+        <div className="flex items-center gap-3 sm:gap-3.5">
+          <div className="bg-gradient-to-tr from-indigo-600 to-purple-600 p-2.5 sm:p-3 rounded-2xl shadow-lg shadow-indigo-600/20 border border-indigo-400/30 shrink-0">
+            <CheckSquare className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300">
+              <h1 className="text-xl xs:text-2xl sm:text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300">
                 HABIT COMMAND CENTER
               </h1>
               <span className="text-[10px] uppercase font-black tracking-wider bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 px-2 py-0.5 rounded-full">

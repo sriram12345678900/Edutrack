@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Outfit, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import "katex/dist/katex.min.css";
@@ -29,13 +29,26 @@ export const metadata: Metadata = {
   title: "EduTrack - Next-Gen AI Learning OS",
   description: "Personalized AI learning platform for Indian CBSE Class 6-10 students",
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "EduTrack AI",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
-export const viewport = {
-  themeColor: "#6366f1",
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#eef1f9" },
+    { media: "(prefers-color-scheme: dark)", color: "#06080f" },
+  ],
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  userScalable: true,
 };
 
 export default function RootLayout({
@@ -44,7 +57,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${outfit.variable} ${plusJakarta.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`dark ${outfit.variable} ${plusJakarta.variable} ${jetbrainsMono.variable}`}>
       <body className={`${outfit.className} antialiased min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200`}>
         <script
           dangerouslySetInnerHTML={{

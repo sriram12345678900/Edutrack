@@ -10,6 +10,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        xs: "480px",
+      },
       fontFamily: {
         sans: ["var(--font-outfit)", "var(--font-plus-jakarta)", "system-ui", "sans-serif"],
         heading: ["var(--font-outfit)", "sans-serif"],

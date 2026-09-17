@@ -48,68 +48,81 @@ const HERO_CORE_CARDS = [
   {
     title: "AI Tutor",
     subtitle: "AI-Powered Tutor",
+    tag: "Instant 24/7 AI",
     href: "/tutor",
+    floatDuration: 3.2,
+    floatDelay: 0,
     icon: (
       <div className="relative w-16 h-16 flex items-center justify-center">
         {/* Ambient neon back-glow */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500 to-pink-500 rounded-2xl blur-xl opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500 to-indigo-500 rounded-2xl blur-xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 animate-pulse" />
         {/* Glowing Chat Speech Bubble Icon */}
-        <div className="relative z-10 w-14 h-14 rounded-2xl bg-[#0f142b] border border-cyan-400/40 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.5)]">
+        <div className="relative z-10 w-14 h-14 rounded-2xl bg-[#0f142b] border border-cyan-400/50 flex items-center justify-center shadow-[0_0_25px_rgba(6,182,212,0.5)]">
           <MessageSquare className="w-7 h-7 text-cyan-300 drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-          <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-pink-500 shadow-[0_0_8px_#ec4899]" />
+          <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-pink-500 shadow-[0_0_10px_#ec4899] animate-ping" style={{ animationDuration: '3s' }} />
+          <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-pink-500" />
         </div>
       </div>
     ),
-    borderHover: "hover:border-cyan-400/40",
-    glowColor: "rgba(6, 182, 212, 0.2)"
+    borderHover: "hover:border-cyan-400/60",
+    glowColor: "rgba(6, 182, 212, 0.25)"
   },
   {
     title: "Virtual Lab",
     subtitle: "Interactive Virtual Lab",
+    tag: "Simulations",
     href: "/sandbox",
+    floatDuration: 3.8,
+    floatDelay: 0.3,
     icon: (
       <div className="relative w-16 h-16 flex items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 via-teal-400 to-pink-500 rounded-2xl blur-xl opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
-        <div className="relative z-10 w-14 h-14 rounded-2xl bg-[#0f142b] border border-teal-400/40 flex items-center justify-center shadow-[0_0_20px_rgba(45,212,191,0.5)]">
+        <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 via-teal-400 to-pink-500 rounded-2xl blur-xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 animate-pulse" />
+        <div className="relative z-10 w-14 h-14 rounded-2xl bg-[#0f142b] border border-teal-400/50 flex items-center justify-center shadow-[0_0_25px_rgba(45,212,191,0.5)]">
           <FlaskConical className="w-7 h-7 text-teal-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.8)]" />
-          <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-pink-400 animate-ping" />
+          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-teal-400 shadow-[0_0_8px_#2dd4bf] animate-ping" />
         </div>
       </div>
     ),
-    borderHover: "hover:border-teal-400/40",
-    glowColor: "rgba(45, 212, 191, 0.2)"
+    borderHover: "hover:border-teal-400/60",
+    glowColor: "rgba(45, 212, 191, 0.25)"
   },
   {
     title: "Flashcard Deck",
     subtitle: "Dynamic Flashcards",
+    tag: "Spaced Recall",
     href: "/flashcards",
+    floatDuration: 3.4,
+    floatDelay: 0.6,
     icon: (
       <div className="relative w-16 h-16 flex items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-2xl blur-xl opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
-        <div className="relative z-10 w-14 h-14 rounded-2xl bg-[#0f142b] border border-purple-400/40 flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.5)]">
+        <div className="absolute inset-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-2xl blur-xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 animate-pulse" />
+        <div className="relative z-10 w-14 h-14 rounded-2xl bg-[#0f142b] border border-purple-400/50 flex items-center justify-center shadow-[0_0_25px_rgba(168,85,247,0.5)]">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-md">
             <span className="text-white font-black text-sm tracking-wider">A</span>
           </div>
         </div>
       </div>
     ),
-    borderHover: "hover:border-purple-400/40",
-    glowColor: "rgba(168, 85, 247, 0.2)"
+    borderHover: "hover:border-purple-400/60",
+    glowColor: "rgba(168, 85, 247, 0.25)"
   },
   {
     title: "Multiplayer Arena",
     subtitle: "Competitive Learning",
+    tag: "Live PvP Duels",
     href: "/arena",
+    floatDuration: 4.1,
+    floatDelay: 0.9,
     icon: (
       <div className="relative w-16 h-16 flex items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-tr from-rose-500 via-fuchsia-500 to-indigo-500 rounded-2xl blur-xl opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
-        <div className="relative z-10 w-14 h-14 rounded-2xl bg-[#0f142b] border border-rose-400/40 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.5)]">
+        <div className="absolute inset-0 bg-gradient-to-tr from-rose-500 via-fuchsia-500 to-indigo-500 rounded-2xl blur-xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 animate-pulse" />
+        <div className="relative z-10 w-14 h-14 rounded-2xl bg-[#0f142b] border border-rose-400/50 flex items-center justify-center shadow-[0_0_25px_rgba(244,63,94,0.5)]">
           <Swords className="w-7 h-7 text-pink-400 drop-shadow-[0_0_8px_rgba(244,63,94,0.8)]" />
         </div>
       </div>
     ),
-    borderHover: "hover:border-rose-400/40",
-    glowColor: "rgba(244, 63, 94, 0.2)"
+    borderHover: "hover:border-rose-400/60",
+    glowColor: "rgba(244, 63, 94, 0.25)"
   }
 ];
 
@@ -125,7 +138,7 @@ export default function Hero() {
   return (
     <section
       ref={ref}
-      className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-24 px-4 sm:px-6 overflow-hidden bg-[#060814]"
+      className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-24 px-4 sm:px-6 overflow-hidden bg-transparent"
       aria-label="Hero"
     >
       {/* Background Ambient Glowing Neon Orbs */}
@@ -138,12 +151,28 @@ export default function Hero() {
         style={{ y, opacity }}
         className="relative z-10 flex flex-col items-center text-center max-w-6xl mx-auto w-full"
       >
+        {/* Top Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 mb-6 backdrop-blur-xl shadow-[0_0_20px_rgba(99,102,241,0.2)]"
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+          </span>
+          <span className="text-xs font-bold text-indigo-200 tracking-wide">
+            Next-Gen AI Learning OS • CBSE Class 6–10
+          </span>
+        </motion.div>
+
         {/* Main Headline */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="mb-14 sm:mb-16"
+          className="mb-8"
         >
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tight leading-none flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
             <span>Study</span>
@@ -197,28 +226,69 @@ export default function Hero() {
               </svg>
             </span>
           </h1>
+
+          {/* Subheading */}
+          <p className="text-slate-300/90 text-sm sm:text-base md:text-lg max-w-2xl mx-auto mt-6 leading-relaxed font-normal">
+            The futuristic all-in-one platform built for CBSE toppers. Master complex concepts with your 24/7 AI Tutor, 3D interactive labs, spaced recall flashcards, and live multiplayer duels.
+          </p>
+
+          {/* Primary Action Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-3.5 sm:gap-4 mt-8">
+            <Link
+              href="/signup"
+              className="group inline-flex items-center gap-2.5 px-7 py-3.5 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 text-white font-bold text-sm rounded-full shadow-[0_0_30px_rgba(168,85,247,0.4)] hover:shadow-[0_0_45px_rgba(217,70,239,0.6)] transition-all hover:scale-105 active:scale-95"
+            >
+              Start Learning Free
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <button
+              onClick={() => {
+                document.querySelector('#features')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="inline-flex items-center gap-2 px-6 py-3.5 bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 hover:text-white font-semibold text-sm rounded-full border border-white/10 hover:border-white/20 backdrop-blur-xl transition-all hover:scale-105"
+            >
+              Explore Features
+            </button>
+          </div>
         </motion.div>
 
-        {/* 4 Center Elevated Dark Glass Cards */}
+        {/* 4 Center Elevated Dark Glass Cards with Floating Animation */}
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
           {HERO_CORE_CARDS.map((card, idx) => (
             <motion.div
               key={card.title}
               initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 * idx, ease: "easeOut" }}
-              whileHover={{ y: -8, scale: 1.02 }}
+              animate={{
+                opacity: 1,
+                y: [0, -8, 0],
+              }}
+              transition={{
+                opacity: { duration: 0.5, delay: 0.1 * idx, ease: "easeOut" },
+                y: {
+                  duration: card.floatDuration,
+                  delay: card.floatDelay,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  ease: "easeInOut",
+                },
+              }}
+              whileHover={{ y: -12, scale: 1.04 }}
               className="h-full"
             >
               <Link href={card.href} className="h-full block">
                 <div 
-                  className={`group relative h-full flex flex-col items-center justify-center p-6 sm:p-7 rounded-3xl backdrop-blur-2xl bg-[#0c1024]/75 border border-white/[0.08] ${card.borderHover} transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.5)] overflow-hidden`}
+                  className={`group relative h-full flex flex-col items-center justify-center p-6 sm:p-7 rounded-3xl backdrop-blur-2xl bg-[#0c1024]/85 border border-white/10 ${card.borderHover} transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.6)] overflow-hidden hover:bg-[#0f1430]/95`}
                   style={{
                     boxShadow: `0 20px 40px -15px ${card.glowColor}`
                   }}
                 >
                   {/* Subtle inner top glare reflection */}
-                  <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                  <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+
+                  {/* Corner Mini Tag Badge */}
+                  <div className="absolute top-3.5 right-3.5 px-2.5 py-0.5 rounded-full bg-white/[0.06] border border-white/10 text-[9px] font-bold text-slate-300 tracking-wider group-hover:border-white/25 group-hover:text-white transition-all">
+                    {card.tag}
+                  </div>
 
                   {/* 3D Illuminated Icon */}
                   <div className="mb-4 transform group-hover:scale-110 transition-transform duration-300">
@@ -229,7 +299,7 @@ export default function Hero() {
                   <h3 className="text-base font-bold text-white tracking-wide group-hover:text-indigo-200 transition-colors">
                     {card.title}
                   </h3>
-                  <p className="text-[11px] font-medium text-slate-400 mt-1">
+                  <p className="text-[11px] font-medium text-slate-400 mt-1 group-hover:text-slate-300 transition-colors">
                     {card.subtitle}
                   </p>
                 </div>
