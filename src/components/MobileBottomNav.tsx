@@ -51,7 +51,7 @@ export default function MobileBottomNav({ onOpenDrawer, isDrawerOpen }: MobileBo
               <motion.div layoutId="mobileNavActive" className="absolute -top-1 w-8 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
             )}
             <Home className={cn("w-5 h-5 transition-transform", (mounted && isHome) && "scale-110")} />
-            <span className="text-[10px] tracking-tight mt-0.5 leading-none">Home</span>
+            <span className="text-[11px] font-medium tracking-tight mt-0.5 leading-none">Home</span>
           </motion.div>
         </Link>
 
@@ -75,7 +75,7 @@ export default function MobileBottomNav({ onOpenDrawer, isDrawerOpen }: MobileBo
               <motion.div layoutId="mobileNavActive" className="absolute -top-1 w-8 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
             )}
             <BookOpen className={cn("w-5 h-5 transition-transform", (mounted && isLearn) && "scale-110")} />
-            <span className="text-[10px] tracking-tight mt-0.5 leading-none">Learn</span>
+            <span className="text-[11px] font-medium tracking-tight mt-0.5 leading-none">Learn</span>
           </motion.div>
         </Link>
 
@@ -100,7 +100,7 @@ export default function MobileBottomNav({ onOpenDrawer, isDrawerOpen }: MobileBo
             <Sparkles className="w-5.5 h-5.5 animate-pulse" />
           </motion.div>
           <span className={cn(
-            "text-[9.5px] font-black tracking-tight mt-1 leading-none",
+            "text-[11px] font-bold tracking-tight mt-1 leading-none",
             (mounted && isTutor) ? "text-indigo-600 dark:text-indigo-400" : "text-slate-600 dark:text-slate-300"
           )}>
             AI Tutor
@@ -130,7 +130,7 @@ export default function MobileBottomNav({ onOpenDrawer, isDrawerOpen }: MobileBo
               <Camera className={cn("w-5 h-5 transition-transform", (mounted && isLens) && "scale-110")} />
               <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
             </div>
-            <span className="text-[10px] tracking-tight mt-0.5 leading-none">Lens</span>
+            <span className="text-[11px] font-medium tracking-tight mt-0.5 leading-none">Lens</span>
           </motion.div>
         </Link>
 
@@ -154,7 +154,7 @@ export default function MobileBottomNav({ onOpenDrawer, isDrawerOpen }: MobileBo
               <motion.div layoutId="mobileNavActive" className="absolute -top-1 w-8 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
             )}
             <Compass className={cn("w-5 h-5 transition-transform", (mounted && isDrawerOpen) && "rotate-45 scale-110")} />
-            <span className="text-[10px] tracking-tight mt-0.5 leading-none">Explore</span>
+            <span className="text-[11px] font-medium tracking-tight mt-0.5 leading-none">Explore</span>
           </motion.div>
         </button>
       </div>

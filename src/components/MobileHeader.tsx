@@ -72,7 +72,7 @@ export default function MobileHeader({
               <span className="font-black text-sm tracking-tight text-slate-900 dark:text-white leading-none">EduTrack</span>
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
             </div>
-            <span className="text-[8px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 leading-none mt-0.5">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 leading-none mt-0.5">
               Class {userClass}
             </span>
           </div>
@@ -89,7 +89,7 @@ export default function MobileHeader({
           aria-label={`Study streak: ${streakDays} days`}
         >
           <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500 animate-bounce" style={{ animationDuration: "2s" }} />
-          <span className="text-[10px] font-black">{streakDays}d</span>
+          <span className="text-xs font-black">{streakDays}d</span>
         </Link>
 
         {/* Level Pill */}
@@ -100,7 +100,7 @@ export default function MobileHeader({
           aria-label={`Current level: ${userLevel}, with ${userXp} XP`}
         >
           <Trophy className="w-3.5 h-3.5 text-indigo-500" />
-          <span className="text-[10px] font-black">L{userLevel}</span>
+          <span className="text-xs font-black">L{userLevel}</span>
         </Link>
 
         {/* Theme Toggle */}
