@@ -6,7 +6,7 @@ import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import { 
   Home, BookOpen, MessageSquare, Target, Settings, LogOut, Menu, X, 
   GraduationCap, Moon, Sun, Calendar, Sparkles, Users, Award, Palette, Timer, Brain, Camera, Zap, Trophy, Shield, Compass, Video, Gamepad2, Globe, Mic, Radio, GitFork, Sliders, FileText,
-  CheckSquare, ShoppingBag, AlarmClock
+  CheckSquare, ShoppingBag, AlarmClock, Download
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -462,6 +462,31 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
             {isExpanded && (
               <span className="text-[8px] font-black uppercase bg-indigo-500/25 text-indigo-600 dark:text-indigo-300 px-1.5 py-0.5 rounded-full">
                 Tour
+              </span>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                window.dispatchEvent(new Event("edutrack_trigger_install"));
+              }
+            }}
+            title={!isExpanded ? "Install EduTrack App" : undefined}
+            className="flex items-center justify-between px-3 py-2 rounded-xl font-bold text-xs bg-gradient-to-r from-indigo-500/15 to-purple-500/15 hover:from-indigo-500/25 hover:to-purple-500/25 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 transition-all w-full text-left group"
+          >
+            <span className="flex items-center gap-3">
+              <Download className="w-4.5 h-4.5 text-indigo-500 dark:text-indigo-400 group-hover:scale-110 transition-transform shrink-0" />
+              <span className={cn(
+                "transition-all duration-300 whitespace-nowrap",
+                isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden"
+              )}>
+                Install EduTrack App
+              </span>
+            </span>
+            {isExpanded && (
+              <span className="text-[8px] font-black uppercase bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 px-1.5 py-0.5 rounded-full border border-indigo-500/30">
+                PWA
               </span>
             )}
           </button>

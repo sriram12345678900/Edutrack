@@ -4,7 +4,7 @@
  */
 
 export interface PythonAIRequest {
-  task?: "chat" | "notes" | "line-by-line" | "quiz" | "summarize" | "theory" | "plan" | "flashcards" | "solve";
+  task?: "chat" | "notes" | "line-by-line" | "quiz" | "summarize" | "theory" | "plan" | "flashcards" | "solve" | "podcast" | "evaluate_viva" | "generate";
   prompt?: string;
   subject?: string;
   chapter?: string;

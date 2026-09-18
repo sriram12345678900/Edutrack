@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Brain, Flame, Trophy, Moon, Sun, Sparkles, Menu, Compass } from "lucide-react";
+import { Brain, Flame, Trophy, Moon, Sun, Sparkles, Menu, Compass, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useGamificationStore } from "@/store/useGamificationStore";
 import UserAvatar from "./UserAvatar";
@@ -102,6 +102,20 @@ export default function MobileHeader({
           <Trophy className="w-3.5 h-3.5 text-indigo-500" />
           <span className="text-xs font-black">L{userLevel}</span>
         </Link>
+
+        {/* Install App Quick Action */}
+        <button
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              window.dispatchEvent(new Event("edutrack_trigger_install"));
+            }
+          }}
+          className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 active:scale-90 transition-transform"
+          title="Install EduTrack App"
+          aria-label="Install EduTrack App"
+        >
+          <Download className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
+        </button>
 
         {/* Theme Toggle */}
         <button

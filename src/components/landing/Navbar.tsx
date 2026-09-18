@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Brain, Menu, X, ArrowRight } from "lucide-react";
+import { Brain, Menu, X, ArrowRight, Download } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 const NAV_LINKS = [
@@ -67,6 +67,19 @@ export default function Navbar() {
 
           {/* Right Action Button */}
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new Event("edutrack_trigger_install"));
+                }
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 font-bold text-xs rounded-full transition-all active:scale-95"
+              title="Install EduTrack App"
+            >
+              <Download className="w-3.5 h-3.5 text-indigo-400" />
+              <span className="hidden sm:inline">Install App</span>
+            </button>
+
             <div className="hidden md:flex items-center gap-2">
               {loading ? (
                 <div className="w-24 h-9 animate-pulse bg-white/10 rounded-full" />
