@@ -226,7 +226,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="min-h-screen h-screen max-h-screen bg-slate-50 dark:bg-[#06080f] bg-[#eef1f9] text-slate-900 dark:text-slate-100 flex flex-col md:flex-row overflow-hidden grid-bg-overlay selection:bg-indigo-500/30 selection:text-indigo-200">
+      <div className="min-h-screen h-screen max-h-screen bg-slate-50 dark:bg-[#06080f] text-slate-900 dark:text-slate-100 flex flex-col md:flex-row overflow-hidden grid-bg-overlay selection:bg-indigo-500/30 selection:text-indigo-200">
         {/* Global Interactive App Tour */}
         <AppTour />
         <InteractiveAiGuide />
@@ -239,7 +239,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={cn(
-          "hidden md:flex sticky top-0 h-screen border-r border-slate-200/50 dark:border-white/10 bg-white/95 dark:bg-[#040614] bg-[#eef1f9] backdrop-blur-3xl flex-col z-50 shadow-2xl shrink-0 overflow-hidden",
+          "hidden md:flex sticky top-0 h-screen border-r border-slate-200/50 dark:border-white/10 bg-white/95 dark:bg-[#040614] backdrop-blur-3xl flex-col z-50 shadow-2xl shrink-0 overflow-hidden",
           isExpanded ? "shadow-[0_0_40px_rgba(99,102,241,0.2)]" : "shadow-none"
         )}
       >
@@ -549,7 +549,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           <div className={cn(
             isFullHeightPage
               ? "w-full flex-1 min-h-0 overflow-hidden relative flex flex-col"
-              : "p-4 sm:p-6 md:p-10 max-w-7xl mx-auto w-full"
+              : "px-4 sm:px-6 md:px-10 pt-6 sm:pt-8 md:pt-10 pb-8 max-w-7xl mx-auto w-full"
           )}>
             {children}
           </div>

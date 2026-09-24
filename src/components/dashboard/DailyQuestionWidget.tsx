@@ -116,15 +116,15 @@ export function DailyQuestionWidget() {
 
       <div className="space-y-3 relative z-10">
         {questionData.options.map((opt: string, idx: number) => {
-          let stateClass = "bg-slate-900/40 border-white/10 hover:border-amber-500/50 hover:bg-amber-500/10 cursor-pointer text-slate-300 hover:text-white";
+          let stateClass = "bg-white dark:bg-slate-900/40 border-slate-200 dark:border-white/10 hover:border-amber-500/50 hover:bg-amber-50/50 dark:hover:bg-amber-500/10 cursor-pointer text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white shadow-sm";
           
           if (isAnswered) {
             if (idx === questionData.answer) {
-              stateClass = "bg-emerald-500/10 border-emerald-500/50 text-emerald-400 font-bold shadow-[0_0_15px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/20";
+              stateClass = "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-400 font-bold shadow-sm ring-1 ring-emerald-500/20";
             } else if (idx === selectedOption) {
-              stateClass = "bg-red-500/10 border-red-500/50 text-red-400 font-bold shadow-[0_0_15px_rgba(239,68,68,0.15)]";
+              stateClass = "bg-red-50 dark:bg-red-500/10 border-red-500 text-red-700 dark:text-red-400 font-bold shadow-sm";
             } else {
-              stateClass = "bg-slate-900/20 border-transparent opacity-40 cursor-not-allowed";
+              stateClass = "bg-slate-100/50 dark:bg-slate-900/20 border-transparent opacity-40 cursor-not-allowed text-slate-400";
             }
           }
 
@@ -135,10 +135,10 @@ export function DailyQuestionWidget() {
               disabled={isAnswered}
               className={`w-full text-left px-5 py-4 rounded-2xl border-2 transition-all duration-300 flex items-center justify-between group ${stateClass}`}
             >
-              <span className="text-sm">{opt}</span>
+              <span className="text-sm font-semibold">{opt}</span>
               <div className="flex items-center">
                 {!isAnswered && (
-                  <div className="w-5 h-5 rounded-full border-2 border-slate-600 group-hover:border-amber-500 transition-colors" />
+                  <div className="w-5 h-5 rounded-full border-2 border-slate-300 dark:border-slate-600 group-hover:border-amber-500 transition-colors" />
                 )}
                 {isAnswered && idx === questionData.answer && <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0 drop-shadow-md" />}
                 {isAnswered && idx === selectedOption && idx !== questionData.answer && <XCircle className="w-6 h-6 text-red-500 shrink-0 drop-shadow-md" />}
@@ -156,7 +156,7 @@ export function DailyQuestionWidget() {
             className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10"
           >
             <p className="text-xs font-bold text-slate-600 dark:text-slate-400">
-              <span className="text-indigo-500 uppercase tracking-widest text-[10px] block mb-1">Explanation</span>
+              <span className="text-indigo-600 dark:text-indigo-400 uppercase tracking-widest text-[10px] block mb-1">Explanation</span>
               {questionData.explanation}
             </p>
           </motion.div>

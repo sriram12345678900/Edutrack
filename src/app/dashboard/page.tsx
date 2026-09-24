@@ -272,33 +272,16 @@ export default function Dashboard() {
         <div className="premium-grid-overlay" />
       </div>
 
-      {/* ── HEADER WITH ZEN MODE TOGGLE ── */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-1">
-        <DashboardHeader 
-          firstName={firstName} 
-          userClass={profile?.className || userClass} 
-          userLanguage={userLanguage} 
-          streak={streak} 
-          itemVariants={item} 
-        />
-        
-        {/* Quick Zen Mode Toggle Button */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setZenMode(!zenMode)}
-          className={cn(
-            "self-end sm:self-center flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all border shadow-sm",
-            zenMode 
-              ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400 ring-2 ring-emerald-500/20" 
-              : "bg-white/5 hover:bg-white/10 border-white/10 text-slate-400 hover:text-white"
-          )}
-          title="Toggle Zen Focus Mode"
-        >
-          <Sparkles className={cn("w-3.5 h-3.5", zenMode ? "text-emerald-400 animate-pulse" : "text-slate-400")} />
-          <span>{zenMode ? "Zen Mode: Active" : "Zen Focus Mode"}</span>
-        </motion.button>
-      </div>
+      {/* ── HEADER ── */}
+      <DashboardHeader 
+        firstName={firstName} 
+        userClass={profile?.className || userClass} 
+        userLanguage={userLanguage} 
+        streak={streak} 
+        itemVariants={item} 
+        zenMode={zenMode}
+        onToggleZen={() => setZenMode(!zenMode)}
+      />
 
       <AnimatePresence mode="wait">
         {/* ── ZEN FOCUS VIEW (MINIMALIST DISTRACTION-FREE) ── */}
@@ -312,69 +295,69 @@ export default function Dashboard() {
             className="space-y-6"
           >
             {/* Zen Hero Card */}
-            <div className="premium-glass-panel p-8 sm:p-10 rounded-3xl border border-emerald-500/20 bg-emerald-950/10 text-center relative overflow-hidden">
+            <div className="premium-glass-panel p-8 sm:p-10 rounded-3xl border border-emerald-500/20 bg-emerald-50/60 dark:bg-emerald-950/10 text-center relative overflow-hidden shadow-sm">
               <motion.div 
                 animate={{ rotate: 360 }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="w-14 h-14 bg-emerald-500/15 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-500/30 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+                className="w-14 h-14 bg-emerald-500/15 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-500/30 text-emerald-500 dark:text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
               >
                 <Compass className="w-7 h-7" />
               </motion.div>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                 Calm & Focused Study Mode
               </h2>
-              <p className="text-slate-400 text-sm max-w-md mx-auto mt-2 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-400 text-sm max-w-md mx-auto mt-2 leading-relaxed font-medium">
                 All visual distractions and extra cards are hidden. Add websites to your whitelist or use our built-in focus tools to earn XP.
               </p>
 
               {/* Focus Tools / Whitelist Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl mx-auto mt-8 text-left">
                 {/* Left: Built-in Zen Tools */}
-                <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
-                  <h3 className="font-bold text-white mb-4 flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-amber-400" /> Focus Tools
+                <div className="bg-slate-50/90 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-sm">
+                  <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-amber-500" /> Focus Tools
                   </h3>
                   <div className="space-y-3">
-                    <Link href="/learn" className="flex items-center gap-4 p-3 bg-white/5 hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-500/30 rounded-2xl transition-all group relative overflow-hidden">
+                    <Link href="/learn" className="flex items-center gap-4 p-3 bg-white dark:bg-white/5 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 border border-slate-200 dark:border-white/10 hover:border-emerald-500/30 rounded-2xl transition-all group relative overflow-hidden shadow-sm">
                       <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <div className="p-2 bg-emerald-500/10 rounded-xl group-hover:bg-emerald-500/20 text-emerald-400 transition-colors">
+                      <div className="p-2 bg-emerald-500/10 rounded-xl group-hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 transition-colors">
                         <BookOpen className="w-4 h-4" />
                       </div>
                       <div>
-                        <h4 className="font-black text-sm text-white">Study Hub</h4>
-                        <p className="text-[11px] text-slate-400">Read NCERT chapters</p>
+                        <h4 className="font-black text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Study Hub</h4>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Read NCERT chapters</p>
                       </div>
                     </Link>
-                    <Link href="/pomodoro" className="flex items-center gap-4 p-3 bg-white/5 hover:bg-rose-500/10 border border-white/10 hover:border-rose-500/30 rounded-2xl transition-all group relative overflow-hidden">
+                    <Link href="/pomodoro" className="flex items-center gap-4 p-3 bg-white dark:bg-white/5 hover:bg-rose-50 dark:hover:bg-rose-500/10 border border-slate-200 dark:border-white/10 hover:border-rose-500/30 rounded-2xl transition-all group relative overflow-hidden shadow-sm">
                       <div className="absolute inset-0 bg-gradient-to-r from-rose-500/0 to-rose-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <div className="p-2 bg-rose-500/10 rounded-xl group-hover:bg-rose-500/20 text-rose-400 transition-colors">
+                      <div className="p-2 bg-rose-500/10 rounded-xl group-hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 transition-colors">
                         <Timer className="w-4 h-4" />
                       </div>
                       <div>
-                        <h4 className="font-black text-sm text-white">Focus Timer</h4>
-                        <p className="text-[11px] text-slate-400">25-min Pomodoro cycles (+XP)</p>
+                        <h4 className="font-black text-sm text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">Focus Timer</h4>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">25-min Pomodoro cycles (+XP)</p>
                       </div>
                     </Link>
-                    <Link href="/tutor" className="flex items-center gap-4 p-3 bg-white/5 hover:bg-indigo-500/10 border border-white/10 hover:border-indigo-500/30 rounded-2xl transition-all group relative overflow-hidden">
+                    <Link href="/tutor" className="flex items-center gap-4 p-3 bg-white dark:bg-white/5 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 border border-slate-200 dark:border-white/10 hover:border-indigo-500/30 rounded-2xl transition-all group relative overflow-hidden shadow-sm">
                       <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <div className="p-2 bg-indigo-500/10 rounded-xl group-hover:bg-indigo-500/20 text-indigo-400 transition-colors">
+                      <div className="p-2 bg-indigo-500/10 rounded-xl group-hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 transition-colors">
                         <Brain className="w-4 h-4" />
                       </div>
                       <div>
-                        <h4 className="font-black text-sm text-white">AI Tutor</h4>
-                        <p className="text-[11px] text-slate-400">Ask 1-on-1 doubts</p>
+                        <h4 className="font-black text-sm text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">AI Tutor</h4>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Ask 1-on-1 doubts</p>
                       </div>
                     </Link>
                   </div>
                 </div>
 
                 {/* Right: AI Whitelist Manager */}
-                <div className="bg-emerald-950/20 border border-emerald-500/20 rounded-3xl p-6 relative overflow-hidden">
+                <div className="bg-emerald-50/80 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-500/20 rounded-3xl p-6 relative overflow-hidden shadow-sm">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-3xl rounded-full pointer-events-none" />
-                  <h3 className="font-bold text-white mb-1 flex items-center gap-2 relative z-10">
-                    <Shield className="w-4 h-4 text-emerald-400" /> AI Web Filter Whitelist
+                  <h3 className="font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2 relative z-10">
+                    <Shield className="w-4 h-4 text-emerald-500 dark:text-emerald-400" /> AI Web Filter Whitelist
                   </h3>
-                  <p className="text-xs text-emerald-100/60 mb-4 relative z-10">Add websites. AI verifies if they are relevant to your Class {userClass} subjects before granting access.</p>
+                  <p className="text-xs text-emerald-900/80 dark:text-emerald-100/60 mb-4 relative z-10 font-medium">Add websites. AI verifies if they are relevant to your Class {userClass} subjects before granting access.</p>
                   
                   <form onSubmit={(e) => {
                     e.preventDefault();
@@ -392,7 +375,7 @@ export default function Dashboard() {
                       type="url" 
                       placeholder="e.g. https://khanacademy.org" 
                       required
-                      className="flex-1 bg-black/40 border border-emerald-500/30 rounded-xl px-4 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 transition-all"
+                      className="flex-1 bg-white dark:bg-black/40 border border-slate-300 dark:border-emerald-500/30 rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all shadow-inner"
                     />
                     <button type="submit" className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-xl text-sm transition-colors shadow-md shadow-emerald-900/50 flex items-center gap-2">
                       <Shield className="w-4 h-4" /> Check
@@ -400,12 +383,12 @@ export default function Dashboard() {
                   </form>
 
                   <div className="space-y-2 relative z-10">
-                    <div className="flex items-center justify-between p-3 bg-black/30 rounded-xl border border-white/5">
+                    <div className="flex items-center justify-between p-3 bg-white/90 dark:bg-black/30 rounded-xl border border-emerald-200/60 dark:border-white/5 shadow-sm">
                       <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                        <span className="text-sm font-semibold text-emerald-100 truncate max-w-[180px] sm:max-w-[200px]">ncert.nic.in</span>
+                        <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                        <span className="text-sm font-semibold text-emerald-950 dark:text-emerald-100 truncate max-w-[180px] sm:max-w-[200px]">ncert.nic.in</span>
                       </div>
-                      <span className="text-[10px] uppercase font-black text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">Auto-Approved</span>
+                      <span className="text-[10px] uppercase font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">Auto-Approved</span>
                     </div>
                     
                     <AnimatePresence>
@@ -414,29 +397,29 @@ export default function Dashboard() {
                           key={idx}
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: "auto" }}
-                          className="flex items-center justify-between p-3 bg-black/30 rounded-xl border border-white/5"
+                          className="flex items-center justify-between p-3 bg-white/90 dark:bg-black/30 rounded-xl border border-emerald-200/60 dark:border-white/5 shadow-sm"
                         >
                           <div className="flex items-center gap-3">
                             <div className={cn(
                               "w-2 h-2 rounded-full",
-                              site.status === "checking" ? "bg-amber-400 animate-ping" : 
-                              site.status === "approved" ? "bg-emerald-400" : "bg-red-400"
+                              site.status === "checking" ? "bg-amber-500 animate-ping" : 
+                              site.status === "approved" ? "bg-emerald-500" : "bg-red-500"
                             )} />
                             <span className={cn(
                               "text-sm font-semibold truncate max-w-[180px] sm:max-w-[200px]",
-                              site.status === "checking" ? "text-amber-100" : 
-                              site.status === "approved" ? "text-emerald-100" : "text-red-200 line-through opacity-70"
+                              site.status === "checking" ? "text-amber-900 dark:text-amber-100" : 
+                              site.status === "approved" ? "text-emerald-950 dark:text-emerald-100" : "text-red-700 dark:text-red-200 line-through opacity-70"
                             )}>{site.url}</span>
                           </div>
-                          {site.status === "checking" && <span className="text-[10px] uppercase font-black text-amber-400 bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/30">AI Checking...</span>}
-                          {site.status === "approved" && <span className="text-[10px] uppercase font-black text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">Approved</span>}
-                          {site.status === "rejected" && <span className="text-[10px] uppercase font-black text-red-400 bg-red-500/20 px-2 py-0.5 rounded-full border border-red-500/30">Distraction Blocked</span>}
+                          {site.status === "checking" && <span className="text-[10px] uppercase font-black text-amber-600 dark:text-amber-400 bg-amber-500/10 dark:bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/30">AI Checking...</span>}
+                          {site.status === "approved" && <span className="text-[10px] uppercase font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">Approved</span>}
+                          {site.status === "rejected" && <span className="text-[10px] uppercase font-black text-red-600 dark:text-red-400 bg-red-500/10 dark:bg-red-500/20 px-2 py-0.5 rounded-full border border-red-500/30">Distraction Blocked</span>}
                         </motion.div>
                       ))}
                     </AnimatePresence>
 
                     {whitelistSites.length === 0 && (
-                      <div className="text-center p-3 border border-dashed border-white/10 rounded-xl bg-white/5 text-xs text-slate-500">
+                      <div className="text-center p-3 border border-dashed border-slate-300 dark:border-white/10 rounded-xl bg-slate-50 dark:bg-white/5 text-xs text-slate-500 dark:text-slate-400">
                         Add a site to verify via AI...
                       </div>
                     )}
@@ -458,12 +441,12 @@ export default function Dashboard() {
             className="space-y-6"
           >
             {/* ── CLEAN TAB NAVIGATOR ── */}
-            <div className="flex items-center gap-2 p-1.5 bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl w-full sm:w-fit overflow-x-auto snap-x snap-mandatory hide-scrollbar relative">
+            <div className="flex items-center gap-2 p-1.5 bg-slate-100/90 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl w-full sm:w-fit overflow-x-auto snap-x snap-mandatory hide-scrollbar relative shadow-sm">
               <button
                 onClick={() => setActiveTab("focus")}
                 className={cn(
                   "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all shrink-0 snap-center relative z-10",
-                  activeTab === "focus" ? "text-white shadow-md" : "text-slate-400 hover:text-white"
+                  activeTab === "focus" ? "text-white shadow-md" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 )}
               >
                 {activeTab === "focus" && <motion.div layoutId="dashboardTab" className="absolute inset-0 bg-indigo-600 rounded-xl -z-10 shadow-lg shadow-indigo-600/30" />}
@@ -475,7 +458,7 @@ export default function Dashboard() {
                 onClick={() => setActiveTab("tools")}
                 className={cn(
                   "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all shrink-0 snap-center relative z-10",
-                  activeTab === "tools" ? "text-white shadow-md" : "text-slate-400 hover:text-white"
+                  activeTab === "tools" ? "text-white shadow-md" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 )}
               >
                 {activeTab === "tools" && <motion.div layoutId="dashboardTab" className="absolute inset-0 bg-indigo-600 rounded-xl -z-10 shadow-lg shadow-indigo-600/30" />}
@@ -487,7 +470,7 @@ export default function Dashboard() {
                 onClick={() => setActiveTab("social")}
                 className={cn(
                   "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all shrink-0 snap-center relative z-10",
-                  activeTab === "social" ? "text-white shadow-md" : "text-slate-400 hover:text-white"
+                  activeTab === "social" ? "text-white shadow-md" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 )}
               >
                 {activeTab === "social" && <motion.div layoutId="dashboardTab" className="absolute inset-0 bg-indigo-600 rounded-xl -z-10 shadow-lg shadow-indigo-600/30" />}
@@ -513,16 +496,16 @@ export default function Dashboard() {
                     {/* Level HUD Card with Circular SVG */}
                     <motion.div variants={item} id="tour-stats-hud" className="md:col-span-1 p-[1px] rounded-3xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 relative group overflow-hidden shadow-lg shadow-indigo-500/10">
                       <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 blur-md opacity-30 group-hover:opacity-50 transition-opacity duration-500 rounded-3xl" />
-                      <div className="bg-slate-950/80 backdrop-blur-2xl rounded-[23px] h-full p-5 flex flex-col justify-between relative z-10 overflow-hidden">
+                      <div className="bg-white/95 dark:bg-slate-950/80 backdrop-blur-2xl rounded-[23px] h-full p-5 flex flex-col justify-between relative z-10 overflow-hidden shadow-sm">
                         <div className="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/20 blur-3xl rounded-full pointer-events-none" />
                         <div className="flex items-start justify-between gap-4">
                           {/* Circular Progress Ring */}
                           <div className="relative w-16 h-16 flex items-center justify-center shrink-0">
                             <svg className="w-full h-full transform -rotate-90 drop-shadow-md" viewBox="0 0 100 100">
-                              <circle cx="50" cy="50" r="45" fill="none" className="stroke-indigo-900/50" strokeWidth="8" />
+                              <circle cx="50" cy="50" r="45" fill="none" className="stroke-indigo-100 dark:stroke-indigo-900/50" strokeWidth="8" />
                               <motion.circle 
                                 cx="50" cy="50" r="45" fill="none" 
-                                className="stroke-indigo-400 drop-shadow-[0_0_8px_rgba(129,140,248,0.6)]" 
+                                className="stroke-indigo-500 dark:stroke-indigo-400 drop-shadow-[0_0_8px_rgba(129,140,248,0.6)]" 
                                 strokeWidth="8" strokeLinecap="round"
                                 initial={{ strokeDasharray: "283", strokeDashoffset: "283" }}
                                 animate={{ strokeDashoffset: 283 - (283 * xpPercentage) / 100 }}
@@ -530,20 +513,20 @@ export default function Dashboard() {
                               />
                             </svg>
                             <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="font-black text-base text-white">L{level}</span>
+                              <span className="font-black text-base text-slate-900 dark:text-white">L{level}</span>
                             </div>
                           </div>
 
                           <div className="text-right">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-0.5">Total Score</span>
-                            <span className="text-xl font-black text-white font-mono bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 block mb-0.5">Total Score</span>
+                            <span className="text-xl font-black text-indigo-600 dark:text-transparent font-mono dark:bg-clip-text dark:bg-gradient-to-r dark:from-indigo-400 dark:to-purple-400">
                               <AnimatedCounter value={userTotalXp} /> XP
                             </span>
                           </div>
                         </div>
 
                         <div className="mt-4">
-                          <h4 className="font-extrabold text-sm text-white flex items-center gap-1.5 drop-shadow-sm">
+                          <h4 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-1.5 drop-shadow-sm">
                             {equippedTitle ? (
                               equippedTitle === "title-topper" ? "🏆 CBSE All-India Topper" :
                               equippedTitle === "title-prodigy" ? "⚛️ Quantum Prodigy" :
@@ -553,7 +536,7 @@ export default function Dashboard() {
                             ) : (level <= 1 ? "Study Novice" : level <= 3 ? "Elite Scholar" : "Grandmaster")}
                           </h4>
                           <div className="flex items-center gap-2 mt-2">
-                            <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                            <div className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                               <motion.div 
                                 className="h-full bg-gradient-to-r from-indigo-500 to-purple-500" 
                                 initial={{ width: 0 }}
@@ -561,7 +544,7 @@ export default function Dashboard() {
                                 transition={{ duration: 1.5, ease: "easeOut" }}
                               />
                             </div>
-                            <span className="text-[10px] text-indigo-300 font-bold whitespace-nowrap">
+                            <span className="text-[10px] text-indigo-600 dark:text-indigo-300 font-bold whitespace-nowrap">
                               <AnimatedCounter value={xp} /> / {levelXpRequirement} XP
                             </span>
                           </div>
@@ -572,39 +555,39 @@ export default function Dashboard() {
                     {/* Quick 4 Core Shortcuts */}
                     <div className="md:col-span-2 grid grid-cols-2 lg:grid-cols-4 gap-3">
                       <motion.div variants={item} className="h-full">
-                        <Link href="/lens" id="tour-quick-lens" className="h-full group relative flex flex-col items-center justify-center p-5 rounded-3xl bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/20 hover:border-emerald-500/40 transition-all overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/20">
+                        <Link href="/lens" id="tour-quick-lens" className="h-full group relative flex flex-col items-center justify-center p-5 rounded-3xl bg-white dark:bg-emerald-500/5 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 border border-slate-200 dark:border-emerald-500/20 hover:border-emerald-500/40 transition-all overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/20 shadow-sm">
                           <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/0 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                           <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-emerald-500 transition-all duration-300 shadow-inner">
-                            <Camera className="w-6 h-6 text-emerald-400 group-hover:text-white transition-colors" />
+                            <Camera className="w-6 h-6 text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors" />
                           </div>
-                          <span className="text-sm font-black text-emerald-100 group-hover:text-white transition-colors">AI Lens</span>
+                          <span className="text-sm font-black text-slate-800 dark:text-emerald-100 group-hover:text-emerald-600 dark:group-hover:text-white transition-colors">AI Lens</span>
                         </Link>
                       </motion.div>
                       <motion.div variants={item} className="h-full">
-                        <Link href="/tutor" id="tour-tools-aibot" className="h-full group relative flex flex-col items-center justify-center p-5 rounded-3xl bg-indigo-500/5 hover:bg-indigo-500/10 border border-indigo-500/20 hover:border-indigo-500/40 transition-all overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-indigo-500/20">
+                        <Link href="/tutor" id="tour-tools-aibot" className="h-full group relative flex flex-col items-center justify-center p-5 rounded-3xl bg-white dark:bg-indigo-500/5 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 border border-slate-200 dark:border-indigo-500/20 hover:border-indigo-500/40 transition-all overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-indigo-500/20 shadow-sm">
                           <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/0 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                           <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-indigo-500 transition-all duration-300 shadow-inner">
-                            <MessageCircle className="w-6 h-6 text-indigo-400 group-hover:text-white transition-colors" />
+                            <MessageCircle className="w-6 h-6 text-indigo-600 dark:text-indigo-400 group-hover:text-white transition-colors" />
                           </div>
-                          <span className="text-sm font-black text-indigo-100 group-hover:text-white transition-colors">AI Tutor</span>
+                          <span className="text-sm font-black text-slate-800 dark:text-indigo-100 group-hover:text-indigo-600 dark:group-hover:text-white transition-colors">AI Tutor</span>
                         </Link>
                       </motion.div>
                       <motion.div variants={item} className="h-full">
-                        <Link href="/learn" className="h-full group relative flex flex-col items-center justify-center p-5 rounded-3xl bg-purple-500/5 hover:bg-purple-500/10 border border-purple-500/20 hover:border-purple-500/40 transition-all overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/20">
+                        <Link href="/learn" className="h-full group relative flex flex-col items-center justify-center p-5 rounded-3xl bg-white dark:bg-purple-500/5 hover:bg-purple-50 dark:hover:bg-purple-500/10 border border-slate-200 dark:border-purple-500/20 hover:border-purple-500/40 transition-all overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/20 shadow-sm">
                           <div className="absolute inset-0 bg-gradient-to-b from-purple-500/0 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                           <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-purple-500 transition-all duration-300 shadow-inner">
-                            <BookOpen className="w-6 h-6 text-purple-400 group-hover:text-white transition-colors" />
+                            <BookOpen className="w-6 h-6 text-purple-600 dark:text-purple-400 group-hover:text-white transition-colors" />
                           </div>
-                          <span className="text-sm font-black text-purple-100 group-hover:text-white transition-colors">Study Hub</span>
+                          <span className="text-sm font-black text-slate-800 dark:text-purple-100 group-hover:text-purple-600 dark:group-hover:text-white transition-colors">Study Hub</span>
                         </Link>
                       </motion.div>
                       <motion.div variants={item} className="h-full">
-                        <Link href="/whiteboard" className="h-full group relative flex flex-col items-center justify-center p-5 rounded-3xl bg-pink-500/5 hover:bg-pink-500/10 border border-pink-500/20 hover:border-pink-500/40 transition-all overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-pink-500/20">
+                        <Link href="/whiteboard" className="h-full group relative flex flex-col items-center justify-center p-5 rounded-3xl bg-white dark:bg-pink-500/5 hover:bg-pink-50 dark:hover:bg-pink-500/10 border border-slate-200 dark:border-pink-500/20 hover:border-pink-500/40 transition-all overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-pink-500/20 shadow-sm">
                           <div className="absolute inset-0 bg-gradient-to-b from-pink-500/0 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                           <div className="w-12 h-12 rounded-2xl bg-pink-500/10 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-pink-500 transition-all duration-300 shadow-inner">
-                            <Palette className="w-6 h-6 text-pink-400 group-hover:text-white transition-colors" />
+                            <Palette className="w-6 h-6 text-pink-600 dark:text-pink-400 group-hover:text-white transition-colors" />
                           </div>
-                          <span className="text-sm font-black text-pink-100 group-hover:text-white transition-colors">Whiteboard</span>
+                          <span className="text-sm font-black text-slate-800 dark:text-pink-100 group-hover:text-pink-600 dark:group-hover:text-white transition-colors">Whiteboard</span>
                         </Link>
                       </motion.div>
                     </div>
@@ -623,17 +606,17 @@ export default function Dashboard() {
 
                     {/* Right Column: Daily Quests */}
                     <div className="space-y-6">
-                      <motion.div variants={item} className="premium-glass-panel p-6 rounded-3xl border border-indigo-500/20 relative overflow-hidden">
+                      <motion.div variants={item} className="premium-glass-panel p-6 rounded-3xl border border-indigo-500/20 relative overflow-hidden shadow-sm">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl rounded-full pointer-events-none" />
                         
                         <div className="flex items-center justify-between mb-5 relative z-10">
                           <h3 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
                             <div className="p-2 bg-indigo-500/20 rounded-xl">
-                              <Trophy className="w-5 h-5 text-indigo-400" />
+                              <Trophy className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
                             </div>
                             Today's Quests
                           </h3>
-                          <span className="text-xs font-black text-indigo-300 bg-indigo-500/20 px-3 py-1 rounded-full border border-indigo-500/30 shadow-inner">
+                          <span className="text-xs font-black text-indigo-600 dark:text-indigo-300 bg-indigo-500/10 dark:bg-indigo-500/20 px-3 py-1 rounded-full border border-indigo-500/30 shadow-inner">
                             {missions.filter(m => m.completed).length} / {missions.length}
                           </span>
                         </div>
@@ -649,8 +632,8 @@ export default function Dashboard() {
                               className={cn(
                                 "p-3.5 rounded-2xl border transition-all flex items-center gap-4 cursor-pointer select-none relative overflow-hidden group/quest",
                                 mission.completed 
-                                  ? "bg-emerald-500/10 border-emerald-500/30 text-slate-400" 
-                                  : "bg-slate-900/40 border-white/10 hover:border-indigo-500/50 hover:bg-indigo-500/10 text-white"
+                                  ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-300 dark:border-emerald-500/30 text-slate-500 dark:text-slate-400" 
+                                  : "bg-white dark:bg-slate-900/40 border-slate-200 dark:border-white/10 hover:border-indigo-500/50 hover:bg-indigo-50/50 dark:hover:bg-indigo-500/10 text-slate-800 dark:text-white shadow-sm"
                               )}
                             >
                               {/* Stamp animation layer */}
@@ -663,7 +646,7 @@ export default function Dashboard() {
                                     transition={{ type: "spring", stiffness: 400, damping: 15 }}
                                     className="absolute inset-0 flex items-center justify-center bg-emerald-500/20 backdrop-blur-[2px] z-10"
                                   >
-                                    <span className="text-emerald-400 font-black tracking-widest uppercase border-4 border-emerald-400 px-3 py-1 rounded-xl rotate-12 bg-black/50 shadow-lg">Completed</span>
+                                    <span className="text-emerald-500 dark:text-emerald-400 font-black tracking-widest uppercase border-4 border-emerald-500 dark:border-emerald-400 px-3 py-1 rounded-xl rotate-12 bg-white/90 dark:bg-black/50 shadow-lg">Completed</span>
                                   </motion.div>
                                 )}
                               </AnimatePresence>
@@ -672,21 +655,21 @@ export default function Dashboard() {
                                 "w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-500",
                                 mission.completed 
                                   ? "bg-emerald-500 border-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.5)]" 
-                                  : "border-slate-600 bg-slate-800 group-hover/quest:border-indigo-400"
+                                  : "border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 group-hover/quest:border-indigo-500"
                               )}>
                                 {mission.completed && <CheckCircle2 className="w-4 h-4" />}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className={cn("text-sm font-bold truncate transition-all duration-500", mission.completed && "opacity-60 text-emerald-100")}>
+                                <p className={cn("text-sm font-bold truncate transition-all duration-500", mission.completed && "opacity-60 text-emerald-800 dark:text-emerald-100")}>
                                   {mission.title}
                                 </p>
-                                <p className={cn("text-[11px] truncate mt-0.5", mission.completed ? "text-emerald-500/60" : "text-slate-400")}>{mission.desc}</p>
+                                <p className={cn("text-[11px] truncate mt-0.5", mission.completed ? "text-emerald-600 dark:text-emerald-500/60" : "text-slate-500 dark:text-slate-400")}>{mission.desc}</p>
                               </div>
                               <span className={cn(
                                 "text-[10px] font-black shrink-0 px-2 py-1 rounded-lg border",
                                 mission.completed
-                                  ? "text-emerald-500/50 border-emerald-500/20 bg-emerald-500/5"
-                                  : "text-amber-400 border-amber-500/30 bg-amber-500/10 shadow-sm"
+                                  ? "text-emerald-600 dark:text-emerald-500/50 border-emerald-500/20 bg-emerald-500/5"
+                                  : "text-amber-600 dark:text-amber-400 border-amber-500/30 bg-amber-500/10 shadow-sm"
                               )}>
                                 +{mission.xp} XP
                               </span>
@@ -697,15 +680,15 @@ export default function Dashboard() {
 
                       {/* Target Weak Subjects */}
                       {weakSubjects.length > 0 && (
-                        <motion.div variants={item} className="premium-glass-panel p-5 rounded-3xl border border-rose-500/20 group hover:border-rose-500/40 transition-colors">
-                          <h4 className="text-xs font-black uppercase tracking-wider text-rose-400 flex items-center gap-1.5 mb-3">
+                        <motion.div variants={item} className="premium-glass-panel p-5 rounded-3xl border border-rose-500/20 group hover:border-rose-500/40 transition-colors shadow-sm">
+                          <h4 className="text-xs font-black uppercase tracking-wider text-rose-500 dark:text-rose-400 flex items-center gap-1.5 mb-3">
                             <Target className="w-3.5 h-3.5" /> Weak Subject Focus
                           </h4>
                           <div className="space-y-2">
                             {weakSubjects.map((sub, i) => (
-                              <div key={i} className="flex items-center justify-between p-2.5 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
-                                <span className="text-xs font-bold text-white truncate">{sub}</span>
-                                <Link href="/tutor" className="text-[10px] font-black text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-lg hover:bg-indigo-500/30 transition-all hover:scale-105">
+                              <div key={i} className="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors">
+                                <span className="text-xs font-bold text-slate-800 dark:text-white truncate">{sub}</span>
+                                <Link href="/tutor" className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-lg hover:bg-indigo-500/30 transition-all hover:scale-105">
                                   Practice
                                 </Link>
                               </div>
@@ -732,107 +715,107 @@ export default function Dashboard() {
                 >
                   <motion.div variants={item}>
                     <h3 className="text-xl font-black text-slate-900 dark:text-white">AI Tools & Interactive Study Labs</h3>
-                    <p className="text-xs text-slate-400 font-semibold mt-0.5">Explore Next-Gen interactive STEM simulations, oral examiners, and collaborative spaces.</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold mt-0.5">Explore Next-Gen interactive STEM simulations, oral examiners, and collaborative spaces.</p>
                   </motion.div>
 
                   {/* Bento Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     
                     {/* 1. AI Doubt Lens */}
-                    <TiltCard href="/lens" className="premium-glass-panel p-6 rounded-3xl border border-emerald-500/20 hover:border-emerald-500/50 transition-colors flex flex-col justify-between h-48">
+                    <TiltCard href="/lens" className="premium-glass-panel p-6 rounded-3xl border border-emerald-500/20 hover:border-emerald-500/50 transition-colors flex flex-col justify-between h-48 shadow-sm">
                       <div className="flex justify-between items-start">
-                        <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-400 group-hover/card:scale-110 group-hover/card:bg-emerald-500 group-hover/card:text-white transition-all duration-300">
+                        <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-600 dark:text-emerald-400 group-hover/card:scale-110 group-hover/card:bg-emerald-500 group-hover/card:text-white transition-all duration-300">
                           <Camera className="w-6 h-6" />
                         </div>
-                        <span className="text-[9px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">Camera OCR</span>
+                        <span className="text-[9px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">Camera OCR</span>
                       </div>
                       <div className="relative z-10">
-                        <h4 className="font-black text-base text-white group-hover/card:text-emerald-400 transition-colors">AI Doubt Lens</h4>
-                        <p className="text-slate-400 text-xs mt-1">Upload or snap any textbook diagram or handwritten equation for instant step-by-step solutions.</p>
+                        <h4 className="font-black text-base text-slate-900 dark:text-white group-hover/card:text-emerald-600 dark:group-hover/card:text-emerald-400 transition-colors">AI Doubt Lens</h4>
+                        <p className="text-slate-600 dark:text-slate-400 text-xs mt-1 leading-relaxed">Upload or snap any textbook diagram or handwritten equation for instant step-by-step solutions.</p>
                       </div>
                     </TiltCard>
 
                     {/* 2. Simulation Sandbox */}
-                    <TiltCard href="/sandbox" className="premium-glass-panel p-6 rounded-3xl border border-amber-500/20 hover:border-amber-500/50 transition-colors flex flex-col justify-between h-48">
+                    <TiltCard href="/sandbox" className="premium-glass-panel p-6 rounded-3xl border border-amber-500/20 hover:border-amber-500/50 transition-colors flex flex-col justify-between h-48 shadow-sm">
                       <div className="flex justify-between items-start">
-                        <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-400 group-hover/card:scale-110 group-hover/card:bg-amber-500 group-hover/card:text-white transition-all duration-300">
+                        <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-600 dark:text-amber-400 group-hover/card:scale-110 group-hover/card:bg-amber-500 group-hover/card:text-white transition-all duration-300">
                           <Zap className="w-6 h-6" />
                         </div>
-                        <span className="text-[9px] font-black uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">Interactive Lab</span>
+                        <span className="text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">Interactive Lab</span>
                       </div>
                       <div className="relative z-10">
-                        <h4 className="font-black text-base text-white group-hover/card:text-amber-400 transition-colors">Science Sandbox</h4>
-                        <p className="text-slate-400 text-xs mt-1">Mix real reagents in a beaker, test pH colors, and trigger interactive chemistry reactions in real-time.</p>
+                        <h4 className="font-black text-base text-slate-900 dark:text-white group-hover/card:text-amber-600 dark:group-hover/card:text-amber-400 transition-colors">Science Sandbox</h4>
+                        <p className="text-slate-600 dark:text-slate-400 text-xs mt-1 leading-relaxed">Mix real reagents in a beaker, test pH colors, and trigger interactive chemistry reactions in real-time.</p>
                       </div>
                     </TiltCard>
 
                     {/* 3. AI Voice Viva */}
-                    <TiltCard href="/viva" className="premium-glass-panel p-6 rounded-3xl border border-purple-500/20 hover:border-purple-500/50 transition-colors flex flex-col justify-between h-48">
+                    <TiltCard href="/viva" className="premium-glass-panel p-6 rounded-3xl border border-purple-500/20 hover:border-purple-500/50 transition-colors flex flex-col justify-between h-48 shadow-sm">
                       <div className="flex justify-between items-start">
-                        <div className="p-3 bg-purple-500/10 rounded-2xl text-purple-400 group-hover/card:scale-110 group-hover/card:bg-purple-500 group-hover/card:text-white transition-all duration-300">
+                        <div className="p-3 bg-purple-500/10 rounded-2xl text-purple-600 dark:text-purple-400 group-hover/card:scale-110 group-hover/card:bg-purple-500 group-hover/card:text-white transition-all duration-300">
                           <Mic className="w-6 h-6" />
                         </div>
-                        <span className="text-[9px] font-black uppercase tracking-wider text-purple-400 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20">Oral Practice</span>
+                        <span className="text-[9px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20">Oral Practice</span>
                       </div>
                       <div className="relative z-10">
-                        <h4 className="font-black text-base text-white group-hover/card:text-purple-400 transition-colors">AI Voice Viva</h4>
-                        <p className="text-slate-400 text-xs mt-1">Conversational oral board practical examiner with real-time speech dialogue and score feedback.</p>
+                        <h4 className="font-black text-base text-slate-900 dark:text-white group-hover/card:text-purple-600 dark:group-hover/card:text-purple-400 transition-colors">AI Voice Viva</h4>
+                        <p className="text-slate-600 dark:text-slate-400 text-xs mt-1 leading-relaxed">Conversational oral board practical examiner with real-time speech dialogue and score feedback.</p>
                       </div>
                     </TiltCard>
 
                     {/* 4. Whiteboard */}
-                    <TiltCard href="/whiteboard" className="premium-glass-panel p-6 rounded-3xl border border-pink-500/20 hover:border-pink-500/50 transition-colors flex flex-col justify-between h-48">
+                    <TiltCard href="/whiteboard" className="premium-glass-panel p-6 rounded-3xl border border-pink-500/20 hover:border-pink-500/50 transition-colors flex flex-col justify-between h-48 shadow-sm">
                       <div className="flex justify-between items-start">
-                        <div className="p-3 bg-pink-500/10 rounded-2xl text-pink-400 group-hover/card:scale-110 group-hover/card:bg-pink-500 group-hover/card:text-white transition-all duration-300">
+                        <div className="p-3 bg-pink-500/10 rounded-2xl text-pink-600 dark:text-pink-400 group-hover/card:scale-110 group-hover/card:bg-pink-500 group-hover/card:text-white transition-all duration-300">
                           <Palette className="w-6 h-6" />
                         </div>
-                        <span className="text-[9px] font-black uppercase tracking-wider text-pink-400 bg-pink-500/10 px-2.5 py-0.5 rounded-full border border-pink-500/20">Canvas</span>
+                        <span className="text-[9px] font-black uppercase tracking-wider text-pink-600 dark:text-pink-400 bg-pink-500/10 px-2.5 py-0.5 rounded-full border border-pink-500/20">Canvas</span>
                       </div>
                       <div className="relative z-10">
-                        <h4 className="font-black text-base text-white group-hover/card:text-pink-400 transition-colors">Smart Whiteboard</h4>
-                        <p className="text-slate-400 text-xs mt-1">Draw, sketch formulas, and have AI solve handwritten equations directly on your canvas.</p>
+                        <h4 className="font-black text-base text-slate-900 dark:text-white group-hover/card:text-pink-600 dark:group-hover/card:text-pink-400 transition-colors">Smart Whiteboard</h4>
+                        <p className="text-slate-600 dark:text-slate-400 text-xs mt-1 leading-relaxed">Draw, sketch formulas, and have AI solve handwritten equations directly on your canvas.</p>
                       </div>
                     </TiltCard>
 
                     {/* 5. Battle Quiz Arena */}
-                    <TiltCard href="/arena" className="premium-glass-panel p-6 rounded-3xl border border-rose-500/20 hover:border-rose-500/50 transition-colors flex flex-col justify-between h-48">
+                    <TiltCard href="/arena" className="premium-glass-panel p-6 rounded-3xl border border-rose-500/20 hover:border-rose-500/50 transition-colors flex flex-col justify-between h-48 shadow-sm">
                       <div className="flex justify-between items-start">
-                        <div className="p-3 bg-rose-500/10 rounded-2xl text-rose-400 group-hover/card:scale-110 group-hover/card:bg-rose-500 group-hover/card:text-white transition-all duration-300">
+                        <div className="p-3 bg-rose-500/10 rounded-2xl text-rose-600 dark:text-rose-400 group-hover/card:scale-110 group-hover/card:bg-rose-500 group-hover/card:text-white transition-all duration-300">
                           <Gamepad2 className="w-6 h-6" />
                         </div>
-                        <span className="text-[9px] font-black uppercase tracking-wider text-rose-400 bg-rose-500/10 px-2.5 py-0.5 rounded-full border border-rose-500/20">Multiplayer</span>
+                        <span className="text-[9px] font-black uppercase tracking-wider text-rose-600 dark:text-rose-400 bg-rose-500/10 px-2.5 py-0.5 rounded-full border border-rose-500/20">Multiplayer</span>
                       </div>
                       <div className="relative z-10">
-                        <h4 className="font-black text-base text-white group-hover/card:text-rose-400 transition-colors">Quiz Battle Arena</h4>
-                        <p className="text-slate-400 text-xs mt-1">Compete against classmates in fast-paced real-time live question duels with powerups.</p>
+                        <h4 className="font-black text-base text-slate-900 dark:text-white group-hover/card:text-rose-600 dark:group-hover/card:text-rose-400 transition-colors">Quiz Battle Arena</h4>
+                        <p className="text-slate-600 dark:text-slate-400 text-xs mt-1 leading-relaxed">Compete against classmates in fast-paced real-time live question duels with powerups.</p>
                       </div>
                     </TiltCard>
 
                     {/* 6. Formula & Cheatsheet Vault */}
-                    <TiltCard href="/formulas" className="premium-glass-panel p-6 rounded-3xl border border-cyan-500/20 hover:border-cyan-500/50 transition-colors flex flex-col justify-between h-48">
+                    <TiltCard href="/formulas" className="premium-glass-panel p-6 rounded-3xl border border-cyan-500/20 hover:border-cyan-500/50 transition-colors flex flex-col justify-between h-48 shadow-sm">
                       <div className="flex justify-between items-start">
-                        <div className="p-3 bg-cyan-500/10 rounded-2xl text-cyan-400 group-hover/card:scale-110 group-hover/card:bg-cyan-500 group-hover/card:text-white transition-all duration-300">
+                        <div className="p-3 bg-cyan-500/10 rounded-2xl text-cyan-600 dark:text-cyan-400 group-hover/card:scale-110 group-hover/card:bg-cyan-500 group-hover/card:text-white transition-all duration-300">
                           <Compass className="w-6 h-6" />
                         </div>
-                        <span className="text-[9px] font-black uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded-full border border-cyan-500/20">Quick Revision</span>
+                        <span className="text-[9px] font-black uppercase tracking-wider text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded-full border border-cyan-500/20">Quick Revision</span>
                       </div>
                       <div className="relative z-10">
-                        <h4 className="font-black text-base text-white group-hover/card:text-cyan-400 transition-colors">Formula Vault</h4>
-                        <p className="text-slate-400 text-xs mt-1">High-yield equations, periodic trends, math theorems, and quick revision cards.</p>
+                        <h4 className="font-black text-base text-slate-900 dark:text-white group-hover/card:text-cyan-600 dark:group-hover/card:text-cyan-400 transition-colors">Formula Vault</h4>
+                        <p className="text-slate-600 dark:text-slate-400 text-xs mt-1 leading-relaxed">High-yield equations, periodic trends, math theorems, and quick revision cards.</p>
                       </div>
                     </TiltCard>
 
                     {/* 7. Smart Study Alarm Clock */}
-                    <TiltCard href="/alarm" className="premium-glass-panel p-6 rounded-3xl border border-amber-500/20 hover:border-amber-500/50 transition-colors flex flex-col justify-between h-48">
+                    <TiltCard href="/alarm" className="premium-glass-panel p-6 rounded-3xl border border-amber-500/20 hover:border-amber-500/50 transition-colors flex flex-col justify-between h-48 shadow-sm">
                       <div className="flex justify-between items-start">
-                        <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-400 group-hover/card:scale-110 group-hover/card:bg-amber-500 group-hover/card:text-white transition-all duration-300">
+                        <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-600 dark:text-amber-400 group-hover/card:scale-110 group-hover/card:bg-amber-500 group-hover/card:text-white transition-all duration-300">
                           <AlarmClock className="w-6 h-6" />
                         </div>
-                        <span className="text-[9px] font-black uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">MCQ Dismiss</span>
+                        <span className="text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">MCQ Dismiss</span>
                       </div>
                       <div className="relative z-10">
-                        <h4 className="font-black text-base text-white group-hover/card:text-amber-400 transition-colors">Study Alarm Clock</h4>
-                        <p className="text-slate-400 text-xs mt-1">Wake up & study on time. Alarm will only silence once you solve a curriculum MCQ correctly!</p>
+                        <h4 className="font-black text-base text-slate-900 dark:text-white group-hover/card:text-amber-600 dark:group-hover/card:text-amber-400 transition-colors">Study Alarm Clock</h4>
+                        <p className="text-slate-600 dark:text-slate-400 text-xs mt-1 leading-relaxed">Wake up & study on time. Alarm will only silence once you solve a curriculum MCQ correctly!</p>
                       </div>
                     </TiltCard>
 
@@ -859,24 +842,24 @@ export default function Dashboard() {
                     
                     {/* Syllabus Mind Map (Left 2 cols) */}
                     <motion.div variants={item} className="lg:col-span-2 space-y-6">
-                      <div className="premium-glass-panel p-6 rounded-3xl border border-indigo-500/20">
+                      <div className="premium-glass-panel p-6 rounded-3xl border border-indigo-500/20 shadow-sm">
                         <div className="flex items-center justify-between mb-4">
                           <div>
                             <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                              <Compass className="w-4 h-4 text-indigo-400" />
+                              <Compass className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
                               Mastery Mind Map & Syllabus Tree
                             </h3>
-                            <p className="text-xs text-slate-400 mt-0.5">Click nodes to view chapter highlights and trigger mock tests</p>
+                            <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Click nodes to view chapter highlights and trigger mock tests</p>
                           </div>
                         </div>
 
-                        <div className="relative w-full bg-black/30 rounded-2xl border border-white/5 p-4 overflow-x-auto min-h-[200px]">
+                        <div className="relative w-full bg-slate-50/80 dark:bg-black/30 rounded-2xl border border-slate-200 dark:border-white/5 p-4 overflow-x-auto min-h-[200px]">
                           <svg className="w-full max-w-[700px] h-auto mx-auto" viewBox="0 0 800 160">
                             {/* Animated connecting paths */}
                             <motion.path d="M 96 80 Q 176 40 256 40" fill="none" className="stroke-emerald-500/50" strokeWidth="3" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1, ease: "easeOut" }} />
                             <motion.path d="M 256 40 Q 336 80 416 120" fill="none" className="stroke-indigo-500/40" strokeWidth="3" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1, delay: 0.5, ease: "easeOut" }} />
-                            <motion.path d="M 416 120 Q 496 80 576 40" fill="none" className="stroke-slate-700" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1, delay: 1, ease: "easeOut" }} />
-                            <motion.path d="M 576 40 Q 656 80 720 88" fill="none" className="stroke-slate-700" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1, delay: 1.5, ease: "easeOut" }} />
+                            <motion.path d="M 416 120 Q 496 80 576 40" fill="none" className="stroke-slate-300 dark:stroke-slate-700" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1, delay: 1, ease: "easeOut" }} />
+                            <motion.path d="M 576 40 Q 656 80 720 88" fill="none" className="stroke-slate-300 dark:stroke-slate-700" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1, delay: 1.5, ease: "easeOut" }} />
 
                             {skillNodes.map((node, i) => {
                               const isLocked = node.status === "locked";
@@ -900,9 +883,9 @@ export default function Dashboard() {
                                     r="20"
                                     className={cn(
                                       "transition-all duration-300 stroke-2 group-hover:scale-[1.2]",
-                                      isCompleted ? "stroke-emerald-500 fill-emerald-950/40" : "",
-                                      isActive ? "stroke-indigo-500 fill-indigo-950/40 group-hover:stroke-indigo-400 group-hover:fill-indigo-500/20" : "",
-                                      isLocked ? "stroke-slate-800 fill-black/60" : ""
+                                      isCompleted ? "stroke-emerald-500 fill-emerald-100 dark:fill-emerald-950/40" : "",
+                                      isActive ? "stroke-indigo-500 fill-indigo-100 dark:fill-indigo-950/40 group-hover:stroke-indigo-400 group-hover:fill-indigo-200 dark:group-hover:fill-indigo-500/20" : "",
+                                      isLocked ? "stroke-slate-300 dark:stroke-slate-800 fill-slate-100 dark:fill-black/60" : ""
                                     )}
                                   />
                                   {isCompleted ? (
@@ -919,11 +902,11 @@ export default function Dashboard() {
                                       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke="#64748b" strokeWidth="2.5"/>
                                     </g>
                                   ) : (
-                                    <text x={cx} y={cy + 4} textAnchor="middle" className="text-[11px] font-black fill-indigo-400 font-mono transition-transform group-hover:scale-110">
+                                    <text x={cx} y={cy + 4} textAnchor="middle" className="text-[11px] font-black fill-indigo-500 dark:fill-indigo-400 font-mono transition-transform group-hover:scale-110">
                                       {node.percent}%
                                     </text>
                                   )}
-                                  <text x={cx} y={cy - 28} textAnchor="middle" className="text-[10px] font-black fill-slate-400 uppercase transition-colors group-hover:fill-white">
+                                  <text x={cx} y={cy - 28} textAnchor="middle" className="text-[10px] font-black fill-slate-500 dark:fill-slate-400 uppercase transition-colors group-hover:fill-slate-900 dark:group-hover:fill-white">
                                     {node.label.split(" ")[0]}
                                   </text>
                                 </motion.g>
@@ -935,13 +918,13 @@ export default function Dashboard() {
                     </motion.div>
 
                     {/* Classmates Leaderboard (Right col) */}
-                    <motion.div variants={item} id="tour-leaderboard-section" className="premium-glass-panel p-6 rounded-3xl border border-indigo-500/20 space-y-4">
+                    <motion.div variants={item} id="tour-leaderboard-section" className="premium-glass-panel p-6 rounded-3xl border border-indigo-500/20 space-y-4 shadow-sm">
                       <div className="flex items-center justify-between">
                         <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                          <Users className="w-4 h-4 text-indigo-400" />
+                          <Users className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
                           Classmate Ranks
                         </h3>
-                        <Link href="/groups" className="text-[10px] font-bold text-indigo-400 hover:underline">
+                        <Link href="/groups" className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
                           StudyCircles →
                         </Link>
                       </div>
@@ -954,8 +937,8 @@ export default function Dashboard() {
                             className={cn(
                               "flex items-center justify-between p-2.5 rounded-2xl border transition-colors",
                               buddy.isSelf 
-                                ? "bg-indigo-500/10 border-indigo-500/40 shadow-sm shadow-indigo-500/10" 
-                                : "bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10"
+                                ? "bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/40 shadow-sm shadow-indigo-500/10" 
+                                : "bg-slate-50/80 dark:bg-white/5 border-slate-200/60 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/10"
                             )}
                           >
                             <div className="flex items-center gap-2.5 min-w-0">
@@ -964,15 +947,15 @@ export default function Dashboard() {
                                 {buddy.avatar}
                               </div>
                               <div className="min-w-0">
-                                <p className={cn("text-xs font-bold truncate", buddy.isSelf ? "text-indigo-300" : "text-white")}>
+                                <p className={cn("text-xs font-bold truncate", buddy.isSelf ? "text-indigo-700 dark:text-indigo-300" : "text-slate-800 dark:text-white")}>
                                   {buddy.name}
                                 </p>
-                                <p className="text-[10px] text-slate-400 truncate">{buddy.totalXp} XP</p>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{buddy.totalXp} XP</p>
                               </div>
                             </div>
 
                             {!buddy.isSelf && (
-                              <Link href="/groups" className="p-2 bg-white/5 hover:bg-indigo-500/20 rounded-xl text-slate-400 hover:text-indigo-400 transition-colors">
+                              <Link href="/groups" className="p-2 bg-slate-100 dark:bg-white/5 hover:bg-indigo-50 dark:hover:bg-indigo-500/20 rounded-xl text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                                 <MessageCircle className="w-3.5 h-3.5" />
                               </Link>
                             )}
@@ -998,31 +981,31 @@ export default function Dashboard() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="bg-[#0B0F19] border border-white/10 w-full max-w-md rounded-3xl p-6 text-left text-white shadow-2xl space-y-4"
+              className="bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/10 w-full max-w-md rounded-3xl p-6 text-left text-slate-900 dark:text-white shadow-2xl space-y-4"
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <span className="text-[9px] font-black uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
+                  <span className="text-[9px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
                     CBSE Syllabus Node
                   </span>
                   <h3 className="text-xl font-black mt-1.5">{selectedNode.label}</h3>
                 </div>
                 <button 
                   onClick={() => setSelectedNode(null)} 
-                  className="p-1.5 bg-white/5 hover:bg-white/10 hover:text-rose-400 text-slate-400 rounded-xl text-xs transition-colors"
+                  className="p-1.5 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-rose-500 text-slate-500 dark:text-slate-400 rounded-xl text-xs transition-colors"
                 >
                   ✕
                 </button>
               </div>
 
-              <p className="text-slate-300 text-xs leading-relaxed">{selectedNode.desc}</p>
+              <p className="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">{selectedNode.desc}</p>
               
-              <div className="bg-white/5 border border-white/5 p-4 rounded-2xl">
-                <h4 className="text-[10px] font-black uppercase tracking-wider text-indigo-400 mb-2">Key Board Highlights</h4>
+              <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 p-4 rounded-2xl">
+                <h4 className="text-[10px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-2">Key Board Highlights</h4>
                 <ul className="space-y-2">
                   {selectedNode.keyPoints.map((point: string, idx: number) => (
-                    <li key={idx} className="text-xs text-slate-300 font-semibold flex items-start gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0 mt-1.5" />
+                    <li key={idx} className="text-xs text-slate-700 dark:text-slate-300 font-semibold flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0 mt-1.5" />
                       <span className="leading-relaxed">{point}</span>
                     </li>
                   ))}
@@ -1043,7 +1026,7 @@ export default function Dashboard() {
                   <motion.button 
                     whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                     onClick={() => setSelectedNode(null)}
-                    className="w-full py-3 bg-white/5 hover:bg-white/10 text-white font-bold text-xs rounded-xl transition-all border border-white/10"
+                    className="w-full py-3 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-800 dark:text-white font-bold text-xs rounded-xl transition-all border border-slate-200 dark:border-white/10"
                   >
                     Read Theory
                   </motion.button>
@@ -1062,16 +1045,16 @@ export default function Dashboard() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-md bg-[#0B0F19] border border-white/10 rounded-3xl p-6 shadow-2xl space-y-4 text-center text-white"
+              className="w-full max-w-md bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-2xl space-y-4 text-center text-slate-900 dark:text-white"
             >
-              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mx-auto flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 dark:text-indigo-400 mx-auto flex items-center justify-center">
                 <Sparkles className="w-6 h-6 animate-pulse" />
               </div>
               <div>
-                <h3 className="text-xl font-black">Quest Guide</h3>
-                <p className="text-xs text-slate-400 mt-0.5">How to complete this mission</p>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white">Quest Guide</h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">How to complete this mission</p>
               </div>
-              <p className="text-sm text-slate-300 leading-relaxed font-semibold bg-white/5 p-4 rounded-2xl border border-white/5">
+              <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-semibold bg-slate-50 dark:bg-white/5 p-4 rounded-2xl border border-slate-200 dark:border-white/5">
                 {activeMissionGuide}
               </p>
               <motion.button
