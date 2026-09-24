@@ -8,6 +8,7 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
+  sendPasswordResetEmail,
   User,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
@@ -24,6 +25,7 @@ interface AuthContextType {
   loginWithGoogle: () => Promise<void>;
   loginWithOrg: (username: string, password: string) => Promise<void>;
   loginAsGuest: (role?: "student" | "teacher" | "admin") => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   updateNickname: (nickname: string) => Promise<void>;
 }
@@ -202,8 +204,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } catch (err: any) {
+      console.warn("Password reset attempt:", err?.message || err);
+      throw err;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, loginWithGoogle, loginWithOrg, loginAsGuest, logout, updateNickname }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, loginWithGoogle, loginWithOrg, loginAsGuest, resetPassword, logout, updateNickname }}>
       {children}
     </AuthContext.Provider>
   );
