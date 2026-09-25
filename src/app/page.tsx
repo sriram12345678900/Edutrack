@@ -3,8 +3,11 @@
 import { useEffect } from "react";
 import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
+import CurriculumSelector from "@/components/landing/CurriculumSelector";
 import FeatureTabs from "@/components/landing/FeatureTabs";
+import TuitionComparison from "@/components/landing/TuitionComparison";
 import ToolShowcase from "@/components/landing/ToolShowcase";
+import Testimonials from "@/components/landing/Testimonials";
 import FAQ from "@/components/landing/FAQ";
 import Footer from "@/components/landing/Footer";
 
@@ -36,8 +39,11 @@ export default function Home() {
 
       <main className="relative z-10">
         <Hero />
+        <CurriculumSelector />
         <FeatureTabs />
+        <TuitionComparison />
         <ToolShowcase />
+        <Testimonials />
         <FAQ />
         <Footer />
       </main>

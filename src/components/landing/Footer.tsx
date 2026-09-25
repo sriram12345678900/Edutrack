@@ -92,6 +92,7 @@ export default function Footer() {
             <Link href="/flashcards" className="hover:text-white transition-colors">Flashcards</Link>
             <Link href="/arena" className="hover:text-white transition-colors">PvP Arena</Link>
             <Link href="/ncert" className="hover:text-white transition-colors">NCERT Books</Link>
+            <Link href="/exam-generator" className="hover:text-white transition-colors">Exam Generator</Link>
             <Link href="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
           </div>
 

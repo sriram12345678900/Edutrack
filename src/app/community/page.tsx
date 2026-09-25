@@ -50,10 +50,10 @@ export default function CommunityPage() {
     useEffect(() => {
     const q = query(collection(db, "doubts"), orderBy("createdAtTimestamp", "desc"));
     const unsubscribe = onSnapshot(q, async (snapshot) => {
-      const fetchedDoubts = await Promise.all(snapshot.docs.map(async (docSnap) => {
+      const fetchedDoubts = await Promise.all(snapshot.docs.map(async (docSnap: any) => {
         const doubtData = docSnap.data();
         const answersSnap = await getDocs(collection(db, "doubts", docSnap.id, "answers"));
-        const answers = answersSnap.docs.map(a => ({ id: a.id, ...a.data() } as DoubtAnswer));
+        const answers = answersSnap.docs.map((a: any) => ({ id: a.id, ...a.data() } as DoubtAnswer));
         return { id: docSnap.id, ...doubtData, answers } as DoubtQuery;
       }));
       setDoubts(fetchedDoubts);
@@ -221,7 +221,8 @@ export default function CommunityPage() {
       interactors: arrayUnion(user.uid)
     };
 
-    const doubtRef = doc(collection(db, "doubts"));
+    const newDocId = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const doubtRef = doc(db, "doubts", newDocId);
     await setDoc(doubtRef, newDoubtData);
 
     if (askAiInstant) {

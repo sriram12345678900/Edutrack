@@ -25,6 +25,14 @@ const FAQS = [
     q: "Is my data safe and private?",
     a: "Yes. EduTrack uses Firebase for secure authentication and encrypted data storage. We never share your personal information with third parties, and you can delete your account and data at any time.",
   },
+  {
+    q: "Does EduTrack match the latest CBSE 2025–26 syllabus and rationalised NCERT books?",
+    a: "Yes! All chapters, question banks, and AI practice tests are strictly aligned with the latest 2025–26 rationalised NCERT curriculum and official CBSE board blueprints.",
+  },
+  {
+    q: "Can I use EduTrack on mobile devices and offline?",
+    a: "Yes! EduTrack is an installable Progressive Web App (PWA) and has a native Android app. You can install it on your smartphone, tablet, or desktop with 1 tap for instant access to your notes and flashcards.",
+  },
 ];
 
 export default function FAQ() {

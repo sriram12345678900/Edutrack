@@ -7,10 +7,12 @@ import { Brain, Menu, X, ArrowRight, Download } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 const NAV_LINKS = [
+  { label: "Curriculum", href: "#curriculum" },
   { label: "Features", href: "#features" },
-  { label: "Solutions", href: "#solutions" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "About", href: "#about" },
+  { label: "Why EduTrack", href: "#comparison" },
+  { label: "Tools", href: "#tools" },
+  { label: "Toppers", href: "#testimonials" },
+  { label: "FAQ", href: "#faq" },
 ];
 
 export default function Navbar() {

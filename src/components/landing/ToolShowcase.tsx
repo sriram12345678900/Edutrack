@@ -80,7 +80,7 @@ const TOOLS: Tool[] = [
     icon: FileText,
     title: "Exam Generator",
     tag: "CBSE Blueprint",
-    href: "/dashboard",
+    href: "/exam-generator",
     description:
       "Generate timed practice tests matching official CBSE exam patterns with instant AI-powered grading and feedback.",
     gradient: "from-indigo-500 to-blue-500",

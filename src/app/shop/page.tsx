@@ -108,7 +108,7 @@ export default function ShopPage() {
       setPreviewTitle(state.equippedTitle);
       setPreviewTheme(state.equippedTheme);
       setPreviewCompanion(state.equippedCompanion);
-      setPreviewRoblox(state.robloxAvatar);
+      setPreviewRoblox(state.robloxAvatar as any);
 
       setBoosterTimeRemaining(getBoosterTimeRemaining());
 
@@ -197,7 +197,7 @@ export default function ShopPage() {
     if (item.category === "avatar_item" && item.robloxSlot && item.robloxValue) {
       const isCurrentlyEquipped = (shopState.robloxAvatar as any)[item.robloxSlot] === item.robloxValue;
       if (isCurrentlyEquipped) {
-        unequipShopItem("avatar_item", item.robloxSlot);
+        unequipShopItem("avatar_item", item.robloxSlot as any);
         const fallbackVal = item.robloxSlot === "hat" ? "none" : item.robloxSlot === "gear" ? "none" : item.robloxSlot === "outfit" ? "default" : "classic";
         setPreviewRoblox(prev => ({ ...prev, [item.robloxSlot!]: fallbackVal }));
         showToast(`Unequipped ${item.name}`, "info");
@@ -268,13 +268,13 @@ export default function ShopPage() {
 
   // ── 3D Avatar Studio Handlers ──
   const handleSaveRobloxAvatar = () => {
-    saveRobloxAvatarConfig(previewRoblox);
+    saveRobloxAvatarConfig(previewRoblox as any);
     playShopSound("buy");
     showToast("💾 Saved 3D Avatar! Displaying across your profile and sidebar.", "success");
   };
 
   const handleResetRobloxAvatar = () => {
-    setPreviewRoblox(shopState.robloxAvatar);
+    setPreviewRoblox(shopState.robloxAvatar as any);
     showToast("Reverted 3D avatar to equipped look.", "info");
   };
 
@@ -665,14 +665,14 @@ export default function ShopPage() {
                       <div>
                         <span className="text-[9px] font-bold text-slate-400 block uppercase">Face Print</span>
                         <span className="text-xs font-black text-white truncate block max-w-[90px]">
-                          {previewRoblox.face && previewRoblox.face !== "classic"
-                            ? previewRoblox.face.charAt(0).toUpperCase() + previewRoblox.face.slice(1)
+                          {previewRoblox.face && (previewRoblox.face as string) !== "classic"
+                            ? (previewRoblox.face as string).charAt(0).toUpperCase() + (previewRoblox.face as string).slice(1)
                             : "Classic Smile : )"}
                         </span>
                       </div>
-                      {previewRoblox.face && previewRoblox.face !== "classic" && (
+                      {previewRoblox.face && (previewRoblox.face as string) !== "classic" && (
                         <button
-                          onClick={() => setPreviewRoblox((prev) => ({ ...prev, face: "classic" }))}
+                          onClick={() => setPreviewRoblox((prev) => ({ ...prev, face: "classic" as any }))}
                           className="p-1 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-md transition-colors text-[10px]"
                           title="Reset to Classic Smile"
                         >

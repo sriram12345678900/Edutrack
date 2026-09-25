@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Target,
@@ -196,17 +197,13 @@ export default function FeatureTabs() {
               </div>
 
               <div className="pt-2">
-                <a
-                  href={`#${current.id}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.location.href = current.id === "doubt" ? "/tutor" : current.id === "recall" ? "/flashcards" : "/skill-tree";
-                  }}
+                <Link
+                  href={current.id === "doubt" ? "/tutor" : current.id === "recall" ? "/flashcards" : "/skill-tree"}
                   className="group inline-flex items-center gap-2 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
                 >
                   Experience {current.label} in action
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </a>
+                </Link>
               </div>
             </div>
 

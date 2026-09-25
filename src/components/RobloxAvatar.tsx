@@ -1,10 +1,10 @@
 import React from 'react';
 
-export type RobloxFaceType = 'smile' | 'cool' | 'wink' | 'star' | 'ninja' | 'fire';
-export type RobloxHatType = 'none' | 'crown' | 'cap' | 'headphones' | 'wizard' | 'cyber_helm';
-export type RobloxOutfitType = 'default' | 'hoodie' | 'suit' | 'cyber_armor' | 'topper_robe';
-export type RobloxGearType = 'none' | 'sword' | 'wand' | 'trophy' | 'book';
-export type RobloxPoseType = 'idle' | 'wave' | 'hero' | 'dance';
+export type RobloxFaceType = 'smile' | 'cool' | 'wink' | 'star' | 'ninja' | 'fire' | 'laser' | 'classic' | 'chill' | 'genius' | 'laugh' | (string & {});
+export type RobloxHatType = 'none' | 'crown' | 'cap' | 'headphones' | 'wizard' | 'cyber_helm' | (string & {});
+export type RobloxOutfitType = 'default' | 'hoodie' | 'suit' | 'cyber_armor' | 'topper_robe' | (string & {});
+export type RobloxGearType = 'none' | 'sword' | 'wand' | 'trophy' | 'book' | (string & {});
+export type RobloxPoseType = 'idle' | 'wave' | 'hero' | 'dance' | 'cheer' | 'levitate' | (string & {});
 
 export interface RobloxAvatarConfig {
   bodyColor?: string;
