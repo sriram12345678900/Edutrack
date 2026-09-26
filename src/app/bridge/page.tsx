@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 
 export default function SchoolHomeBridgePage() {
   const { user } = useAuth();
+  const [mounted, setMounted] = useState(false);
   const [classes, setClasses] = useState<Classroom[]>([]);
   const [notices, setNotices] = useState<ParentNotice[]>([]);
   const [checkedTasks, setCheckedTasks] = useState<{ [key: string]: boolean }>({});
@@ -27,6 +28,7 @@ export default function SchoolHomeBridgePage() {
   const [parentNoteSent, setParentNoteSent] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     loadData();
     const handleUpdate = () => loadData();
     window.addEventListener("edutrack_classrooms_updated", handleUpdate);
@@ -155,7 +157,7 @@ export default function SchoolHomeBridgePage() {
             <div>
               <h2 className="text-lg font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2" suppressHydrationWarning>
                 <FileCheck className="w-5 h-5 text-teal-500" />
-                Tonight&apos;s Home Study Checklist (<span suppressHydrationWarning>{new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</span>)
+                Tonight&apos;s Home Study Checklist {mounted ? `(${new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })})` : "(Today)"}
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">Parents and students can tick off completed study tasks</p>
             </div>
