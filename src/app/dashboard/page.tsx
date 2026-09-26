@@ -573,7 +573,7 @@ export default function Dashboard() {
                         </Link>
                       </motion.div>
                       <motion.div variants={item} className="h-full">
-                        <Link href="/learn" className="h-full group relative flex flex-col items-center justify-center p-5 rounded-3xl bg-white dark:bg-purple-500/5 hover:bg-purple-50 dark:hover:bg-purple-500/10 border border-slate-200 dark:border-purple-500/20 hover:border-purple-500/40 transition-all overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/20 shadow-sm">
+                        <Link href="/learn" id="tour-flashcards-deck" className="h-full group relative flex flex-col items-center justify-center p-5 rounded-3xl bg-white dark:bg-purple-500/5 hover:bg-purple-50 dark:hover:bg-purple-500/10 border border-slate-200 dark:border-purple-500/20 hover:border-purple-500/40 transition-all overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/20 shadow-sm">
                           <div className="absolute inset-0 bg-gradient-to-b from-purple-500/0 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                           <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-purple-500 transition-all duration-300 shadow-inner">
                             <BookOpen className="w-6 h-6 text-purple-600 dark:text-purple-400 group-hover:text-white transition-colors" />
@@ -599,14 +599,14 @@ export default function Dashboard() {
                     
                     {/* Left Column: Today's Question + Flashcard Swiper */}
                     <div className="lg:col-span-2 space-y-6">
-                      <motion.div variants={item}>
+                      <motion.div variants={item} id="tour-daily-challenge">
                         <DailyQuestionWidget />
                       </motion.div>
                     </div>
 
                     {/* Right Column: Daily Quests */}
                     <div className="space-y-6">
-                      <motion.div variants={item} className="premium-glass-panel p-6 rounded-3xl border border-indigo-500/20 relative overflow-hidden shadow-sm">
+                      <motion.div variants={item} id="tour-daily-quests" className="premium-glass-panel p-6 rounded-3xl border border-indigo-500/20 relative overflow-hidden shadow-sm">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl rounded-full pointer-events-none" />
                         
                         <div className="flex items-center justify-between mb-5 relative z-10">

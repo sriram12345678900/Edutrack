@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { awardXp } from "@/lib/xp";
 import { cn } from "@/lib/utils";
+import { SUPPORTED_LANGUAGES, getSpeechLanguageCode } from "@/lib/languages";
 
 interface VivaQuestion {
   id: number;
@@ -86,6 +87,7 @@ const VIVA_QUESTION_BANKS: { [key: string]: VivaQuestion[] } = {
 
 export default function VivaPage() {
   const [selectedTopic, setSelectedTopic] = useState<string>("Physics - Light & Optics");
+  const [vivaLanguage, setVivaLanguage] = useState<string>("English");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isExamActive, setIsExamActive] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -105,6 +107,12 @@ export default function VivaPage() {
 
   const recognitionRef = useRef<any>(null);
 
+  // Load saved language
+  useEffect(() => {
+    const saved = localStorage.getItem("edutrack_language");
+    if (saved) setVivaLanguage(saved);
+  }, []);
+
   const questions = VIVA_QUESTION_BANKS[selectedTopic] || [];
   const currentQuestion = questions[currentIndex];
 
@@ -116,7 +124,7 @@ export default function VivaPage() {
         const recog = new SpeechRecognition();
         recog.continuous = true;
         recog.interimResults = true;
-        recog.lang = "en-US";
+        recog.lang = getSpeechLanguageCode(vivaLanguage);
 
         recog.onresult = (event: any) => {
           let currentTranscript = "";
@@ -138,7 +146,7 @@ export default function VivaPage() {
         recognitionRef.current = recog;
       }
     }
-  }, []);
+  }, [vivaLanguage]);
 
   const speakText = (text: string) => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
@@ -148,10 +156,21 @@ export default function VivaPage() {
     utterance.rate = 0.95;
     utterance.pitch = 1.0;
     
+    const speechLang = getSpeechLanguageCode(vivaLanguage);
+    utterance.lang = speechLang;
+
     // Choose natural voice if available
     const voices = window.speechSynthesis.getVoices();
-    const englishVoice = voices.find(v => v.lang.includes("en-US") || v.lang.includes("en-GB"));
-    if (englishVoice) utterance.voice = englishVoice;
+    if (voices.length > 0) {
+      const langPrefix = speechLang.split("-")[0];
+      const langVoice = voices.find(v => v.lang.toLowerCase().startsWith(langPrefix.toLowerCase()));
+      if (langVoice) {
+        utterance.voice = langVoice;
+      } else {
+        const englishVoice = voices.find(v => v.lang.includes("en-US") || v.lang.includes("en-GB"));
+        if (englishVoice) utterance.voice = englishVoice;
+      }
+    }
 
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
@@ -215,7 +234,8 @@ export default function VivaPage() {
           question: currentQuestion.question,
           expectedAnswer: currentQuestion.idealAnswerSummary,
           studentTranscript: transcript,
-          topic: selectedTopic
+          topic: selectedTopic,
+          language: vivaLanguage
         })
       });
 
@@ -363,10 +383,25 @@ export default function VivaPage() {
               })}
             </div>
 
-            <div className="flex justify-end pt-4 border-t border-slate-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-slate-800">
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Viva Language:</span>
+                <select
+                  value={vivaLanguage}
+                  onChange={e => setVivaLanguage(e.target.value)}
+                  className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-indigo-500 cursor-pointer"
+                >
+                  {SUPPORTED_LANGUAGES.map(lang => (
+                    <option key={lang.code} value={lang.code}>
+                      {lang.label} {lang.nativeName !== lang.label ? `(${lang.nativeName})` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <button
                 onClick={handleStartExam}
-                className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm flex items-center gap-2 shadow-xl shadow-indigo-600/30 transition-all hover:scale-105 active:scale-95"
+                className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-xl shadow-indigo-600/30 transition-all hover:scale-105 active:scale-95"
               >
                 <Play className="w-4 h-4 fill-white" />
                 Start Viva Examination

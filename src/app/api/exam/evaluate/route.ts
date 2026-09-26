@@ -1,16 +1,20 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import { queryPythonServer } from "@/lib/python-ai";
+import { getLanguagePromptInstruction } from "@/lib/languages";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    const { paper, studentAnswers } = await req.json();
+    const { paper, studentAnswers, language = "English" } = await req.json();
 
     if (!paper || !studentAnswers) {
       return NextResponse.json({ error: "Missing paper or student answers" }, { status: 400 });
     }
+
+    const langInstruction = getLanguagePromptInstruction(language);
 
     const prompt = `You are an expert ${paper.board || "CBSE"} Board Exam Evaluator with 15+ years of experience.
 Grade the student's exam sheet.
@@ -36,73 +40,107 @@ Student's Answer:
 `;
 }).join("\n")}
 
+LANGUAGE & PEDAGOGICAL INSTRUCTION:
+${langInstruction}
+Provide student-facing feedback, markingSchemeUsed, overallRemarks, weakAreas, and actionPlan in ${language}.
+
 EVALUATION RULES:
 1. For Section A Multiple Choice Questions (MCQs), compare the option selected by the student (e.g. (a) or (b)) against the correct option in the marking scheme. Award 1 mark if correct, 0 if incorrect.
 2. For descriptive questions (Sections B, C, D, E), award marks step-by-step according to the marking scheme.
 3. Be fair, objective, and constructive. Provide details on where they lost marks.
 
-Return the evaluation results as a strictly formatted JSON object matching the following structure:
+Return the evaluation results strictly as a JSON object matching the following structure:
 {
   "totalMarks": ${paper.maxMarks},
-  "marksAwarded": <number>, // The total sum of marks awarded across all questions
-  "percentage": <number>, // (marksAwarded / totalMarks) * 100
+  "marksAwarded": 0,
+  "percentage": 0,
   "verdict": "<short evaluation verdict, e.g., Excellent / Good / Needs Improvement>",
   "sectionScores": {
-    // For each section present in the exam paper (e.g., A, B, C, D, E), list the max marks and awarded marks
-    "A": { "max": <number>, "awarded": <number> }
+    "A": { "max": 0, "awarded": 0 }
   },
   "questionEvaluations": [
     {
-      "num": <number>,
-      "marksMax": <number>,
-      "marksAwarded": <number>,
-      "feedback": "<Specific observation on the student's answer, highlighting correct parts or missing points>",
-      "markingSchemeUsed": "<Brief explanation of how the score was calculated based on the marking scheme>"
+      "num": 1,
+      "marksMax": 1,
+      "marksAwarded": 1,
+      "feedback": "<Specific observation in ${language}>",
+      "markingSchemeUsed": "<Brief explanation in ${language}>"
     }
   ],
-  "overallRemarks": "<Overall summary of the student's performance, layout structure, and tips for improvement>",
+  "overallRemarks": "<Overall summary and tips for improvement in ${language}>",
   "weakAreas": ["<Topics or chapters where the student lost marks>"],
-  "actionPlan": "<Actionable steps for the student to practice and improve their score>"
+  "actionPlan": "<Actionable steps in ${language}>"
 }
 `;
+
+    const parseJson = (text: string) => {
+      let clean = text.trim();
+      if (clean.startsWith('```json')) clean = clean.replace(/^```json\n?/, '').replace(/\n?```$/, '');
+      else if (clean.startsWith('```')) clean = clean.replace(/^```\n?/, '').replace(/\n?```$/, '');
+      return JSON.parse(clean);
+    };
 
     // 1. Try local Python AI Server first
     let parsed = null;
     const pythonRes = await queryPythonServer({
       task: "solve",
-      prompt: prompt
+      prompt: prompt,
+      language: language
     });
 
     if (pythonRes && pythonRes.reply) {
       try {
-        let cleanText = pythonRes.reply.trim();
-        if (cleanText.startsWith('```json')) cleanText = cleanText.replace(/^```json\n?/, '').replace(/\n?```$/, '');
-        else if (cleanText.startsWith('```')) cleanText = cleanText.replace(/^```\n?/, '').replace(/\n?```$/, '');
-        parsed = JSON.parse(cleanText);
+        parsed = parseJson(pythonRes.reply);
       } catch (err) {
-        console.warn("Failed to parse local Python AI evaluation response as JSON, falling back to Gemini:", err);
+        console.warn("Failed to parse local Python AI evaluation response as JSON:", err);
       }
     }
 
-    // 2. Fallback to Gemini
-    if (!parsed) {
-      const apiKey = process.env.GEMINI_API_KEY || "";
-      if (!apiKey) {
-        return NextResponse.json({ error: "Gemini API key is missing and local server is offline." }, { status: 500 });
+    // 2. Try Gemini
+    const geminiKey = process.env.GEMINI_API_KEY || "";
+    if (!parsed && geminiKey) {
+      try {
+        const genAI = new GoogleGenerativeAI(geminiKey);
+        const model = genAI.getGenerativeModel({
+          model: "gemini-2.5-flash",
+          generationConfig: { responseMimeType: "application/json" }
+        });
+        const result = await model.generateContent(prompt);
+        parsed = parseJson(result.response.text());
+      } catch (geminiErr: any) {
+        console.warn("Gemini evaluation failed, falling back to Groq:", geminiErr?.message || geminiErr);
       }
+    }
 
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({
-        model: "gemini-2.5-flash",
-        generationConfig: { responseMimeType: "application/json" }
-      });
+    // 3. Fallback to Groq
+    const groqKey = process.env.GROQ_API_KEY || "";
+    if (!parsed && groqKey) {
+      try {
+        const groq = new Groq({ apiKey: groqKey });
+        const completion = await groq.chat.completions.create({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            {
+              role: "system",
+              content: "You are an expert CBSE NCERT exam evaluator. Always return strictly valid JSON matching the schema."
+            },
+            {
+              role: "user",
+              content: `${prompt}\n\nRespond strictly with valid JSON.`
+            }
+          ],
+          response_format: { type: "json_object" },
+          max_tokens: 4096,
+        });
+        const raw = completion.choices[0]?.message?.content || "";
+        parsed = parseJson(raw);
+      } catch (groqErr: any) {
+        console.warn("Groq evaluation failed:", groqErr?.message || groqErr);
+      }
+    }
 
-      const result = await model.generateContent(prompt);
-      const resultText = result.response.text();
-      let cleanText = resultText.trim();
-      if (cleanText.startsWith('```json')) cleanText = cleanText.replace(/^```json\n?/, '').replace(/\n?```$/, '');
-      else if (cleanText.startsWith('```')) cleanText = cleanText.replace(/^```\n?/, '').replace(/\n?```$/, '');
-      parsed = JSON.parse(cleanText);
+    if (!parsed) {
+      return NextResponse.json({ error: "Failed to evaluate exam paper. Please check AI provider keys." }, { status: 500 });
     }
 
     return NextResponse.json({ evaluation: parsed });

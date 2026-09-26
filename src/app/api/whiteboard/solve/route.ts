@@ -1,17 +1,20 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import { findOfflineKnowledge } from "@/lib/offline-knowledge";
+import { getLanguagePromptInstruction } from "@/lib/languages";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    const { image, prompt, strokesText } = await req.json();
+    const { image, prompt, strokesText, language = "English" } = await req.json();
 
     const queryText = (prompt || strokesText || "").toLowerCase().trim();
+    const langInstruction = getLanguagePromptInstruction(language);
 
-    // 1. Prioritize EduTrack Offline AI Math & Science Solver First
-    if (queryText) {
+    // 1. Prioritize EduTrack Offline AI Math & Science Solver First (if English default)
+    if (queryText && language === "English") {
       // Case A: Logarithmic Expression (e.g., log10(1) + log10(10) = ?)
       if (queryText.includes("log") || (queryText.includes("10") && queryText.includes("1") && queryText.includes("+"))) {
         const logSolution = `### **EduTrack Whiteboard AI Math Solution**
@@ -118,7 +121,13 @@ $$\\mathbf{x = 5}$$`;
               role: "user",
               parts: [
                 {
-                  text: "Analyze this hand-drawn whiteboard canvas. Identify the exact mathematical expression, equation, or scientific diagram drawn. Provide a complete step-by-step NCERT textbook solution. Include: 1. Recognized Equation/Expression 2. Step-by-Step Breakdown 3. Final Answer."
+                  text: `Analyze this hand-drawn whiteboard canvas. Identify the exact mathematical expression, equation, or scientific diagram drawn.
+Provide a complete step-by-step NCERT textbook solution.
+Include: 1. Recognized Equation/Expression 2. Step-by-Step Breakdown 3. Final Answer.
+
+LANGUAGE & SCRIPT INSTRUCTION:
+${langInstruction}
+Keep all equations, formulas, variables ($x, y$), and units preserved in standard LaTeX/Unicode notation.`
                 },
                 {
                   inlineData: {
@@ -136,7 +145,35 @@ $$\\mathbf{x = 5}$$`;
           return NextResponse.json({ solution: text, engine: "Gemini Vision AI" });
         }
       } catch (geminiErr) {
-        console.warn("Gemini vision solve failed, falling back to EduTrack Intelligent Math & Science Engine.");
+        console.warn("Gemini vision solve failed, falling back to Groq / Offline Engine.");
+      }
+    }
+
+    // 3. Fallback to Groq for text/query solving
+    const groqKey = process.env.GROQ_API_KEY;
+    if (groqKey && queryText) {
+      try {
+        const groq = new Groq({ apiKey: groqKey });
+        const completion = await groq.chat.completions.create({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            {
+              role: "system",
+              content: `You are an expert CBSE NCERT math and science problem solver.\n${langInstruction}`
+            },
+            {
+              role: "user",
+              content: `Solve this problem step-by-step with clear breakdown and final answer:\n"${queryText}"`
+            }
+          ],
+          max_tokens: 1500
+        });
+        const out = completion.choices[0]?.message?.content;
+        if (out) {
+          return NextResponse.json({ solution: out, engine: "Groq Llama 3.3 Engine" });
+        }
+      } catch (groqErr) {
+        console.warn("Groq solve failed:", groqErr);
       }
     }
 

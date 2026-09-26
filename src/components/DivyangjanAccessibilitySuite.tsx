@@ -79,7 +79,7 @@ export default function DivyangjanAccessibilitySuite() {
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsOpen(true)}
           title="Open Divyangjan Accessibility Menu"
-          className="w-13 h-13 rounded-full bg-indigo-600 dark:bg-indigo-600 text-white flex items-center justify-center shadow-[0_8px_24px_rgba(99,102,241,0.4)] border border-indigo-400/40 relative overflow-hidden"
+          className="w-12 h-12 rounded-full bg-indigo-600 dark:bg-indigo-600 text-white flex items-center justify-center shadow-[0_8px_24px_rgba(99,102,241,0.4)] border border-indigo-400/40 relative overflow-hidden"
         >
           <span className="absolute inset-0 bg-white/20 animate-pulse pointer-events-none" />
           <Accessibility className="w-6 h-6 relative z-10" />

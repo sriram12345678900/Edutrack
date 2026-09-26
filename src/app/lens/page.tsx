@@ -569,8 +569,36 @@ export default function LensPage() {
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 p-4 sm:p-6 overflow-hidden min-h-0 relative z-10">
         
         {/* Left Column: Holographic Laser Scanner Canvas & Sample Presets */}
-        <div className="flex flex-col gap-6 overflow-y-auto no-scrollbar pb-10">
+        <div className="flex flex-col gap-4 overflow-y-auto no-scrollbar pb-10">
           
+          {/* Quick Language Switcher Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 shrink-0">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">Solve in:</span>
+            {["English", "Hinglish", "Hindi", "Telugu", "Tamil", "Kannada", "Marathi", "Bengali"].map(langCode => {
+              const active = userLanguage === langCode;
+              return (
+                <button
+                  key={langCode}
+                  type="button"
+                  onClick={() => {
+                    setUserLanguage(langCode);
+                    localStorage.setItem("edutrack_language", langCode);
+                    if (typeof window !== "undefined") {
+                      window.dispatchEvent(new CustomEvent("edutrack_profile_updated", { detail: { language: langCode } }));
+                    }
+                  }}
+                  className={`px-3 py-1 rounded-full text-[11px] font-extrabold whitespace-nowrap transition-all border ${
+                    active
+                      ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40 shadow-sm"
+                      : "bg-white/5 text-slate-400 border-white/5 hover:border-white/10 hover:text-white"
+                  }`}
+                >
+                  {langCode}
+                </button>
+              );
+            })}
+          </div>
+
           {/* Holographic HUD Viewport */}
           <div 
             className={`relative dark:bg-[#060a1c] bg-[#f5f7ff] backdrop-blur-3xl border-2 border-dashed ${

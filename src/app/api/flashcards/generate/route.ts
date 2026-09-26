@@ -1,90 +1,122 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import * as fs from "fs";
 import * as path from "path";
+import { getLanguagePromptInstruction, getLanguageMnemonicHeader } from "@/lib/languages";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    const { topic, classLevel = "10", subject = "Geography", count = 10, sourceText } = await req.json();
+    const { topic, classLevel = "10", subject = "Geography", count = 10, sourceText, language = "English" } = await req.json();
 
     if (!topic && !sourceText) {
       return NextResponse.json({ error: "Topic or source text is required" }, { status: 400 });
     }
 
     const requestedCount = Number(count) || 10;
+    const mnemonicHeader = getLanguageMnemonicHeader(language);
+    const langInstruction = getLanguagePromptInstruction(language);
 
-    // 1. Prioritize EduTrack's Local Curated NCERT Flashcard Engine First (if no sourceText)
-    if (!sourceText && topic) {
-      const localFlashcards = generateLocalFlashcards(topic, subject, requestedCount);
-      // If local flashcards found a high-quality curated match
+    // 1. If English and curated offline topic without custom prompt requirement in local mode
+    if (!sourceText && topic && language === "English" && process.env.USE_LOCAL_AI === "true") {
       const cleanTopic = topic.toLowerCase();
-      const isCuratedTopic = ["water", "resource", "agriculture", "light", "electric", "chem", "life", "acid"].some(k => cleanTopic.includes(k));
-
-      if (isCuratedTopic && localFlashcards.length >= Math.min(requestedCount, 5)) {
+      const isCuratedTopic = ["water", "resource", "agriculture", "light", "electric"].some(k => cleanTopic.includes(k));
+      if (isCuratedTopic) {
+        const localFlashcards = generateLocalFlashcards(topic, subject, requestedCount);
         return NextResponse.json({ flashcards: localFlashcards.slice(0, requestedCount), engine: "EduTrack Curated NCERT Flashcard Engine" });
       }
-
-      const apiKey = process.env.GEMINI_API_KEY_FLASHCARDS || process.env.GEMINI_API_KEY || "";
-
-      // If no API key or local AI mode, return local flashcards
-      if (!apiKey || process.env.USE_LOCAL_AI === "true") {
-        return NextResponse.json({ flashcards: localFlashcards.slice(0, requestedCount), engine: "EduTrack Self-Hosted Engine" });
-      }
     }
 
-    const apiKey = process.env.GEMINI_API_KEY_FLASHCARDS || process.env.GEMINI_API_KEY || "";
-    if (!apiKey) {
-       return NextResponse.json({ error: "Gemini API key is missing. Cannot generate from text." }, { status: 500 });
-    }
+    const geminiKey = process.env.GEMINI_API_KEY_FLASHCARDS || process.env.GEMINI_API_KEY || "";
+    const groqKey = process.env.GROQ_API_KEY || "";
 
-    // 2. Try Gemini API for custom/un-indexed topics or sourceText
-    try {
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({
-        model: "gemini-2.5-flash",
-        generationConfig: { responseMimeType: "application/json" }
-      });
-
-      let prompt = "";
-      if (sourceText) {
-        prompt = `You are an expert AI tutor. Create exactly ${requestedCount} highly effective flashcards based strictly on the following source material.
-        
+    const prompt = sourceText
+      ? `You are an expert CBSE NCERT AI tutor for Indian students. Create exactly ${requestedCount} high-yield exam-prep flashcards based on this source text.
 Source Material:
 """
 ${sourceText}
 """
 
-You MUST generate the flashcards strictly in English.
-Keep the "front" concise (short question under 15 words).
-The "back" should contain the answer directly derived from the text.
-You MUST return a JSON object with a single key "flashcards" containing an array of objects with "front" and "back".`;
-      } else {
-        prompt = `You are an expert AI tutor for Indian students. Create exactly ${requestedCount} highly effective flashcards for a Class ${classLevel} student studying ${subject}, focusing on the topic: "${topic}".
-        
-You MUST generate the flashcards strictly in English.
-Keep the "front" concise (short question under 15 words).
-You MUST return a JSON object with a single key "flashcards" containing an array of objects with "front" and "back".`;
-      }
+LANGUAGE INSTRUCTION:
+${langInstruction}
 
-      const result = await model.generateContent(prompt);
-      const resultText = result.response.text();
-      let cleanText = resultText.trim();
-      if (cleanText.startsWith('```json')) cleanText = cleanText.replace(/^```json\n?/, '').replace(/\n?```$/, '');
-      else if (cleanText.startsWith('```')) cleanText = cleanText.replace(/^```\n?/, '').replace(/\n?```$/, '');
-      const parsed = JSON.parse(cleanText);
+FLASHCARD RULES:
+- "front": Crisp, high-yield question or concept (under 15 words).
+- "back": Clear, step-by-step answer or definition, ending with a memory trick line starting with "${mnemonicHeader}".
+- FORMULAS: Keep all math/science equations (e.g. F = ma, H₂O, sin²θ + cos²θ = 1) in standard universal notation.
+- Return ONLY a valid JSON object with a single key "flashcards" containing an array of objects with "front" and "back".`
+      : `You are an expert CBSE NCERT AI tutor for Indian students in Class ${classLevel} studying ${subject}. Create exactly ${requestedCount} high-yield exam-prep flashcards focusing on: "${topic}".
 
-      return NextResponse.json({ flashcards: parsed.flashcards || [] });
-    } catch (apiErr: any) {
-      console.warn("External Flashcard API failed:", apiErr.message);
-      if (!sourceText && topic) {
-          const localFlashcards = generateLocalFlashcards(topic, subject, requestedCount);
-          return NextResponse.json({ flashcards: localFlashcards.slice(0, requestedCount), engine: "EduTrack Self-Hosted Engine Fallback" });
+LANGUAGE INSTRUCTION:
+${langInstruction}
+
+FLASHCARD RULES:
+- "front": Crisp, high-yield question or concept (under 15 words).
+- "back": Clear, step-by-step answer or definition, ending with a memorable mnemonic or memory trick line starting with "${mnemonicHeader}".
+- FORMULAS: Keep all math/science equations (e.g. F = ma, H₂O, sin²θ + cos²θ = 1) in standard universal notation.
+- Return ONLY a valid JSON object with a single key "flashcards" containing an array of objects with "front" and "back".`;
+
+    // 2. Try Gemini first
+    if (geminiKey) {
+      try {
+        const genAI = new GoogleGenerativeAI(geminiKey);
+        const model = genAI.getGenerativeModel({
+          model: "gemini-2.5-flash",
+          generationConfig: { responseMimeType: "application/json" }
+        });
+        const result = await model.generateContent(prompt);
+        const resultText = result.response.text();
+        let cleanText = resultText.trim();
+        if (cleanText.startsWith('```json')) cleanText = cleanText.replace(/^```json\n?/, '').replace(/\n?```$/, '');
+        else if (cleanText.startsWith('```')) cleanText = cleanText.replace(/^```\n?/, '').replace(/\n?```$/, '');
+        const parsed = JSON.parse(cleanText);
+        if (parsed.flashcards && Array.isArray(parsed.flashcards)) {
+          return NextResponse.json({ flashcards: parsed.flashcards });
+        }
+      } catch (geminiErr: any) {
+        console.warn("Gemini Flashcard API failed, attempting Groq fallback:", geminiErr?.message || geminiErr);
       }
-      return NextResponse.json({ error: "Failed to generate flashcards from API" }, { status: 500 });
     }
 
+    // 3. Try Groq fallback
+    if (groqKey) {
+      try {
+        const groq = new Groq({ apiKey: groqKey });
+        const completion = await groq.chat.completions.create({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            {
+              role: "system",
+              content: "You are an expert CBSE NCERT educational content generator. You always return strictly valid JSON."
+            },
+            {
+              role: "user",
+              content: `${prompt}\n\nRespond strictly with JSON format: {"flashcards": [{"front": "...", "back": "..."}]}`
+            }
+          ],
+          response_format: { type: "json_object" },
+          max_tokens: 2048,
+        });
+
+        const raw = completion.choices[0]?.message?.content || "";
+        const parsed = JSON.parse(raw);
+        if (parsed.flashcards && Array.isArray(parsed.flashcards)) {
+          return NextResponse.json({ flashcards: parsed.flashcards });
+        }
+      } catch (groqErr: any) {
+        console.warn("Groq Flashcard API failed:", groqErr?.message || groqErr);
+      }
+    }
+
+    // 4. Fallback to local offline deck if topic exists
+    if (!sourceText && topic) {
+      const localFlashcards = generateLocalFlashcards(topic, subject, requestedCount);
+      return NextResponse.json({ flashcards: localFlashcards.slice(0, requestedCount), engine: "EduTrack Self-Hosted Engine Fallback" });
+    }
+
+    return NextResponse.json({ error: "Failed to generate flashcards from available AI engines" }, { status: 500 });
   } catch (error: any) {
     console.error("Flashcard Gen Error:", error);
     return NextResponse.json({ error: error.message || "Failed to generate flashcards" }, { status: 500 });

@@ -124,7 +124,7 @@ Use simple analogies, real-world examples, and be encouraging!`;
     apiKey: groqKey,
   });
 
-  const modelToUse = "openai/gpt-oss-120b";
+  const modelToUse = "llama-3.3-70b-versatile";
 
   const formattedMessages = messages.map(m => {
     const containsImage = m.attachments?.some(att => att.type?.startsWith("image") || (typeof att.data === "string" && att.data.startsWith("data:image/")));
@@ -192,12 +192,17 @@ Use simple analogies, real-world examples, and be encouraging!`;
   return rawReply.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
 }
 
-export async function generateContent(prompt: string) {
+export async function generateContent(prompt: string, languagePreference?: string) {
   try {
+    const fullPrompt = languagePreference
+      ? `${prompt}\n\n${getLanguagePromptInstruction(languagePreference)}`
+      : prompt;
+
     // 1. Try Python Developed Local AI Server First (http://localhost:5000)
     const pythonRes = await queryPythonServer({
       task: "chat",
-      prompt
+      prompt: fullPrompt,
+      language: languagePreference
     });
     if (pythonRes && pythonRes.reply) {
       return pythonRes.reply;
@@ -208,7 +213,7 @@ export async function generateContent(prompt: string) {
       try {
         const genAI = new GoogleGenerativeAI(geminiKey);
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const res = await model.generateContent(prompt);
+        const res = await model.generateContent(fullPrompt);
         const txt = res.response.text();
         if (txt) return txt;
       } catch (gemErr) {
@@ -225,8 +230,8 @@ export async function generateContent(prompt: string) {
     });
 
     const response = await groq.chat.completions.create({
-      model: "openai/gpt-oss-120b",
-      messages: [{ role: "user", content: prompt }],
+      model: "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: fullPrompt }],
       max_tokens: 1500,
     });
 

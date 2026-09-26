@@ -48,7 +48,7 @@ export function DashboardHeader({
           </span>
         </h1>
         <p className="text-slate-600 dark:text-slate-400 mt-1.5 sm:mt-2.5 font-bold text-xs">
-          {userClass ? `Class ${userClass}` : "Class 10"} | Studying in {langConfig.label} ({langConfig.nativeName})
+          {userClass ? `Class ${userClass}` : "Class 10"} | Studying in {langConfig.englishName === langConfig.nativeName ? langConfig.englishName : `${langConfig.englishName} (${langConfig.nativeName})`}
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">

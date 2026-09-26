@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, X, Layers, Clock, Loader2, Sparkles, Home, ArrowRight, RotateCcw, Trophy, BookOpen, Search, SortAsc, Flame, Zap, Plus, Filter } from "lucide-react";
 import { FlashcardDeck, getDecks, saveDeck, deleteDeck } from "@/lib/flashcards";
+import { SUPPORTED_LANGUAGES } from "@/lib/languages";
 
 export default function FlashcardsHub() {
   const [decks, setDecks] = useState<FlashcardDeck[]>([]);
@@ -17,6 +18,7 @@ export default function FlashcardsHub() {
   const [topic, setTopic] = useState("");
   const [subject, setSubject] = useState("");
   const [classLevel, setClassLevel] = useState("10");
+  const [language, setLanguage] = useState("English");
   const [generateMode, setGenerateMode] = useState<"topic" | "text">("topic");
   const [sourceText, setSourceText] = useState("");
 
@@ -30,6 +32,8 @@ export default function FlashcardsHub() {
     setDecks(getDecks());
     const savedClass = localStorage.getItem("edutrack_class");
     if (savedClass) setClassLevel(savedClass);
+    const savedLang = localStorage.getItem("edutrack_language");
+    if (savedLang) setLanguage(savedLang);
   }, []);
 
   useEffect(() => {
@@ -59,8 +63,8 @@ export default function FlashcardsHub() {
     setLoading(true);
     try {
       const bodyPayload = generateMode === "text" 
-        ? { sourceText, subject, classLevel, count: 10 }
-        : { topic, subject, classLevel, count: 10 };
+        ? { sourceText, subject, classLevel, count: 10, language }
+        : { topic, subject, classLevel, count: 10, language };
 
       const res = await fetch("/api/flashcards/generate", {
         method: "POST",
@@ -496,6 +500,21 @@ export default function FlashcardsHub() {
                       {["6","7","8","9","10"].map(c => <option key={c} value={c}>Class {c}</option>)}
                     </select>
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+                    <span>Language / Medium</span>
+                    <span className="text-[10px] text-fuchsia-400 font-semibold">Bilingual & Regional</span>
+                  </label>
+                  <select value={language} onChange={e => setLanguage(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 text-sm text-white font-bold">
+                    {SUPPORTED_LANGUAGES.map(lang => (
+                      <option key={lang.code} value={lang.code}>
+                        {lang.label} {lang.nativeName !== lang.label ? `(${lang.nativeName})` : ""}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <button type="submit" disabled={loading}

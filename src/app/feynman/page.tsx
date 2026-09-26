@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { awardXp } from "@/lib/xp";
 import { cn } from "@/lib/utils";
+import { SUPPORTED_LANGUAGES } from "@/lib/languages";
 
 interface ConceptTopic {
   id: string;
@@ -67,6 +68,7 @@ interface Message {
 
 export default function FeynmanPage() {
   const [selectedTopic, setSelectedTopic] = useState<ConceptTopic>(PRESET_TOPICS[0]);
+  const [feynmanLanguage, setFeynmanLanguage] = useState<string>("English");
   const [customTopic, setCustomTopic] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
@@ -77,6 +79,11 @@ export default function FeynmanPage() {
   const [isMasteryReached, setIsMasteryReached] = useState(false);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("edutrack_language");
+    if (saved) setFeynmanLanguage(saved);
+  }, []);
 
   useEffect(() => {
     // Start session
@@ -101,7 +108,7 @@ export default function FeynmanPage() {
     setIsMasteryReached(false);
   };
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim() || isTyping) return;
 
@@ -122,7 +129,7 @@ export default function FeynmanPage() {
     }
 
     // Reward for simple analogies or relatable words
-    if (lower.includes("like") || lower.includes("imagine") || lower.includes("think of") || lower.includes("for example")) {
+    if (lower.includes("like") || lower.includes("imagine") || lower.includes("think of") || lower.includes("for example") || lower.includes("jaise")) {
       delta += 12;
     }
 
@@ -140,24 +147,62 @@ export default function FeynmanPage() {
     const newRound = teachingRounds + 1;
     setTeachingRounds(newRound);
 
-    // AI "Leo" replies
-    setTimeout(() => {
-      let aiReply = "";
-      if (foundJargon.length > 0) {
-        aiReply = `Wait, you said "${foundJargon[0]}"! What does that big word actually mean? Can you explain it to me using an everyday example I can touch or see at home?`;
-      } else if (newRound >= 3) {
-        aiReply = `Whoa, that makes so much sense now! Because of your explanation, I can totally visualize it. You explained "${selectedTopic.title}" so simply that even a 10-year-old like me gets it!`;
-        setIsMasteryReached(true);
-        awardXp(100, "Feynman Mastery Achieved");
-      } else if (newRound === 1) {
-        aiReply = `Ah, I see! But what happens if you increase the amount or change the surroundings? Can you give me a fun real-world example?`;
-      } else {
-        aiReply = `That's super interesting! So does this always happen every single time, or are there special cases where it breaks?`;
-      }
+    // Call live AI endpoint
+    try {
+      const history = messages.slice(-4).map(m => ({
+        role: m.sender === "student" ? "user" : "assistant",
+        content: m.text
+      }));
 
-      setMessages(prev => [...prev, { sender: "ai", text: aiReply }]);
-      setIsTyping(false);
-    }, 1200);
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [
+            ...history,
+            {
+              role: "user",
+              content: `[ROLEPLAY PROMPT: You are Leo, an inquisitive 10-year-old Indian student learning "${selectedTopic.title}" (${selectedTopic.subject}). The student is explaining it to you.
+Student said: "${userText}".
+${foundJargon.length > 0 ? `The student used textbook jargon: [${foundJargon.join(", ")}]. Call them out playfully and ask them to explain that big word using a fun everyday Indian analogy (cricket, chai, cycle, kite).` : `If this was clear and simple, celebrate and ask one fun curiosity question. If round is 3+, declare that you totally understood and love science!`}
+Keep your response short (2-3 sentences max), friendly, and strictly in ${feynmanLanguage}!]`
+            }
+          ],
+          language: feynmanLanguage,
+          bookInfo: `${selectedTopic.subject}: ${selectedTopic.title}`
+        })
+      });
+
+      const data = await res.json();
+      if (data && data.reply) {
+        setMessages(prev => [...prev, { sender: "ai", text: data.reply }]);
+        if (newRound >= 3) {
+          setIsMasteryReached(true);
+          awardXp(100, "Feynman Mastery Achieved");
+        }
+        setIsTyping(false);
+        return;
+      }
+    } catch (err) {
+      console.warn("Feynman AI call fallback", err);
+    }
+
+    // Fallback if network/server is unavailable
+    let aiReply = "";
+    if (foundJargon.length > 0) {
+      aiReply = `Wait, you said "${foundJargon[0]}"! What does that big word actually mean? Can you explain it to me using an everyday example I can touch or see at home?`;
+    } else if (newRound >= 3) {
+      aiReply = `Whoa, that makes so much sense now! Because of your explanation, I can totally visualize it. You explained "${selectedTopic.title}" so simply that even a 10-year-old like me gets it!`;
+      setIsMasteryReached(true);
+      awardXp(100, "Feynman Mastery Achieved");
+    } else if (newRound === 1) {
+      aiReply = `Ah, I see! But what happens if you increase the amount or change the surroundings? Can you give me a fun real-world example?`;
+    } else {
+      aiReply = `That's super interesting! So does this always happen every single time, or are there special cases where it breaks?`;
+    }
+
+    setMessages(prev => [...prev, { sender: "ai", text: aiReply }]);
+    setIsTyping(false);
   };
 
   return (
@@ -181,6 +226,21 @@ export default function FeynmanPage() {
             </div>
 
             <div className="flex items-center gap-3">
+              <div className="p-3 bg-slate-900/80 rounded-2xl border border-slate-800">
+                <span className="text-[10px] text-slate-400 font-bold block mb-1">LANGUAGE</span>
+                <select
+                  value={feynmanLanguage}
+                  onChange={e => setFeynmanLanguage(e.target.value)}
+                  className="bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 text-xs font-bold text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
+                >
+                  {SUPPORTED_LANGUAGES.map(lang => (
+                    <option key={lang.code} value={lang.code}>
+                      {lang.label} {lang.nativeName !== lang.label ? `(${lang.nativeName})` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div className="p-3 bg-slate-900/80 rounded-2xl border border-slate-800 text-center">
                 <span className="text-[10px] text-slate-400 font-bold block">INTUITION XP</span>
                 <span className="text-sm font-black text-emerald-400 flex items-center gap-1 justify-center">

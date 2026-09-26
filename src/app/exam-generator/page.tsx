@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { awardXp } from "@/lib/xp";
 import { cn } from "@/lib/utils";
+import { SUPPORTED_LANGUAGES } from "@/lib/languages";
 
 interface ExamQuestion {
   num: number;
@@ -219,9 +220,16 @@ export default function ExamGeneratorPage() {
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [selectedBoard, setSelectedBoard] = useState<string>("CBSE");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("Medium");
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("English");
   const [customPaper, setCustomPaper] = useState<ExamPaper | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Load saved language on mount
+  useEffect(() => {
+    const savedLang = localStorage.getItem("edutrack_language");
+    if (savedLang) setSelectedLanguage(savedLang);
+  }, []);
 
   // Exam Taker & Evaluation states
   const [isExamMode, setIsExamMode] = useState(false);
@@ -281,7 +289,8 @@ export default function ExamGeneratorPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           paper: paper,
-          studentAnswers: answersToSubmit
+          studentAnswers: answersToSubmit,
+          language: selectedLanguage
         })
       });
       const data = await res.json();
@@ -334,7 +343,8 @@ export default function ExamGeneratorPage() {
           maxMarks: selectedMarks,
           chapters: selectedChapters,
           board: selectedBoard,
-          difficulty: selectedDifficulty
+          difficulty: selectedDifficulty,
+          language: selectedLanguage
         })
       });
       const data = await res.json();
@@ -739,7 +749,7 @@ ${q.markingScheme}
                 <h2 className="text-lg font-black text-white uppercase tracking-wider">Exam Configuration</h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 {/* Class Selection */}
                 <div className="space-y-2">
                   <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400">Class / Grade</label>
@@ -779,6 +789,25 @@ ${q.markingScheme}
                     <option value="Easy">Easy (Conceptual)</option>
                     <option value="Medium">Medium (Balanced)</option>
                     <option value="Hard">Hard (HOTS/Analytical)</option>
+                  </select>
+                </div>
+
+                {/* Language / Medium Selection */}
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center justify-between">
+                    <span>Language</span>
+                    <span className="text-emerald-400 font-bold lowercase text-[9px]">Indic</span>
+                  </label>
+                  <select
+                    value={selectedLanguage}
+                    onChange={(e) => setSelectedLanguage(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 rounded-xl px-4 py-3 text-sm font-bold text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all cursor-pointer"
+                  >
+                    {SUPPORTED_LANGUAGES.map(lang => (
+                      <option key={lang.code} value={lang.code}>
+                        {lang.label} {lang.nativeName !== lang.label ? `(${lang.nativeName})` : ""}
+                      </option>
+                    ))}
                   </select>
                 </div>
 

@@ -12,6 +12,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { ADMIN_PORTAL_ROUTE } from "@/lib/admin";
+import { SUPPORTED_LANGUAGES } from "@/lib/languages";
 
 import AppTour from "./AppTour";
 import MobileHeader from "./MobileHeader";
@@ -95,9 +96,18 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   const [equippedTitle, setEquippedTitle] = useState<string | null>(null);
   const [equippedFrame, setEquippedFrame] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState<string>("English");
   
   useEffect(() => {
     setMounted(true);
+    const saved = localStorage.getItem("edutrack_language");
+    if (saved) setCurrentLanguage(saved);
+
+    const handleProfileUpdate = (e: any) => {
+      if (e.detail?.language) setCurrentLanguage(e.detail.language);
+    };
+    window.addEventListener("edutrack_profile_updated", handleProfileUpdate);
+    return () => window.removeEventListener("edutrack_profile_updated", handleProfileUpdate);
   }, []);
   const { user, loading, logout } = useAuth();
   const router = useRouter();
@@ -490,6 +500,35 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               </span>
             )}
           </button>
+
+          {/* Quick Medium Switcher */}
+          <div className="px-2 py-1.5 flex items-center justify-between gap-1 rounded-xl bg-slate-100/60 dark:bg-white/[0.03] border border-slate-200/40 dark:border-white/5">
+            <span className={cn("text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5 shrink-0", !isExpanded && "hidden")}>
+              <Globe className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" /> Medium
+            </span>
+            <select
+              value={currentLanguage}
+              onChange={(e) => {
+                const val = e.target.value;
+                setCurrentLanguage(val);
+                localStorage.setItem("edutrack_language", val);
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new CustomEvent("edutrack_profile_updated", { detail: { language: val } }));
+                }
+              }}
+              title="Change Global Study Language"
+              className={cn(
+                "bg-transparent text-[11px] font-extrabold text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer",
+                !isExpanded ? "w-full text-center" : "max-w-[125px] text-right"
+              )}
+            >
+              {SUPPORTED_LANGUAGES.map(l => (
+                <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-white text-slate-900 dark:text-white">
+                  {l.code}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <Link 
             href="/settings" 

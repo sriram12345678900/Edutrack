@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { awardXp } from "@/lib/xp";
 import { cn } from "@/lib/utils";
+import { SUPPORTED_LANGUAGES, getSpeechLanguageCode } from "@/lib/languages";
 
 interface PodcastDialogue {
   speaker: "Alex" | "Maya";
@@ -26,6 +27,8 @@ interface PodcastEpisode {
   duration: string;
   summary: string;
   dialogues: PodcastDialogue[];
+  language?: string;
+  speechCode?: string;
 }
 
 const PRESET_PODCASTS: PodcastEpisode[] = [
@@ -135,10 +138,17 @@ export default function PodcastPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
   const [customTopic, setCustomTopic] = useState("");
+  const [podcastLanguage, setPodcastLanguage] = useState("English");
   const [isGenerating, setIsGenerating] = useState(false);
 
   const transcriptScrollRef = useRef<HTMLDivElement>(null);
   const lineTimeoutRef = useRef<any>(null);
+
+  // Load saved language on mount
+  useEffect(() => {
+    const savedLang = localStorage.getItem("edutrack_language");
+    if (savedLang) setPodcastLanguage(savedLang);
+  }, []);
 
   // Sync scroll with active dialogue line
   useEffect(() => {
@@ -183,13 +193,20 @@ export default function PodcastPage() {
       utterance.rate = playbackSpeed;
       utterance.pitch = currentDialogue.speaker === "Maya" ? 1.15 : 0.95;
 
+      const speechLang = selectedPodcast.speechCode || getSpeechLanguageCode(selectedPodcast.language || podcastLanguage || "English");
+      utterance.lang = speechLang;
+
       const voices = window.speechSynthesis.getVoices();
       if (voices.length > 0) {
+        const langPrefix = speechLang.split("-")[0];
+        const langVoices = voices.filter(v => v.lang.toLowerCase().startsWith(langPrefix.toLowerCase()));
+        const pool = langVoices.length > 0 ? langVoices : voices;
+
         if (currentDialogue.voiceGender === "female") {
-          const fVoice = voices.find(v => v.name.includes("Female") || v.name.includes("Zira") || v.name.includes("Samantha") || v.lang.includes("en-US"));
+          const fVoice = pool.find(v => v.name.includes("Female") || v.name.includes("Zira") || v.name.includes("Samantha") || v.name.includes("Kalpana") || v.name.includes("Google हिन्दी") || v.name.includes("Swara") || v.lang.startsWith(langPrefix));
           if (fVoice) utterance.voice = fVoice;
         } else {
-          const mVoice = voices.find(v => v.name.includes("Male") || v.name.includes("David") || v.name.includes("George") || v.lang.includes("en-GB"));
+          const mVoice = pool.find(v => v.name.includes("Male") || v.name.includes("David") || v.name.includes("George") || v.name.includes("Ravi") || v.name.includes("Hemant") || v.name.includes("Google") || v.lang.startsWith(langPrefix));
           if (mVoice) utterance.voice = mVoice;
         }
       }
@@ -252,7 +269,7 @@ export default function PodcastPage() {
       const res = await fetch('/api/podcast/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic: customTopic })
+        body: JSON.stringify({ topic: customTopic, language: podcastLanguage })
       });
       
       if (!res.ok) throw new Error("API call failed");
@@ -272,10 +289,12 @@ export default function PodcastPage() {
         const newEp: PodcastEpisode = {
           id: `pod-custom-${Date.now()}`,
           title: `${customTopic} Deep Dive`,
-          subject: "Custom Topic",
+          subject: `${data.language || podcastLanguage} Episode`,
           duration: `${Math.max(1, Math.round(mappedDialogues.reduce((acc, d) => acc + d.durationEst, 0) / 60))} min`,
-          summary: `Alex and Maya explore key concepts, real-life applications, and exam strategies for ${customTopic}.`,
-          dialogues: mappedDialogues
+          summary: `Alex and Maya explore key concepts and exam strategies for ${customTopic} in ${data.language || podcastLanguage}.`,
+          dialogues: mappedDialogues,
+          language: data.language || podcastLanguage,
+          speechCode: data.speechCode
         };
 
         setSelectedPodcast(newEp);
@@ -378,13 +397,24 @@ export default function PodcastPage() {
               placeholder="Enter any topic or chapter (e.g. 'Human Eye & Colourful World', 'Trigonometry Ratios')..."
               className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs md:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-pink-500"
             />
+            <select
+              value={podcastLanguage}
+              onChange={e => setPodcastLanguage(e.target.value)}
+              className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 font-bold focus:outline-none focus:border-pink-500 cursor-pointer"
+            >
+              {SUPPORTED_LANGUAGES.map(lang => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.label} {lang.nativeName !== lang.label ? `(${lang.nativeName})` : ""}
+                </option>
+              ))}
+            </select>
             <button
               type="submit"
               disabled={isGenerating || !customTopic.trim()}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-black text-xs flex items-center justify-center gap-2 disabled:opacity-50 transition-all shadow-md shadow-pink-600/25"
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-black text-xs flex items-center justify-center gap-2 disabled:opacity-50 transition-all shadow-md shadow-pink-600/25 shrink-0"
             >
               <Sparkles className="w-4 h-4" />
-              {isGenerating ? "Generating Dialogue..." : "Generate AI Podcast"}
+              {isGenerating ? "Generating..." : "Generate AI Podcast"}
             </button>
           </form>
         </div>

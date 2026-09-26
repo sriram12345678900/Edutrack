@@ -252,22 +252,52 @@ export function isBilingualLanguage(languageName?: string): boolean {
   return config.category === "bilingual" || Boolean(languageName?.endsWith("ish") && languageName !== "English");
 }
 
+export function getLanguageMnemonicHeader(languagePreference: string = "English"): string {
+  const config = getLanguageConfig(languagePreference);
+  const code = config.code.toLowerCase();
+
+  if (code === "hinglish") return "💡 Yaad Rakhne Ka Tarika:";
+  if (code === "hindi") return "💡 याद रखने का आसान तरीका:";
+  if (code === "telugu" || code === "telgish") return "💡 గుర్తుంచుకోవడానికి సులభమైన ట్రిక్:";
+  if (code === "tamil" || code === "tanglish") return "💡 நினைவில் வைக்க எளிய வழி:";
+  if (code === "kannada" || code === "kanglish") return "💡 ನೆನಪಿಡುವ ಸುಲಭ ತಂತ್ರ:";
+  if (code === "bengali" || code === "benglish") return "💡 মনে রাখার সহজ কৌশল:";
+  if (code === "marathi" || code === "marathish") return "💡 लक्षात ठेवण्याची सोपी युक्ती:";
+  if (code === "gujarati" || code === "gujlish") return "💡 યાદ રાખવાની સરળ ટ્રીક:";
+  if (code === "malayalam" || code === "manglish") return "💡 ഓർമ്മിക്കാൻ എളുപ്പവഴി:";
+  if (code === "punjabi" || code === "punglish") return "💡 ਯਾਦ ਰੱਖਣ ਦਾ ਤਰੀਕਾ:";
+  return "💡 Memory Trick & Key Takeaway:";
+}
+
 export function getLanguagePromptInstruction(languagePreference: string = "English"): string {
   const config = getLanguageConfig(languagePreference);
 
   if (config.code === "English") {
-    return "Respond strictly in clear, friendly, and simple English.";
+    return `LANGUAGE INSTRUCTION: Respond in clear, engaging, and simple English tailored for Indian CBSE students.
+- Keep technical terms in **bold**.
+- Explain complex concepts using intuitive real-world examples (e.g., sports, technology, daily life).
+- Maintain rigorous mathematical and chemical equation accuracy.`;
   }
 
   if (config.category === "bilingual" || config.code.endsWith("ish")) {
     const baseName = config.code.replace(/ish$/i, "");
-    return `LANGUAGE INSTRUCTION: Respond in conversational ${config.code} (a student-friendly mix of ${config.englishName || baseName} and English).
-- SCRIPT: You MUST strictly write in the English/Roman alphabet (Latin script). NEVER use native Indic scripts.
-- CONVERSATIONAL TONE: Use casual conversational phrasing written in English letters.
-- TERMINOLOGY: Always keep scientific terms, mathematical identities, formula names, and NCERT keywords in proper English.`;
+    return `CRITICAL LANGUAGE INSTRUCTION: Respond in natural, conversational ${config.code} (a student-friendly Indian blend of ${config.englishName || baseName} and English).
+- SCRIPT: You MUST strictly write in the English/Roman alphabet (Latin script). NEVER output native Indic scripts (e.g. do not output Devanagari or Telugu characters).
+- TONE: Warm, encouraging, and highly relatable—like a passionate senior CBSE topper or favorite teacher explaining over a study session. Use conversational phrasing written in English letters (e.g. "Dhyan se dekho", "Iska simple matlab ye hai", "Board exam me ye step miss mat karna").
+- FORMULA & MATH NOTATION PROTECTION: All mathematical variables, equations, identities, and chemical formulas MUST remain in standard universal Unicode/LaTeX notation (e.g., $F = ma$, $2\\text{H}_2 + \\text{O}_2 \\rightarrow 2\\text{H}_2\\text{O}$, $x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$). NEVER awkwardly romanize or translate formulas.
+- KEYWORDS: Always keep standard NCERT subject keywords in English (e.g. "Photosynthesis", "Refractive Index", "Quadratic Equation", "Mitochondria").
+- ANALOGIES: Use vivid Indian real-life examples (e.g., cricket bowling, pressure cookers, bicycle chains, metro train inertia, tea boiling) to make concepts click instantly.`;
   }
 
-  return `LANGUAGE INSTRUCTION: Respond in fluent ${config.code} (${config.nativeName}) using its authentic native script.
-- SCRIPT: Write the explanations in authentic ${config.nativeName} script.
-- TERMINOLOGY: Keep technical, chemical, and mathematical terms, SI units, and key NCERT formulas clearly understandable and standard, pairing them with English/Unicode notation where helpful for student clarity.`;
+  return `CRITICAL LANGUAGE INSTRUCTION: Respond in fluent ${config.code} (${config.nativeName}) using its authentic native script.
+- SCRIPT: Write the core narrative explanations and conceptual steps in authentic ${config.nativeName} script with grammatical fluency.
+- BILINGUAL KEYWORD PAIRING: Whenever introducing a key scientific, mathematical, or social science term, ALWAYS mention the English NCERT term in parentheses right next to it (e.g. "${config.code === "Hindi" ? "प्रकाश संश्लेषण (Photosynthesis)" : "Concept (English Keyword)"}"). This ensures students understand both native concepts and their board exam English terminology.
+- FORMULA & MATH NOTATION PROTECTION: Chemical symbols (e.g. $\\text{H}_2\\text{O}$, $\\text{Fe}_3\\text{O}_4$), mathematical equations ($a^2 + b^2 = c^2$, $\\sin^2\\theta + \\cos^2\\theta = 1$), and SI units (e.g. $\\text{m/s}^2$, $\\text{Joule}$, $\\Omega$) MUST strictly remain in standard alphanumeric/Unicode notation. DO NOT translate formula variables into native words.
+- TONE: Highly supportive, motivating, and pedagogically clear. Break complex multi-step derivations into digestible numbered points.`;
+}
+
+export function formatBilingualPrompt(topic: string, languagePreference: string = "English"): string {
+  const config = getLanguageConfig(languagePreference);
+  const langInstruction = getLanguagePromptInstruction(languagePreference);
+  return `TOPIC: "${topic}"\nTARGET LANGUAGE: ${config.label} (${config.code})\n\n${langInstruction}`;
 }

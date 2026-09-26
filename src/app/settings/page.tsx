@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { 
   ArrowLeft, User, Mail, GraduationCap, Globe, Monitor, 
-  Lock, Save, Edit3, Shield, Award 
+  Lock, Save, Edit3, Shield, Award, Sparkles 
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -138,6 +138,37 @@ export default function SettingsPage() {
               <p className="text-xs font-medium opacity-80">
                 Your account is fully active and secured. Progress is syncing to the cloud automatically.
               </p>
+            </motion.div>
+
+            {/* Interactive Tours Card */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="p-5 rounded-3xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-950 dark:text-indigo-100 space-y-3"
+            >
+              <h4 className="font-black text-sm flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-indigo-500" /> Guided Tours
+              </h4>
+              <p className="text-xs font-medium opacity-80">
+                Want to refresh your knowledge of EduTrack tools and navigation?
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    localStorage.removeItem("edutrack_feature_spotlight_completed");
+                    router.push("/dashboard");
+                    setTimeout(() => {
+                      window.dispatchEvent(new CustomEvent("edutrack_open_feature_tour", { detail: { stepIndex: 0 } }));
+                    }, 400);
+                  }
+                }}
+                className="w-full text-xs font-black bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 px-4 rounded-xl shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Replay Spotlight Tour</span>
+              </button>
             </motion.div>
           </div>
 
