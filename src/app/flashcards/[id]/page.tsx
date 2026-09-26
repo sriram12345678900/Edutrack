@@ -330,37 +330,37 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
   const boxConfig = getBoxConfig(leitnerBox);
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#080d24] text-slate-100 flex flex-col select-none overflow-hidden font-sans">
+    <div className="fixed inset-0 z-50 bg-slate-50 dark:bg-[#080d24] text-slate-900 dark:text-slate-100 flex flex-col select-none overflow-hidden font-sans">
       {showConfetti && <Confetti active={showConfetti} />}
 
       {/* Ambient background glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-indigo-600/15 rounded-full blur-[140px]" />
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-fuchsia-600/15 rounded-full blur-[120px]" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-indigo-600/10 dark:bg-indigo-600/15 rounded-full blur-[140px]" />
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-fuchsia-600/10 dark:bg-fuchsia-600/15 rounded-full blur-[120px]" />
       </div>
 
       {/* Header Bar */}
-      <header className="px-6 py-4 flex flex-wrap items-center justify-between border-b border-indigo-500/20 bg-slate-900/60 backdrop-blur-2xl z-20 gap-4">
+      <header className="px-6 py-4 flex flex-wrap items-center justify-between border-b border-slate-200 dark:border-indigo-500/20 bg-white/90 dark:bg-slate-900/60 backdrop-blur-2xl z-20 gap-4 shadow-sm">
         <button 
           onClick={() => router.push("/flashcards")}
-          className="flex items-center gap-2 text-slate-400 hover:text-white font-bold transition-colors text-sm group"
+          className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-bold transition-colors text-sm group"
         >
-          <div className="p-1.5 rounded-xl bg-white/5 border border-white/10 group-hover:bg-white/10">
+          <div className="p-1.5 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 group-hover:bg-slate-200 dark:group-hover:bg-white/10">
             <ArrowLeft className="w-4 h-4" />
           </div>
           <span>Exit Hub</span>
-          <kbd className="hidden sm:inline text-[10px] bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-slate-400">Esc</kbd>
+          <kbd className="hidden sm:inline text-[10px] bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-1.5 py-0.5 rounded text-slate-500 dark:text-slate-400">Esc</kbd>
         </button>
 
-        <div className="font-extrabold text-white text-base sm:text-lg tracking-tight flex items-center gap-3">
-          <span className="p-2 rounded-xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-400">
+        <div className="font-extrabold text-slate-900 dark:text-white text-base sm:text-lg tracking-tight flex items-center gap-3">
+          <span className="p-2 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 border border-indigo-500/20 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-400">
             <Sparkles className="w-4 h-4" />
           </span>
           {deck.title}
         </div>
 
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-300 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10 hover:bg-white/10 transition-all">
+          <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-600 dark:text-slate-300 bg-white dark:bg-white/5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 transition-all shadow-sm">
             <input 
               type="checkbox" 
               className="accent-indigo-500 w-4 h-4 rounded"
@@ -374,14 +374,14 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
             />
             Due Only
           </label>
-          <div className="text-xs font-extrabold text-indigo-300 bg-indigo-500/20 border border-indigo-500/30 px-3.5 py-1.5 rounded-full backdrop-blur-md">
+          <div className="text-xs font-extrabold text-indigo-700 dark:text-indigo-300 bg-indigo-500/10 dark:bg-indigo-500/20 border border-indigo-500/20 dark:border-indigo-500/30 px-3.5 py-1.5 rounded-full backdrop-blur-md">
             Card {Math.min(currentIndex + 1, sessionCards.length)} / {sessionCards.length}
           </div>
         </div>
       </header>
 
       {/* Spaced Repetition Progress Bar */}
-      <div className="w-full h-1.5 bg-slate-900 relative z-20">
+      <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-900 relative z-20">
         <div 
           className="h-full bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-cyan-400 transition-all duration-300 shadow-[0_0_12px_rgba(168,85,247,0.5)]"
           style={{ width: `${sessionCompleted ? 100 : progress}%` }}
@@ -418,14 +418,14 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
                 transition={{ type: "spring", stiffness: 240, damping: 20 }}
               >
                 {/* ── CARD FRONT (QUESTION) ── */}
-                <div className="absolute inset-0 backface-hidden bg-[#0d1436]/90 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl border border-indigo-500/30 p-8 md:p-10 flex flex-col justify-between pointer-events-none group">
+                <div className="absolute inset-0 backface-hidden bg-white/95 dark:bg-[#0d1436]/90 backdrop-blur-2xl rounded-[2.5rem] shadow-xl dark:shadow-2xl border border-slate-200/90 dark:border-indigo-500/30 p-8 md:p-10 flex flex-col justify-between pointer-events-none group">
                   {/* Subtle top light bar */}
                   <div className="absolute top-0 left-12 right-12 h-[1px] bg-gradient-to-r from-transparent via-indigo-400/40 to-transparent" />
 
                   {/* Header Badge & Audio */}
                   <div className="flex items-center justify-between pointer-events-auto">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-black uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">
+                      <span className="text-xs font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">
                         QUESTION
                       </span>
                       <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${boxConfig.color}`}>
@@ -437,23 +437,23 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
                       onClick={(e) => playAudio(e, currentCard.front)}
                       disabled={isPlayingAudio}
                       title="Read Question Aloud (Press R)"
-                      className="p-3 rounded-2xl bg-white/5 hover:bg-indigo-500/20 text-slate-300 hover:text-indigo-400 transition-all border border-white/10 hover:border-indigo-500/30 active:scale-90"
+                      className="p-3 rounded-2xl bg-slate-100 dark:bg-white/5 hover:bg-indigo-50 dark:hover:bg-indigo-500/20 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all border border-slate-200 dark:border-white/10 hover:border-indigo-500/30 active:scale-90 shadow-sm"
                     >
-                      {isPlayingAudio ? <Loader2 className="w-5 h-5 animate-spin text-indigo-400" /> : <Volume2 className="w-5 h-5" />}
+                      {isPlayingAudio ? <Loader2 className="w-5 h-5 animate-spin text-indigo-500" /> : <Volume2 className="w-5 h-5" />}
                     </button>
                   </div>
 
                   {/* Card Front Content */}
                   <div className="my-auto py-6 text-center">
-                    <h2 className="text-2xl md:text-3xl font-extrabold text-white leading-relaxed tracking-tight">
+                    <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white leading-relaxed tracking-tight">
                       {bionicMode ? formatBionicText(currentCard.front) : currentCard.front}
                     </h2>
                   </div>
 
                   {/* Bottom Flip Hint */}
-                  <div className="flex items-center justify-center gap-2 text-xs font-bold text-slate-400 animate-pulse">
+                  <div className="flex items-center justify-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 animate-pulse">
                     <span>Tap or press</span>
-                    <kbd className="px-2 py-0.5 bg-indigo-500/20 border border-indigo-500/30 rounded text-indigo-300 font-mono font-black">
+                    <kbd className="px-2 py-0.5 bg-indigo-500/10 dark:bg-indigo-500/20 border border-indigo-500/20 dark:border-indigo-500/30 rounded text-indigo-600 dark:text-indigo-300 font-mono font-black">
                       Space
                     </kbd>
                     <span>to reveal answer</span>
@@ -462,7 +462,7 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
 
                 {/* ── CARD BACK (ANSWER) ── */}
                 <div 
-                  className="absolute inset-0 backface-hidden bg-gradient-to-br from-[#121c4d]/95 via-[#1a1542]/95 to-[#161233]/95 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl border border-fuchsia-500/40 p-8 md:p-10 flex flex-col justify-between pointer-events-none"
+                  className="absolute inset-0 backface-hidden bg-gradient-to-br from-fuchsia-50/95 via-purple-50/95 to-indigo-50/95 dark:from-[#121c4d]/95 dark:via-[#1a1542]/95 dark:to-[#161233]/95 backdrop-blur-2xl rounded-[2.5rem] shadow-xl dark:shadow-2xl border border-fuchsia-300/80 dark:border-fuchsia-500/40 p-8 md:p-10 flex flex-col justify-between pointer-events-none"
                   style={{ transform: "rotateY(180deg)" }}
                 >
                   {/* Glowing header line */}
@@ -471,7 +471,7 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
                   {/* Header Badge & Audio */}
                   <div className="flex items-center justify-between pointer-events-auto">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-black uppercase tracking-widest text-fuchsia-400 bg-fuchsia-500/10 px-3 py-1 rounded-full border border-fuchsia-500/20">
+                      <span className="text-xs font-black uppercase tracking-widest text-fuchsia-600 dark:text-fuchsia-400 bg-fuchsia-500/10 px-3 py-1 rounded-full border border-fuchsia-500/20">
                         ANSWER
                       </span>
                       <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${boxConfig.color}`}>
@@ -483,21 +483,21 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
                       onClick={(e) => playAudio(e, currentCard.back)}
                       disabled={isPlayingAudio}
                       title="Read Answer Aloud (Press R)"
-                      className="p-3 rounded-2xl bg-white/5 hover:bg-fuchsia-500/20 text-slate-300 hover:text-fuchsia-400 transition-all border border-white/10 hover:border-fuchsia-500/30 active:scale-90"
+                      className="p-3 rounded-2xl bg-white dark:bg-white/5 hover:bg-fuchsia-50 dark:hover:bg-fuchsia-500/20 text-slate-600 dark:text-slate-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-400 transition-all border border-slate-200 dark:border-white/10 hover:border-fuchsia-500/30 active:scale-90 shadow-sm"
                     >
-                      {isPlayingAudio ? <Loader2 className="w-5 h-5 animate-spin text-fuchsia-400" /> : <Volume2 className="w-5 h-5" />}
+                      {isPlayingAudio ? <Loader2 className="w-5 h-5 animate-spin text-fuchsia-500" /> : <Volume2 className="w-5 h-5" />}
                     </button>
                   </div>
 
                   {/* Card Back Answer Content */}
                   <div className="my-auto py-6 text-center">
-                    <h2 className="text-xl md:text-2xl font-bold text-fuchsia-100 leading-relaxed max-w-lg mx-auto">
+                    <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-fuchsia-100 leading-relaxed max-w-lg mx-auto">
                       {bionicMode ? formatBionicText(currentCard.back) : currentCard.back}
                     </h2>
                   </div>
 
                   {/* Bottom Navigation Hint */}
-                  <div className="flex items-center justify-center gap-2 text-xs font-bold text-fuchsia-300/80">
+                  <div className="flex items-center justify-center gap-2 text-xs font-bold text-fuchsia-600/80 dark:text-fuchsia-300/80">
                     <span>Rate your confidence below or swipe</span>
                   </div>
                 </div>
@@ -508,30 +508,30 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-slate-900/90 backdrop-blur-2xl p-8 sm:p-12 rounded-[2.5rem] shadow-2xl border border-indigo-500/30 text-center max-w-md w-full relative overflow-hidden"
+              className="bg-white/95 dark:bg-slate-900/90 backdrop-blur-2xl p-8 sm:p-12 rounded-[2.5rem] shadow-xl dark:shadow-2xl border border-slate-200 dark:border-indigo-500/30 text-center max-w-md w-full relative overflow-hidden"
             >
               <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-400 via-indigo-500 to-fuchsia-500" />
               
-              <div className="w-20 h-20 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/20">
+              <div className="w-20 h-20 bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 dark:border-emerald-500/40 text-emerald-600 dark:text-emerald-400 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/20">
                 <Award className="w-10 h-10" />
               </div>
-              <h2 className="text-3xl font-extrabold mb-2 text-white tracking-tight">Session Complete! 🎉</h2>
-              <p className="text-slate-400 mb-6 font-medium text-sm">
+              <h2 className="text-3xl font-extrabold mb-2 text-slate-900 dark:text-white tracking-tight">Session Complete! 🎉</h2>
+              <p className="text-slate-500 dark:text-slate-400 mb-6 font-medium text-sm">
                 You've mastered all {sessionCards.length} {dueOnly ? "due cards" : "cards"} in this session.
               </p>
 
               {earnedXpTotal > 0 && (
-                <div className="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 flex items-center justify-center gap-2 font-bold text-base">
-                  <Flame className="w-5 h-5 text-amber-400" /> +{earnedXpTotal} XP Earned!
+                <div className="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-300 flex items-center justify-center gap-2 font-bold text-base">
+                  <Flame className="w-5 h-5 text-amber-500 dark:text-amber-400" /> +{earnedXpTotal} XP Earned!
                 </div>
               )}
               
               <div className="space-y-3">
                 <button 
                   onClick={restart}
-                  className="w-full flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 text-white font-bold py-3.5 rounded-2xl transition-all border border-white/10 text-sm active:scale-95"
+                  className="w-full flex items-center justify-center gap-2 bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-slate-800 dark:text-white font-bold py-3.5 rounded-2xl transition-all border border-slate-200 dark:border-white/10 text-sm active:scale-95"
                 >
-                  <RotateCcw className="w-4 h-4 text-indigo-400" /> Review Deck Again
+                  <RotateCcw className="w-4 h-4 text-indigo-500 dark:text-indigo-400" /> Review Deck Again
                 </button>
                 <button 
                   onClick={() => router.push("/flashcards")}
@@ -552,7 +552,7 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 30 }}
-            className="p-4 sm:p-6 border-t border-indigo-500/20 bg-slate-900/80 backdrop-blur-2xl z-20 flex flex-col items-center justify-center gap-3"
+            className="p-4 sm:p-6 border-t border-slate-200 dark:border-indigo-500/20 bg-white/90 dark:bg-slate-900/80 backdrop-blur-2xl z-20 flex flex-col items-center justify-center gap-3 shadow-sm"
           >
             {isFlipped ? (
               /* SM-2 4-Level Quality Rating Bar when card is flipped */
@@ -560,37 +560,37 @@ export default function FlashcardPlayer({ params }: { params: { id: string } }) 
                 <button 
                   onClick={() => handleAnswerQuality(1)}
                   title="Press 1 key"
-                  className="py-3 px-3 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold rounded-2xl border border-rose-500/30 transition-all flex flex-col items-center justify-center gap-0.5 active:scale-95"
+                  className="py-3 px-3 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 font-bold rounded-2xl border border-rose-500/30 transition-all flex flex-col items-center justify-center gap-0.5 active:scale-95"
                 >
                   <span className="text-xs flex items-center gap-1"><X className="w-3.5 h-3.5" /> Again</span>
-                  <span className="text-[10px] text-rose-400/70 font-mono">1d review</span>
+                  <span className="text-[10px] text-rose-500/70 dark:text-rose-400/70 font-mono">1d review</span>
                 </button>
 
                 <button 
                   onClick={() => handleAnswerQuality(2)}
                   title="Press 2 key"
-                  className="py-3 px-3 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 font-bold rounded-2xl border border-orange-500/30 transition-all flex flex-col items-center justify-center gap-0.5 active:scale-95"
+                  className="py-3 px-3 bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 dark:text-orange-400 font-bold rounded-2xl border border-orange-500/30 transition-all flex flex-col items-center justify-center gap-0.5 active:scale-95"
                 >
                   <span className="text-xs flex items-center gap-1"><ShieldAlert className="w-3.5 h-3.5" /> Hard</span>
-                  <span className="text-[10px] text-orange-400/70 font-mono">2d review</span>
+                  <span className="text-[10px] text-orange-500/70 dark:text-orange-400/70 font-mono">2d review</span>
                 </button>
 
                 <button 
                   onClick={() => handleAnswerQuality(4)}
                   title="Press 3 key"
-                  className="py-3 px-3 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 font-bold rounded-2xl border border-indigo-500/30 transition-all flex flex-col items-center justify-center gap-0.5 active:scale-95"
+                  className="py-3 px-3 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 font-bold rounded-2xl border border-indigo-500/30 transition-all flex flex-col items-center justify-center gap-0.5 active:scale-95"
                 >
                   <span className="text-xs flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Good</span>
-                  <span className="text-[10px] text-indigo-400/70 font-mono">6d review</span>
+                  <span className="text-[10px] text-indigo-500/70 dark:text-indigo-400/70 font-mono">6d review</span>
                 </button>
 
                 <button 
                   onClick={() => handleAnswerQuality(5)}
                   title="Press 4 key"
-                  className="py-3 px-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold rounded-2xl border border-emerald-500/30 transition-all flex flex-col items-center justify-center gap-0.5 active:scale-95 shadow-md shadow-emerald-500/10"
+                  className="py-3 px-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold rounded-2xl border border-emerald-500/30 transition-all flex flex-col items-center justify-center gap-0.5 active:scale-95 shadow-md shadow-emerald-500/10"
                 >
                   <span className="text-xs flex items-center gap-1"><Zap className="w-3.5 h-3.5" /> Easy ⭐</span>
-                  <span className="text-[10px] text-emerald-400/70 font-mono">Mastered</span>
+                  <span className="text-[10px] text-emerald-600/70 dark:text-emerald-400/70 font-mono">Mastered</span>
                 </button>
               </div>
             ) : (

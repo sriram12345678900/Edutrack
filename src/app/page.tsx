@@ -12,11 +12,6 @@ import FAQ from "@/components/landing/FAQ";
 import Footer from "@/components/landing/Footer";
 
 export default function Home() {
-  useEffect(() => {
-    // Ensure dark class is active for landing page aesthetics
-    document.documentElement.classList.add("dark");
-  }, []);
-
   return (
     <div className="dark bg-[#06080f] text-slate-100 min-h-screen relative font-sans selection:bg-indigo-500/30 selection:text-indigo-200 overflow-x-hidden">
       {/* Dynamic Cyber Grid & Neon Mesh Orbs across entire page */}

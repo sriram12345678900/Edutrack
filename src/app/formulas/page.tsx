@@ -477,10 +477,10 @@ export default function FormulasPage() {
       <div className="fixed bottom-0 right-1/4 w-[40vw] h-[40vw] bg-purple-600/15 rounded-full blur-[140px] pointer-events-none" />
 
       {/* Top Header Navigation */}
-      <header className="sticky top-0 z-40 bg-white/85 dark:bg-[#02040a] bg-[#eef1f9] backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/10 px-4 sm:px-8 py-4">
+      <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#02040a]/90 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/10 px-4 sm:px-8 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-white/10 border border-slate-200/70 dark:border-white/10 transition-all text-slate-600 dark:text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white">
+            <Link href="/dashboard" className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200/80 dark:border-white/10 transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-3">
@@ -685,7 +685,7 @@ export default function FormulasPage() {
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="dark:bg-[#080b18] bg-[#eef1f9] border border-white/15 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative"
+            className="bg-white dark:bg-[#080b18] border border-slate-200/80 dark:border-white/15 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative"
           >
             <button
               onClick={() => setActiveCalcFormula(null)}

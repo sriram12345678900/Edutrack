@@ -141,32 +141,32 @@ export default function FlashcardsHub() {
   };
 
   return (
-    <div className="space-y-8 pb-24 font-sans">
+    <div className="space-y-8 pb-24 font-sans text-slate-900 dark:text-slate-100">
 
       {/* ── HERO HEADER ── */}
-      <header className="relative p-6 md:p-10 rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-[#090d24] border border-indigo-500/20 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <header className="relative p-6 md:p-10 rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-indigo-50/90 via-purple-50/90 to-white dark:from-slate-900 dark:via-indigo-950 dark:to-[#090d24] border border-indigo-200/80 dark:border-indigo-500/20 shadow-xl dark:shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-fuchsia-600/20 rounded-full blur-[100px]" />
-          <div className="absolute -bottom-24 -left-12 w-80 h-80 bg-indigo-600/20 rounded-full blur-[100px]" />
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-fuchsia-600/10 dark:bg-fuchsia-600/20 rounded-full blur-[100px]" />
+          <div className="absolute -bottom-24 -left-12 w-80 h-80 bg-indigo-600/10 dark:bg-indigo-600/20 rounded-full blur-[100px]" />
         </div>
         
         <div className="relative z-10 space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-1">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-600 dark:text-fuchsia-400 text-xs font-bold uppercase tracking-wider mb-1">
             <Zap className="w-3.5 h-3.5" /> Spaced Repetition Engine
           </div>
-          <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-fuchsia-300 tracking-tight flex items-center gap-4">
-            <div className="bg-fuchsia-500/20 p-3 rounded-2xl border border-fuchsia-500/30 shadow-lg shadow-fuchsia-500/20">
-              <Layers className="w-8 h-8 text-fuchsia-400" />
+          <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:via-indigo-200 dark:to-fuchsia-300 tracking-tight flex items-center gap-4">
+            <div className="bg-fuchsia-500/15 dark:bg-fuchsia-500/20 p-3 rounded-2xl border border-fuchsia-500/30 shadow-lg shadow-fuchsia-500/20">
+              <Layers className="w-8 h-8 text-fuchsia-600 dark:text-fuchsia-400" />
             </div>
             AI Flashcards Hub
           </h1>
-          <p className="text-slate-400 font-medium text-sm md:text-base max-w-xl">
+          <p className="text-slate-600 dark:text-slate-400 font-medium text-sm md:text-base max-w-xl">
             Automated active recall decks powered by SM-2 spacing algorithms to keep concepts locked in long-term memory.
           </p>
         </div>
 
         <div className="flex items-center gap-3 relative z-10">
-          <Link href="/dashboard" className="p-3.5 bg-white/5 hover:bg-white/10 text-white rounded-2xl transition-all border border-white/10 active:scale-95">
+          <Link href="/dashboard" className="p-3.5 bg-white/80 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-white rounded-2xl transition-all border border-slate-200/80 dark:border-white/10 shadow-sm active:scale-95">
             <Home className="w-5 h-5" />
           </Link>
           <button onClick={() => setIsModalOpen(true)}
@@ -200,35 +200,35 @@ export default function FlashcardsHub() {
           {/* Stats Column */}
           <div className="flex flex-col gap-4">
             {[
-              { label: "Active Decks", value: decks.length, icon: <Layers className="w-5 h-5 text-fuchsia-400" />, color: "from-fuchsia-500/10 to-indigo-500/5 border-fuchsia-500/20" },
-              { label: "Total Flashcards", value: totalCards, icon: <BookOpen className="w-5 h-5 text-indigo-400" />, color: "from-indigo-500/10 to-cyan-500/5 border-indigo-500/20" },
-              { label: "Overall Retention", value: `${overallMastery}%`, icon: <Trophy className="w-5 h-5 text-amber-400" />, color: "from-amber-500/10 to-orange-500/5 border-amber-500/20" },
+              { label: "Active Decks", value: decks.length, icon: <Layers className="w-5 h-5 text-fuchsia-500 dark:text-fuchsia-400" />, color: "from-fuchsia-500/10 to-indigo-500/5 border-fuchsia-500/20" },
+              { label: "Total Flashcards", value: totalCards, icon: <BookOpen className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />, color: "from-indigo-500/10 to-cyan-500/5 border-indigo-500/20" },
+              { label: "Overall Retention", value: `${overallMastery}%`, icon: <Trophy className="w-5 h-5 text-amber-500 dark:text-amber-400" />, color: "from-amber-500/10 to-orange-500/5 border-amber-500/20" },
             ].map(stat => (
-              <div key={stat.label} className={`bg-gradient-to-br ${stat.color} border rounded-3xl p-5 flex items-center gap-4 shadow-lg backdrop-blur-xl hover:scale-[1.02] transition-all`}>
-                <div className="p-3.5 bg-slate-900/80 rounded-2xl border border-white/10 shadow-sm">{stat.icon}</div>
+              <div key={stat.label} className={`bg-white/80 dark:bg-gradient-to-br ${stat.color} border border-slate-200/80 dark:border-white/10 rounded-3xl p-5 flex items-center gap-4 shadow-sm dark:shadow-lg backdrop-blur-xl hover:scale-[1.02] transition-all`}>
+                <div className="p-3.5 bg-slate-100 dark:bg-slate-900/80 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-sm">{stat.icon}</div>
                 <div>
-                  <p className="text-3xl font-black text-white leading-none mb-1">{stat.value}</p>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{stat.label}</p>
+                  <p className="text-3xl font-black text-slate-900 dark:text-white leading-none mb-1">{stat.value}</p>
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{stat.label}</p>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Leitner Box Matrix Chart */}
-          <div className="md:col-span-3 bg-slate-900/80 backdrop-blur-2xl border border-slate-800 p-6 sm:p-8 rounded-[2.5rem] shadow-2xl flex flex-col justify-between">
+          <div className="md:col-span-3 bg-white/90 dark:bg-slate-900/80 backdrop-blur-2xl border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 rounded-[2.5rem] shadow-sm dark:shadow-2xl flex flex-col justify-between">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-indigo-400 flex items-center gap-2.5">
-                <div className="p-2 bg-indigo-500/20 rounded-xl border border-indigo-500/30">
-                  <Layers className="w-5 h-5 text-indigo-400" />
+              <h3 className="text-lg font-extrabold text-slate-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-fuchsia-400 dark:to-indigo-400 flex items-center gap-2.5">
+                <div className="p-2 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-xl border border-indigo-500/20 dark:border-indigo-500/30">
+                  <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 </div>
                 Leitner Spaced Repetition Matrix
               </h3>
-              <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-slate-400">
+              <span className="px-3 py-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-full text-xs font-bold text-slate-600 dark:text-slate-400">
                 5-Box Distribution
               </span>
             </div>
             
-            <div className="grid grid-cols-5 gap-3 h-48 items-end pt-6 border-b border-slate-800 pb-3 flex-1">
+            <div className="grid grid-cols-5 gap-3 h-48 items-end pt-6 border-b border-slate-200 dark:border-slate-800 pb-3 flex-1">
               {boxCounts.map((count, idx) => {
                 const maxCount = Math.max(...boxCounts, 1);
                 const heightPercent = Math.round((count / maxCount) * 85) + 5;
@@ -257,13 +257,13 @@ export default function FlashcardsHub() {
               })}
             </div>
 
-            <div className="grid grid-cols-5 gap-2 text-center pt-4 text-[10px] md:text-xs font-bold text-slate-400">
+            <div className="grid grid-cols-5 gap-2 text-center pt-4 text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400">
               {[
-                { label: "Box 1", desc: "Daily", badge: "bg-rose-500/10 text-rose-400 border-rose-500/20" },
-                { label: "Box 2", desc: "2 Days", badge: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
-                { label: "Box 3", desc: "5 Days", badge: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
-                { label: "Box 4", desc: "9 Days", badge: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" },
-                { label: "Box 5", desc: "Mastered", badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" }
+                { label: "Box 1", desc: "Daily", badge: "bg-rose-500/10 text-rose-500 dark:text-rose-400 border-rose-500/20" },
+                { label: "Box 2", desc: "2 Days", badge: "bg-orange-500/10 text-orange-500 dark:text-orange-400 border-orange-500/20" },
+                { label: "Box 3", desc: "5 Days", badge: "bg-amber-500/10 text-amber-500 dark:text-amber-400 border-amber-500/20" },
+                { label: "Box 4", desc: "9 Days", badge: "bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border-indigo-500/20" },
+                { label: "Box 5", desc: "Mastered", badge: "bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 border-emerald-500/20" }
               ].map((box, idx) => (
                 <div key={idx} className="flex flex-col items-center gap-1.5">
                   <span className={`px-2.5 py-1 rounded-full border text-[10px] font-black tracking-widest uppercase ${box.badge}`}>
@@ -286,11 +286,11 @@ export default function FlashcardsHub() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search decks..."
-              className="w-full pl-10 pr-4 py-3 bg-slate-900/80 border border-slate-800 rounded-2xl text-sm font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50"
+              className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 rounded-2xl text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 shadow-sm"
             />
           </div>
           <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
-            <span className="text-xs font-bold text-slate-400 flex items-center gap-1 mr-1">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1 mr-1">
               <Filter className="w-3.5 h-3.5" /> Sort:
             </span>
             {(["recent", "mastery", "name", "due"] as const).map(s => (
@@ -298,7 +298,7 @@ export default function FlashcardsHub() {
                 className={`px-4 py-2 rounded-xl text-xs font-extrabold capitalize transition-all ${
                   sortBy === s
                     ? "bg-gradient-to-r from-fuchsia-600 to-indigo-600 text-white shadow-md shadow-fuchsia-500/20"
-                    : "bg-slate-900/60 text-slate-400 border border-slate-800 hover:border-slate-700"
+                    : "bg-white dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
                 }`}>
                 {s === "recent" ? "⏱ Recent" : s === "mastery" ? "⭐ Mastery" : s === "due" ? "⏳ Due" : "🔤 A–Z"}
               </button>
@@ -310,12 +310,12 @@ export default function FlashcardsHub() {
       {/* ── DECK GRID ── */}
       {decks.length === 0 ? (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          className="bg-slate-900/50 border-2 border-dashed border-slate-800 rounded-[2.5rem] p-16 text-center flex flex-col items-center justify-center min-h-[380px]">
+          className="bg-white/80 dark:bg-slate-900/50 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-16 text-center flex flex-col items-center justify-center min-h-[380px] shadow-sm">
           <div className="w-20 h-20 bg-fuchsia-500/10 border border-fuchsia-500/20 rounded-3xl flex items-center justify-center mb-6 shadow-inner">
-            <Brain className="w-10 h-10 text-fuchsia-400" />
+            <Brain className="w-10 h-10 text-fuchsia-500 dark:text-fuchsia-400" />
           </div>
-          <h2 className="text-2xl font-black text-white mb-2">No Decks Yet</h2>
-          <p className="text-slate-400 max-w-sm mx-auto mb-8 font-medium text-sm">
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">No Decks Yet</h2>
+          <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-8 font-medium text-sm">
             Enter a chapter or paste notes to generate custom flashcard decks with spaced repetition algorithms.
           </p>
           <button onClick={() => setIsModalOpen(true)}
@@ -326,7 +326,7 @@ export default function FlashcardsHub() {
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 text-slate-500">
           <Search className="w-10 h-10 mx-auto mb-3 opacity-40" />
-          <p className="font-bold text-slate-400">No decks match "{search}"</p>
+          <p className="font-bold text-slate-500 dark:text-slate-400">No decks match "{search}"</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -345,14 +345,14 @@ export default function FlashcardsHub() {
                   transition={{ delay: i * 0.05, type: "spring", stiffness: 300, damping: 25 }}
                   whileHover={{ y: -6, scale: 1.02, transition: { duration: 0.2 } }}
                   whileTap={{ scale: 0.98 }}
-                  className="group relative bg-slate-900/80 backdrop-blur-xl rounded-[2rem] border border-slate-800 shadow-xl hover:shadow-2xl hover:border-fuchsia-500/40 transition-all overflow-hidden h-full flex flex-col"
+                  className="group relative bg-white/90 dark:bg-slate-900/80 backdrop-blur-xl rounded-[2rem] border border-slate-200/80 dark:border-slate-800 shadow-sm dark:shadow-xl hover:shadow-xl hover:border-fuchsia-500/40 transition-all overflow-hidden h-full flex flex-col"
                 >
                   {/* Subject top gradient stripe */}
                   <div className={`h-2 w-full bg-gradient-to-r ${gradient}`} />
 
                   {/* Delete button */}
                   <button onClick={(e) => handleDelete(e, deck.id)}
-                    className="absolute top-5 right-5 p-2 bg-slate-800/80 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 rounded-full transition-all border border-slate-700 opacity-0 group-hover:opacity-100 z-10">
+                    className="absolute top-5 right-5 p-2 bg-slate-100 dark:bg-slate-800/80 hover:bg-rose-50 dark:hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 rounded-full transition-all border border-slate-200 dark:border-slate-700 opacity-0 group-hover:opacity-100 z-10">
                     <X className="w-3.5 h-3.5" />
                   </button>
 
@@ -363,23 +363,23 @@ export default function FlashcardsHub() {
                         {deck.subject}
                       </span>
                       {isNew && (
-                        <span className="inline-block px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold rounded-full">
+                        <span className="inline-block px-2.5 py-0.5 bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 text-xs font-bold rounded-full">
                           New Deck
                         </span>
                       )}
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-xl font-extrabold text-white leading-snug pr-6 group-hover:text-fuchsia-300 transition-colors">
+                    <h3 className="text-xl font-extrabold text-slate-900 dark:text-white leading-snug pr-6 group-hover:text-fuchsia-600 dark:group-hover:text-fuchsia-300 transition-colors">
                       {deck.title}
                     </h3>
 
                     {/* Meta */}
-                    <div className="flex items-center gap-4 text-xs text-slate-400 font-bold">
-                      <span className="flex items-center gap-1.5"><Layers className="w-3.5 h-3.5 text-indigo-400" /> {total} cards</span>
-                      <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-slate-500" /> {new Date(deck.createdAt || Date.now()).toLocaleDateString()}</span>
+                    <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 font-bold">
+                      <span className="flex items-center gap-1.5"><Layers className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" /> {total} cards</span>
+                      <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-slate-400" /> {new Date(deck.createdAt || Date.now()).toLocaleDateString()}</span>
                       {deck.lastStudied && (
-                        <span className="flex items-center gap-1 text-emerald-400">
+                        <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
                           <Flame className="w-3.5 h-3.5" /> Studied
                         </span>
                       )}
@@ -388,21 +388,21 @@ export default function FlashcardsHub() {
                     {/* Progress Bar */}
                     <div className="mt-auto space-y-2">
                       <div className="flex justify-between text-xs font-extrabold">
-                        <span className="text-slate-400">Mastery</span>
-                        <span className={progress === 100 ? "text-emerald-400" : "text-fuchsia-400"}>{progress}%</span>
+                        <span className="text-slate-500 dark:text-slate-400">Mastery</span>
+                        <span className={progress === 100 ? "text-emerald-600 dark:text-emerald-400" : "text-fuchsia-600 dark:text-fuchsia-400"}>{progress}%</span>
                       </div>
-                      <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden p-0.5">
+                      <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden p-0.5">
                         <div className={`h-full bg-gradient-to-r ${gradient} rounded-full transition-all duration-500`}
                           style={{ width: `${progress}%` }} />
                       </div>
                     </div>
 
                     {/* Action Button */}
-                    <div className="flex items-center justify-between pt-3 border-t border-slate-800/80">
-                      <span className="text-sm font-extrabold text-indigo-400 flex items-center gap-1.5 group-hover:gap-2.5 transition-all">
+                    <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                      <span className="text-sm font-extrabold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 group-hover:gap-2.5 transition-all">
                         Study Deck <ArrowRight className="w-4 h-4" />
                       </span>
-                      <span className="text-xs text-slate-500 font-medium">
+                      <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">
                         {mastered}/{total} mastered
                       </span>
                     </div>
@@ -418,12 +418,12 @@ export default function FlashcardsHub() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: filtered.length * 0.05 }}
             onClick={() => setIsModalOpen(true)}
-            className="group border-2 border-dashed border-slate-800 hover:border-fuchsia-500/50 rounded-[2rem] p-8 flex flex-col items-center justify-center gap-4 text-slate-400 hover:text-fuchsia-400 transition-all min-h-[220px] bg-slate-900/30 hover:bg-slate-900/60"
+            className="group border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-fuchsia-500/50 rounded-[2rem] p-8 flex flex-col items-center justify-center gap-4 text-slate-500 dark:text-slate-400 hover:text-fuchsia-500 dark:hover:text-fuchsia-400 transition-all min-h-[220px] bg-white/50 dark:bg-slate-900/30 hover:bg-slate-50 dark:hover:bg-slate-900/60 shadow-sm"
           >
-            <div className="w-14 h-14 rounded-2xl bg-slate-800 group-hover:bg-fuchsia-500/20 flex items-center justify-center transition-colors border border-slate-700 group-hover:border-fuchsia-500/30">
-              <Plus className="w-7 h-7 group-hover:scale-110 transition-transform text-fuchsia-400" />
+            <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 group-hover:bg-fuchsia-500/15 dark:group-hover:bg-fuchsia-500/20 flex items-center justify-center transition-colors border border-slate-200 dark:border-slate-700 group-hover:border-fuchsia-500/30">
+              <Plus className="w-7 h-7 group-hover:scale-110 transition-transform text-fuchsia-600 dark:text-fuchsia-400" />
             </div>
-            <p className="font-extrabold text-sm text-white">Generate Custom Deck</p>
+            <p className="font-extrabold text-sm text-slate-900 dark:text-white">Generate Custom Deck</p>
           </motion.button>
         </div>
       )}
@@ -431,13 +431,13 @@ export default function FlashcardsHub() {
       {/* ── GENERATE DECK MODAL ── */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 dark:bg-slate-950/80 backdrop-blur-md">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-slate-900 w-full max-w-md rounded-[2.5rem] shadow-2xl border border-indigo-500/30 overflow-hidden">
-              <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-gradient-to-r from-fuchsia-600 via-indigo-600 to-cyan-600">
+              className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-indigo-500/30 overflow-hidden">
+              <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-gradient-to-r from-fuchsia-600 via-indigo-600 to-cyan-600">
                 <h3 className="text-lg font-extrabold text-white flex items-center gap-2">
                   <Sparkles className="w-5 h-5" /> Generate AI Flashcard Deck
                 </h3>
@@ -448,43 +448,43 @@ export default function FlashcardsHub() {
               <form onSubmit={handleGenerate} className="p-6 space-y-5">
                 
                 {/* Mode Selector */}
-                <div className="flex bg-slate-800/80 p-1 rounded-2xl border border-slate-700">
+                <div className="flex bg-slate-100 dark:bg-slate-800/80 p-1 rounded-2xl border border-slate-200 dark:border-slate-700">
                   <button type="button" onClick={() => setGenerateMode("topic")}
-                    className={`flex-1 py-2.5 text-xs font-extrabold rounded-xl transition-all ${generateMode === "topic" ? "bg-indigo-600 text-white shadow" : "text-slate-400 hover:text-white"}`}>
+                    className={`flex-1 py-2.5 text-xs font-extrabold rounded-xl transition-all ${generateMode === "topic" ? "bg-indigo-600 text-white shadow" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}>
                     By Topic / Chapter
                   </button>
                   <button type="button" onClick={() => setGenerateMode("text")}
-                    className={`flex-1 py-2.5 text-xs font-extrabold rounded-xl transition-all ${generateMode === "text" ? "bg-fuchsia-600 text-white shadow" : "text-slate-400 hover:text-white"}`}>
+                    className={`flex-1 py-2.5 text-xs font-extrabold rounded-xl transition-all ${generateMode === "text" ? "bg-fuchsia-600 text-white shadow" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}>
                     From Text Paste
                   </button>
                 </div>
 
                 {generateMode === "topic" ? (
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Topic / Chapter Title</label>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Topic / Chapter Title</label>
                     <input
                       autoFocus required value={topic} onChange={e => setTopic(e.target.value)}
                       placeholder="e.g. Life Processes, Trigonometry, Chemical Reactions"
-                      className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 text-sm text-white font-medium placeholder-slate-500"
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 text-sm text-slate-900 dark:text-white font-medium placeholder-slate-400 dark:placeholder-slate-500"
                     />
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Source Notes / Text</label>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Source Notes / Text</label>
                     <textarea
                       autoFocus required value={sourceText} onChange={e => setSourceText(e.target.value)}
                       placeholder="Paste your study notes, textbook excerpt, or formula list..."
                       rows={4}
-                      className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm text-white font-medium placeholder-slate-500 resize-none"
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm text-slate-900 dark:text-white font-medium placeholder-slate-400 dark:placeholder-slate-500 resize-none"
                     />
                   </div>
                 )}
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Subject</label>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Subject</label>
                     <select required value={subject} onChange={e => setSubject(e.target.value)}
-                      className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 text-sm text-white font-bold">
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 text-sm text-slate-900 dark:text-white font-bold">
                       <option value="" disabled>Select</option>
                       <option value="Science">Science</option>
                       <option value="Mathematics">Mathematics</option>
@@ -494,21 +494,21 @@ export default function FlashcardsHub() {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Class Level</label>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Class Level</label>
                     <select required value={classLevel} onChange={e => setClassLevel(e.target.value)}
-                      className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 text-sm text-white font-bold">
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 text-sm text-slate-900 dark:text-white font-bold">
                       {["6","7","8","9","10"].map(c => <option key={c} value={c}>Class {c}</option>)}
                     </select>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center justify-between">
                     <span>Language / Medium</span>
-                    <span className="text-[10px] text-fuchsia-400 font-semibold">Bilingual & Regional</span>
+                    <span className="text-[10px] text-fuchsia-600 dark:text-fuchsia-400 font-semibold">Bilingual & Regional</span>
                   </label>
                   <select value={language} onChange={e => setLanguage(e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 text-sm text-white font-bold">
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 text-sm text-slate-900 dark:text-white font-bold">
                     {SUPPORTED_LANGUAGES.map(lang => (
                       <option key={lang.code} value={lang.code}>
                         {lang.label} {lang.nativeName !== lang.label ? `(${lang.nativeName})` : ""}

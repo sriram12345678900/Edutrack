@@ -579,19 +579,19 @@ export default function TutorPage() {
   };
 
   return (
-    <div className="w-full h-full flex-1 min-h-0 flex flex-col dark:bg-[#020309] bg-[#eef1f9] dark:text-slate-100 text-slate-900 font-sans relative overflow-hidden">
+    <div className="w-full h-full flex-1 min-h-0 flex flex-col bg-slate-50 dark:bg-[#020309] text-slate-900 dark:text-slate-100 font-sans relative overflow-hidden">
       
       {/* Ambient Background Glows */}
-      <div className="absolute top-[-15%] left-[10vw] w-[45vw] h-[45vw] bg-cyan-600/12 rounded-full blur-[160px] pointer-events-none" />
-      <div className="absolute bottom-[-15%] right-[10vw] w-[45vw] h-[45vw] bg-indigo-600/12 rounded-full blur-[160px] pointer-events-none" />
+      <div className="absolute top-[-15%] left-[10vw] w-[45vw] h-[45vw] bg-cyan-600/10 dark:bg-cyan-600/12 rounded-full blur-[160px] pointer-events-none" />
+      <div className="absolute bottom-[-15%] right-[10vw] w-[45vw] h-[45vw] bg-indigo-600/10 dark:bg-indigo-600/12 rounded-full blur-[160px] pointer-events-none" />
 
       {/* Top Compact Controls Header Bar */}
-      <header className="sticky top-0 z-20 shrink-0 dark:bg-[#040613] bg-[#eef1f9] backdrop-blur-3xl border-b border-white/10 px-4 sm:px-6 py-2.5 flex flex-col lg:flex-row items-center justify-between gap-3 shadow-xl">
+      <header className="sticky top-0 z-20 shrink-0 bg-white/90 dark:bg-[#040613]/90 backdrop-blur-3xl border-b border-slate-200/80 dark:border-white/10 px-4 sm:px-6 py-2.5 flex flex-col lg:flex-row items-center justify-between gap-3 shadow-sm dark:shadow-xl">
         
         {/* Left: AI Tutor Identity */}
         <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-start">
           <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 transition-all shadow-sm active:scale-95">
+            <Link href="/dashboard" className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200/80 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all shadow-sm active:scale-95">
               <ChevronLeft className="w-4 h-4" />
             </Link>
             <div className="flex items-center gap-2.5">
@@ -600,13 +600,13 @@ export default function TutorPage() {
                 <div className="absolute inset-0 bg-cyan-500/10 mix-blend-overlay" />
               </div>
               <div>
-                <h1 className="text-sm font-black dark:text-white text-slate-900 leading-tight flex items-center gap-2">
+                <h1 className="text-sm font-black text-slate-900 dark:text-white leading-tight flex items-center gap-2">
                   Professor AI Tutor 
-                  <span className="text-[9px] bg-cyan-500/20 dark:text-cyan-300 text-cyan-700 border border-cyan-500/40 px-2 py-0.5 rounded-full uppercase tracking-wider font-extrabold flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" /> Live Core
+                  <span className="text-[9px] bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider font-extrabold flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-ping" /> Live Core
                   </span>
                 </h1>
-                <p className="text-[10px] dark:text-slate-400 text-slate-600 font-medium">NCERT CBSE Class 10 Specialist</p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">NCERT CBSE Class 10 Specialist</p>
               </div>
             </div>
           </div>
@@ -614,7 +614,7 @@ export default function TutorPage() {
           {/* Mobile History Toggle */}
           <button 
             onClick={() => setIsHistoryOpen(!isHistoryOpen)}
-            className="lg:hidden p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 dark:text-cyan-300 text-cyan-700 flex items-center gap-1.5 text-xs font-bold"
+            className="lg:hidden p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-700 dark:text-cyan-300 flex items-center gap-1.5 text-xs font-bold"
           >
             <MessageSquare className="w-4 h-4" />
             <span>History</span>
@@ -622,7 +622,7 @@ export default function TutorPage() {
         </div>
 
         {/* Center: Persona Switcher Pills */}
-        <div className="flex p-1 bg-black/50 border border-white/10 rounded-2xl backdrop-blur-xl shrink-0 overflow-x-auto max-w-full">
+        <div className="flex p-1 bg-slate-100/90 dark:bg-black/50 border border-slate-200 dark:border-white/10 rounded-2xl backdrop-blur-xl shrink-0 overflow-x-auto max-w-full">
           {[
             { id: "ncert_expert", label: "NCERT Board Expert", icon: ShieldCheck },
             { id: "socratic", label: "Socratic Mentor", icon: Lightbulb },
@@ -718,19 +718,19 @@ export default function TutorPage() {
       <div className="flex-1 flex overflow-hidden min-h-0 relative z-10">
         
         {/* ── COLLAPSIBLE SESSIONS DRAWER ── */}
-        <aside className={`fixed lg:relative top-0 bottom-0 left-0 w-72 border-r border-white/10 dark:bg-[#040614] bg-[#eef1f9] lg:dark:bg-[#040614] bg-[#eef1f9] backdrop-blur-2xl p-4 flex flex-col gap-3 z-30 transition-all duration-300 ${
+        <aside className={`fixed lg:relative top-0 bottom-0 left-0 w-72 border-r border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-[#040614] backdrop-blur-2xl p-4 flex flex-col gap-3 z-30 transition-all duration-300 ${
           isHistoryOpen ? "translate-x-0 ml-0" : "-translate-x-full lg:translate-x-0 lg:-ml-72"
         }`}>
           <div className="flex items-center justify-between pt-2">
-            <span className="text-[10px] font-black uppercase tracking-widest dark:text-slate-400 text-slate-600">Study Sessions</span>
-            <button onClick={() => setIsHistoryOpen(false)} className="p-1 hover:bg-white/10 rounded-lg dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900">
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Study Sessions</span>
+            <button onClick={() => setIsHistoryOpen(false)} className="p-1 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
               <X className="w-4 h-4" />
             </button>
           </div>
 
           <button 
             onClick={startNewSession}
-            className="w-full py-2.5 bg-gradient-to-r from-cyan-500 via-teal-500 to-indigo-600 text-white font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] border border-white/20 flex items-center justify-center gap-2"
+            className="w-full py-2.5 bg-gradient-to-r from-cyan-500 via-teal-500 to-indigo-600 text-white font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all shadow-md shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] border border-white/20 flex items-center justify-center gap-2"
           >
             <Plus className="w-4 h-4" />
             <span>New Study Chat</span>
@@ -738,9 +738,9 @@ export default function TutorPage() {
 
           <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 custom-scrollbar">
             {sessions.length === 0 ? (
-              <div className="text-center py-8 border border-dashed border-white/10 rounded-xl bg-white/[0.01] p-3">
-                <MessageSquare className="w-6 h-6 text-slate-600 mx-auto mb-1.5 opacity-50" />
-                <p className="dark:text-slate-400 text-slate-600 text-xs font-semibold">No previous chats.</p>
+              <div className="text-center py-8 border border-dashed border-slate-200 dark:border-white/10 rounded-xl bg-slate-50/50 dark:bg-white/[0.01] p-3">
+                <MessageSquare className="w-6 h-6 text-slate-400 dark:text-slate-600 mx-auto mb-1.5 opacity-50" />
+                <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold">No previous chats.</p>
               </div>
             ) : (
               sessions.map(s => {
@@ -751,20 +751,20 @@ export default function TutorPage() {
                     onClick={() => selectSession(s.id)}
                     className={`group w-full p-3 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-all relative ${
                       isActive
-                        ? "bg-cyan-500/20 border-cyan-500/50 text-cyan-200 font-extrabold shadow-md"
-                        : "bg-white/[0.02] border-white/5 text-slate-400 hover:bg-white/[0.06] hover:text-slate-200"
+                        ? "bg-cyan-500/15 border-cyan-500/40 text-cyan-800 dark:text-cyan-200 font-extrabold shadow-sm"
+                        : "bg-slate-50 dark:bg-white/[0.02] border-slate-200/60 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.06] hover:text-slate-900 dark:hover:text-slate-200"
                     }`}
                   >
                     {isActive && (
-                      <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-cyan-400 rounded-full shadow-[0_0_10px_#22d3ee]" />
+                      <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-cyan-500 dark:bg-cyan-400 rounded-full shadow-[0_0_10px_#22d3ee]" />
                     )}
                     <div className="flex items-center gap-2 min-w-0">
-                      <MessageSquare className={`w-3.5 h-3.5 shrink-0 ${isActive ? "text-cyan-400" : "text-slate-500"}`} />
+                      <MessageSquare className={`w-3.5 h-3.5 shrink-0 ${isActive ? "text-cyan-600 dark:text-cyan-400" : "text-slate-400 dark:text-slate-500"}`} />
                       <span className="text-xs truncate font-semibold">{s.title}</span>
                     </div>
                     <button
                       onClick={(e) => deleteSession(e, s.id)}
-                      className="opacity-0 group-hover:opacity-100 hover:text-red-400 p-1 rounded-lg hover:bg-white/10 transition-opacity"
+                      className="opacity-0 group-hover:opacity-100 hover:text-red-500 dark:hover:text-red-400 p-1 rounded-lg hover:bg-slate-200/60 dark:hover:bg-white/10 transition-opacity text-slate-400"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -776,32 +776,32 @@ export default function TutorPage() {
         </aside>
 
         {/* ── MAIN EXPANSIVE CHAT VIEWPORT ── */}
-        <section className="flex-1 flex flex-col min-w-0 dark:bg-[#03040d] bg-[#eef1f9] relative p-2 sm:p-3 pb-0 sm:pb-0 overflow-hidden h-full min-h-0">
+        <section className="flex-1 flex flex-col min-w-0 bg-slate-50 dark:bg-[#03040d] relative p-2 sm:p-3 pb-0 sm:pb-0 overflow-hidden h-full min-h-0">
           
           {/* Framed Chat Box Container */}
-          <div className="w-full flex-1 min-h-0 max-w-6xl mx-auto dark:bg-[#050718] bg-[#f5f7ff] backdrop-blur-3xl border border-cyan-500/30 rounded-t-2xl rounded-b-none sm:rounded-t-2xl flex flex-col overflow-hidden shadow-[0_0_50px_rgba(6,182,212,0.12)] relative">
+          <div className="w-full flex-1 min-h-0 max-w-6xl mx-auto bg-white/95 dark:bg-[#050718] backdrop-blur-3xl border border-slate-200/80 dark:border-cyan-500/30 rounded-t-2xl rounded-b-none sm:rounded-t-2xl flex flex-col overflow-hidden shadow-sm dark:shadow-[0_0_50px_rgba(6,182,212,0.12)] relative">
             
             {/* Top Cyan Glow Beam Rim */}
             <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-cyan-400 to-indigo-500 shrink-0 shadow-[0_0_12px_#22d3ee]" />
 
             {/* Box Header Bar */}
-            <div className="px-5 py-3 border-b border-cyan-500/20 dark:bg-[#070b22] bg-[#f5f7ff] backdrop-blur-md flex items-center justify-between shrink-0 z-20">
+            <div className="px-5 py-3 border-b border-slate-200/80 dark:border-cyan-500/20 bg-slate-50/90 dark:bg-[#070b22] backdrop-blur-md flex items-center justify-between shrink-0 z-20">
               <div className="flex items-center gap-2.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]" />
-                <span className="text-xs font-black dark:text-cyan-200 text-cyan-800 uppercase tracking-widest truncate max-w-[240px] sm:max-w-md">
+                <div className="w-2.5 h-2.5 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]" />
+                <span className="text-xs font-black text-cyan-900 dark:text-cyan-200 uppercase tracking-widest truncate max-w-[240px] sm:max-w-md">
                   {currentSession ? currentSession.title : "Active Study Session"}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={startNewSession}
-                  className="px-3 py-1 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 dark:text-cyan-300 text-cyan-700 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all active:scale-95 shadow-sm"
+                  className="px-3 py-1 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-700 dark:text-cyan-300 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all active:scale-95 shadow-sm"
                   title="Start a new session"
                 >
-                  <Plus className="w-3.5 h-3.5 dark:text-cyan-400 text-cyan-700" />
+                  <Plus className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
                   <span className="hidden sm:inline">New Chat</span>
                 </button>
-                <span className="text-[10px] dark:text-cyan-400 text-cyan-700 font-extrabold uppercase tracking-wider px-3 py-1 bg-cyan-500/15 border border-cyan-500/30 rounded-lg shadow-sm">
+                <span className="text-[10px] text-cyan-700 dark:text-cyan-400 font-extrabold uppercase tracking-wider px-3 py-1 bg-cyan-500/15 border border-cyan-500/30 rounded-lg shadow-sm">
                   {currentSession ? `${currentSession.messages.length} Messages` : "Live Core"}
                 </span>
               </div>
@@ -918,10 +918,10 @@ export default function TutorPage() {
                             </div>
                           )}
 
-                          <div className={`p-4 sm:p-5 rounded-3xl shadow-2xl border leading-relaxed select-text ${
+                          <div className={`p-4 sm:p-5 rounded-3xl shadow-md dark:shadow-2xl border leading-relaxed select-text ${
                             msg.role === "user"
                               ? "bg-gradient-to-br from-cyan-600 via-teal-600 to-indigo-600 text-white rounded-tr-none border-cyan-400/30 font-bold text-sm shadow-[0_4px_20px_rgba(6,182,212,0.25)]"
-                              : "dark:bg-[#070b22] bg-[#f5f7ff] backdrop-blur-2xl dark:text-slate-100 text-slate-900 rounded-tl-none border-white/10 border-l-4 border-l-cyan-400 font-medium text-sm shadow-[0_6px_30px_rgba(0,0,0,0.5)]"
+                              : "bg-slate-100 dark:bg-[#070b22] backdrop-blur-2xl text-slate-900 dark:text-slate-100 rounded-tl-none border-slate-200/80 dark:border-white/10 border-l-4 border-l-cyan-500 font-medium text-sm shadow-sm dark:shadow-[0_6px_30px_rgba(0,0,0,0.5)]"
                           }`}>
                             {msg.role === "user" ? (
                               <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
@@ -935,13 +935,13 @@ export default function TutorPage() {
                           {isAi && (
                             <button
                               onClick={() => speakText(msg.content, identifier)}
-                              className="absolute -right-10 top-3 p-2 rounded-xl dark:bg-slate-900/90 bg-slate-200/90 hover:bg-slate-800 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 border border-white/10 shadow-lg transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 active:scale-95"
+                              className="absolute -right-10 top-3 p-2 rounded-xl bg-white/90 dark:bg-slate-900/90 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10 shadow-sm transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 active:scale-95"
                               title="Read text aloud"
                             >
                               {activeSpeakingMsg === identifier ? (
-                                <VolumeX className="w-4 h-4 text-red-400 animate-pulse" />
+                                <VolumeX className="w-4 h-4 text-red-500 animate-pulse" />
                               ) : (
-                                <Volume2 className="w-4 h-4 dark:text-cyan-400 text-cyan-700" />
+                                <Volume2 className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                               )}
                             </button>
                           )}
@@ -957,12 +957,12 @@ export default function TutorPage() {
                     <motion.div 
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="bg-gradient-to-br from-cyan-500/15 via-indigo-500/10 to-transparent border border-cyan-500/40 rounded-3xl p-5 shadow-2xl relative overflow-hidden border-l-4 border-l-cyan-400"
+                      className="bg-gradient-to-br from-cyan-500/10 via-indigo-500/5 to-transparent border border-cyan-500/30 rounded-3xl p-5 shadow-md dark:shadow-2xl relative overflow-hidden border-l-4 border-l-cyan-500"
                     >
                       <div className="flex items-center justify-between border-b border-cyan-500/20 pb-3 mb-3.5">
                         <div className="flex items-center gap-2.5">
-                          <Sparkles className="w-4.5 h-4.5 dark:text-cyan-400 text-cyan-700 animate-pulse" />
-                          <h4 className="font-black text-xs dark:text-cyan-300 text-cyan-700 uppercase tracking-widest">Study Session Summary</h4>
+                          <Sparkles className="w-4.5 h-4.5 text-cyan-600 dark:text-cyan-400 animate-pulse" />
+                          <h4 className="font-black text-xs text-cyan-800 dark:text-cyan-300 uppercase tracking-widest">Study Session Summary</h4>
                         </div>
                         <button
                           type="button"
@@ -970,7 +970,7 @@ export default function TutorPage() {
                             navigator.clipboard.writeText(currentSession.conclusion || "");
                             alert("Summary copied to clipboard!");
                           }}
-                          className="flex items-center gap-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 dark:text-cyan-300 text-cyan-700 border border-cyan-500/40 px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-md"
+                          className="flex items-center gap-1.5 bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-800 dark:text-cyan-300 border border-cyan-500/30 px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm"
                         >
                           <Copy className="w-3.5 h-3.5" />
                           <span>Copy Summary</span>
@@ -990,13 +990,13 @@ export default function TutorPage() {
                       animate={{ opacity: 1, y: 0 }}
                       className="flex gap-4"
                     >
-                      <div className="w-9 h-9 rounded-2xl bg-cyan-950/60 dark:text-cyan-400 text-cyan-700 border border-cyan-500/30 flex items-center justify-center shrink-0 shadow-lg">
-                        <Bot className="w-4.5 h-4.5 animate-pulse dark:text-cyan-400 text-cyan-700" />
+                      <div className="w-9 h-9 rounded-2xl bg-cyan-100 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-400 border border-cyan-500/20 flex items-center justify-center shrink-0 shadow-sm">
+                        <Bot className="w-4.5 h-4.5 animate-pulse text-cyan-600 dark:text-cyan-400" />
                       </div>
-                      <div className="dark:bg-[#080d26] bg-[#f5f7ff] backdrop-blur-xl rounded-3xl rounded-tl-none border border-cyan-500/20 border-l-4 border-l-cyan-400 px-5 py-3.5 flex items-center gap-2 shadow-2xl">
-                        <span className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                        <span className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                        <span className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                      <div className="bg-slate-100 dark:bg-[#080d26] backdrop-blur-xl rounded-3xl rounded-tl-none border border-slate-200 dark:border-cyan-500/20 border-l-4 border-l-cyan-500 px-5 py-3.5 flex items-center gap-2 shadow-sm dark:shadow-2xl">
+                        <span className="w-2.5 h-2.5 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <span className="w-2.5 h-2.5 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <span className="w-2.5 h-2.5 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                       </div>
                     </motion.div>
                   )}
@@ -1007,23 +1007,23 @@ export default function TutorPage() {
             </div>
 
             {/* Fixed Input Dock Inside Box */}
-            <div className="p-3 sm:p-4 pb-20 sm:pb-5 dark:bg-[#040616] bg-[#eef1f9] border-t border-cyan-500/20 backdrop-blur-2xl shrink-0 z-20 shadow-[0_-15px_40px_rgba(0,0,0,0.5)]">
+            <div className="p-3 sm:p-4 pb-20 sm:pb-5 bg-white/95 dark:bg-[#040616] border-t border-slate-200/80 dark:border-cyan-500/20 backdrop-blur-2xl shrink-0 z-20 shadow-sm">
               <div className="max-w-5xl mx-auto">
                 
                 {attachedImage && (
-                  <div className="mb-2.5 p-2.5 dark:bg-slate-900/90 bg-slate-200/90 border border-cyan-500/30 rounded-2xl flex items-center justify-between w-fit gap-3 shadow-xl backdrop-blur-md">
+                  <div className="mb-2.5 p-2.5 bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-cyan-500/30 rounded-2xl flex items-center justify-between w-fit gap-3 shadow-md backdrop-blur-md">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-xl overflow-hidden border border-white/20 shadow-md">
+                      <div className="w-9 h-9 rounded-xl overflow-hidden border border-slate-200 dark:border-white/20 shadow-sm">
                         <img src={attachedImage} alt="Homework draft" className="w-full h-full object-cover" />
                       </div>
                       <div>
-                        <p className="text-xs font-extrabold dark:text-slate-200 text-slate-800">Homework Photo Attached</p>
-                        <p className="text-[10px] dark:text-cyan-400 text-cyan-700 font-bold uppercase tracking-wide">Ready for analysis</p>
+                        <p className="text-xs font-extrabold text-slate-900 dark:text-slate-200">Homework Photo Attached</p>
+                        <p className="text-[10px] text-cyan-700 dark:text-cyan-400 font-bold uppercase tracking-wide">Ready for analysis</p>
                       </div>
                     </div>
                     <button 
                       onClick={() => setAttachedImage(null)}
-                      className="p-1 bg-slate-800 hover:bg-slate-700 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 rounded-full transition-all active:scale-95"
+                      className="p-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-full transition-all active:scale-95"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -1036,11 +1036,11 @@ export default function TutorPage() {
                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="flex items-center justify-center gap-1.5 mb-3 py-2 px-5 bg-red-500/15 border border-red-500/30 rounded-2xl w-fit mx-auto shadow-lg shadow-red-500/10 backdrop-blur-md"
+                      className="flex items-center justify-center gap-1.5 mb-3 py-2 px-5 bg-red-500/10 border border-red-500/20 rounded-2xl w-fit mx-auto shadow-sm backdrop-blur-md"
                     >
                       <div className="flex items-center gap-2 mr-3">
                         <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                        <span className="text-xs font-black text-red-400 uppercase tracking-widest">Listening</span>
+                        <span className="text-xs font-black text-red-600 dark:text-red-400 uppercase tracking-widest">Listening</span>
                       </div>
                       {[0.3, 0.7, 0.4, 1.0, 0.6, 0.8, 0.4, 0.9, 0.5, 0.7, 0.3].map((h, idx) => (
                         <motion.div
@@ -1061,17 +1061,17 @@ export default function TutorPage() {
                     onChange={(e) => setChatInputValue(e.target.value)}
                     onPaste={handleChatPaste}
                     placeholder={isListening ? "Listening closely to your voice..." : "Ask your doubt (e.g. solve 2x² - 5x + 3 = 0, or upload photo)..."}
-                    className={`w-full dark:bg-[#030514] bg-white border ${
+                    className={`w-full bg-slate-50 dark:bg-[#030514] border ${
                       isListening 
                         ? "border-red-500/60 focus:ring-red-500" 
-                        : "border-slate-300 dark:border-white/10 focus:border-cyan-500/60 focus:ring-2 focus:ring-cyan-500/25"
-                    } rounded-full pl-13 pr-24 py-3.5 text-sm focus:outline-none dark:text-slate-100 text-slate-900 placeholder:text-slate-500 transition-all font-semibold shadow-inner`}
+                        : "border-slate-200 dark:border-white/10 focus:border-cyan-500/60 focus:ring-2 focus:ring-cyan-500/25"
+                    } rounded-full pl-13 pr-24 py-3.5 text-sm focus:outline-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-all font-semibold shadow-inner`}
                   />
 
                   <button 
                     type="button"
                     onClick={() => chatFileInputRef.current?.click()}
-                    className="absolute left-3 w-9 h-9 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/15 border border-white/10 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 transition-all active:scale-95 shadow-sm"
+                    className="absolute left-3 w-9 h-9 rounded-full flex items-center justify-center bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/15 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all active:scale-95 shadow-sm"
                     title="Attach homework photo"
                   >
                     <Paperclip className="w-4 h-4" />
