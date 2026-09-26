@@ -19,7 +19,7 @@ export interface DoubtQuery {
   title: string;
   description: string;
   subject: "Physics" | "Mathematics" | "Chemistry" | "Biology" | "Computer Science" | "English";
-  grade: string; // "Class 9", "Class 10", "Class 11", "Class 12", "College"
+  grade: string; // "Class 6", "Class 7", "Class 8", "Class 9", "Class 10"
   examTarget?: string; // "CBSE", "JEE", "NEET", "ICSE", "SAT", "IGCSE"
   tags: string[];
   authorName: string;
@@ -85,8 +85,8 @@ export const INITIAL_COMMUNITY_DOUBTS: DoubtQuery[] = [
     title: "How to solve for roots of quadratic equations with non-real discriminant in standard form?",
     description: "Given 2x² - 4x + 5 = 0, how do we break down the complex conjugate roots step by step using basic quadratic formula?",
     subject: "Mathematics",
-    grade: "Class 11",
-    examTarget: "JEE",
+    grade: "Class 10",
+    examTarget: "CBSE",
     tags: ["Algebra", "Complex Numbers", "Quadratic Equations"],
     authorName: "Sofia Rodriguez",
     authorAvatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Sofia",

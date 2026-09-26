@@ -104,7 +104,7 @@ export default function WorksheetGenerator() {
                 <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Class Level</label>
                 <select value={classLevel} onChange={e => setClassLevel(e.target.value)}
                   className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm font-medium">
-                  {["6","7","8","9","10","11","12"].map(c => <option key={c} value={c}>Class {c}</option>)}
+                  {["6","7","8","9","10"].map(c => <option key={c} value={c}>Class {c}</option>)}
                 </select>
               </div>
             </div>

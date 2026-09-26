@@ -206,7 +206,7 @@ export default function SettingsPage() {
                     onChange={(e) => setLocalClass(Number(e.target.value))}
                     className="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
                   >
-                    {[6, 7, 8, 9, 10, 11, 12].map(cls => (
+                    {[6, 7, 8, 9, 10].map(cls => (
                       <option key={cls} value={cls} className="bg-slate-900 text-white">Class {cls}</option>
                     ))}
                   </select>

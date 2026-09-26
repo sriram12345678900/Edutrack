@@ -523,6 +523,23 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
   const [snapToGrid, setSnapToGrid] = useState(false);
   const [pattern, setPattern] = useState<BackgroundPattern>("dots");
   const [canvasTheme, setCanvasTheme] = useState<CanvasTheme>("dark");
+
+  const handleToggleCanvasTheme = () => {
+    setCanvasTheme(t => {
+      const next = t === "dark" ? "light" : "dark";
+      if (typeof window !== "undefined") {
+        if (next === "dark") {
+          document.documentElement.classList.add("dark");
+          localStorage.setItem("edutrack_theme", "dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+          localStorage.setItem("edutrack_theme", "light");
+        }
+      }
+      return next;
+    });
+  };
+
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedStrokeIds, setSelectedStrokeIds] = useState<string[]>([]);
   const [showKeyShortcuts, setShowKeyShortcuts] = useState(false);
@@ -623,6 +640,11 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
 
     handleResize();
     window.addEventListener("resize", handleResize);
+
+    // Synchronize canvas theme with EduTrack global theme
+    const isDark = document.documentElement.classList.contains("dark");
+    setCanvasTheme(isDark ? "dark" : "light");
+
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -1980,9 +2002,9 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
               className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300 transition-colors" title="Presets">
               <Library className="w-4 h-4" />
             </button>
-            <button onClick={() => setCanvasTheme(t => t === "dark" ? "light" : "dark")}
+            <button onClick={handleToggleCanvasTheme}
               className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300 transition-colors" title="Toggle Theme">
-              {canvasTheme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {canvasTheme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}
             </button>
             <button onClick={downloadCanvas}
               className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300 transition-colors" title="Download PNG">
@@ -2027,7 +2049,7 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
                       className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
                       <Library className="w-4 h-4 text-indigo-500" /> Diagram Presets
                     </button>
-                    <button onClick={() => setCanvasTheme(t => t === "dark" ? "light" : "dark")}
+                    <button onClick={handleToggleCanvasTheme}
                       className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors">
                       {canvasTheme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}
                       {canvasTheme === "dark" ? "Light Mode" : "Dark Mode"}

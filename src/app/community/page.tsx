@@ -17,7 +17,7 @@ import { db } from "@/lib/firebase";
 import { collection, doc, onSnapshot, setDoc, updateDoc, increment, arrayUnion, query, orderBy, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
 
 const SUBJECTS = ["All", "Physics", "Mathematics", "Chemistry", "Biology", "Computer Science", "English"] as const;
-const GRADES = ["All Grades", "Class 9", "Class 10", "Class 11", "Class 12", "College"];
+const GRADES = ["All Grades", "Class 6", "Class 7", "Class 8", "Class 9", "Class 10"];
 const EXAMS = ["All Exams", "CBSE", "JEE", "NEET", "ICSE", "SAT", "IGCSE"];
 
 export default function CommunityPage() {

@@ -5,11 +5,13 @@ import Link from "next/link";
 import { 
   Brain, User as UserIcon, Mail, Lock, ArrowRight, AlertCircle, 
   Loader2, Eye, EyeOff, Sparkles, CheckCircle2, ShieldCheck, 
-  GraduationCap, BookOpen, Trophy, ArrowLeft, Building, Users
+  GraduationCap, BookOpen, Trophy, ArrowLeft, Building, Users,
+  Sun, Moon, Palette, Check
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useMotionTemplate } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export default function Signup() {
   const { user, loading: authLoading, signup, loginWithGoogle, loginAsGuest } = useAuth();
@@ -22,11 +24,34 @@ export default function Signup() {
   const [selectedClass, setSelectedClass] = useState("10");
   const [agreedTerms, setAgreedTerms] = useState(true);
   
+  // Theme State
+  const [isDark, setIsDark] = useState(true);
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [demoLoadingRole, setDemoLoadingRole] = useState<string | null>(null);
   const [shake, setShake] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isDarkMode = document.documentElement.classList.contains("dark");
+      setIsDark(isDarkMode);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (typeof window === "undefined") return;
+    const nextDark = !isDark;
+    setIsDark(nextDark);
+    if (nextDark) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("edutrack_theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("edutrack_theme", "light");
+    }
+  };
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -36,7 +61,7 @@ export default function Signup() {
 
   // Compute Password Strength
   const passwordStrength = useMemo(() => {
-    if (!password) return { score: 0, label: "", color: "bg-slate-700" };
+    if (!password) return { score: 0, label: "", color: "bg-slate-300 dark:bg-slate-700" };
     let score = 0;
     if (password.length >= 6) score += 1;
     if (password.length >= 9) score += 1;
@@ -48,7 +73,7 @@ export default function Signup() {
       case 2: return { score: 2, label: "Fair", color: "bg-amber-500" };
       case 3: return { score: 3, label: "Good", color: "bg-indigo-500" };
       case 4: return { score: 4, label: "Strong & Secure", color: "bg-emerald-500" };
-      default: return { score: 0, label: "", color: "bg-slate-700" };
+      default: return { score: 0, label: "", color: "bg-slate-300 dark:bg-slate-700" };
     }
   }, [password]);
 
@@ -133,8 +158,8 @@ export default function Signup() {
   };
 
   const springConfig = { damping: 24, stiffness: 280, mass: 0.5 };
-  const rotateX = useSpring(useTransform(mouseY, [-10, 10], [8, -8]), springConfig);
-  const rotateY = useSpring(useTransform(mouseX, [-10, 10], [-8, 8]), springConfig);
+  const rotateX = useSpring(useTransform(mouseY, [-10, 10], [6, -6]), springConfig);
+  const rotateY = useSpring(useTransform(mouseX, [-10, 10], [-6, 6]), springConfig);
 
   // Dynamic Background Glow
   const bgMouseX = useMotionValue(0);
@@ -143,69 +168,80 @@ export default function Signup() {
     bgMouseX.set(e.clientX);
     bgMouseY.set(e.clientY);
   };
-  const bgGlow = useMotionTemplate`radial-gradient(700px circle at ${bgMouseX}px ${bgMouseY}px, rgba(168, 85, 247, 0.09), transparent 80%)`;
+  const bgGlow = useMotionTemplate`radial-gradient(700px circle at ${bgMouseX}px ${bgMouseY}px, ${isDark ? "rgba(168, 85, 247, 0.12)" : "rgba(168, 85, 247, 0.08)"}, transparent 80%)`;
 
   return (
     <motion.div 
       onMouseMove={handleGlobalMouseMove}
-      className="min-h-screen flex flex-col justify-center items-center p-4 sm:p-6 lg:p-10 relative overflow-x-hidden bg-[#060813] text-slate-100 font-sans"
+      className="min-h-screen flex flex-col justify-center items-center p-4 sm:p-6 lg:p-10 relative overflow-x-hidden bg-slate-50 dark:bg-[#060813] text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300"
     >
       {/* Interactive Global Background Glow */}
       <motion.div className="fixed inset-0 z-0 pointer-events-none" style={{ background: bgGlow }} />
 
       {/* Static mesh background blobs */}
-      <div className="fixed top-[-10%] right-[-5%] w-[550px] h-[550px] bg-purple-600/15 rounded-full blur-[140px] pointer-events-none -z-10 animate-pulse" />
-      <div className="fixed bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-indigo-600/15 rounded-full blur-[140px] pointer-events-none -z-10 animate-pulse" />
+      <div className="fixed top-[-10%] right-[-5%] w-[550px] h-[550px] bg-purple-500/10 dark:bg-purple-600/15 rounded-full blur-[140px] pointer-events-none -z-10 animate-pulse" />
+      <div className="fixed bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-indigo-500/10 dark:bg-indigo-600/15 rounded-full blur-[140px] pointer-events-none -z-10 animate-pulse" />
 
-      {/* Top Navigation Bar */}
-      <div className="w-full max-w-6xl mx-auto flex items-center justify-between py-4 mb-4 relative z-20">
-        <Link href="/" className="inline-flex items-center gap-2.5 text-xs font-bold text-slate-400 hover:text-white transition-colors group">
-          <div className="p-2 rounded-xl bg-white/5 border border-white/10 group-hover:bg-white/10 transition-colors">
+      {/* Top Navigation Bar with Theme Toggle */}
+      <header className="w-full max-w-6xl mx-auto flex items-center justify-between py-4 mb-4 relative z-20">
+        <Link href="/" className="inline-flex items-center gap-2.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-fuchsia-600 dark:hover:text-white transition-colors group">
+          <div className="p-2 rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-sm group-hover:bg-slate-100 dark:group-hover:bg-white/10 transition-colors">
             <ArrowLeft className="w-4 h-4" />
           </div>
           <span>Back to Home</span>
         </Link>
 
-        <div className="flex items-center gap-2">
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-300 text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5 text-fuchsia-400" /> Free Student Account
+        <div className="flex items-center gap-2.5">
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-700 dark:text-fuchsia-300 text-xs font-bold shadow-sm">
+            <Sparkles className="w-3.5 h-3.5 text-fuchsia-500 dark:text-fuchsia-400" /> Free Student Workspace
           </span>
+
+          {/* Theme Toggle Button */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="p-2 rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-400 shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            title={`Switch to ${isDark ? "Light" : "Dark"} Mode`}
+          >
+            {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-600" />}
+          </button>
         </div>
-      </div>
+      </header>
 
       {/* Split-Screen Grid on Desktop */}
       <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
         
         {/* ── LEFT SHOWCASE PANEL (Desktop) ── */}
-        <div className="hidden lg:flex lg:col-span-6 flex-col justify-center space-y-8 pr-6">
+        <div className="hidden lg:flex lg:col-span-6 flex-col justify-center space-y-7 pr-6">
           <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-fuchsia-500/15 to-indigo-500/15 border border-fuchsia-500/30 text-fuchsia-300 text-xs font-extrabold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-fuchsia-400" /> Start Your CBSE Board Journey
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-fuchsia-500/10 to-indigo-500/10 border border-fuchsia-500/25 text-fuchsia-700 dark:text-fuchsia-300 text-xs font-black uppercase tracking-wider shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-fuchsia-500" /> Start Your CBSE Board Journey
             </div>
             
-            <h1 className="text-4xl xl:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-fuchsia-100 to-indigo-200 tracking-tight leading-tight">
+            <h1 className="text-4xl xl:text-5xl font-black text-slate-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:via-fuchsia-100 dark:to-indigo-200 tracking-tight leading-tight">
               Create Your Free Scholar Workspace.
             </h1>
             
-            <p className="text-slate-400 text-base leading-relaxed max-w-lg">
-              Unlock AI chapter roadmaps, 3D science simulations, daily recall streaks, and multiplayer study rooms tailored to your syllabus.
+            <p className="text-slate-600 dark:text-slate-400 text-base leading-relaxed max-w-lg font-medium">
+              Unlock AI chapter roadmaps, 3D science simulations, interactive whiteboard math solver, and daily recall streaks tailored to your board syllabus.
             </p>
           </div>
 
           {/* Interactive Curriculum Feature Grid */}
-          <div className="space-y-3 pt-2">
+          <div className="space-y-3.5 pt-2">
             {[
-              { icon: <GraduationCap className="w-4.5 h-4.5 text-indigo-400" />, title: "Full NCERT Syllabus Coverage", desc: "Line-by-line textbook guides, formulas, and NCERT exemplars." },
-              { icon: <Trophy className="w-4.5 h-4.5 text-amber-400" />, title: "Gamified XP & Leaderboards", desc: "Level up from Novice to Grandmaster CBSE Scholar with every quiz." },
-              { icon: <ShieldCheck className="w-4.5 h-4.5 text-emerald-400" />, title: "100% Free for Students", desc: "Zero subscriptions or paywalls for core learning modules." }
+              { icon: <GraduationCap className="w-5 h-5 text-indigo-500" />, title: "Full NCERT Syllabus Coverage", desc: "Line-by-line textbook guides, formulas, and NCERT exemplars." },
+              { icon: <Palette className="w-5 h-5 text-fuchsia-500" />, title: "AI Interactive Whiteboard Canvas", desc: "Solve handwritten math, draw smart geometry, and export KaTeX steps." },
+              { icon: <Trophy className="w-5 h-5 text-amber-500" />, title: "Gamified XP & Leaderboards", desc: "Level up from Novice to Grandmaster CBSE Scholar with every quiz." },
+              { icon: <ShieldCheck className="w-5 h-5 text-emerald-500" />, title: "100% Free for Students", desc: "Zero subscriptions or paywalls for core learning modules." }
             ].map((feature, i) => (
-              <div key={i} className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md flex items-center gap-4 hover:border-indigo-500/30 transition-all">
-                <div className="p-2.5 rounded-xl bg-slate-900/80 border border-white/10 shrink-0">
+              <div key={i} className="p-4 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-sm flex items-center gap-4 hover:border-indigo-500/30 transition-all">
+                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 shrink-0">
                   {feature.icon}
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-sm text-white">{feature.title}</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">{feature.desc}</p>
+                  <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">{feature.title}</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">{feature.desc}</p>
                 </div>
               </div>
             ))}
@@ -221,13 +257,13 @@ export default function Signup() {
             style={{ rotateX, rotateY }}
             animate={shake ? { x: [-10, 10, -10, 10, 0] } : {}}
             transition={shake ? { duration: 0.4 } : undefined}
-            className="bg-[#0b1026]/90 backdrop-blur-2xl border border-indigo-500/25 shadow-2xl rounded-[2.5rem] p-6 sm:p-9 relative overflow-hidden group/card"
+            className="bg-white/95 dark:bg-[#0b1026]/90 backdrop-blur-2xl border border-slate-200/90 dark:border-indigo-500/25 shadow-xl dark:shadow-2xl rounded-[2.5rem] p-6 sm:p-9 relative overflow-hidden group/card"
           >
             {/* Hover Specular Glare */}
             <div 
               className="absolute inset-0 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-none rounded-[2.5rem]"
               style={{
-                background: `radial-gradient(400px circle at ${mouseX.get() * 28 + 200}px ${mouseY.get() * 28 + 200}px, rgba(255,255,255,0.06), transparent 45%)`
+                background: `radial-gradient(400px circle at ${mouseX.get() * 28 + 200}px ${mouseY.get() * 28 + 200}px, rgba(168,85,247,0.08), transparent 45%)`
               }}
             />
 
@@ -240,55 +276,55 @@ export default function Signup() {
                 <div className="w-11 h-11 bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30 text-white group-hover:scale-105 transition-transform duration-300">
                   <Brain className="w-6 h-6" />
                 </div>
-                <span className="text-2xl font-black tracking-tight text-white group-hover:text-indigo-400 transition-colors">
-                  EduTrack <span className="text-fuchsia-400 font-extrabold text-sm">AI</span>
+                <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  EduTrack <span className="text-fuchsia-600 dark:text-fuchsia-400 font-extrabold text-sm">AI</span>
                 </span>
               </Link>
 
               {/* Seamless Tab Switcher */}
-              <div className="w-full grid grid-cols-2 p-1 bg-white/5 border border-white/10 rounded-2xl mb-1">
+              <div className="w-full grid grid-cols-2 p-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl mb-1">
                 <Link
                   href="/login"
-                  className="py-2.5 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all text-slate-400 hover:text-white text-center flex items-center justify-center"
+                  className="py-2.5 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-center flex items-center justify-center"
                 >
                   Sign In
                 </Link>
                 <button
                   type="button"
-                  className="py-2.5 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all bg-gradient-to-r from-fuchsia-600 to-indigo-600 text-white shadow-md shadow-fuchsia-500/20"
+                  className="py-2.5 rounded-xl font-extrabold text-xs tracking-wider uppercase transition-all bg-gradient-to-r from-fuchsia-600 to-indigo-600 text-white shadow-md shadow-fuchsia-500/20 cursor-pointer"
                 >
                   Create Account
                 </button>
               </div>
             </div>
 
-            {/* Error banner */}
+            {/* Error Notification */}
             <AnimatePresence>
               {error && (
                 <motion.div
                   initial={{ opacity: 0, height: 0, scale: 0.95 }}
                   animate={{ opacity: 1, height: "auto", scale: 1 }}
                   exit={{ opacity: 0, height: 0, scale: 0.95 }}
-                  className="flex items-center gap-2.5 bg-rose-500/10 border border-rose-500/25 text-rose-400 rounded-2xl p-3.5 mb-5 text-xs font-bold leading-normal relative z-10"
+                  className="flex items-center gap-2.5 bg-rose-500/10 text-rose-600 dark:text-rose-400 p-3.5 rounded-2xl mb-5 text-xs font-bold border border-rose-500/25 relative z-10"
                 >
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{error}</span>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* Google Signup Button */}
-            <div className="space-y-4 relative z-10 mb-4">
+            {/* Quick Google Sign-Up */}
+            <div className="space-y-4 mb-4 relative z-10">
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="button"
                 onClick={handleGoogle}
                 disabled={googleLoading}
-                className="w-full flex items-center justify-center gap-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-2xl py-3.5 px-4 text-xs font-bold text-slate-200 transition-all shadow-sm active:scale-95"
+                className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 font-bold py-3.5 rounded-2xl transition-all text-xs flex items-center justify-center gap-3 shadow-sm active:scale-95 cursor-pointer"
               >
                 {googleLoading ? (
-                  <Loader2 className="w-4.5 h-4.5 animate-spin text-fuchsia-400" />
+                  <Loader2 className="w-4 h-4 animate-spin text-fuchsia-500" />
                 ) : (
                   <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -301,9 +337,9 @@ export default function Signup() {
               </motion.button>
 
               <div className="flex items-center gap-3 py-1">
-                <div className="flex-1 h-px bg-white/10" />
-                <span className="text-[10px] text-slate-400 font-extrabold tracking-widest uppercase">Or email registration</span>
-                <div className="flex-1 h-px bg-white/10" />
+                <div className="flex-1 h-px bg-slate-200 dark:bg-white/10" />
+                <span className="text-[10px] text-slate-500 font-extrabold tracking-widest uppercase">Or email registration</span>
+                <div className="flex-1 h-px bg-slate-200 dark:bg-white/10" />
               </div>
             </div>
 
@@ -312,19 +348,19 @@ export default function Signup() {
               
               {/* Class Selector Chips */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-black uppercase tracking-wider text-slate-300">
+                <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
                   Select Your CBSE Grade
                 </label>
-                <div className="grid grid-cols-4 gap-1.5">
-                  {["9", "10", "11", "12"].map((cls) => (
+                <div className="grid grid-cols-5 gap-1.5">
+                  {["6", "7", "8", "9", "10"].map((cls) => (
                     <button
                       key={cls}
                       type="button"
                       onClick={() => setSelectedClass(cls)}
-                      className={`py-2 rounded-xl text-xs font-black transition-all border ${
+                      className={`py-2 rounded-xl text-xs font-black transition-all border cursor-pointer ${
                         selectedClass === cls
                           ? "bg-fuchsia-600 text-white border-fuchsia-500 shadow-md shadow-fuchsia-500/25"
-                          : "bg-white/5 text-slate-400 border-white/10 hover:border-slate-600"
+                          : "bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:border-fuchsia-400"
                       }`}
                     >
                       Class {cls}
@@ -335,59 +371,59 @@ export default function Signup() {
 
               {/* Full Name */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-black uppercase tracking-wider text-slate-300">
+                <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
                   Full Name
                 </label>
                 <div className="relative">
-                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
+                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 dark:text-slate-500" />
                   <input
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Aarav Sharma"
-                    className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 font-medium"
+                    className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 font-medium"
                   />
                 </div>
               </div>
 
               {/* Email Address */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-black uppercase tracking-wider text-slate-300">
+                <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
                   Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 dark:text-slate-500" />
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="student@cbse.in"
-                    className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 font-medium"
+                    className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 font-medium"
                   />
                 </div>
               </div>
 
               {/* Password */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-black uppercase tracking-wider text-slate-300">
+                <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 dark:text-slate-500" />
                   <input
                     type={showPassword ? "text" : "password"}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Min. 6 characters"
-                    className="w-full pl-12 pr-12 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 font-medium"
+                    className="w-full pl-12 pr-12 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 font-medium"
                   />
                   <button 
                     type="button" 
                     onClick={() => setShowPassword(!showPassword)} 
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
                   </button>
@@ -401,12 +437,12 @@ export default function Signup() {
                         <div
                           key={step}
                           className={`flex-1 rounded-full transition-all duration-300 ${
-                            step <= passwordStrength.score ? passwordStrength.color : "bg-slate-800"
+                            step <= passwordStrength.score ? passwordStrength.color : "bg-slate-200 dark:bg-slate-800"
                           }`}
                         />
                       ))}
                     </div>
-                    <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold">
+                    <div className="flex justify-between items-center text-[10px] text-slate-500 dark:text-slate-400 font-bold">
                       <span>Strength: {passwordStrength.label}</span>
                       <span>Min 6 characters</span>
                     </div>
@@ -415,12 +451,12 @@ export default function Signup() {
               </div>
 
               {/* Terms Checkbox */}
-              <label className="flex items-start gap-2.5 cursor-pointer select-none text-xs text-slate-300 pt-1">
+              <label className="flex items-start gap-2.5 cursor-pointer select-none text-xs text-slate-600 dark:text-slate-300 pt-1">
                 <input 
                   type="checkbox" 
                   checked={agreedTerms} 
                   onChange={e => setAgreedTerms(e.target.checked)} 
-                  className="accent-fuchsia-500 w-4 h-4 rounded cursor-pointer mt-0.5"
+                  className="accent-fuchsia-600 w-4 h-4 rounded cursor-pointer mt-0.5"
                 />
                 <span>I agree to EduTrack's honor code and student privacy policy.</span>
               </label>
@@ -431,7 +467,7 @@ export default function Signup() {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 via-indigo-600 to-cyan-500 hover:opacity-95 text-white font-extrabold text-sm py-3.5 rounded-2xl shadow-xl shadow-fuchsia-500/25 transition-all active:scale-95 disabled:opacity-60"
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 via-indigo-600 to-cyan-500 hover:opacity-95 text-white font-extrabold text-sm py-3.5 rounded-2xl shadow-xl shadow-fuchsia-500/25 transition-all active:scale-95 disabled:opacity-60 cursor-pointer"
               >
                 {loading ? (
                   <Loader2 className="w-4.5 h-4.5 animate-spin" />
@@ -445,9 +481,9 @@ export default function Signup() {
             </form>
 
             {/* Quick Demo Access Bar */}
-            <div className="mt-6 pt-5 border-t border-white/10 relative z-10">
+            <div className="mt-6 pt-5 border-t border-slate-200 dark:border-white/10 relative z-10">
               <div className="flex items-center justify-center mb-2.5">
-                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 bg-[#0b1026] px-3 py-0.5 rounded-full border border-indigo-500/20">
+                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-3 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-500/20">
                   ✨ Or Test Drive Instantly
                 </span>
               </div>
@@ -456,27 +492,27 @@ export default function Signup() {
                   type="button" 
                   disabled={demoLoadingRole !== null} 
                   onClick={() => handleGuestDemo("student")} 
-                  className="p-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 active:scale-95"
+                  className="p-2 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/20 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
                 >
-                  <GraduationCap className="w-3.5 h-3.5 text-indigo-400" />
+                  <GraduationCap className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                   <span>Student</span>
                 </button>
                 <button 
                   type="button" 
                   disabled={demoLoadingRole !== null} 
                   onClick={() => handleGuestDemo("teacher")} 
-                  className="p-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/20 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 active:scale-95"
+                  className="p-2 bg-purple-50 dark:bg-purple-500/10 hover:bg-purple-100 dark:hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-500/20 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
                 >
-                  <Users className="w-3.5 h-3.5 text-purple-400" />
+                  <Users className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                   <span>Teacher</span>
                 </button>
                 <button 
                   type="button" 
                   disabled={demoLoadingRole !== null} 
                   onClick={() => handleGuestDemo("admin")} 
-                  className="p-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 active:scale-95"
+                  className="p-2 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/20 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
                 >
-                  <Building className="w-3.5 h-3.5 text-emerald-400" />
+                  <Building className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   <span>Admin</span>
                 </button>
               </div>
@@ -484,9 +520,9 @@ export default function Signup() {
 
             {/* Bottom link to login */}
             <div className="mt-5 text-center relative z-10">
-              <p className="text-xs text-slate-400 font-medium">
+              <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
                 Already have an account?{" "}
-                <Link href="/login" className="text-fuchsia-400 hover:text-fuchsia-300 font-extrabold underline underline-offset-4">
+                <Link href="/login" className="text-fuchsia-600 dark:text-fuchsia-400 hover:underline font-extrabold">
                   Sign in here
                 </Link>
               </p>

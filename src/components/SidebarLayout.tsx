@@ -39,6 +39,7 @@ const categories = [
   {
     title: "Self-Guided & Tools",
     items: [
+      { href: "/whiteboard", label: "Interactive Whiteboard", icon: Palette, badge: "Canvas" },
       { href: "/ncert", label: "AI Study Hub", icon: BookOpen, badge: "NCERT" },
       { href: "/sandbox", label: "Simulations Lab", icon: Sliders, badge: "Lab" },
       { href: "/tutor", label: "AI Tutor", icon: MessageSquare, badge: "AI" },
@@ -335,25 +336,23 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               </p>
             </div>
             
-            {isExpanded && (
-              <button 
-                onClick={() => {
-                  const isDark = document.documentElement.classList.contains('dark');
-                  if (isDark) {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('edutrack_theme', 'light');
-                  } else {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('edutrack_theme', 'dark');
-                  }
-                }}
-                className="p-1.5 rounded-xl bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-indigo-500 dark:hover:text-indigo-400 hover:scale-105 active:scale-95 transition-all shrink-0 shadow-sm"
-                title="Toggle Light/Dark Theme"
-              >
-                <Moon className="w-3.5 h-3.5 hidden dark:block text-indigo-400" />
-                <Sun className="w-3.5 h-3.5 block dark:hidden text-amber-500" />
-              </button>
-            )}
+            <button 
+              onClick={() => {
+                const isDark = document.documentElement.classList.contains('dark');
+                if (isDark) {
+                  document.documentElement.classList.remove('dark');
+                  localStorage.setItem('edutrack_theme', 'light');
+                } else {
+                  document.documentElement.classList.add('dark');
+                  localStorage.setItem('edutrack_theme', 'dark');
+                }
+              }}
+              className="p-1.5 rounded-xl bg-white dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-105 active:scale-95 transition-all shrink-0 shadow-sm"
+              title="Toggle Light/Dark Theme"
+            >
+              <Moon className="w-3.5 h-3.5 hidden dark:block text-indigo-400" />
+              <Sun className="w-3.5 h-3.5 block dark:hidden text-amber-500" />
+            </button>
 
             {isExpanded && (
               <div className="pt-2 w-full flex justify-center">
@@ -378,7 +377,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               )}>
                 Platform Management
               </span>
-              <Link href={ADMIN_PORTAL_ROUTE} className={cn("flex items-center justify-between px-3 py-2.5 rounded-xl font-extrabold text-xs transition-all relative group", pathname.startsWith("/admin-portal") ? "bg-indigo-500/15 text-indigo-650" : "hover:bg-slate-100")}>
+              <Link href={ADMIN_PORTAL_ROUTE} className={cn("flex items-center justify-between px-3 py-2.5 rounded-xl font-extrabold text-xs transition-all relative group", pathname.startsWith("/admin-portal") ? "bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30" : "hover:bg-slate-100 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400")}>
                 <div className="flex items-center gap-3"><Shield className="w-4 h-4" /><span className={cn("whitespace-nowrap transition-all duration-300", isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden")}>Super Admin</span></div>
               </Link>
             </div>
@@ -414,8 +413,8 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                       className={cn(
                         "flex items-center justify-between px-3 py-2.5 rounded-xl font-extrabold text-xs transition-all relative group",
                         (mounted && isActive)
-                          ? "bg-indigo-500/15 text-indigo-650 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-500/30 shadow-sm"
-                          : "hover:bg-slate-100/70 dark:hover:bg-white/[0.05] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                          ? "bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30 shadow-sm font-black"
+                          : "hover:bg-slate-100 dark:hover:bg-white/[0.05] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                       )}
                     >
                       <div className={cn(
@@ -438,7 +437,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                       {link.badge && isExpanded && (
                         <span className={cn(
                           "text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full border",
-                          isActive ? "bg-indigo-500/20 text-indigo-400 border-indigo-500/30" : "bg-white/5 text-slate-400 border-white/10"
+                          isActive ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/30" : "bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-400 border-slate-200 dark:border-white/10"
                         )}>
                           {link.badge}
                         </span>
