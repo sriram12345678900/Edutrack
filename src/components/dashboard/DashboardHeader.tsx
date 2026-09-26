@@ -55,7 +55,7 @@ export function DashboardHeader({
         <div id="tour-streak-header" className="inline-flex items-center gap-2 bg-orange-500/10 dark:bg-orange-500/5 text-orange-600 dark:text-orange-400 px-3.5 sm:px-4.5 py-2 sm:py-2.5 rounded-2xl border border-orange-500/20 font-black text-xs sm:text-sm shadow-sm relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-orange-500/10 to-orange-500/0 -translate-x-full group-hover:animate-shimmer" />
           <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500 animate-flame-glow" /> 
-          <span>{streak} Day Streak</span>
+          <span suppressHydrationWarning>{streak} Day Streak</span>
         </div>
 
         {onToggleZen && (
