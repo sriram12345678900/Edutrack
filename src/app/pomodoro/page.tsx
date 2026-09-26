@@ -253,12 +253,12 @@ export default function PomodoroPage() {
     <div className="space-y-8 max-w-5xl mx-auto select-none">
       
       {/* HEADER SECTION */}
-      <div className="border-b border-slate-200/60 dark:border-slate-800/60 pb-5">
+      <div className="border-b border-slate-200/80 dark:border-slate-800/80 pb-5">
         <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/15">
           Productivity Booster
         </span>
-        <h1 className="text-3xl font-extrabold mt-3 tracking-tight">Pomodoro Focus Timer ⏳</h1>
-        <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 mt-1.5 font-semibold text-xs">
+        <h1 className="text-3xl font-extrabold mt-3 tracking-tight text-slate-900 dark:text-white">Pomodoro Focus Timer ⏳</h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-1.5 font-semibold text-xs">
           Stay focused for 25-minute intervals and recharge with structured breaks to optimize retention.
         </p>
       </div>
@@ -266,18 +266,18 @@ export default function PomodoroPage() {
       <div className="grid md:grid-cols-3 gap-8 items-start">
         
         {/* TIMER CORE UNIT (Spans 2 columns) */}
-        <div className="md:col-span-2 flex flex-col items-center justify-center bg-white dark:bg-slate-50 dark:bg-slate-900/60 bg-slate-200/60 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 p-8 rounded-[2rem] shadow-sm relative overflow-hidden">
+        <div className="md:col-span-2 flex flex-col items-center justify-center bg-white dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 p-8 rounded-[2rem] shadow-sm relative overflow-hidden">
           {/* Ambient Glow */}
           <div className="absolute top-[-40%] left-[-20%] w-[300px] h-[300px] bg-indigo-500/5 rounded-full blur-[80px]" />
           
           {/* Mode Switchers */}
-          <div className="flex bg-slate-50 dark:bg-slate-950 p-1.5 rounded-2xl border border-slate-200/60 dark:border-slate-850 gap-1.5 mb-10 relative z-10">
+          <div className="flex bg-slate-100 dark:bg-slate-950 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1.5 mb-10 relative z-10">
             <button 
               onClick={() => changeMode("study")}
               className={`px-5 py-2.5 rounded-xl font-extrabold text-xs uppercase tracking-wide transition-all ${
                 mode === "study"
                   ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/10"
-                  : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
               }`}
             >
               Focus Session
@@ -287,7 +287,7 @@ export default function PomodoroPage() {
               className={`px-5 py-2.5 rounded-xl font-extrabold text-xs uppercase tracking-wide transition-all ${
                 mode === "shortBreak"
                   ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/10"
-                  : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
               }`}
             >
               Short Break
@@ -297,7 +297,7 @@ export default function PomodoroPage() {
               className={`px-5 py-2.5 rounded-xl font-extrabold text-xs uppercase tracking-wide transition-all ${
                 mode === "longBreak"
                   ? "bg-blue-600 text-white shadow-md shadow-blue-500/10"
-                  : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
               }`}
             >
               Long Break
@@ -313,7 +313,7 @@ export default function PomodoroPage() {
                 cx="128"
                 cy="128"
                 r="110"
-                className="stroke-slate-100 dark:stroke-slate-850"
+                className="stroke-slate-200 dark:stroke-slate-800"
                 strokeWidth="8"
                 fill="transparent"
               />
@@ -334,10 +334,10 @@ export default function PomodoroPage() {
 
             {/* Inner text countdown */}
             <div className="absolute text-center flex flex-col items-center justify-center">
-              <span className="text-5xl font-black font-mono tracking-tight text-slate-850 dark:text-white leading-none">
+              <span className="text-5xl font-black font-mono tracking-tight text-slate-900 dark:text-white leading-none">
                 {formatTime(timeLeft)}
               </span>
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-555 mt-2.5">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mt-2.5">
                 {mode === "study" ? "Focus" : "Rest & Recharge"}
               </span>
             </div>
@@ -347,7 +347,7 @@ export default function PomodoroPage() {
           <div className="flex items-center gap-4 relative z-10 mb-8">
             <button 
               onClick={resetTimer}
-              className="p-4 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-50 dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-850 text-slate-600 dark:text-slate-500 dark:text-slate-400 rounded-2xl transition-all active:scale-95"
+              className="p-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-2xl transition-all active:scale-95 shadow-sm"
               title="Reset Timer"
             >
               <RotateCcw className="w-5 h-5" />
@@ -357,10 +357,10 @@ export default function PomodoroPage() {
               onClick={toggleStart}
               className={`px-8 py-4 text-white font-extrabold text-xs uppercase tracking-widest rounded-2xl transition-all shadow-md active:scale-95 flex items-center gap-2 hover:scale-[1.03] ${
                 mode === "study" 
-                  ? "bg-indigo-650 hover:bg-indigo-700 shadow-indigo-500/10" 
+                  ? "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/20" 
                   : mode === "shortBreak" 
-                  ? "bg-emerald-650 hover:bg-emerald-700 shadow-emerald-500/10" 
-                  : "bg-blue-650 hover:bg-blue-700 shadow-blue-500/10"
+                  ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20" 
+                  : "bg-blue-600 hover:bg-blue-700 shadow-blue-500/20"
               }`}
             >
               {isRunning ? (
@@ -378,10 +378,10 @@ export default function PomodoroPage() {
 
             <button 
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className={`p-4 border rounded-2xl transition-all active:scale-95 ${
+              className={`p-4 border rounded-2xl transition-all active:scale-95 shadow-sm ${
                 soundEnabled 
-                  ? "bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 border-indigo-150 dark:border-indigo-900/35" 
-                  : "bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-850"
+                  ? "bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-900/40" 
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700"
               }`}
               title="Toggle Audio Cues"
             >
@@ -390,11 +390,11 @@ export default function PomodoroPage() {
           </div>
 
           {/* Interactive Quote Indicator */}
-          <div className="w-full max-w-md text-center border-t border-slate-100 dark:border-slate-850/80 pt-6">
-            <p className="text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400 italic leading-relaxed">
+          <div className="w-full max-w-md text-center border-t border-slate-200 dark:border-slate-800/80 pt-6">
+            <p className="text-xs text-slate-500 dark:text-slate-400 italic leading-relaxed">
               &ldquo;{quotes[quoteIdx].text}&rdquo;
             </p>
-            <p className="text-[10px] font-black text-indigo-600 dark:text-indigo-455 uppercase tracking-wide mt-2">
+            <p className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mt-2">
               — {quotes[quoteIdx].author}
             </p>
           </div>
@@ -403,7 +403,7 @@ export default function PomodoroPage() {
         {/* STATS & SETTINGS BLOCK (1 column) */}
         <div className="space-y-6">
           {/* STATS PANEL */}
-          <div className="bg-white dark:bg-slate-50 dark:bg-slate-900/60 bg-slate-200/60 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 p-6 rounded-[2rem] shadow-sm">
+          <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-[2rem] shadow-sm">
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2 mb-6">
               <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl">
                 <Award className="w-4.5 h-4.5 text-indigo-600 dark:text-indigo-400" />
@@ -412,32 +412,32 @@ export default function PomodoroPage() {
             </h3>
 
             <div className="space-y-4">
-              <div className="bg-slate-50/50 dark:bg-slate-950/35 border border-slate-150/70 dark:border-slate-850/50 p-4 rounded-2xl flex items-center gap-3.5">
-                <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-650 dark:text-indigo-400 rounded-xl flex items-center justify-center shrink-0">
+              <div className="bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl flex items-center gap-3.5">
+                <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center shrink-0">
                   <Flame className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 dark:text-slate-450 font-bold">Sessions Completed</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Sessions Completed</p>
                   <p className="text-xl font-black text-slate-900 dark:text-white mt-0.5">{sessionsCompleted}</p>
                 </div>
               </div>
 
-              <div className="bg-slate-50/50 dark:bg-slate-950/35 border border-slate-150/70 dark:border-slate-850/50 p-4 rounded-2xl flex items-center gap-3.5">
-                <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-650 dark:text-emerald-400 rounded-xl flex items-center justify-center shrink-0">
+              <div className="bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl flex items-center gap-3.5">
+                <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center shrink-0">
                   <CheckCircle className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 dark:text-slate-450 font-bold">Breaks Completed</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Breaks Completed</p>
                   <p className="text-xl font-black text-slate-900 dark:text-white mt-0.5">{breaksCompleted}</p>
                 </div>
               </div>
 
-              <div className="bg-slate-50/50 dark:bg-slate-950/35 border border-slate-150/70 dark:border-slate-850/50 p-4 rounded-2xl flex items-center gap-3.5">
-                <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 text-amber-650 dark:text-amber-400 rounded-xl flex items-center justify-center shrink-0">
+              <div className="bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl flex items-center gap-3.5">
+                <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center shrink-0">
                   <Timer className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 dark:text-slate-450 font-bold">Total Focus Time</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Total Focus Time</p>
                   <p className="text-xl font-black text-slate-900 dark:text-white mt-0.5">{totalFocusMinutes} Mins</p>
                 </div>
               </div>
@@ -445,7 +445,7 @@ export default function PomodoroPage() {
           </div>
 
           {/* INTERACTIVE EXTRA OPTIONS */}
-          <div className="bg-white dark:bg-slate-50 dark:bg-slate-900/60 bg-slate-200/60 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 p-6 rounded-[2rem] shadow-sm">
+          <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-[2rem] shadow-sm">
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2 mb-6">
               <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl">
                 <Lightbulb className="w-4.5 h-4.5 text-indigo-600 dark:text-indigo-400" />
@@ -462,7 +462,7 @@ export default function PomodoroPage() {
                 <button
                   onClick={() => setTickEnabled(!tickEnabled)}
                   className={`w-10 h-6 rounded-full transition-all relative ${
-                    tickEnabled ? "bg-indigo-650" : "bg-slate-200 dark:bg-slate-800"
+                    tickEnabled ? "bg-indigo-600" : "bg-slate-200 dark:bg-slate-800"
                   }`}
                 >
                   <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
@@ -482,7 +482,7 @@ export default function PomodoroPage() {
       </div>
 
       {/* POMODORO FOREST SECTION */}
-      <div className="bg-white dark:bg-slate-50 dark:bg-slate-900/60 bg-slate-200/60 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 p-8 rounded-[2rem] shadow-sm mt-8">
+      <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 p-8 rounded-[2rem] shadow-sm mt-8">
         <h3 className="text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2 mb-6">
           <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl">
             <TreePine className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />

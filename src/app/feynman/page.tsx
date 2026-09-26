@@ -206,32 +206,32 @@ Keep your response short (2-3 sentences max), friendly, and strictly in ${feynma
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 p-4 md:p-8 font-sans">
       <div className="max-w-6xl mx-auto space-y-6">
         
         {/* Header */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-900/40 via-teal-900/40 to-slate-900/60 border border-emerald-500/20 p-6 md:p-8 backdrop-blur-xl shadow-2xl">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-indigo-500/10 dark:from-emerald-900/40 dark:via-teal-900/40 dark:to-slate-900/60 border border-emerald-500/20 p-6 md:p-8 backdrop-blur-xl shadow-xl">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-black uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-wider">
                 <Brain className="w-3.5 h-3.5" />
                 The Feynman Technique
               </div>
-              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">
-                "Teach the AI" <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">Mastery Lab</span>
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
+                "Teach the AI" <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500 dark:from-emerald-400 dark:to-teal-300">Mastery Lab</span>
               </h1>
-              <p className="text-slate-300 text-xs md:text-sm max-w-xl">
+              <p className="text-slate-600 dark:text-slate-300 text-xs md:text-sm max-w-xl">
                 "If you can't explain it simply, you don't understand it well enough." Teach concepts to Leo, an inquisitive AI student. Strip away complex jargon and master deep intuition!
               </p>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-slate-900/80 rounded-2xl border border-slate-800">
-                <span className="text-[10px] text-slate-400 font-bold block mb-1">LANGUAGE</span>
+              <div className="p-3 bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold block mb-1">LANGUAGE</span>
                 <select
                   value={feynmanLanguage}
                   onChange={e => setFeynmanLanguage(e.target.value)}
-                  className="bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 text-xs font-bold text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
+                  className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
                 >
                   {SUPPORTED_LANGUAGES.map(lang => (
                     <option key={lang.code} value={lang.code}>
@@ -241,9 +241,9 @@ Keep your response short (2-3 sentences max), friendly, and strictly in ${feynma
                 </select>
               </div>
 
-              <div className="p-3 bg-slate-900/80 rounded-2xl border border-slate-800 text-center">
-                <span className="text-[10px] text-slate-400 font-bold block">INTUITION XP</span>
-                <span className="text-sm font-black text-emerald-400 flex items-center gap-1 justify-center">
+              <div className="p-3 bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-800 text-center shadow-sm">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold block">INTUITION XP</span>
+                <span className="text-sm font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1 justify-center">
                   <Flame className="w-4 h-4" /> +100 XP
                 </span>
               </div>
@@ -256,9 +256,9 @@ Keep your response short (2-3 sentences max), friendly, and strictly in ${feynma
           
           {/* Left Column: Topic Selector & Intuition Metrics */}
           <div className="space-y-4">
-            <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl">
-              <h3 className="text-sm font-black text-white flex items-center gap-2">
-                <Lightbulb className="w-4 h-4 text-amber-400" />
+            <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 space-y-4 shadow-sm">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <Lightbulb className="w-4 h-4 text-amber-500" />
                 Select Concept to Teach
               </h3>
 
@@ -272,16 +272,16 @@ Keep your response short (2-3 sentences max), friendly, and strictly in ${feynma
                       className={cn(
                         "w-full text-left p-3.5 rounded-2xl border transition-all space-y-1 block",
                         isSelected
-                          ? "bg-emerald-950/40 border-emerald-500 shadow-md shadow-emerald-950/40"
-                          : "bg-slate-950/60 border-slate-800 hover:border-slate-700"
+                          ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-md shadow-emerald-500/10"
+                          : "bg-slate-50 dark:bg-slate-950/60 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
                       )}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-black text-emerald-400">{topic.subject}</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-bold">Concept</span>
+                        <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">{topic.subject}</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold">Concept</span>
                       </div>
-                      <h4 className="text-xs font-bold text-white">{topic.title}</h4>
-                      <p className="text-[11px] text-slate-400 line-clamp-1">{topic.summary}</p>
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white">{topic.title}</h4>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">{topic.summary}</p>
                     </button>
                   );
                 })}
@@ -289,23 +289,23 @@ Keep your response short (2-3 sentences max), friendly, and strictly in ${feynma
             </div>
 
             {/* Simplicity & Jargon Monitor */}
-            <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl">
-              <h3 className="text-sm font-black text-white flex items-center gap-2">
-                <Brain className="w-4 h-4 text-indigo-400" />
+            <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 space-y-4 shadow-sm">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <Brain className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
                 Intuition & Simplicity Meter
               </h3>
 
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-bold">
-                  <span className="text-slate-400">Simplicity Score</span>
+                  <span className="text-slate-500 dark:text-slate-400">Simplicity Score</span>
                   <span className={cn(
                     "font-black",
-                    simplicityScore >= 80 ? "text-emerald-400" : simplicityScore >= 50 ? "text-amber-400" : "text-red-400"
+                    simplicityScore >= 80 ? "text-emerald-600 dark:text-emerald-400" : simplicityScore >= 50 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400"
                   )}>
                     {simplicityScore}%
                   </span>
                 </div>
-                <div className="w-full h-3 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                <div className="w-full h-3 bg-slate-100 dark:bg-slate-950 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800">
                   <div 
                     className={cn(
                       "h-full transition-all duration-500",
@@ -316,20 +316,20 @@ Keep your response short (2-3 sentences max), friendly, and strictly in ${feynma
                 </div>
               </div>
 
-              <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 text-xs space-y-1.5">
-                <div className="flex items-center justify-between text-slate-400">
+              <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs space-y-1.5">
+                <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
                   <span>Jargon Words Flagged:</span>
-                  <span className="font-bold text-amber-400">{jargonCount}</span>
+                  <span className="font-bold text-amber-600 dark:text-amber-400">{jargonCount}</span>
                 </div>
-                <div className="flex items-center justify-between text-slate-400">
+                <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
                   <span>Teaching Exchanges:</span>
-                  <span className="font-bold text-white">{teachingRounds}</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{teachingRounds}</span>
                 </div>
               </div>
 
-              <div className="p-3.5 bg-emerald-950/20 border border-emerald-500/20 rounded-2xl space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">Pro Feynman Tip</span>
-                <p className="text-xs text-slate-300">
+              <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block">Pro Feynman Tip</span>
+                <p className="text-xs text-slate-700 dark:text-slate-300">
                   {selectedTopic.idealAnalogy}
                 </p>
               </div>
@@ -337,23 +337,23 @@ Keep your response short (2-3 sentences max), friendly, and strictly in ${feynma
           </div>
 
           {/* Right 2 Columns: Conversational Teaching Lab */}
-          <div className="lg:col-span-2 bg-slate-900/90 border border-slate-800 rounded-3xl p-5 md:p-6 flex flex-col justify-between shadow-2xl h-[650px]">
+          <div className="lg:col-span-2 bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 md:p-6 flex flex-col justify-between shadow-xl h-[650px]">
             
             {/* Top Bar */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-300">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-300">
                   <Bot className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black text-white">Leo (Curious 10-Year-Old)</h3>
-                  <p className="text-[11px] text-emerald-400 font-medium">Ready to learn {selectedTopic.title}</p>
+                  <h3 className="text-sm font-black text-slate-900 dark:text-white">Leo (Curious 10-Year-Old)</h3>
+                  <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">Ready to learn {selectedTopic.title}</p>
                 </div>
               </div>
 
               <button
                 onClick={() => startSession(selectedTopic)}
-                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-bold flex items-center gap-1 transition-colors"
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold flex items-center gap-1 transition-colors"
                 title="Restart teaching session"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
@@ -375,7 +375,7 @@ Keep your response short (2-3 sentences max), friendly, and strictly in ${feynma
                   >
                     <div className={cn(
                       "w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold",
-                      isStudent ? "bg-indigo-600 text-white" : "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                      isStudent ? "bg-indigo-600 text-white" : "bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30"
                     )}>
                       {isStudent ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
                     </div>
@@ -385,13 +385,13 @@ Keep your response short (2-3 sentences max), friendly, and strictly in ${feynma
                         "p-4 rounded-2xl text-xs md:text-sm leading-relaxed",
                         isStudent 
                           ? "bg-indigo-600 text-white rounded-tr-none shadow-md shadow-indigo-600/20"
-                          : "bg-slate-950 border border-slate-800 text-slate-200 rounded-tl-none"
+                          : "bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-none"
                       )}>
                         {msg.text}
                       </div>
 
                       {msg.jargonFound && msg.jargonFound.length > 0 && (
-                        <div className="p-2 bg-amber-950/30 border border-amber-500/30 rounded-xl text-[11px] text-amber-300 flex items-center gap-1.5">
+                        <div className="p-2 bg-amber-500/10 border border-amber-500/30 rounded-xl text-[11px] text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
                           <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                           <span>Jargon Detected: <strong>{msg.jargonFound.join(", ")}</strong></span>
                         </div>
@@ -403,7 +403,7 @@ Keep your response short (2-3 sentences max), friendly, and strictly in ${feynma
 
               {isTyping && (
                 <div className="flex items-center gap-2 text-xs text-slate-500 italic">
-                  <Bot className="w-4 h-4 text-amber-400 animate-spin" />
+                  <Bot className="w-4 h-4 text-amber-500 animate-spin" />
                   Leo is thinking about your explanation...
                 </div>
               )}
@@ -412,11 +412,11 @@ Keep your response short (2-3 sentences max), friendly, and strictly in ${feynma
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="p-5 bg-gradient-to-r from-emerald-950/60 to-teal-950/60 border border-emerald-500/40 rounded-2xl text-center space-y-2"
+                  className="p-5 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 dark:from-emerald-950/60 dark:to-teal-950/60 border border-emerald-500/40 rounded-2xl text-center space-y-2"
                 >
-                  <Trophy className="w-8 h-8 text-amber-400 mx-auto" />
-                  <h4 className="text-sm font-black text-white">Concept Mastered via Feynman Method!</h4>
-                  <p className="text-xs text-emerald-300">You earned +100 XP for explaining without textbook jargon!</p>
+                  <Trophy className="w-8 h-8 text-amber-500 mx-auto" />
+                  <h4 className="text-sm font-black text-slate-900 dark:text-white">Concept Mastered via Feynman Method!</h4>
+                  <p className="text-xs text-emerald-600 dark:text-emerald-300">You earned +100 XP for explaining without textbook jargon!</p>
                 </motion.div>
               )}
 
@@ -424,13 +424,13 @@ Keep your response short (2-3 sentences max), friendly, and strictly in ${feynma
             </div>
 
             {/* Input form */}
-            <form onSubmit={handleSendMessage} className="pt-3 border-t border-slate-800 flex gap-2">
+            <form onSubmit={handleSendMessage} className="pt-3 border-t border-slate-200 dark:border-slate-800 flex gap-2">
               <input
                 type="text"
                 value={inputMessage}
                 onChange={e => setInputMessage(e.target.value)}
                 placeholder="Explain in simple words or use a metaphor (e.g. 'Think of it like...')..."
-                className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-xs md:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-3 text-xs md:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500"
               />
               <button
                 type="submit"

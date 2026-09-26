@@ -184,7 +184,7 @@ export default function GraderPage() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-black tracking-wider uppercase mb-2">
               <Award className="w-3.5 h-3.5" /> CBSE AI Answer Sheet Grader
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight dark:text-white text-slate-900">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Handwritten Answer OCR & Step-Marking
             </h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
@@ -367,7 +367,7 @@ export default function GraderPage() {
                 <div className="w-16 h-16 bg-indigo-500/10 text-indigo-500 rounded-2xl flex items-center justify-center mx-auto animate-pulse">
                   <Sparkles className="w-8 h-8 animate-spin" />
                 </div>
-                <h3 className="text-lg font-black dark:text-white text-slate-900">AI Examiner at Work</h3>
+                <h3 className="text-lg font-black text-slate-900 dark:text-white">AI Examiner at Work</h3>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
                   Transcribing handwriting, verifying step methodology, and calculating marks for formulas, working steps, and SI units...
                 </p>
@@ -481,7 +481,7 @@ export default function GraderPage() {
                 <div className="w-14 h-14 bg-indigo-500/10 text-indigo-500 rounded-2xl flex items-center justify-center mx-auto">
                   <PenTool className="w-7 h-7" />
                 </div>
-                <h3 className="text-base font-extrabold dark:text-white text-slate-900">Awaiting Submission</h3>
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Awaiting Submission</h3>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
                   Select a practice question on the left, upload your handwritten solution sheet or type your answer, and click Evaluate to see the CBSE step-marking breakdown.
                 </p>

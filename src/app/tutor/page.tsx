@@ -507,7 +507,7 @@ export default function TutorPage() {
                 return <strong key={i} className="font-black dark:text-cyan-200 text-cyan-800 bg-cyan-500/10 px-1 py-0.5 rounded border border-cyan-500/20">{part.slice(2, -2)}</strong>;
               }
               if (part.startsWith("*") && part.endsWith("*") && part.length > 2) {
-                return <em key={i} className="italic dark:text-slate-300 text-slate-700">{part.slice(1, -1)}</em>;
+                return <em key={i} className="italic text-slate-700 dark:text-slate-300">{part.slice(1, -1)}</em>;
               }
               return part;
             })}
@@ -537,12 +537,12 @@ export default function TutorPage() {
           );
         } else if (level === 2) {
           return (
-            <h2 key={idx} className="text-base font-extrabold dark:text-white text-slate-900 mt-4 mb-2 tracking-tight flex items-center gap-2">
+            <h2 key={idx} className="text-base font-extrabold text-slate-900 dark:text-white mt-4 mb-2 tracking-tight flex items-center gap-2">
               {headingContent}
             </h2>
           );
         } else {
-          return <h3 key={idx} className="text-sm font-extrabold dark:text-white text-slate-900 mt-3 mb-1 tracking-tight">{headingContent}</h3>;
+          return <h3 key={idx} className="text-sm font-extrabold text-slate-900 dark:text-white mt-3 mb-1 tracking-tight">{headingContent}</h3>;
         }
       }
 
@@ -553,7 +553,7 @@ export default function TutorPage() {
         return (
           <div key={idx} className="flex items-start gap-2.5 ml-2 my-1.5 select-text">
             <span className="dark:text-cyan-400 text-cyan-700 mt-1 text-xs">•</span>
-            <span className="dark:text-slate-300 text-slate-700 text-sm font-medium leading-relaxed">{parseMix(line.trim().substring(2))}</span>
+            <span className="text-slate-700 dark:text-slate-300 text-sm font-medium leading-relaxed">{parseMix(line.trim().substring(2))}</span>
           </div>
         );
       }
@@ -564,14 +564,14 @@ export default function TutorPage() {
           return (
             <div key={idx} className="flex items-start gap-2.5 ml-1 my-2 select-text">
               <span className="dark:text-cyan-400 text-cyan-700 font-extrabold text-xs bg-cyan-500/10 px-2 py-0.5 rounded-lg border border-cyan-500/30 shrink-0">{numMatch[1]}</span>
-              <span className="dark:text-slate-200 text-slate-800 text-sm font-semibold leading-relaxed pt-0.5">{parseMix(numMatch[2])}</span>
+              <span className="text-slate-800 dark:text-slate-200 text-sm font-semibold leading-relaxed pt-0.5">{parseMix(numMatch[2])}</span>
             </div>
           );
         }
       }
 
       return (
-        <p key={idx} className="dark:text-slate-300 text-slate-700 text-sm font-medium mb-2 last:mb-0 leading-relaxed select-text">
+        <p key={idx} className="text-slate-700 dark:text-slate-300 text-sm font-medium mb-2 last:mb-0 leading-relaxed select-text">
           {parseMix(line)}
         </p>
       );
@@ -654,7 +654,7 @@ export default function TutorPage() {
             className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 via-teal-500 to-indigo-600 hover:from-cyan-600 hover:to-indigo-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-lg shadow-cyan-500/25 active:scale-95 border border-white/20"
             title="Start a new AI study conversation"
           >
-            <Plus className="w-4 h-4 dark:text-white text-slate-900" />
+            <Plus className="w-4 h-4 text-slate-900 dark:text-white" />
             <span>New Chat</span>
           </button>
 
@@ -685,25 +685,25 @@ export default function TutorPage() {
                   }));
                 }
               }}
-              className="bg-transparent dark:text-white text-slate-900 font-extrabold focus:outline-none cursor-pointer text-xs pr-1 max-w-[140px]"
+              className="bg-transparent text-slate-900 dark:text-white font-extrabold focus:outline-none cursor-pointer text-xs pr-1 max-w-[140px]"
             >
               <optgroup label="Standard" className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-cyan-400 text-cyan-700 font-bold">
                 {SUPPORTED_LANGUAGES.filter(l => l.category === "standard").map(l => (
-                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] text-slate-900 dark:text-white">
                     {l.label}
                   </option>
                 ))}
               </optgroup>
               <optgroup label="Conversational Blends (-ish)" className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-amber-400 text-amber-700 font-bold">
                 {SUPPORTED_LANGUAGES.filter(l => l.category === "bilingual").map(l => (
-                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] text-slate-900 dark:text-white">
                     {l.label}
                   </option>
                 ))}
               </optgroup>
               <optgroup label="Regional Languages (Native)" className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-purple-400 text-purple-700 font-bold">
                 {SUPPORTED_LANGUAGES.filter(l => l.category === "regional").map(l => (
-                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] text-slate-900 dark:text-white">
                     {l.label}
                   </option>
                 ))}
@@ -834,7 +834,7 @@ export default function TutorPage() {
                   <h2 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-teal-300 mb-2 tracking-tight">
                     How can I help your study today?
                   </h2>
-                  <p className="dark:text-slate-400 text-slate-600 text-xs sm:text-sm font-semibold mb-6 max-w-md leading-relaxed">
+                  <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm font-semibold mb-6 max-w-md leading-relaxed">
                     Ask any doubt, upload homework photos, or select a topic below. Active in <strong className="dark:text-cyan-400 text-cyan-700 uppercase tracking-wider">{personaMode.replace('_', ' ')}</strong> mode in <strong className="dark:text-cyan-400 text-cyan-700">{userLanguage}</strong>.
                   </p>
 

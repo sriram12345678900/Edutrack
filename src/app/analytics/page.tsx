@@ -213,7 +213,7 @@ export default function AnalyticsPage() {
       <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Radar Chart (Mastery) */}
-        <div className="bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col items-center">
+        <div className="bg-white bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col items-center">
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
           <h2 className="text-lg font-bold text-slate-900 dark:text-white w-full flex items-center gap-2 mb-8">
             <Target className="w-5 h-5 dark:text-indigo-400 text-indigo-700" /> Subject Mastery
@@ -276,7 +276,7 @@ export default function AnalyticsPage() {
         <div className="lg:col-span-2 grid grid-rows-2 gap-6">
           
           {/* Heatmap */}
-          <div className="bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col justify-center">
+          <div className="bg-white bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col justify-center">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
               <TrendingUp className="w-5 h-5 dark:text-emerald-400 text-emerald-700" /> 28-Day Study Streak
             </h2>

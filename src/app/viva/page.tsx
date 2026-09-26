@@ -315,29 +315,29 @@ export default function VivaPage() {
   const currentEval = evaluations.find(e => e.questionId === currentQuestion?.id);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 p-4 md:p-8 font-sans">
       <div className="max-w-5xl mx-auto space-y-6">
         
         {/* Header */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-900/40 via-indigo-900/40 to-slate-900/60 border border-purple-500/20 p-6 md:p-8 backdrop-blur-xl shadow-2xl">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-slate-500/10 dark:from-purple-900/40 dark:via-indigo-900/40 dark:to-slate-900/60 border border-purple-500/20 p-6 md:p-8 backdrop-blur-xl shadow-xl">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-black uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-600 dark:text-purple-400 text-xs font-black uppercase tracking-wider">
                 <Mic className="w-3.5 h-3.5 animate-pulse" />
                 Conversational AI Oral Examiner
               </div>
-              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">
-                AI Voice <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-300">Viva Simulator</span>
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
+                AI Voice <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-300">Viva Simulator</span>
               </h1>
-              <p className="text-slate-300 text-xs md:text-sm max-w-xl">
+              <p className="text-slate-600 dark:text-slate-300 text-xs md:text-sm max-w-xl">
                 Test your conceptual clarity, oral articulation, and quick thinking with an interactive AI examiner simulating official board practical viva exams.
               </p>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-slate-900/80 rounded-2xl border border-slate-800 text-center">
-                <span className="text-[10px] text-slate-400 font-bold block">REWARD</span>
-                <span className="text-sm font-black text-amber-400 flex items-center gap-1 justify-center">
+              <div className="p-3 bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-800 text-center shadow-sm">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold block">REWARD</span>
+                <span className="text-sm font-black text-amber-600 dark:text-amber-400 flex items-center gap-1 justify-center">
                   <Flame className="w-4 h-4" /> +120 XP
                 </span>
               </div>
@@ -347,13 +347,13 @@ export default function VivaPage() {
 
         {!isExamActive ? (
           /* Topic Selection Screen */
-          <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 md:p-8 space-y-6 shadow-xl">
+          <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 md:p-8 space-y-6 shadow-xl">
             <div>
-              <h2 className="text-xl font-black text-white flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-indigo-400" />
+              <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
                 Select Viva Subject & Topic
               </h2>
-              <p className="text-xs text-slate-400 mt-1">Choose an exam topic to begin your oral questioning round with the AI examiner.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Choose an exam topic to begin your oral questioning round with the AI examiner.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -366,30 +366,30 @@ export default function VivaPage() {
                     className={cn(
                       "p-5 rounded-2xl border cursor-pointer transition-all space-y-3",
                       isSelected
-                        ? "bg-indigo-950/40 border-indigo-500 shadow-lg shadow-indigo-950/50 scale-[1.02]"
-                        : "bg-slate-950/60 border-slate-800 hover:border-slate-700"
+                        ? "bg-indigo-50 dark:bg-indigo-950/40 border-indigo-500 shadow-lg shadow-indigo-500/10 scale-[1.02]"
+                        : "bg-slate-50 dark:bg-slate-950/60 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
                     )}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-black text-indigo-400">{topicKey.split(" - ")[0]}</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-bold">
+                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">{topicKey.split(" - ")[0]}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold">
                         {VIVA_QUESTION_BANKS[topicKey].length} Questions
                       </span>
                     </div>
-                    <h3 className="text-sm font-bold text-white">{topicKey.split(" - ")[1]}</h3>
-                    <p className="text-xs text-slate-400">Board practicals & oral viva coverage</p>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">{topicKey.split(" - ")[1]}</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Board practicals & oral viva coverage</p>
                   </div>
                 );
               })}
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-slate-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-3">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Viva Language:</span>
+                <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Viva Language:</span>
                 <select
                   value={vivaLanguage}
                   onChange={e => setVivaLanguage(e.target.value)}
-                  className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-indigo-500 cursor-pointer"
+                  className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 cursor-pointer"
                 >
                   {SUPPORTED_LANGUAGES.map(lang => (
                     <option key={lang.code} value={lang.code}>
@@ -413,37 +413,37 @@ export default function VivaPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl text-center"
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl text-center"
           >
-            <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400">
+            <div className="w-16 h-16 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400">
               <Trophy className="w-8 h-8" />
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-2xl font-black text-white">Viva Examination Complete!</h2>
-              <p className="text-xs text-slate-400">Here is your official oral performance summary:</p>
+              <h2 className="text-2xl font-black text-slate-900 dark:text-white">Viva Examination Complete!</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Here is your official oral performance summary:</p>
             </div>
 
-            <div className="inline-flex items-center gap-4 p-4 rounded-2xl bg-slate-950 border border-slate-800">
+            <div className="inline-flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
               <div>
-                <span className="text-xs text-slate-400 block font-bold">Total Viva Score</span>
-                <span className="text-3xl font-black text-emerald-400">{totalScore} / {maxPossibleScore}</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 block font-bold">Total Viva Score</span>
+                <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{totalScore} / {maxPossibleScore}</span>
               </div>
-              <div className="w-[1px] h-10 bg-slate-800" />
+              <div className="w-[1px] h-10 bg-slate-200 dark:bg-slate-800" />
               <div>
-                <span className="text-xs text-slate-400 block font-bold">Accuracy Rating</span>
-                <span className="text-3xl font-black text-indigo-400">{Math.round((totalScore / maxPossibleScore) * 100)}%</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 block font-bold">Accuracy Rating</span>
+                <span className="text-3xl font-black text-indigo-600 dark:text-indigo-400">{Math.round((totalScore / maxPossibleScore) * 100)}%</span>
               </div>
             </div>
 
             <div className="space-y-3 text-left max-w-2xl mx-auto">
               {evaluations.map((ev, i) => (
-                <div key={i} className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                <div key={i} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-300">Question {i + 1}</span>
-                    <span className="text-xs font-black text-amber-400">{ev.score}/10 Marks</span>
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Question {i + 1}</span>
+                    <span className="text-xs font-black text-amber-600 dark:text-amber-400">{ev.score}/10 Marks</span>
                   </div>
-                  <p className="text-xs text-slate-400">{ev.feedback}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">{ev.feedback}</p>
                 </div>
               ))}
             </div>
@@ -451,7 +451,7 @@ export default function VivaPage() {
             <div className="flex justify-center gap-3 pt-4">
               <button
                 onClick={() => setIsExamActive(false)}
-                className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-2"
+                className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-indigo-600/20"
               >
                 <RotateCcw className="w-4 h-4" /> Try Another Topic
               </button>
@@ -461,12 +461,12 @@ export default function VivaPage() {
           /* Live Viva Examination Screen */
           <div className="space-y-6">
             {/* Progress bar */}
-            <div className="flex items-center justify-between text-xs text-slate-400 font-bold px-1">
+            <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-bold px-1">
               <span>Question {currentIndex + 1} of {questions.length}</span>
               <span>Topic: {selectedTopic}</span>
             </div>
 
-            <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+            <div className="w-full h-2 bg-slate-200 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800">
               <div 
                 className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-300"
                 style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
@@ -474,70 +474,70 @@ export default function VivaPage() {
             </div>
 
             {/* Examiner Character Card */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 md:p-8 space-y-6 shadow-xl relative overflow-hidden">
+            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 md:p-8 space-y-6 shadow-xl relative overflow-hidden">
               <div className="flex items-start gap-4">
                 <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300 shadow-inner">
+                  <div className="w-14 h-14 rounded-2xl bg-purple-500/10 dark:bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-600 dark:text-purple-300 shadow-inner">
                     <Bot className="w-8 h-8" />
                   </div>
                   {isSpeaking && (
-                    <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 ring-4 ring-slate-900 animate-pulse" />
+                    <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 ring-4 ring-white dark:ring-slate-900 animate-pulse" />
                   )}
                 </div>
 
                 <div className="space-y-2 flex-1">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-sm font-black text-white">Professor Sophia</h3>
-                      <p className="text-[10px] text-purple-400 font-bold uppercase tracking-wider">Senior Academic Examiner</p>
+                      <h3 className="text-sm font-black text-slate-900 dark:text-white">Professor Sophia</h3>
+                      <p className="text-[10px] text-purple-600 dark:text-purple-400 font-bold uppercase tracking-wider">Senior Academic Examiner</p>
                     </div>
 
                     <button
                       onClick={() => speakText(currentQuestion.question)}
-                      className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                      className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5 transition-colors"
                     >
-                      <Volume2 className="w-4 h-4 text-purple-400" />
+                      <Volume2 className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                       Repeat Question
                     </button>
                   </div>
 
-                  <div className="p-4 bg-slate-950/80 rounded-2xl border border-slate-800/80 text-sm md:text-base font-medium text-slate-100 leading-relaxed shadow-inner">
+                  <div className="p-4 bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200 dark:border-slate-800/80 text-sm md:text-base font-medium text-slate-900 dark:text-slate-100 leading-relaxed shadow-inner">
                     "{currentQuestion.question}"
                   </div>
                 </div>
               </div>
 
               {/* Student Voice Input Area */}
-              <div className="pt-4 border-t border-slate-800 space-y-4">
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-400 flex items-center gap-2">
-                    <User className="w-4 h-4 text-indigo-400" />
+                  <span className="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                    <User className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
                     Your Spoken Response:
                   </span>
                   {isListening && (
-                    <span className="text-xs font-bold text-red-400 flex items-center gap-1.5 animate-pulse">
+                    <span className="text-xs font-bold text-red-500 dark:text-red-400 flex items-center gap-1.5 animate-pulse">
                       <span className="w-2 h-2 rounded-full bg-red-500" />
                       Recording Audio...
                     </span>
                   )}
                 </div>
 
-                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 min-h-[100px] flex flex-col justify-between">
+                <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 min-h-[100px] flex flex-col justify-between">
                   <textarea
                     value={transcript}
                     onChange={e => setTranscript(e.target.value)}
                     placeholder="Click the microphone and speak your answer clearly, or type here directly..."
-                    className="w-full bg-transparent text-sm text-slate-200 placeholder-slate-600 focus:outline-none resize-none"
+                    className="w-full bg-transparent text-sm text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none resize-none"
                     rows={3}
                   />
 
-                  <div className="flex items-center justify-between pt-3 border-t border-slate-900">
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-900">
                     <button
                       onClick={toggleListening}
                       className={cn(
                         "px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 transition-all",
                         isListening
-                          ? "bg-red-500/20 text-red-400 border border-red-500/40 animate-pulse"
+                          ? "bg-red-500/20 text-red-500 dark:text-red-400 border border-red-500/40 animate-pulse"
                           : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30"
                       )}
                     >
@@ -548,7 +548,7 @@ export default function VivaPage() {
                     <button
                       onClick={handleEvaluateAnswer}
                       disabled={isEvaluating || !transcript.trim()}
-                      className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white text-xs font-black flex items-center gap-2 transition-all"
+                      className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white text-xs font-black flex items-center gap-2 transition-all shadow-md shadow-purple-600/20"
                     >
                       <Sparkles className="w-4 h-4" />
                       {isEvaluating ? "Grading..." : "Submit Answer to Examiner"}
@@ -563,44 +563,44 @@ export default function VivaPage() {
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-5 rounded-2xl bg-indigo-950/30 border border-indigo-500/30 space-y-4 shadow-lg"
+                    className="p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-500/30 space-y-4 shadow-lg"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Award className="w-5 h-5 text-amber-400" />
-                        <h4 className="text-sm font-black text-white">Examiner Score:</h4>
-                        <span className="text-base font-black text-amber-400">{currentEval.score} / 10</span>
+                        <Award className="w-5 h-5 text-amber-500 dark:text-amber-400" />
+                        <h4 className="text-sm font-black text-slate-900 dark:text-white">Examiner Score:</h4>
+                        <span className="text-base font-black text-amber-600 dark:text-amber-400">{currentEval.score} / 10</span>
                       </div>
 
                       <button
                         onClick={handleNextQuestion}
-                        className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black flex items-center gap-1.5"
+                        className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black flex items-center gap-1.5 shadow-md shadow-indigo-600/20"
                       >
                         Next Question <ChevronRight className="w-4 h-4" />
                       </button>
                     </div>
 
-                    <p className="text-xs text-slate-300 leading-relaxed">{currentEval.feedback}</p>
+                    <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">{currentEval.feedback}</p>
 
-                    <div className="space-y-2 pt-2 border-t border-indigo-900/50">
+                    <div className="space-y-2 pt-2 border-t border-indigo-200 dark:border-indigo-900/50">
                       <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-                        <span className="text-slate-400 font-bold">Keywords Detected:</span>
+                        <span className="text-slate-600 dark:text-slate-400 font-bold">Keywords Detected:</span>
                         {currentEval.detectedKeywords.length > 0 ? (
                           currentEval.detectedKeywords.map(k => (
-                            <span key={k} className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold flex items-center gap-1">
+                            <span key={k} className="px-2 py-0.5 rounded bg-emerald-500/15 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold flex items-center gap-1">
                               <CheckCircle2 className="w-3 h-3" /> {k}
                             </span>
                           ))
                         ) : (
-                          <span className="text-slate-500">None detected</span>
+                          <span className="text-slate-400 dark:text-slate-500">None detected</span>
                         )}
                       </div>
 
                       {currentEval.missingKeywords.length > 0 && (
                         <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-                          <span className="text-slate-400 font-bold">Suggested Terms:</span>
+                          <span className="text-slate-600 dark:text-slate-400 font-bold">Suggested Terms:</span>
                           {currentEval.missingKeywords.map(k => (
-                            <span key={k} className="px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-medium">
+                            <span key={k} className="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 font-medium">
                               {k}
                             </span>
                           ))}

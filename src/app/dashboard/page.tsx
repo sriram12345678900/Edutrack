@@ -38,7 +38,7 @@ const AnimatedCounter = ({ value, className }: { value: number; className?: stri
     });
   }, [springVal]);
 
-  return <span className={className}>{display.toLocaleString()}</span>;
+  return <span className={className} suppressHydrationWarning>{display.toLocaleString()}</span>;
 };
 
 // Reusable 3D Tilt Card for Bento Grid with enhanced hover physics & specular reflection

@@ -285,7 +285,7 @@ export default function StudyPlanner() {
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="dark:bg-slate-900 bg-slate-100 border-2 border-amber-500/50 rounded-[3rem] p-8 md:p-12 shadow-[0_0_80px_rgba(245,158,11,0.25)] max-w-md w-full text-center relative overflow-hidden ring-1 ring-white/10"
+              className="bg-white dark:bg-slate-900 border-2 border-amber-500/50 rounded-[3rem] p-8 md:p-12 shadow-[0_0_80px_rgba(245,158,11,0.25)] max-w-md w-full text-center relative overflow-hidden ring-1 ring-slate-200 dark:ring-white/10"
             >
               {/* Glowing back bubbles */}
               <div className="absolute -top-24 -left-24 w-48 h-48 bg-amber-500/20 rounded-full blur-3xl"></div>
@@ -306,20 +306,20 @@ export default function StudyPlanner() {
 
               <div className="relative z-10 space-y-6">
                 <div className="w-24 h-24 bg-amber-500/10 border-2 border-amber-500 rounded-full flex items-center justify-center mx-auto shadow-inner animate-pulse">
-                  <Award className="w-12 h-12 dark:text-amber-400 text-amber-700" />
+                  <Award className="w-12 h-12 text-amber-600 dark:text-amber-400" />
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-300 tracking-tight">LEVEL UP!</h3>
+                  <h3 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-yellow-500 dark:from-amber-400 dark:to-yellow-300 tracking-tight">LEVEL UP!</h3>
                   <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">New Rank Unlocked</p>
                 </div>
 
-                <div className="bg-slate-950/60 p-5 rounded-2xl border border-white/5 shadow-inner">
-                  <span className="text-slate-500 text-sm font-semibold block">Level {levelUpData.oldLevel}  Level {levelUpData.newLevel}</span>
-                  <span className="dark:text-white text-slate-900 font-extrabold text-lg mt-1 block tracking-wide">{getLevelTitle(levelUpData.newLevel)}</span>
+                <div className="bg-slate-100 dark:bg-slate-950/60 p-5 rounded-2xl border border-slate-200 dark:border-white/5 shadow-inner">
+                  <span className="text-slate-500 text-sm font-semibold block">Level {levelUpData.oldLevel} → Level {levelUpData.newLevel}</span>
+                  <span className="text-slate-900 dark:text-white font-extrabold text-lg mt-1 block tracking-wide">{getLevelTitle(levelUpData.newLevel)}</span>
                 </div>
 
-                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium px-4">
+                <p className="text-sm text-slate-600 dark:text-slate-400 font-medium px-4">
                   You are gaining XP rapidly! Keep reading and answering mock tests to reach the Rank of **Academic Legend**!
                 </p>
 
@@ -335,7 +335,7 @@ export default function StudyPlanner() {
         )}
       </AnimatePresence>
 
-      <header className="relative p-8 rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 bg-slate-100 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <header className="relative p-8 rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl"></div>
         <div className="relative z-10">
@@ -345,7 +345,7 @@ export default function StudyPlanner() {
             </div>
             AI Study Planner
           </h1>
-          <p className="text-lg text-slate-600 dark:text-slate-500 dark:text-slate-400 font-medium ml-1">
+          <p className="text-lg text-slate-600 dark:text-slate-400 font-medium ml-1">
             Let AI schedule your study days for maximum retention.
           </p>
         </div>
@@ -387,7 +387,7 @@ export default function StudyPlanner() {
               <Sparkles className="w-10 h-10 text-emerald-500" />
             </div>
             <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">Create a Master Plan</h2>
-            <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 mt-2">Fill in your exam details and let our AI coach build a day-by-day roadmap.</p>
+            <p className="text-slate-500 dark:text-slate-400 mt-2">Fill in your exam details and let our AI coach build a day-by-day roadmap.</p>
           </div>
 
           <form onSubmit={handleGenerate} className="space-y-6">
@@ -550,7 +550,7 @@ export default function StudyPlanner() {
                   <p className="text-sm font-bold text-orange-600 dark:text-orange-400 mt-0.5">{gamification.streakCount} Day{gamification.streakCount !== 1 ? 's' : ''} studied</p>
                 </div>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
                 {gamification.streakCount > 0 
                   ? "Your daily learning streak is burning bright! Complete another study day tomorrow to keep it alive."
                   : "Start complete study days to ignite your hot learning streak!"}
@@ -558,7 +558,7 @@ export default function StudyPlanner() {
             </div>
 
             {/* Achievements Trophy Hall */}
-            <div className="bg-white/70 dark:bg-slate-900/70 bg-slate-200/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-slate-200/50 dark:border-white/10 sticky top-[30rem] space-y-4 hover:shadow-purple-500/10 transition-shadow">
+            <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 sticky top-[30rem] space-y-4 hover:shadow-purple-500/10 transition-shadow">
               <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Trophy Milestones</h4>
               <div className="grid grid-cols-1 gap-2.5">
                 {ACHIEVEMENTS.map((ach) => {
@@ -568,8 +568,8 @@ export default function StudyPlanner() {
                       key={ach.id} 
                       className={`flex items-center gap-3 p-3 rounded-2xl border transition-all duration-300 ${
                         isUnlocked 
-                          ? 'bg-slate-50/50 dark:bg-slate-900/30 bg-slate-200/30 border-indigo-200 dark:border-indigo-900/40 shadow-sm' 
-                          : 'bg-slate-50/20 dark:bg-slate-900/10 bg-slate-200/10 border-slate-100 dark:border-slate-800/60 opacity-60'
+                          ? 'bg-slate-50 dark:bg-slate-800/50 border-indigo-200 dark:border-indigo-900/40 shadow-sm' 
+                          : 'bg-slate-50/50 dark:bg-slate-900/20 border-slate-100 dark:border-slate-800/60 opacity-60'
                       }`}
                     >
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 ${
@@ -581,12 +581,12 @@ export default function StudyPlanner() {
                         <div className="flex items-center justify-between">
                           <h5 className="font-extrabold text-xs text-slate-800 dark:text-white truncate">{ach.title}</h5>
                           <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded ${
-                            isUnlocked ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-500 dark:text-slate-400'
+                            isUnlocked ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-400'
                           }`}>
                             +{ach.points} XP
                           </span>
                         </div>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-500 dark:text-slate-400 truncate mt-0.5">{ach.description}</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">{ach.description}</p>
                       </div>
                     </div>
                   );

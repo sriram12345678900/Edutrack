@@ -133,6 +133,7 @@ const ROUTINE_TEMPLATES = [
 ];
 
 export default function HabitTrackerPage() {
+  const [mounted, setMounted] = useState(false);
   const [habits, setHabits] = useState<Habit[]>([]);
   // logs: { "YYYY-MM-DD": { [habitId]: boolean } }
   const [logs, setLogs] = useState<Record<string, Record<string, boolean>>>({});
@@ -243,6 +244,7 @@ export default function HabitTrackerPage() {
 
   // Load from local storage
   useEffect(() => {
+    setMounted(true);
     const storedHabits = localStorage.getItem('edutrack_habits');
     const storedLogs = localStorage.getItem('edutrack_habit_logs');
     const storedSound = localStorage.getItem('edutrack_habit_sound');
@@ -626,11 +628,11 @@ export default function HabitTrackerPage() {
       const completedCount = Object.values(dayLogs).filter(Boolean).length;
       const maxPossible = habits.length;
       const ratio = maxPossible > 0 ? Math.min(100, Math.round((completedCount / maxPossible) * 100)) : 0;
-      const isToday = selectedYear === realYear && monthIndex === realMonthIndex && d === realDay;
+      const isToday = mounted && selectedYear === realYear && monthIndex === realMonthIndex && d === realDay;
       data.push({ day: d, completedCount, ratio, isToday });
     }
     return data;
-  }, [logs, daysInMonth, selectedYear, monthIndex, habits.length, realYear, realMonthIndex, realDay]);
+  }, [logs, daysInMonth, selectedYear, monthIndex, habits.length, realYear, realMonthIndex, realDay, mounted]);
 
   // Top Ranked Habits
   const topHabits = useMemo(() => {
@@ -741,7 +743,7 @@ export default function HabitTrackerPage() {
   }, [totals.progressPercent]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans p-3 xs:p-4 sm:p-6 pb-28 md:pb-24 relative overflow-x-hidden selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans p-3 xs:p-4 sm:p-6 pb-28 md:pb-24 relative overflow-x-hidden selection:bg-indigo-500/30">
       <Confetti active={confettiActive} />
 
       {/* Floating XP Toast */}
@@ -775,14 +777,14 @@ export default function HabitTrackerPage() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl xs:text-2xl sm:text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300">
+              <h1 className="text-xl xs:text-2xl sm:text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-300 dark:via-purple-300 dark:to-pink-300">
                 HABIT COMMAND CENTER
               </h1>
-              <span className="text-[10px] uppercase font-black tracking-wider bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] uppercase font-black tracking-wider bg-indigo-500/10 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-full">
                 Gamified 2.0
               </span>
             </div>
-            <p className="text-slate-400 text-xs sm:text-sm font-medium mt-0.5">
+            <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium mt-0.5">
               Build relentless atomic routines, track graphical consistency, and earn academic XP.
             </p>
           </div>
@@ -794,17 +796,17 @@ export default function HabitTrackerPage() {
           <button
             onClick={toggleSound}
             title={soundEnabled ? "Mute audio chimes" : "Enable audio chimes"}
-            className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-slate-200 transition-all"
+            className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-all shadow-sm"
           >
-            {soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-400" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
+            {soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" /> : <VolumeX className="w-4 h-4 text-slate-400 dark:text-slate-500" />}
           </button>
 
           {/* Routine Templates Button */}
           <button
             onClick={() => setShowTemplatesModal(true)}
-            className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-600/20 to-purple-600/20 hover:from-indigo-600/30 hover:to-purple-600/30 border border-indigo-500/30 text-indigo-300 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm"
+            className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 dark:from-indigo-600/20 dark:to-purple-600/20 hover:from-indigo-500/20 hover:to-purple-500/20 border border-indigo-500/30 text-indigo-600 dark:text-indigo-300 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm"
           >
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> Routine Kits
+            <Sparkles className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" /> Routine Kits
           </button>
 
           {/* Add Habit Button */}
@@ -817,7 +819,7 @@ export default function HabitTrackerPage() {
 
           <Link 
             href="/dashboard" 
-            className="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-300 transition-all"
+            className="flex items-center gap-1.5 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 transition-all shadow-sm"
           >
             <Home className="w-3.5 h-3.5" /> Dashboard
           </Link>
@@ -826,17 +828,17 @@ export default function HabitTrackerPage() {
 
       {/* TOP SECTION: Today's Routine Hero Deck */}
       <section className="max-w-[1600px] mx-auto mb-6">
-        <div className="bg-gradient-to-br from-slate-900/90 via-slate-900 to-indigo-950/40 border border-slate-800/80 rounded-3xl p-5 sm:p-6 shadow-2xl relative overflow-hidden backdrop-blur-xl">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden backdrop-blur-xl">
           {/* Subtle decorative glow */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
           
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 mb-5 border-b border-slate-800/80 pb-5">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 mb-5 border-b border-slate-200 dark:border-slate-800/80 pb-5">
             <div className="flex items-center gap-4">
               {/* Circular Progress Indicator for Today */}
               <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                   <path
-                    className="text-slate-800"
+                    className="text-slate-200 dark:text-slate-800"
                     stroke="currentColor"
                     strokeWidth="3.5"
                     fill="none"
@@ -852,31 +854,31 @@ export default function HabitTrackerPage() {
                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   />
                 </svg>
-                <div className="absolute flex flex-col items-center justify-center">
-                  <span className="text-sm sm:text-base font-black text-white">{todayStats.percentage}%</span>
-                  <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400">Today</span>
+                <div className="absolute flex flex-col items-center justify-center" suppressHydrationWarning>
+                  <span className="text-sm sm:text-base font-black text-slate-900 dark:text-white" suppressHydrationWarning>{todayStats.percentage}%</span>
+                  <span className="text-[8px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Today</span>
                 </div>
               </div>
 
               <div>
                 <div className="flex items-center gap-2">
                   <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                    Today&apos;s Focus &bull; {months[realMonthIndex]} {realDay}, {realYear}
+                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider" suppressHydrationWarning>
+                    Today&apos;s Focus &bull; {months[realMonthIndex]} <span suppressHydrationWarning>{realDay}</span>, {realYear}
                   </span>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-0.5">
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5" suppressHydrationWarning>
                   {todayStats.percentage === 100 ? (
-                    <span className="text-emerald-400 flex items-center gap-2">
+                    <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
                       <Award className="w-6 h-6" /> Perfect Routine Complete!
                     </span>
                   ) : (
-                    <span>
+                    <span suppressHydrationWarning>
                       {todayStats.completed} of {todayStats.total} Habits Done
                     </span>
                   )}
                 </h2>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5" suppressHydrationWarning>
                   {todayStats.pending === 0 
                     ? "Sensational discipline! You unlocked full bonus XP today." 
                     : `${todayStats.pending} remaining routine item${todayStats.pending > 1 ? 's' : ''} to complete your day.`}
@@ -887,22 +889,25 @@ export default function HabitTrackerPage() {
             {/* Quick Actions & Filters */}
             <div className="flex flex-wrap items-center gap-2">
               {/* Status Filters */}
-              <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1 text-xs font-bold">
+              <div className="bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-1 text-xs font-bold">
                 <button
                   onClick={() => setTodayFilter('all')}
-                  className={`px-3 py-1 rounded-lg transition-all ${todayFilter === 'all' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}`}
+                  className={`px-3 py-1 rounded-lg transition-all ${todayFilter === 'all' ? 'bg-indigo-600 text-white shadow' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+                  suppressHydrationWarning
                 >
                   All ({habits.length})
                 </button>
                 <button
                   onClick={() => setTodayFilter('pending')}
-                  className={`px-3 py-1 rounded-lg transition-all ${todayFilter === 'pending' ? 'bg-amber-600/30 text-amber-300 border border-amber-500/40' : 'text-slate-400 hover:text-slate-200'}`}
+                  className={`px-3 py-1 rounded-lg transition-all ${todayFilter === 'pending' ? 'bg-amber-600/20 text-amber-700 dark:text-amber-300 border border-amber-500/40' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+                  suppressHydrationWarning
                 >
                   Pending ({todayStats.pending})
                 </button>
                 <button
                   onClick={() => setTodayFilter('done')}
-                  className={`px-3 py-1 rounded-lg transition-all ${todayFilter === 'done' ? 'bg-emerald-600/30 text-emerald-300 border border-emerald-500/40' : 'text-slate-400 hover:text-slate-200'}`}
+                  className={`px-3 py-1 rounded-lg transition-all ${todayFilter === 'done' ? 'bg-emerald-600/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+                  suppressHydrationWarning
                 >
                   Done ({todayStats.completed})
                 </button>
@@ -1000,9 +1005,9 @@ export default function HabitTrackerPage() {
               )}
             </div>
 
-            <div className="hidden md:flex items-center gap-2 text-[11px] font-bold text-slate-400 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-slate-850 shrink-0">
+            <div className="hidden md:flex items-center gap-2 text-[11px] font-bold text-slate-400 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-slate-850 shrink-0" suppressHydrationWarning>
               <Clock className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Current Time: <strong className="text-white font-black">{formatTime12(currentTimeStr)}</strong></span>
+              <span suppressHydrationWarning>Current Time: <strong className="text-white font-black" suppressHydrationWarning>{formatTime12(currentTimeStr)}</strong></span>
             </div>
           </div>
 
@@ -1458,6 +1463,7 @@ export default function HabitTrackerPage() {
                     return (
                       <div
                         key={day.day}
+                        suppressHydrationWarning
                         className={`aspect-square p-2 rounded-xl border flex flex-col items-center justify-between transition-all hover:scale-110 cursor-pointer ${bg} ${
                           day.isToday ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-slate-900' : ''
                         }`}
@@ -1558,7 +1564,7 @@ export default function HabitTrackerPage() {
           <div className="overflow-x-auto pb-2">
             <div className="flex items-end justify-between gap-1.5 h-36 min-w-[700px] pt-4 px-1">
               {dailyProgress.map(d => (
-                <div key={d.day} className="flex-1 flex flex-col items-center group h-full justify-end">
+                <div key={d.day} suppressHydrationWarning className="flex-1 flex flex-col items-center group h-full justify-end">
                   <div className="text-[9px] font-bold text-slate-400 mb-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     {d.completedCount}
                   </div>
@@ -1576,7 +1582,7 @@ export default function HabitTrackerPage() {
                       }`}
                     />
                   </div>
-                  <span className={`text-[9px] font-black mt-1.5 ${d.isToday ? 'text-amber-400 font-extrabold' : 'text-slate-500'}`}>
+                  <span suppressHydrationWarning className={`text-[9px] font-black mt-1.5 ${d.isToday ? 'text-amber-400 font-extrabold' : 'text-slate-500'}`}>
                     {d.day}
                   </span>
                 </div>
@@ -1807,10 +1813,11 @@ export default function HabitTrackerPage() {
                     </th>
                     {Array.from({ length: daysInMonth }).map((_, i) => {
                       const dNum = i + 1;
-                      const isToday = selectedYear === realYear && monthIndex === realMonthIndex && dNum === realDay;
+                      const isToday = mounted && selectedYear === realYear && monthIndex === realMonthIndex && dNum === realDay;
                       return (
                         <th 
                           key={i} 
+                          suppressHydrationWarning
                           className={`text-center py-2 text-[9px] font-black w-6 ${
                             isToday ? 'text-amber-400 bg-amber-500/10 rounded-t-lg' : 'text-slate-500'
                           }`}
@@ -1859,10 +1866,10 @@ export default function HabitTrackerPage() {
                           const dayNum = i + 1;
                           const dateKey = `${selectedYear}-${String(monthIndex + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
                           const isChecked = !!logs[dateKey]?.[h.id];
-                          const isToday = selectedYear === realYear && monthIndex === realMonthIndex && dayNum === realDay;
+                          const isToday = mounted && selectedYear === realYear && monthIndex === realMonthIndex && dayNum === realDay;
 
                           return (
-                            <td key={i} className={`py-1.5 text-center ${isToday ? 'bg-amber-500/5' : ''}`}>
+                            <td key={i} suppressHydrationWarning className={`py-1.5 text-center ${isToday ? 'bg-amber-500/5' : ''}`}>
                               <button
                                 onClick={() => toggleDayNum(h.id, dayNum)}
                                 className={`w-4 h-4 mx-auto rounded-md border flex items-center justify-center transition-all ${

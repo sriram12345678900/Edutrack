@@ -273,7 +273,7 @@ export default function TrophiesPage() {
               </motion.div>
             ) : (
               <div className="space-y-4">
-                <h3 className="text-xl font-extrabold dark:text-white text-slate-900">
+                <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">
                   {crateOpened ? "You already opened today's crate!" : "Unlock Today's Daily Academic Loot"}
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">

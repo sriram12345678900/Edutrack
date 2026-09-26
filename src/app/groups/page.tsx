@@ -298,7 +298,7 @@ const WhiteboardPanel = ({ chatId, nickname, db }: { chatId: string, nickname: s
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-slate-50 dark:bg-slate-900 bg-slate-100 border-l border-slate-200 dark:border-slate-800">
+    <div className="flex flex-col h-full w-full bg-slate-50 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800">
       <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-950">
         <h3 className="font-black text-sm text-slate-800 dark:text-white flex items-center gap-2">
           <PenTool className="w-4 h-4 text-indigo-500" /> Co-Op Board

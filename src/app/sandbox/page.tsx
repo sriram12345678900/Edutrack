@@ -382,7 +382,7 @@ export default function SandboxPage() {
   }, [compendiumCategory, compendiumSearch]);
 
   return (
-    <div className="min-h-screen dark:bg-[#03050d] bg-[#eef1f9] text-slate-100 font-sans p-3 sm:p-6 lg:p-8 relative selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#03050d] text-slate-900 dark:text-slate-100 font-sans p-3 sm:p-6 lg:p-8 relative selection:bg-indigo-500/30">
       
       {/* Dynamic Background Glows */}
       <div className="fixed top-0 left-1/4 w-[50vw] h-[50vw] bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none" />
@@ -396,14 +396,14 @@ export default function SandboxPage() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-300">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-600 dark:from-white dark:via-slate-100 dark:to-indigo-300">
                 Interactive Science Sim Sandbox
               </h1>
-              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">
                 118 Elements & 150+ Rxns
               </span>
             </div>
-            <p className="text-slate-400 text-xs sm:text-sm font-semibold">
+            <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm font-semibold">
               Complete Virtual Chemistry Laboratory, All 118 Elements, Real-time Reaction Engine & Optics Physics
             </p>
           </div>
@@ -411,13 +411,13 @@ export default function SandboxPage() {
 
         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
           {/* Subject Navigation Bar */}
-          <div className="flex p-1 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md overflow-x-auto max-w-full gap-0.5 snap-x snap-mandatory hide-scrollbar">
+          <div className="flex p-1 bg-slate-200/80 dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-2xl backdrop-blur-md overflow-x-auto max-w-full gap-0.5 snap-x snap-mandatory hide-scrollbar">
             <button
               onClick={() => setActiveTab('chemistry')}
               className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 snap-center ${
                 activeSubject === 'chemistry'
                   ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Beaker className="w-3.5 h-3.5 text-orange-400" /> Chemistry
@@ -427,7 +427,7 @@ export default function SandboxPage() {
               className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 snap-center ${
                 activeSubject === 'physics'
                   ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Zap className="w-3.5 h-3.5 text-amber-400" /> Physics
@@ -437,7 +437,7 @@ export default function SandboxPage() {
               className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 snap-center ${
                 activeSubject === 'biology'
                   ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Heart className="w-3.5 h-3.5 text-emerald-400" /> Biology
@@ -447,13 +447,13 @@ export default function SandboxPage() {
           {/* Sound Toggle */}
           <button
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 transition-all"
+            className="p-2.5 rounded-xl bg-slate-200/80 dark:bg-white/5 border border-slate-300 dark:border-white/10 hover:bg-slate-300 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 transition-all"
             title={soundEnabled ? "Mute Lab Sound FX" : "Unmute Lab Sound FX"}
           >
-            {soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-400" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
+            {soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
           </button>
 
-          <Link href="/dashboard" className="hidden xl:flex items-center gap-2 bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl text-xs font-extrabold transition-all border border-white/10 text-slate-300">
+          <Link href="/dashboard" className="hidden xl:flex items-center gap-2 bg-slate-200/80 dark:bg-white/5 hover:bg-slate-300 dark:hover:bg-white/10 px-4 py-2 rounded-xl text-xs font-extrabold transition-all border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-300">
             <Home className="w-4 h-4" /> Exit
           </Link>
         </div>
@@ -462,7 +462,7 @@ export default function SandboxPage() {
       {/* Secondary Sub-Tabs for Chemistry and Physics */}
       {activeSubject !== 'biology' && (
         <div className="max-w-7xl mx-auto flex justify-start mb-6 relative z-10">
-          <div className="flex p-1 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md overflow-x-auto max-w-full gap-1 snap-x snap-mandatory hide-scrollbar">
+          <div className="flex p-1 bg-slate-200/80 dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-2xl backdrop-blur-md overflow-x-auto max-w-full gap-1 snap-x snap-mandatory hide-scrollbar">
             {activeSubject === 'chemistry' && (
               <>
                 <button
@@ -556,7 +556,7 @@ export default function SandboxPage() {
             
             {/* Shelf Header */}
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-black dark:text-white text-slate-900 flex items-center gap-2 uppercase tracking-wider">
+              <h2 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2 uppercase tracking-wider">
                 <Atom className="w-4 h-4 text-indigo-400" /> Reagent & Element Shelf
               </h2>
               <span className="text-[11px] font-bold text-slate-400 bg-white/5 px-2.5 py-0.5 rounded-lg border border-white/10">
@@ -667,7 +667,7 @@ export default function SandboxPage() {
             <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
               <div className="flex items-center gap-2">
                 <Flame className="w-4 h-4 text-orange-400" />
-                <h2 className="text-sm font-black dark:text-white text-slate-900 uppercase tracking-wider">
+                <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
                   Reaction Deck & Virtual Apparatus
                 </h2>
               </div>
@@ -1356,7 +1356,7 @@ export default function SandboxPage() {
                     )}
                   </div>
 
-                  <h3 className="text-base font-black dark:text-white text-slate-900 font-mono mb-1">{rxn.equation}</h3>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white font-mono mb-1">{rxn.equation}</h3>
                   <h4 className="text-xs font-bold text-indigo-400 mb-2">{rxn.name}</h4>
                   <p className="text-xs text-slate-400 leading-relaxed">{rxn.desc}</p>
                 </div>
@@ -1653,7 +1653,7 @@ export default function SandboxPage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-white/5 pt-3">
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/10">
                   <div className="text-[10px] font-bold text-slate-400 uppercase">Image Distance (v)</div>
-                  <div className="text-xs font-mono font-black dark:text-white text-slate-900">
+                  <div className="text-xs font-mono font-black text-slate-900 dark:text-white">
                     {opticsRes.v === Infinity ? '∞' : `${opticsRes.v.toFixed(1)} cm`}
                   </div>
                 </div>

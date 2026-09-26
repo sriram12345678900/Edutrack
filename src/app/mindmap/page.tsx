@@ -93,7 +93,7 @@ export default function MindmapPage() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-600 dark:text-violet-400 text-xs font-black tracking-wider uppercase mb-2">
               <GitFork className="w-3.5 h-3.5" /> Concept Knowledge Graph • Mind Maps
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight dark:text-white text-slate-900">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Interactive Concept Mind Maps
             </h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">

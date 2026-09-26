@@ -138,7 +138,7 @@ export default function ErrorVaultPage() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-black tracking-wider uppercase mb-2">
               <ShieldAlert className="w-3.5 h-3.5" /> Error Vault • Mistake Notebook
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight dark:text-white text-slate-900">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Your Intelligent Error Vault
             </h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
@@ -478,7 +478,7 @@ export default function ErrorVaultPage() {
                   <X className="w-5 h-5" />
                 </button>
 
-                <h3 className="text-xl font-extrabold dark:text-white text-slate-900 mb-1">
+                <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mb-1">
                   Log Custom Mistake or Doubt
                 </h3>
                 <p className="text-xs text-slate-400 mb-4">

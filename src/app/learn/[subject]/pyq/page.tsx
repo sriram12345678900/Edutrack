@@ -117,7 +117,7 @@ export default function PYQPage({ params }: { params: { subject: string } }) {
                 <div className="w-12 h-12 bg-rose-100 dark:bg-rose-900/30 rounded-2xl flex items-center justify-center text-rose-600 dark:text-rose-400">
                   <FileText className="w-6 h-6" />
                 </div>
-                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 bg-slate-100 px-3 py-1 rounded-full">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 bg-white dark:bg-slate-900 px-3 py-1 rounded-full">
                   PDF
                 </span>
               </div>

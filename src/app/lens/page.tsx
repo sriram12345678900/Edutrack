@@ -400,7 +400,7 @@ export default function LensPage() {
         const parts = plainText.split(/\*\*/g);
         return (
           <React.Fragment key={`plain-${keyIdx}`}>
-            {parts.map((part, i) => i % 2 === 1 ? <strong key={i} className="font-extrabold dark:text-white text-slate-900">{part}</strong> : part)}
+            {parts.map((part, i) => i % 2 === 1 ? <strong key={i} className="font-extrabold text-slate-900 dark:text-white">{part}</strong> : part)}
           </React.Fragment>
         );
       };
@@ -432,7 +432,7 @@ export default function LensPage() {
             </h2>
           );
         } else {
-          return <h3 key={idx} className="text-sm font-extrabold dark:text-white text-slate-900 mt-3 mb-1.5 tracking-tight">{headingContent}</h3>;
+          return <h3 key={idx} className="text-sm font-extrabold text-slate-900 dark:text-white mt-3 mb-1.5 tracking-tight">{headingContent}</h3>;
         }
       }
 
@@ -443,7 +443,7 @@ export default function LensPage() {
         return (
           <div key={idx} className="flex items-start gap-2.5 ml-2.5 my-1.5 select-text">
             <span className="dark:text-emerald-400 text-emerald-700 mt-1.5 text-xs">•</span>
-            <span className="dark:text-slate-300 text-slate-700 text-sm font-medium leading-relaxed">{parseMix(line.trim().substring(2))}</span>
+            <span className="text-slate-700 dark:text-slate-300 text-sm font-medium leading-relaxed">{parseMix(line.trim().substring(2))}</span>
           </div>
         );
       }
@@ -454,7 +454,7 @@ export default function LensPage() {
           return (
             <div key={idx} className="flex items-start gap-2.5 ml-2.5 my-1.5 select-text">
               <span className="dark:text-emerald-400 text-emerald-700 font-bold mt-0.5 text-sm">{numMatch[1]}</span>
-              <span className="dark:text-slate-300 text-slate-700 text-sm font-medium leading-relaxed">{parseMix(numMatch[2])}</span>
+              <span className="text-slate-700 dark:text-slate-300 text-sm font-medium leading-relaxed">{parseMix(numMatch[2])}</span>
             </div>
           );
         }
@@ -463,7 +463,7 @@ export default function LensPage() {
       if (!line.trim()) return <div key={idx} className="h-2.5" />;
 
       return (
-        <p key={idx} className="dark:text-slate-300 text-slate-700 text-sm font-medium mb-2.5 last:mb-0 leading-relaxed select-text">
+        <p key={idx} className="text-slate-700 dark:text-slate-300 text-sm font-medium mb-2.5 last:mb-0 leading-relaxed select-text">
           {parseMix(line)}
         </p>
       );
@@ -475,7 +475,7 @@ export default function LensPage() {
       <div className="min-h-screen flex items-center justify-center dark:bg-[#05060f] bg-[#eef1f9]">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-12 h-12 text-emerald-500 animate-spin" />
-          <p className="dark:text-slate-400 text-slate-600 text-sm font-semibold">Loading doubt solver lens...</p>
+          <p className="text-slate-600 dark:text-slate-400 text-sm font-semibold">Loading doubt solver lens...</p>
         </div>
       </div>
     );
@@ -530,25 +530,25 @@ export default function LensPage() {
                   }));
                 }
               }}
-              className="bg-transparent dark:text-white text-slate-900 font-extrabold focus:outline-none cursor-pointer text-xs pr-1 max-w-[140px]"
+              className="bg-transparent text-slate-900 dark:text-white font-extrabold focus:outline-none cursor-pointer text-xs pr-1 max-w-[140px]"
             >
               <optgroup label="Standard" className="dark:bg-[#080b18] bg-[#eef1f9] text-emerald-400 font-bold">
                 {SUPPORTED_LANGUAGES.filter(l => l.category === "standard").map(l => (
-                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] text-slate-900 dark:text-white">
                     {l.label}
                   </option>
                 ))}
               </optgroup>
               <optgroup label="Conversational Blends (-ish)" className="dark:bg-[#080b18] bg-[#eef1f9] text-amber-400 font-bold">
                 {SUPPORTED_LANGUAGES.filter(l => l.category === "bilingual").map(l => (
-                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] text-slate-900 dark:text-white">
                     {l.label}
                   </option>
                 ))}
               </optgroup>
               <optgroup label="Regional Languages (Native)" className="dark:bg-[#080b18] bg-[#eef1f9] text-purple-400 font-bold">
                 {SUPPORTED_LANGUAGES.filter(l => l.category === "regional").map(l => (
-                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] text-slate-900 dark:text-white">
                     {l.label}
                   </option>
                 ))}
@@ -557,7 +557,7 @@ export default function LensPage() {
           </div>
 
           <Link href="/dashboard">
-            <button className="px-4.5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 dark:text-slate-300 text-slate-700 hover:dark:text-white text-slate-900 text-xs font-extrabold transition-all flex items-center gap-2 shadow-sm">
+            <button className="px-4.5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:text-white text-xs font-extrabold transition-all flex items-center gap-2 shadow-sm">
               <Home className="w-4 h-4" />
               Back to Dashboard
             </button>

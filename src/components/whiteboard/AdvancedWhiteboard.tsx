@@ -1867,7 +1867,7 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
           >
             <button
               onClick={duplicateSelectedStrokes}
-              className="p-2 hover:bg-slate-800 rounded-xl dark:text-slate-200 text-slate-800 hover:dark:text-white text-slate-900 transition-all flex items-center gap-1 text-xs font-semibold"
+              className="p-2 hover:bg-slate-800 rounded-xl text-slate-800 dark:text-slate-200 hover:text-slate-900 dark:text-white transition-all flex items-center gap-1 text-xs font-semibold"
               title="Duplicate (Clone)"
             >
               <Copy className="w-3.5 h-3.5 dark:text-indigo-400 text-indigo-700" />
@@ -1876,7 +1876,7 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
 
             <button
               onClick={() => scaleSelectedStrokes(1.2)}
-              className="p-2 hover:bg-slate-800 rounded-xl dark:text-slate-200 text-slate-800 hover:dark:text-white text-slate-900 transition-all flex items-center gap-1 text-xs font-semibold"
+              className="p-2 hover:bg-slate-800 rounded-xl text-slate-800 dark:text-slate-200 hover:text-slate-900 dark:text-white transition-all flex items-center gap-1 text-xs font-semibold"
               title="Enlarge"
             >
               <Maximize2 className="w-3.5 h-3.5 dark:text-cyan-400 text-cyan-700" />
@@ -1884,7 +1884,7 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
 
             <button
               onClick={() => scaleSelectedStrokes(0.8)}
-              className="p-2 hover:bg-slate-800 rounded-xl dark:text-slate-200 text-slate-800 hover:dark:text-white text-slate-900 transition-all flex items-center gap-1 text-xs font-semibold"
+              className="p-2 hover:bg-slate-800 rounded-xl text-slate-800 dark:text-slate-200 hover:text-slate-900 dark:text-white transition-all flex items-center gap-1 text-xs font-semibold"
               title="Shrink"
             >
               <Minimize2 className="w-3.5 h-3.5 dark:text-cyan-400 text-cyan-700" />
@@ -1913,7 +1913,7 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
 
             <button
               onClick={() => setSelectedStrokeIds([])}
-              className="p-2 hover:bg-slate-800 rounded-xl dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 transition-all"
+              className="p-2 hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-all"
               title="Deselect"
             >
               <X className="w-3.5 h-3.5" />
@@ -1973,7 +1973,7 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
         {/* Center: Zoom indicator (desktop) */}
         <div className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
           <button onClick={() => setZoomLevel(z => Math.max(0.25, parseFloat((z - 0.25).toFixed(2))))}
-            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg dark:text-slate-400 text-slate-500 transition-colors">
+            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 transition-colors">
             <ZoomOut className="w-3.5 h-3.5" />
           </button>
           <button onClick={() => setZoomLevel(1)}
@@ -1981,7 +1981,7 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
             {Math.round(zoomLevel * 100)}%
           </button>
           <button onClick={() => setZoomLevel(z => Math.min(3, parseFloat((z + 0.25).toFixed(2))))}
-            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg dark:text-slate-400 text-slate-500 transition-colors">
+            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 transition-colors">
             <ZoomIn className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -2032,7 +2032,7 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
                   initial={{ opacity: 0, scale: 0.95, y: -4 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: -4 }}
-                  className="absolute right-0 top-[calc(100%+8px)] w-52 dark:bg-slate-900 bg-white border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl p-1.5 z-50"
+                  className="absolute right-0 top-[calc(100%+8px)] w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl p-1.5 z-50"
                   onClick={() => setShowOverflowMenu(false)}
                 >
                   {/* Mobile-only items */}
@@ -2192,7 +2192,7 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
                   value={textValue}
                   onChange={(e) => setTextValue(e.target.value)}
                   placeholder={isEditingLatex ? "Enter LaTeX (e.g. E=mc^2)" : "Type on whiteboard..."}
-                  className="bg-transparent dark:text-white text-slate-900 text-sm px-2 focus:outline-none w-full font-medium"
+                  className="bg-transparent text-slate-900 dark:text-white text-sm px-2 focus:outline-none w-full font-medium"
                 />
                 <button type="submit" className="p-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shrink-0">
                   <Check className="w-4 h-4" />
@@ -2220,7 +2220,7 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
                         e.preventDefault(); // prevents input focus loss
                         setTextValue(prev => prev + tpl.code);
                       }}
-                      className="px-2 py-1 bg-white/5 hover:bg-white/10 dark:text-slate-300 text-slate-700 hover:text-white border border-transparent hover:border-slate-500/30 text-[10px] font-black rounded-lg transition-all"
+                      className="px-2 py-1 bg-white/5 hover:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-white border border-transparent hover:border-slate-500/30 text-[10px] font-black rounded-lg transition-all"
                     >
                       {tpl.label}
                     </button>
@@ -2418,12 +2418,12 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
                 <AnimatePresence>
                   {showBrushPopover && (
                     <motion.div initial={{ opacity: 0, y: 8, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                      className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 dark:bg-slate-900 bg-white border border-slate-200 dark:border-slate-700 rounded-2xl p-3 shadow-2xl flex items-end gap-3 z-50">
+                      className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 shadow-2xl flex items-end gap-3 z-50">
                       {[2, 4, 8, 14, 24, 36].map(sz => (
                         <button key={sz} onClick={() => { setBrushSize(sz); setShowBrushPopover(false); }}
                           className={`flex flex-col items-center gap-1 transition-all ${brushSize === sz ? 'scale-110 opacity-100' : 'opacity-40 hover:opacity-100'}`}>
                           <div className="bg-slate-800 dark:bg-slate-200 rounded-full" style={{ width: `${Math.min(22, Math.max(4, sz / 1.5))}px`, height: `${Math.min(22, Math.max(4, sz / 1.5))}px` }} />
-                          <span className="text-[9px] font-mono dark:text-slate-400 text-slate-600">{sz}</span>
+                          <span className="text-[9px] font-mono text-slate-600 dark:text-slate-400">{sz}</span>
                         </button>
                       ))}
                     </motion.div>
@@ -2431,10 +2431,10 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
                 </AnimatePresence>
               </div>
               <button onClick={handleUndo} disabled={historyStep <= 0} className="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all">
-                <Undo2 className="w-4 h-4 dark:text-slate-300 text-slate-700" />
+                <Undo2 className="w-4 h-4 text-slate-700 dark:text-slate-300" />
               </button>
               <button onClick={handleRedo} disabled={historyStep >= history.length - 1} className="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-all">
-                <Redo2 className="w-4 h-4 dark:text-slate-300 text-slate-700" />
+                <Redo2 className="w-4 h-4 text-slate-700 dark:text-slate-300" />
               </button>
             </div>
           </div>
@@ -2511,7 +2511,7 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
             <motion.div
               initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
               transition={{ type: "spring", stiffness: 400, damping: 40 }}
-              className="md:hidden fixed bottom-0 left-0 right-0 z-50 dark:bg-slate-900 bg-white rounded-t-3xl shadow-2xl border-t border-slate-200 dark:border-slate-800 pb-24"
+              className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 rounded-t-3xl shadow-2xl border-t border-slate-200 dark:border-slate-800 pb-24"
             >
               {/* Drag handle */}
               <div className="flex justify-center pt-3 pb-1">
@@ -2722,24 +2722,24 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
                 </div>
                 <div>
                   <h3 className="text-sm font-bold">AI Math & Science Solution</h3>
-                  <p className="text-[10px] dark:text-slate-400 text-slate-500">Powered by Gemini Vision</p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400">Powered by Gemini Vision</p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => navigator.clipboard.writeText(aiSolution || '').then(() => showToast('Solution copied! 📋'))}
-                  className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg dark:text-slate-400 text-slate-600 transition-all"
+                  className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 transition-all"
                   title="Copy Solution"
                 >
                   <Copy className="w-3.5 h-3.5" />
                 </button>
-                <button onClick={() => setAiSolution(null)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg dark:text-slate-400 text-slate-600 transition-all">
+                <button onClick={() => setAiSolution(null)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 transition-all">
                   <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
             {/* Solution content */}
-            <div className="flex-1 overflow-y-auto p-4 text-xs dark:text-slate-300 text-slate-700 whitespace-pre-line leading-relaxed font-sans custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-4 text-xs text-slate-700 dark:text-slate-300 whitespace-pre-line leading-relaxed font-sans custom-scrollbar">
               {aiSolution}
             </div>
             {/* Footer */}
@@ -2766,14 +2766,14 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-lg dark:bg-slate-900 bg-slate-100 border border-slate-800 rounded-3xl p-6 shadow-2xl"
+              className="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-3xl p-6 shadow-2xl"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <Library className="w-5 h-5 dark:text-indigo-400 text-indigo-700" />
+                  <Library className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                   <h3 className="text-base font-bold">Educational Diagram Presets</h3>
                 </div>
-                <button onClick={() => setShowPresetBank(false)} className="p-1 hover:bg-slate-800 rounded-lg dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900">
+                <button onClick={() => setShowPresetBank(false)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -2783,48 +2783,48 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
                   className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
                 >
                   <Compass className="w-5 h-5 dark:text-indigo-400 text-indigo-700 mb-2 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">X-Y Coordinate Axes</h4>
-                  <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">2D Graph plane with origin & axes</p>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">X-Y Coordinate Axes</h4>
+                  <p className="text-[10px] text-slate-600 dark:text-slate-400 mt-1">2D Graph plane with origin & axes</p>
                 </button>
                 <button
                   onClick={() => insertPresetDiagram("triangle")}
                   className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
                 >
                   <Triangle className="w-5 h-5 dark:text-cyan-400 text-cyan-700 mb-2 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">Labeled Triangle</h4>
-                  <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">Geometric triangle with vertices A, B, C</p>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Labeled Triangle</h4>
+                  <p className="text-[10px] text-slate-600 dark:text-slate-400 mt-1">Geometric triangle with vertices A, B, C</p>
                 </button>
                 <button
                   onClick={() => insertPresetDiagram("unit_circle")}
                   className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
                 >
                   <Circle className="w-5 h-5 dark:text-amber-400 text-amber-700 mb-2 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">Trig Unit Circle</h4>
-                  <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">Unit circle marked with 0° & 90° angles</p>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Trig Unit Circle</h4>
+                  <p className="text-[10px] text-slate-600 dark:text-slate-400 mt-1">Unit circle marked with 0° & 90° angles</p>
                 </button>
                 <button
                   onClick={() => insertPresetDiagram("venn")}
                   className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
                 >
                   <Layers className="w-5 h-5 dark:text-pink-400 text-pink-700 mb-2 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">Venn Diagram</h4>
-                  <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">Two overlapping set circles</p>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Venn Diagram</h4>
+                  <p className="text-[10px] text-slate-600 dark:text-slate-400 mt-1">Two overlapping set circles</p>
                 </button>
                 <button
                   onClick={() => insertPresetDiagram("number_line")}
                   className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
                 >
                   <Minus className="w-5 h-5 dark:text-green-400 text-green-700 mb-2 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">Number Line</h4>
-                  <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">Labeled number line -3 to +3</p>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Number Line</h4>
+                  <p className="text-[10px] text-slate-600 dark:text-slate-400 mt-1">Labeled number line -3 to +3</p>
                 </button>
                 <button
                   onClick={() => insertPresetDiagram("right_triangle")}
                   className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
                 >
                   <Triangle className="w-5 h-5 dark:text-yellow-400 text-yellow-600 mb-2 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xs font-bold dark:text-slate-200 text-slate-800">Pythagoras Triangle</h4>
-                  <p className="text-[10px] dark:text-slate-400 text-slate-600 mt-1">Right-angle triangle with a² + b² = c²</p>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Pythagoras Triangle</h4>
+                  <p className="text-[10px] text-slate-600 dark:text-slate-400 mt-1">Right-angle triangle with a² + b² = c²</p>
                 </button>
               </div>
             </motion.div>
@@ -2840,14 +2840,14 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-md dark:bg-slate-900 bg-slate-100 border border-slate-800 rounded-3xl p-6 shadow-2xl"
+              className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-3xl p-6 shadow-2xl"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-base font-bold flex items-center gap-2">
-                  <Keyboard className="w-5 h-5 dark:text-indigo-400 text-indigo-700" />
+                  <Keyboard className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                   Whiteboard Shortcuts
                 </h3>
-                <button onClick={() => setShowKeyShortcuts(false)} className="p-1 hover:bg-slate-800 rounded-lg dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900">
+                <button onClick={() => setShowKeyShortcuts(false)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
                   <X className="w-5 h-5" />
                 </button>
               </div>

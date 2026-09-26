@@ -359,28 +359,28 @@ export default function PodcastPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 p-4 md:p-8 font-sans">
       <div className="max-w-6xl mx-auto space-y-6">
         
         {/* Banner */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-pink-900/40 via-purple-900/40 to-slate-900/60 border border-pink-500/20 p-6 md:p-8 backdrop-blur-xl shadow-2xl">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-slate-500/10 dark:from-pink-900/40 dark:via-purple-900/40 dark:to-slate-900/60 border border-pink-500/20 p-6 md:p-8 backdrop-blur-xl shadow-xl">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/30 text-pink-400 text-xs font-black uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/30 text-pink-600 dark:text-pink-400 text-xs font-black uppercase tracking-wider">
                 <Radio className="w-3.5 h-3.5 animate-pulse" />
                 2-Host Conversational AI Podcast
               </div>
-              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">
-                AI Audio <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-300">Podcast Generator</span>
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
+                AI Audio <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600 dark:from-pink-400 dark:to-purple-300">Podcast Generator</span>
               </h1>
-              <p className="text-slate-300 text-xs md:text-sm max-w-xl">
+              <p className="text-slate-600 dark:text-slate-300 text-xs md:text-sm max-w-xl">
                 Convert any chapter, formula sheet, or revision topic into a lively 2-host audio discussion (NotebookLM style) for hands-free learning on the go!
               </p>
             </div>
 
-            <div className="p-3 bg-slate-900/80 rounded-2xl border border-slate-800 text-center">
-              <span className="text-[10px] text-slate-400 font-bold block">LISTEN REWARD</span>
-              <span className="text-sm font-black text-amber-400 flex items-center gap-1 justify-center">
+            <div className="p-3 bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-800 text-center shadow-sm">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold block">LISTEN REWARD</span>
+              <span className="text-sm font-black text-amber-600 dark:text-amber-400 flex items-center gap-1 justify-center">
                 <Flame className="w-4 h-4" /> +60 XP
               </span>
             </div>
@@ -388,19 +388,19 @@ export default function PodcastPage() {
         </div>
 
         {/* Generate Custom Bar */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-lg">
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
           <form onSubmit={handleGenerateCustom} className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
               value={customTopic}
               onChange={e => setCustomTopic(e.target.value)}
               placeholder="Enter any topic or chapter (e.g. 'Human Eye & Colourful World', 'Trigonometry Ratios')..."
-              className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs md:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-pink-500"
+              className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-xs md:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-pink-500"
             />
             <select
               value={podcastLanguage}
               onChange={e => setPodcastLanguage(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 font-bold focus:outline-none focus:border-pink-500 cursor-pointer"
+              className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-slate-200 font-bold focus:outline-none focus:border-pink-500 cursor-pointer"
             >
               {SUPPORTED_LANGUAGES.map(lang => (
                 <option key={lang.code} value={lang.code}>
@@ -424,8 +424,8 @@ export default function PodcastPage() {
           
           {/* Left: Episodes List */}
           <div className="space-y-3">
-            <h3 className="text-sm font-black text-white flex items-center gap-2 px-1">
-              <Headphones className="w-4 h-4 text-pink-400" />
+            <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2 px-1">
+              <Headphones className="w-4 h-4 text-pink-500" />
               Featured Podcast Episodes
             </h3>
 
@@ -439,20 +439,20 @@ export default function PodcastPage() {
                     setSelectedPodcast(pod);
                   }}
                   className={cn(
-                    "p-4 rounded-2xl border cursor-pointer transition-all space-y-2",
+                    "p-4 rounded-2xl border cursor-pointer transition-all space-y-2 shadow-sm",
                     isSelected
-                      ? "bg-pink-950/30 border-pink-500 shadow-md shadow-pink-950/40"
-                      : "bg-slate-900/60 border-slate-800 hover:border-slate-700"
+                      ? "bg-pink-50 dark:bg-pink-950/30 border-pink-500 shadow-md shadow-pink-500/10"
+                      : "bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
                   )}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-pink-400">{pod.subject}</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-bold flex items-center gap-1">
+                    <span className="text-xs font-black text-pink-600 dark:text-pink-400">{pod.subject}</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold flex items-center gap-1">
                       <Clock className="w-3 h-3" /> {pod.duration}
                     </span>
                   </div>
-                  <h4 className="text-xs font-bold text-white">{pod.title}</h4>
-                  <p className="text-[11px] text-slate-400 line-clamp-2">{pod.summary}</p>
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white">{pod.title}</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">{pod.summary}</p>
                 </div>
               );
             })}
@@ -462,15 +462,15 @@ export default function PodcastPage() {
           <div className="lg:col-span-2 space-y-4">
             
             {/* Player Card */}
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-5 shadow-xl">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-5 shadow-xl">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-bold text-pink-400">{selectedPodcast.subject}</span>
-                  <h2 className="text-lg font-black text-white">{selectedPodcast.title}</h2>
+                  <span className="text-xs font-bold text-pink-600 dark:text-pink-400">{selectedPodcast.subject}</span>
+                  <h2 className="text-lg font-black text-slate-900 dark:text-white">{selectedPodcast.title}</h2>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 rounded-xl p-1 text-xs">
+                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-1 text-xs">
                     {[0.8, 1.0, 1.25, 1.5].map(speed => (
                       <button
                         key={speed}
@@ -479,7 +479,7 @@ export default function PodcastPage() {
                           "px-2 py-1 rounded-lg font-bold transition-all",
                           playbackSpeed === speed
                             ? "bg-pink-600 text-white"
-                            : "text-slate-400 hover:text-white"
+                            : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                         )}
                       >
                         {speed}x
@@ -490,7 +490,7 @@ export default function PodcastPage() {
               </div>
 
               {/* Waveform / Visualizer */}
-              <div className="h-16 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-center gap-1.5 px-4 overflow-hidden">
+              <div className="h-16 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-center gap-1.5 px-4 overflow-hidden">
                 {Array.from({ length: 36 }).map((_, i) => {
                   const barHeight = isPlaying 
                     ? Math.sin(i * 0.4 + currentLineIndex) * 24 + 28
@@ -500,7 +500,7 @@ export default function PodcastPage() {
                       key={i}
                       className={cn(
                         "w-1.5 rounded-full transition-all duration-150",
-                        isPlaying ? "bg-gradient-to-t from-pink-600 to-purple-400" : "bg-slate-800"
+                        isPlaying ? "bg-gradient-to-t from-pink-600 to-purple-400" : "bg-slate-300 dark:bg-slate-800"
                       )}
                       style={{ height: `${barHeight}px` }}
                     />
@@ -510,12 +510,12 @@ export default function PodcastPage() {
 
               {/* Progress Slider & Playback Controls */}
               <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
+                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-bold">
                   <span>Dialogue {currentLineIndex + 1} of {selectedPodcast.dialogues.length}</span>
                   <span>{Math.round(((currentLineIndex + 1) / selectedPodcast.dialogues.length) * 100)}%</span>
                 </div>
 
-                <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                <div className="w-full h-2 bg-slate-200 dark:bg-slate-950 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800">
                   <div
                     className="h-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-300"
                     style={{ width: `${((currentLineIndex + 1) / selectedPodcast.dialogues.length) * 100}%` }}
@@ -526,7 +526,7 @@ export default function PodcastPage() {
                   <button
                     onClick={handleSkipPrev}
                     disabled={currentLineIndex === 0}
-                    className="p-3 rounded-2xl bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-white transition-all"
+                    className="p-3 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 disabled:opacity-30 text-slate-700 dark:text-white transition-all shadow-sm"
                     title="Previous Dialogue"
                   >
                     <Rewind className="w-5 h-5" />
@@ -542,7 +542,7 @@ export default function PodcastPage() {
                   <button
                     onClick={handleSkipNext}
                     disabled={currentLineIndex === selectedPodcast.dialogues.length - 1}
-                    className="p-3 rounded-2xl bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-white transition-all"
+                    className="p-3 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 disabled:opacity-30 text-slate-700 dark:text-white transition-all shadow-sm"
                     title="Next Dialogue"
                   >
                     <FastForward className="w-5 h-5" />
@@ -552,9 +552,9 @@ export default function PodcastPage() {
             </div>
 
             {/* Synchronized Transcript View */}
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-3 shadow-xl">
-              <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <FileText className="w-4 h-4 text-pink-400" />
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 space-y-3 shadow-xl">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                <FileText className="w-4 h-4 text-pink-500" />
                 Live Synchronized Transcript
               </h3>
 
@@ -574,23 +574,23 @@ export default function PodcastPage() {
                       className={cn(
                         "p-4 rounded-2xl border transition-all cursor-pointer space-y-1.5",
                         isCurrent
-                          ? "bg-pink-950/30 border-pink-500/60 shadow-md shadow-pink-950/40 scale-[1.01]"
-                          : "bg-slate-950/60 border-slate-800/80 hover:border-slate-700 opacity-70"
+                          ? "bg-pink-50 dark:bg-pink-950/30 border-pink-500 shadow-md shadow-pink-500/10 scale-[1.01]"
+                          : "bg-slate-50 dark:bg-slate-950/60 border-slate-200 dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700 opacity-80"
                       )}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <img src={dlg.avatar} alt={dlg.speaker} className="w-6 h-6 rounded-full bg-slate-800" />
+                          <img src={dlg.avatar} alt={dlg.speaker} className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-800" />
                           <span className={cn(
                             "text-xs font-black",
-                            dlg.speaker === "Maya" ? "text-purple-400" : "text-pink-400"
+                            dlg.speaker === "Maya" ? "text-purple-600 dark:text-purple-400" : "text-pink-600 dark:text-pink-400"
                           )}>
                             {dlg.speaker} ({dlg.role})
                           </span>
                         </div>
 
                         {isCurrent && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 font-bold flex items-center gap-1 animate-pulse">
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-700 dark:text-pink-300 font-bold flex items-center gap-1 animate-pulse">
                             <Radio className="w-3 h-3" /> Speaking
                           </span>
                         )}
@@ -598,7 +598,7 @@ export default function PodcastPage() {
 
                       <p className={cn(
                         "text-xs md:text-sm leading-relaxed",
-                        isCurrent ? "text-white font-medium" : "text-slate-400"
+                        isCurrent ? "text-slate-900 dark:text-white font-medium" : "text-slate-600 dark:text-slate-400"
                       )}>
                         {dlg.text}
                       </p>

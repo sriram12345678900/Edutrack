@@ -1899,7 +1899,7 @@ export default function BiologyLab() {
           <div className="lg:col-span-7 dark:bg-[#070916] bg-white dark:border-white/10 border-slate-200 rounded-3xl p-5 shadow-2xl backdrop-blur-xl flex flex-col">
             
             <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
-              <h3 className="text-sm font-black dark:text-white text-slate-900 flex items-center gap-2 uppercase tracking-wider">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2 uppercase tracking-wider">
                 <Sun className="w-4 h-4 text-amber-400" /> Plant Photosynthesis Workbench
               </h3>
               
@@ -2062,7 +2062,7 @@ export default function BiologyLab() {
             {/* Output Diagnostics */}
             <div className="grid grid-cols-2 gap-3.5 mt-4 p-4 dark:bg-white/5 bg-slate-100 rounded-2xl border dark:border-white/5 border-slate-200">
               <div>
-                <div className="text-[9px] font-bold dark:text-slate-400 text-slate-600 uppercase tracking-widest">Rate of Photosynthesis:</div>
+                <div className="text-[9px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Rate of Photosynthesis:</div>
                 <div className="text-sm font-black dark:text-teal-300 text-teal-700 font-mono mt-0.5">
                   {(() => {
                     const intensityFactor = photoLightIntensity / 100;
@@ -2075,7 +2075,7 @@ export default function BiologyLab() {
                 </div>
               </div>
               <div>
-                <div className="text-[9px] font-bold dark:text-slate-400 text-slate-600 uppercase tracking-widest">Starch Test Status:</div>
+                <div className="text-[9px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Starch Test Status:</div>
                 <div className="text-sm font-black dark:text-indigo-300 text-indigo-700 font-mono mt-0.5">
                   {starchTestIodineAdded ? "Blue-Black (Starch Present)" : starchTestBoiled ? "Chlorophyll Extracted" : "Untested leaf"}
                 </div>
@@ -2095,14 +2095,14 @@ export default function BiologyLab() {
             </button>
 
             
-            <div className="p-6 rounded-3xl dark:bg-slate-900 bg-white border dark:border-white/10 border-slate-200 shadow-2xl space-y-5">
+            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border dark:border-white/10 border-slate-200 shadow-2xl space-y-5">
               <div className="border-b dark:border-white/10 border-slate-200 pb-3">
-                <h3 className="text-sm font-black dark:text-white text-slate-900 uppercase tracking-wide">Environment Controls</h3>
+                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wide">Environment Controls</h3>
               </div>
 
               {/* Light Wavelength Selector */}
               <div className="space-y-2">
-                <span className="text-xs font-bold dark:text-slate-300 text-slate-700 block">Light Wavelength (Color):</span>
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Light Wavelength (Color):</span>
                 <div className="grid grid-cols-4 gap-1.5">
                   {[
                     { id: "white", color: "bg-slate-200 text-slate-900", border: "border-slate-400" },
@@ -2126,7 +2126,7 @@ export default function BiologyLab() {
               {/* Light Intensity Slider */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold dark:text-slate-300 text-slate-700">Light Intensity (Lux)</span>
+                  <span className="font-bold text-slate-700 dark:text-slate-300">Light Intensity (Lux)</span>
                   <span className="font-mono text-amber-400 font-bold">{photoLightIntensity} Lux</span>
                 </div>
                 <input
@@ -2143,7 +2143,7 @@ export default function BiologyLab() {
               {/* CO2 Concentration Slider */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold dark:text-slate-300 text-slate-700">CO₂ Concentration</span>
+                  <span className="font-bold text-slate-700 dark:text-slate-300">CO₂ Concentration</span>
                   <span className="font-mono text-cyan-400 font-bold">{photoCo2} ppm</span>
                 </div>
                 <input
@@ -2160,7 +2160,7 @@ export default function BiologyLab() {
               {/* Temperature Slider */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold dark:text-slate-300 text-slate-700">Temperature (°C)</span>
+                  <span className="font-bold text-slate-700 dark:text-slate-300">Temperature (°C)</span>
                   <span className="font-mono text-rose-450 font-bold">{photoTemp} °C</span>
                 </div>
                 <input
@@ -2187,12 +2187,12 @@ export default function BiologyLab() {
             </div>
 
             {/* Informative Theory Box */}
-            <div className="p-5 rounded-3xl dark:bg-slate-900 bg-white border dark:border-white/10 border-slate-200 space-y-4">
+            <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border dark:border-white/10 border-slate-200 space-y-4">
               <div className="flex items-center gap-2 text-xs font-black dark:text-indigo-400 text-indigo-700 uppercase tracking-wider">
                 <Info className="w-4 h-4" /> CBSE Board Theory Guide:
               </div>
               
-              <ul className="space-y-2.5 text-xs dark:text-slate-300 text-slate-700 list-disc list-inside leading-relaxed">
+              <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 list-disc list-inside leading-relaxed">
                 <li>
                   <strong className="dark:text-indigo-300 text-indigo-700">Photosynthesis Equation:</strong>
                   <div className="my-1.5 p-2 bg-slate-950 rounded-xl border border-slate-800 text-center font-mono text-[10px] text-indigo-300 overflow-x-auto">

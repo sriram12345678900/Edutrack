@@ -1018,7 +1018,7 @@ export default function NcertViewer() {
   return (
     <div className="space-y-8">
       {/* Header & Navigation */}
-      <header className="relative p-8 rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 bg-slate-100 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+      <header className="relative p-8 rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
         <div className="relative z-10">
@@ -1037,7 +1037,7 @@ export default function NcertViewer() {
           href="/dashboard" 
           className="relative z-10 group flex items-center justify-center gap-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-6 py-3.5 rounded-2xl font-bold transition-all duration-300 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:-translate-y-1"
         >
-          <Home className="w-5 h-5 dark:text-slate-400 text-slate-600 group-hover:text-indigo-500 transition-colors" />
+          <Home className="w-5 h-5 text-slate-600 dark:text-slate-400 group-hover:text-indigo-500 transition-colors" />
           Back to Dashboard
         </Link>
       </header>
@@ -1050,7 +1050,7 @@ export default function NcertViewer() {
           placeholder="Search books by name or subject..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="text-slate-900 dark:text-white w-full pl-14 pr-6 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border-2 border-slate-200/60 dark:border-slate-700/60 rounded-2xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 shadow-sm text-lg font-medium placeholder:dark:text-slate-400 text-slate-600"
+          className="text-slate-900 dark:text-white w-full pl-14 pr-6 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border-2 border-slate-200/60 dark:border-slate-700/60 rounded-2xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 shadow-sm text-lg font-medium placeholder:text-slate-600 dark:text-slate-400"
         />
       </div>
 
@@ -1101,8 +1101,8 @@ export default function NcertViewer() {
                   {/* Glassmorphism shine effect */}
                   <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 translate-x-[-100%] group-hover:translate-x-[100%]" />
                   
-                  <BookOpen className="w-12 h-12 dark:text-white text-slate-900 drop-shadow-lg group-hover:scale-110 transition-transform duration-500" />
-                  <span className="absolute top-3 right-3 bg-black/20 backdrop-blur-md dark:text-white text-slate-900 text-xs font-extrabold px-2.5 py-1 rounded-xl border border-white/20 shadow-sm">
+                  <BookOpen className="w-12 h-12 text-slate-900 dark:text-white drop-shadow-lg group-hover:scale-110 transition-transform duration-500" />
+                  <span className="absolute top-3 right-3 bg-black/20 backdrop-blur-md text-slate-900 dark:text-white text-xs font-extrabold px-2.5 py-1 rounded-xl border border-white/20 shadow-sm">
                     Class {book.class}
                   </span>
                 </div>
@@ -1133,15 +1133,15 @@ export default function NcertViewer() {
         </div>
       ) : (
         <div className="text-center py-20 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-slate-200 dark:border-slate-700">
-          <BookOpen className="w-12 h-12 dark:text-slate-300 text-slate-700 mx-auto mb-4" />
+          <BookOpen className="w-12 h-12 text-slate-700 dark:text-slate-300 mx-auto mb-4" />
           <p className="text-slate-500 font-medium">No books found for your selection.</p>
         </div>
       )}
 
       {/* ── CHAPTER LIST MODAL ── */}
       {openBook && !openChapter && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-slate-950">
-          <div className="bg-white dark:bg-slate-900 bg-slate-100 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-slate-950/80 backdrop-blur-md">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800">
             {/* Header */}
             <div className={`bg-gradient-to-br ${gradient} p-6 shrink-0`}>
               <div className="flex items-start justify-between">
@@ -1149,10 +1149,10 @@ export default function NcertViewer() {
                   <p className="text-white/70 text-xs font-semibold uppercase tracking-widest mb-1">
                     Class {openBook.class} · {openBook.subject}
                   </p>
-                  <h2 className="dark:text-white text-slate-900 font-bold text-xl leading-tight">{openBook.title}</h2>
+                  <h2 className="text-slate-900 dark:text-white font-bold text-xl leading-tight">{openBook.title}</h2>
                   <p className="text-white/70 text-sm mt-1">{openBook.chapters} chapters</p>
                 </div>
-                <button onClick={() => setOpenBook(null)} className="bg-white/20 hover:bg-white/30 dark:text-white text-slate-900 rounded-xl p-2 transition-all">
+                <button onClick={() => setOpenBook(null)} className="bg-white/20 hover:bg-white/30 text-slate-900 dark:text-white rounded-xl p-2 transition-all">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -1160,7 +1160,7 @@ export default function NcertViewer() {
                 href={getFullBookUrl(openBook.code, openBook.chapters)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-4 inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 dark:text-white text-slate-900 text-sm font-semibold px-4 py-2 rounded-xl transition-all"
+                className="mt-4 inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-slate-900 dark:text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all"
               >
                 <ExternalLink className="w-4 h-4" />
                 Open Full Book on NCERT
@@ -1169,7 +1169,7 @@ export default function NcertViewer() {
 
             {/* Chapter List */}
             <div className="p-4 overflow-y-auto flex-1">
-              <p className="text-xs dark:text-slate-400 text-slate-600 font-semibold uppercase tracking-wider mb-3 px-1">
+              <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold uppercase tracking-wider mb-3 px-1">
                 Click a chapter to read it in-app
               </p>
               <div className="space-y-2">
@@ -1207,7 +1207,7 @@ export default function NcertViewer() {
                             Chapter {ch}{chName ? `: ${chName}` : ""}
                           </span>
                         </div>
-                        <ChevronRight className="w-4 h-4 dark:text-slate-400 text-slate-600 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
+                        <ChevronRight className="w-4 h-4 text-slate-600 dark:text-slate-400 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
                       </button>
                     </div>
                   );
@@ -1242,13 +1242,13 @@ export default function NcertViewer() {
                 <div className="relative">
                   <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${gradient} opacity-20 animate-ping`} style={{ animationDuration: "2s" }} />
                   <div className={`relative w-20 h-20 rounded-3xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-2xl`}>
-                    <BookOpen className="w-10 h-10 dark:text-white text-slate-900 animate-pulse" />
+                    <BookOpen className="w-10 h-10 text-slate-900 dark:text-white animate-pulse" />
                   </div>
                 </div>
 
                 {/* Book title */}
                 <div className="text-center max-w-sm">
-                  <h3 className="dark:text-white text-slate-900 font-bold text-lg mb-1">{openBook.title}</h3>
+                  <h3 className="text-slate-900 dark:text-white font-bold text-lg mb-1">{openBook.title}</h3>
                   <p className="text-white/50 text-sm">
                     {openBook.singleFileName || openBook.directUrl ? "Loading book..." : "Loading Chapter " + openChapter.num + "..."}
                   </p>
@@ -1537,7 +1537,7 @@ export default function NcertViewer() {
               onClick={() => setIsAiChatOpen(!isAiChatOpen)}
               className="absolute bottom-6 right-6 z-[120] w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full shadow-2xl shadow-indigo-500/50 flex items-center justify-center hover:scale-110 transition-transform ring-4 ring-white/10"
             >
-              {isAiChatOpen ? <X className="w-6 h-6 dark:text-white text-slate-900" /> : <Brain className="w-6 h-6 dark:text-white text-slate-900" />}
+              {isAiChatOpen ? <X className="w-6 h-6 text-slate-900 dark:text-white" /> : <Brain className="w-6 h-6 text-slate-900 dark:text-white" />}
               {/* Ping indicator */}
               {!isAiChatOpen && (
                 <span className="absolute -top-1 -right-1 flex h-4 w-4">
@@ -1550,7 +1550,7 @@ export default function NcertViewer() {
             {/* AI Tutor Chat Popover */}
             {isAiChatOpen && winState.x !== -1 && (
               <div 
-                className="fixed z-[120] bg-white dark:bg-slate-900 bg-slate-100 rounded-3xl shadow-2xl shadow-black/50 border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col animate-in zoom-in-95 fade-in duration-200"
+                className="fixed z-[120] bg-white dark:bg-slate-900 rounded-3xl shadow-2xl shadow-black/50 border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col animate-in zoom-in-95 fade-in duration-200"
                 style={{ left: winState.x, top: winState.y, width: winState.w, height: winState.h }}
               >
                 {/* 8 Invisible Resize Handles */}
@@ -1623,7 +1623,7 @@ export default function NcertViewer() {
                 </div>
 
                 {/* Input Area */}
-                <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 bg-slate-100 shrink-0 flex flex-col gap-2">
+                <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 flex flex-col gap-2">
                   {chatAttachments.length > 0 && (
                     <div className="flex gap-2 overflow-x-auto pb-1">
                       {chatAttachments.map((att, i) => (
@@ -1656,7 +1656,7 @@ export default function NcertViewer() {
                         onChange={(e) => setChatInput(e.target.value)}
                         onPaste={handlePaste}
                         placeholder="Ask or paste an image (Ctrl+V)..."
-                        className="text-slate-900 dark:text-white w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full pl-4 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-slate-200 placeholder:dark:text-slate-400 text-slate-600"
+                        className="text-slate-900 dark:text-white w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full pl-4 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-slate-200 placeholder:text-slate-600 dark:text-slate-400"
                       />
                       <button
                         type="submit"
@@ -1698,7 +1698,7 @@ export default function NcertViewer() {
                 </button>
                 <button 
                   onClick={() => setShowSideTheory(false)}
-                  className="p-2 hover:bg-white/5 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 rounded-xl transition-colors shrink-0"
+                  className="p-2 hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white rounded-xl transition-colors shrink-0"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1711,11 +1711,11 @@ export default function NcertViewer() {
                     {theoryLoading ? (
                       <div className="py-20 flex flex-col items-center justify-center gap-3">
                         <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
-                        <span className="text-xs dark:text-slate-400 text-slate-600 font-bold uppercase tracking-wider animate-pulse">Drafting study guide...</span>
+                        <span className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider animate-pulse">Drafting study guide...</span>
                       </div>
                     ) : theory ? (
                       <div 
-                        className="prose prose-invert max-w-none dark:text-slate-300 text-slate-700 text-sm leading-relaxed"
+                        className="prose prose-invert max-w-none text-slate-700 dark:text-slate-300 text-sm leading-relaxed"
                         dangerouslySetInnerHTML={{ __html: formatMarkdown(theory) }}
                       />
                     ) : (
@@ -1856,16 +1856,16 @@ export default function NcertViewer() {
                                       "w-2.5 h-2.5 rounded-full",
                                       selectedNode.type === 'root' ? 'bg-indigo-500' : selectedNode.type === 'branch' ? 'bg-amber-500' : 'bg-emerald-500'
                                     )} />
-                                    <h4 className="font-extrabold text-sm dark:text-white text-slate-900">{selectedNode.label}</h4>
+                                    <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">{selectedNode.label}</h4>
                                   </div>
-                                  <span className="text-[8px] font-black uppercase tracking-wider dark:text-slate-400 text-slate-600 bg-white/5 px-2 py-0.5 rounded-md">
+                                  <span className="text-[8px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-400 bg-white/5 px-2 py-0.5 rounded-md">
                                     {selectedNode.type}
                                   </span>
                                 </div>
                                 <div className="space-y-3">
                                   <div>
                                     <span className="text-[9px] font-black dark:text-indigo-400 text-indigo-700 uppercase tracking-widest block mb-1">Concept Definition</span>
-                                    <p className="text-xs dark:text-slate-300 text-slate-700 leading-relaxed font-semibold">{selectedNode.definition}</p>
+                                    <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-semibold">{selectedNode.definition}</p>
                                   </div>
 
                                   {selectedNode.equation && (
@@ -1915,14 +1915,14 @@ export default function NcertViewer() {
       {/* ── LINE-BY-LINE NCERT ANNOTATED STUDY GUIDE MODAL ── */}
       {showLineByLineModal && lineByLineData && (
         <div className="fixed inset-0 z-[150] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-8 select-none overflow-y-auto animate-in fade-in duration-300">
-          <div className="bg-white dark:bg-slate-900 bg-slate-100 rounded-[2.5rem] shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200 print-view">
+          <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200 print-view">
             
             {/* Modal Header */}
-            <div className="p-6 dark:bg-slate-900 bg-slate-100 dark:text-white text-slate-900 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 relative">
+            <div className="p-6 bg-white dark:bg-slate-900 text-slate-900 dark:text-white shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 relative">
               <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-indigo-600" />
               <div>
-                <span className="text-[10px] font-black uppercase tracking-widest dark:text-indigo-400 text-indigo-700">NCERT Active Annotation Study Guide</span>
-                <h3 className="text-xl font-bold dark:text-white text-slate-900 mt-1 leading-none">{openBook ? openBook.title : "NCERT"} — Line-by-Line Breakdown</h3>
+                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">NCERT Active Annotation Study Guide</span>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-1 leading-none">{openBook ? openBook.title : "NCERT"} — Line-by-Line Breakdown</h3>
               </div>
               <div className="flex items-center gap-3">
                 <button
@@ -1934,7 +1934,7 @@ export default function NcertViewer() {
                 </button>
                 <button
                   onClick={() => setShowLineByLineModal(false)}
-                  className="p-2.5 bg-slate-800 hover:bg-slate-700 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 rounded-xl transition-all border border-slate-700"
+                  className="p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl transition-all border border-slate-200 dark:border-slate-700"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1951,10 +1951,10 @@ export default function NcertViewer() {
 
               <div className="space-y-6">
                 {lineByLineData.lines?.map((line: any, idx: number) => (
-                  <div key={idx} className="bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden flex flex-col md:grid md:grid-cols-2">
+                  <div key={idx} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden flex flex-col md:grid md:grid-cols-2">
                     
                     {/* Left Column: Original NCERT Quote */}
-                    <div className="p-6 bg-slate-50 dark:bg-slate-900/30 bg-slate-200/30 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                    <div className="p-6 bg-slate-50 dark:bg-slate-900/30 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                       <div>
                         <span className="inline-block px-2.5 py-0.5 bg-amber-500/10 text-amber-500 text-[9px] font-black tracking-widest uppercase rounded-full mb-3 border border-amber-500/20">
                           NCERT Textbook Line {idx + 1}
@@ -1963,7 +1963,7 @@ export default function NcertViewer() {
                           "{line.original}"
                         </blockquote>
                       </div>
-                      <span className="text-[10px] dark:text-slate-400 text-slate-600 font-bold tracking-widest uppercase mt-4 block opacity-50">
+                      <span className="text-[10px] text-slate-600 dark:text-slate-400 font-bold tracking-widest uppercase mt-4 block opacity-50">
                         Official Curriculum Quote
                       </span>
                     </div>
@@ -2148,7 +2148,7 @@ function CropOverlay({ imageSrc, onClose, onCrop }: { imageSrc: string, onClose:
     <div className="fixed inset-0 z-[200] bg-black/80 flex flex-col items-center justify-center select-none"
          onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
       <div className="absolute top-4 right-4 flex gap-4 z-[210]">
-        <button onClick={onClose} className="px-6 py-2 bg-slate-800 dark:text-white text-slate-900 rounded-full font-semibold hover:bg-slate-700 shadow-xl border border-white/20 flex items-center gap-2">
+        <button onClick={onClose} className="px-6 py-2 bg-slate-800 text-slate-900 dark:text-white rounded-full font-semibold hover:bg-slate-700 shadow-xl border border-white/20 flex items-center gap-2">
           <X className="w-5 h-5" /> Cancel
         </button>
       </div>

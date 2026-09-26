@@ -82,8 +82,8 @@ export default function SubjectHubPage() {
                   onClick={() => setSelectedSubject(isSelected ? null : book.code)}
                   className={`relative overflow-hidden rounded-3xl p-6 text-left transition-all duration-300 border-2 shadow-sm hover:shadow-xl hover:-translate-y-1 ${
                     isSelected 
-                      ? 'border-indigo-500 shadow-indigo-500/20' 
-                      : 'border-transparent bg-white dark:bg-slate-50 dark:bg-slate-900 bg-slate-100 shadow-slate-200/50 dark:shadow-none'
+                      ? 'border-indigo-500 shadow-indigo-500/20 bg-white dark:bg-slate-900' 
+                      : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-slate-200/50 dark:shadow-none'
                   }`}
                 >
                   <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${gradient} opacity-10 rounded-full blur-2xl -mr-10 -mt-10`}></div>
@@ -92,8 +92,8 @@ export default function SubjectHubPage() {
                     <BookOpen className="w-7 h-7" />
                   </div>
                   
-                  <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200">{book.subject}</h3>
-                  <p className="text-slate-500 text-sm mt-1">{book.title}</p>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">{book.subject}</h3>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{book.title}</p>
                 </button>
 
                 {/* Chapter List (Expands when clicked) */}
@@ -101,10 +101,10 @@ export default function SubjectHubPage() {
                   <motion.div 
                     initial={{ opacity: 0, height: 0 }} 
                     animate={{ opacity: 1, height: 'auto' }} 
-                    className="bg-white dark:bg-slate-50 dark:bg-slate-900 bg-slate-100 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-lg"
+                    className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-lg"
                   >
                     <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-                      <h4 className="font-bold text-slate-700 dark:text-slate-600 dark:text-slate-300 text-sm uppercase tracking-wider flex items-center gap-2">
+                      <h4 className="font-bold text-slate-700 dark:text-slate-300 text-sm uppercase tracking-wider flex items-center gap-2">
                         <Book className="w-4 h-4" /> Select Chapter
                       </h4>
                     </div>
@@ -112,7 +112,7 @@ export default function SubjectHubPage() {
                       {Array.from({ length: book.chapters }, (_, i) => i + 1).map(ch => (
                         <Link key={ch} href={`/pyq/${book.code}/${ch}`}>
                           <div className="flex items-center justify-between p-4 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-2xl transition-colors group cursor-pointer">
-                            <span className="font-semibold text-slate-700 dark:text-slate-600 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:dark:text-indigo-400 text-indigo-700">
+                            <span className="font-semibold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
                               Chapter {ch}
                             </span>
                             <div className="flex items-center gap-2">

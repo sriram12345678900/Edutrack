@@ -150,12 +150,12 @@ export default function SignupWizard() {
         {/* Header */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-650 shadow-lg shadow-indigo-500/30 mb-6 border border-indigo-400/20">
-            <Sparkles className="w-8 h-8 dark:text-white text-slate-900" />
+            <Sparkles className="w-8 h-8 text-slate-900 dark:text-white" />
           </div>
           <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white mb-3">
             Set Up Your Profile
           </h1>
-          <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm font-semibold">
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-semibold">
             Let's customize EduTrack perfectly for you.
           </p>
         </div>
@@ -202,7 +202,7 @@ export default function SignupWizard() {
                       animate={{ opacity: 1, y: 0 }}
                       className="bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-150 dark:border-indigo-900/60 p-4 rounded-2xl"
                     >
-                      <p className="text-xs font-semibold text-slate-500 dark:text-slate-500 dark:text-slate-400">Your Assigned Unique Friend Code:</p>
+                      <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Your Assigned Unique Friend Code:</p>
                       <p className="text-lg font-black text-indigo-600 dark:text-indigo-400 font-mono tracking-wider mt-1">{generatedCode}</p>
                       <p className="text-[10px] text-slate-450 mt-1 leading-snug">Classmates can search this code to invite and message you directly!</p>
                     </motion.div>

@@ -306,7 +306,7 @@ export default function ProjectileLab() {
         
         {/* Header */}
         <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
-          <h2 className="text-sm font-black dark:text-white text-slate-900 flex items-center gap-2 uppercase tracking-wider">
+          <h2 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2 uppercase tracking-wider">
             <Flame className="w-4 h-4 text-orange-400" /> Projectile Motion Trajectory Lab
           </h2>
           <div className="flex items-center gap-3">
@@ -371,15 +371,15 @@ export default function ProjectileLab() {
         {/* Real-time Math Outputs */}
         <div className="grid grid-cols-3 gap-3.5 mt-4 p-4 dark:bg-white/5 bg-slate-100 rounded-2xl border dark:border-white/5 border-slate-200">
           <div>
-            <div className="text-[9px] font-bold dark:text-slate-400 text-slate-600 uppercase tracking-widest">Calculated Range:</div>
+            <div className="text-[9px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Calculated Range:</div>
             <div className="text-base font-black dark:text-indigo-300 text-indigo-700 font-mono mt-0.5">{horizontalRange.toFixed(2)} m</div>
           </div>
           <div>
-            <div className="text-[9px] font-bold dark:text-slate-400 text-slate-600 uppercase tracking-widest">Maximum Height:</div>
+            <div className="text-[9px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Maximum Height:</div>
             <div className="text-base font-black dark:text-pink-300 text-pink-700 font-mono mt-0.5">{maxProjHeight.toFixed(2)} m</div>
           </div>
           <div>
-            <div className="text-[9px] font-bold dark:text-slate-400 text-slate-600 uppercase tracking-widest">Time of Flight:</div>
+            <div className="text-[9px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Time of Flight:</div>
             <div className="text-base font-black dark:text-emerald-300 text-emerald-700 font-mono mt-0.5">{timeOfFlight.toFixed(2)} s</div>
           </div>
         </div>
@@ -390,15 +390,15 @@ export default function ProjectileLab() {
       <div className="lg:col-span-5 space-y-4">
         
         {/* Controls Panel */}
-        <div className="p-6 rounded-3xl dark:bg-slate-900 bg-white border dark:border-white/10 border-slate-200 shadow-2xl space-y-5">
+        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border dark:border-white/10 border-slate-200 shadow-2xl space-y-5">
           <div className="border-b dark:border-white/10 border-slate-200 pb-3">
-            <h3 className="text-sm font-black dark:text-white text-slate-900 uppercase tracking-wide">Launcher Parameters</h3>
+            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wide">Launcher Parameters</h3>
           </div>
 
           {/* Launch Angle Slider */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold dark:text-slate-300 text-slate-700">Launch Angle (&theta;)</span>
+              <span className="font-bold text-slate-700 dark:text-slate-300">Launch Angle (&theta;)</span>
               <span className="font-mono text-indigo-400 font-bold">{angle}°</span>
             </div>
             <input
@@ -416,7 +416,7 @@ export default function ProjectileLab() {
           {/* Initial Velocity Slider */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold dark:text-slate-300 text-slate-700">Initial Velocity (u)</span>
+              <span className="font-bold text-slate-700 dark:text-slate-300">Initial Velocity (u)</span>
               <span className="font-mono text-pink-400 font-bold">{velocity} m/s</span>
             </div>
             <input
@@ -434,7 +434,7 @@ export default function ProjectileLab() {
           {/* Launcher Height Slider */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold dark:text-slate-300 text-slate-700">Launcher Height (y0)</span>
+              <span className="font-bold text-slate-700 dark:text-slate-300">Launcher Height (y0)</span>
               <span className="font-mono text-emerald-400 font-bold">{height} m</span>
             </div>
             <input
@@ -451,7 +451,7 @@ export default function ProjectileLab() {
 
           {/* Environment Gravity Selector */}
           <div className="space-y-2.5">
-            <span className="text-xs font-bold dark:text-slate-300 text-slate-700 block">Environment Gravity (g)</span>
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Environment Gravity (g)</span>
             <div className="grid grid-cols-2 gap-2">
               {[
                 { type: "earth", label: "Earth (9.8 m/s²)" },
@@ -466,7 +466,7 @@ export default function ProjectileLab() {
                   className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
                     gravityType === env.type
                       ? "bg-indigo-600/20 text-indigo-400 border-indigo-500/50"
-                      : "dark:bg-white/5 bg-slate-100 hover:bg-white/10 dark:text-slate-400 text-slate-600 border-transparent"
+                      : "dark:bg-white/5 bg-slate-100 hover:bg-white/10 text-slate-600 dark:text-slate-400 border-transparent"
                   }`}
                 >
                   {env.label}
@@ -478,8 +478,8 @@ export default function ProjectileLab() {
           {/* Complementary Trajectory Option */}
           <div className="flex items-center justify-between pt-2 border-t dark:border-white/10 border-slate-200">
             <div className="flex flex-col">
-              <span className="text-xs font-bold dark:text-slate-200 text-slate-800">Show Complementary Angle</span>
-              <span className="text-[9px] dark:text-slate-400 text-slate-600">Simulate trajectory for 90° - &theta;</span>
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Show Complementary Angle</span>
+              <span className="text-[9px] text-slate-600 dark:text-slate-400">Simulate trajectory for 90° - &theta;</span>
             </div>
             <button
               onClick={() => setShowComplementary(!showComplementary)}
@@ -507,12 +507,12 @@ export default function ProjectileLab() {
         </div>
 
         {/* Educational Cheat Sheet */}
-        <div className="p-5 rounded-3xl dark:bg-slate-900 bg-white border dark:border-white/10 border-slate-200 space-y-4">
+        <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border dark:border-white/10 border-slate-200 space-y-4">
           <div className="flex items-center gap-2 text-xs font-black dark:text-indigo-400 text-indigo-700 uppercase tracking-wider">
             <Info className="w-4 h-4" /> CBSE Board Theory Guide:
           </div>
           
-          <ul className="space-y-2 text-xs dark:text-slate-300 text-slate-700 list-disc list-inside leading-relaxed">
+          <ul className="space-y-2 text-xs text-slate-700 dark:text-slate-300 list-disc list-inside leading-relaxed">
             <li>
               <strong className="dark:text-indigo-300 text-indigo-700">Complementary Angles:</strong> When firing from the ground (y0=0), two complementary angles (like 30° and 60°) will land at the <strong className="underline">exact same spot</strong> on the ground.
             </li>

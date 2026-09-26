@@ -57,8 +57,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`dark ${outfit.variable} ${plusJakarta.variable} ${jetbrainsMono.variable}`}>
-      <body className={`${outfit.className} antialiased min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200`}>
+    <html lang="en" suppressHydrationWarning className={`dark ${outfit.variable} ${plusJakarta.variable} ${jetbrainsMono.variable}`}>
+      <body suppressHydrationWarning className={`${outfit.className} antialiased min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200`}>
         <script
           dangerouslySetInnerHTML={{
             __html: `

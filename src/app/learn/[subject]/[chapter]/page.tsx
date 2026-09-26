@@ -772,25 +772,25 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                   }));
                 }
               }}
-              className="bg-transparent dark:text-white text-slate-900 font-bold focus:outline-none cursor-pointer text-xs pr-1 max-w-[130px]"
+              className="bg-transparent text-slate-900 dark:text-white font-bold focus:outline-none cursor-pointer text-xs pr-1 max-w-[130px]"
             >
               <optgroup label="Standard" className="dark:bg-[#080b18] bg-[#eef1f9] font-bold text-indigo-500">
                 {SUPPORTED_LANGUAGES.filter(l => l.category === "standard").map(l => (
-                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] text-slate-900 dark:text-white">
                     {l.label}
                   </option>
                 ))}
               </optgroup>
               <optgroup label="Bilingual Blends (-ish)" className="dark:bg-[#080b18] bg-[#eef1f9] font-bold text-amber-500">
                 {SUPPORTED_LANGUAGES.filter(l => l.category === "bilingual").map(l => (
-                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] text-slate-900 dark:text-white">
                     {l.label}
                   </option>
                 ))}
               </optgroup>
               <optgroup label="Regional Languages (Native)" className="dark:bg-[#080b18] bg-[#eef1f9] font-bold text-purple-500">
                 {SUPPORTED_LANGUAGES.filter(l => l.category === "regional").map(l => (
-                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] dark:text-white text-slate-900">
+                  <option key={l.code} value={l.code} className="dark:bg-[#080b18] bg-[#eef1f9] text-slate-900 dark:text-white">
                     {l.label}
                   </option>
                 ))}
@@ -1028,18 +1028,18 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                               </div>
                             </div>
 
-                            <h4 className="text-lg font-bold dark:text-white text-slate-900 leading-snug group-hover:dark:text-emerald-400 text-emerald-700 transition-colors">
+                            <h4 className="text-lg font-bold text-slate-900 dark:text-white leading-snug text-emerald-700 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                               {deck.title}
                             </h4>
 
-                            <div className="flex items-center gap-4 text-xs dark:text-slate-400 text-slate-600 font-semibold">
+                            <div className="flex items-center gap-4 text-xs text-slate-600 dark:text-slate-400 font-semibold">
                               <span className="flex items-center gap-1.5"><Layers className="w-4 h-4 text-slate-500" /> {total} cards</span>
                               <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-slate-500" /> {new Date(deck.createdAt).toLocaleDateString()}</span>
                             </div>
 
                             <div className="space-y-1.5">
                               <div className="flex justify-between text-xs font-bold">
-                                <span className="dark:text-slate-400 text-slate-600">Mastery</span>
+                                <span className="text-slate-600 dark:text-slate-400">Mastery</span>
                                 <span className="dark:text-emerald-400 text-emerald-700">{progress}%</span>
                               </div>
                               <div className="w-full bg-slate-800/80 h-1.5 rounded-full overflow-hidden">
@@ -1052,7 +1052,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                               <span className="text-sm font-bold dark:text-indigo-400 text-indigo-700 flex items-center gap-1 group-hover:gap-2 transition-all">
                                 {isSelected ? 'Active Deck ' : 'Select Deck →'}
                               </span>
-                              <span className="text-xs dark:text-slate-400 text-slate-600 font-medium">
+                              <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">
                                 {mastered}/{total} mastered
                               </span>
                             </div>
@@ -1076,7 +1076,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                             <Sparkles className="w-5 h-5 text-indigo-500" />
                             {activeDeck.title} — Study Session
                           </h3>
-                          <p className="text-xs dark:text-slate-400 text-slate-600 font-semibold mt-1">
+                          <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold mt-1">
                             {activeDeck.cards.filter((c: any) => c.status === "mastered" || c.status === "complete").length} of {activeDeck.cards.length} cards mastered
                           </p>
                         </div>
@@ -1137,12 +1137,12 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                                 </div>
                                 
                                 {/* Back */}
-                                <div className="absolute inset-0 backface-hidden rotate-y-180 dark:bg-slate-900 bg-slate-100 border-2 border-indigo-500/60 rounded-3xl p-8 flex flex-col justify-between shadow-md">
+                                <div className="absolute inset-0 backface-hidden rotate-y-180 bg-white dark:bg-slate-900 border-2 border-indigo-500/60 rounded-3xl p-8 flex flex-col justify-between shadow-md">
                                   <span className="text-xs font-bold uppercase tracking-wider text-indigo-650 bg-indigo-500/10 px-3 py-1 rounded-full mb-4 w-fit flex items-center gap-1">
                                     <CheckSquare className="w-3 h-3" /> Answer
                                   </span>
-                                  <p className="font-semibold text-lg dark:text-slate-200 text-slate-800 leading-relaxed text-center my-auto">{topic.flashcard.back}</p>
-                                  <p className="dark:text-slate-400 text-slate-600 text-xs mt-6 text-center font-bold">Tap to flip back ↺</p>
+                                  <p className="font-semibold text-lg text-slate-800 dark:text-slate-200 leading-relaxed text-center my-auto">{topic.flashcard.back}</p>
+                                  <p className="text-slate-600 dark:text-slate-400 text-xs mt-6 text-center font-bold">Tap to flip back ↺</p>
                                 </div>
                               </div>
                             </div>
@@ -1202,7 +1202,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                                     <span className="text-xs font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">
                                       Answer Revealed
                                     </span>
-                                    <span className="text-[10px] font-bold dark:text-slate-400 text-slate-600 uppercase tracking-widest truncate max-w-[120px]" title={activeDeck.title}>
+                                    <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest truncate max-w-[120px]" title={activeDeck.title}>
                                       {activeDeck.title}
                                     </span>
                                   </div>
@@ -1227,7 +1227,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                                 setCurrentCardIndex(prev => Math.max(0, prev - 1));
                                 setStudySessionFlipped(false);
                               }}
-                              className="w-12 h-12 rounded-full border border-slate-800 dark:bg-slate-900 bg-slate-100 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 disabled:opacity-20 hover:border-slate-700 transition-all flex items-center justify-center shadow-lg active:scale-95"
+                              className="w-12 h-12 rounded-full border border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white disabled:opacity-20 hover:border-slate-700 transition-all flex items-center justify-center shadow-lg active:scale-95"
                             >
                               <ChevronLeft className="w-6 h-6" />
                             </button>
@@ -1251,7 +1251,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                                 setCurrentCardIndex(prev => Math.min(activeDeck.cards.length - 1, prev + 1));
                                 setStudySessionFlipped(false);
                               }}
-                              className="w-12 h-12 rounded-full border border-slate-800 dark:bg-slate-900 bg-slate-100 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 disabled:opacity-20 hover:border-slate-700 transition-all flex items-center justify-center shadow-lg active:scale-95"
+                              className="w-12 h-12 rounded-full border border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white disabled:opacity-20 hover:border-slate-700 transition-all flex items-center justify-center shadow-lg active:scale-95"
                             >
                               <ChevronRight className="w-6 h-6" />
                             </button>
@@ -1325,7 +1325,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                         {/* Column 1: Board Must-Knows & Key Terms */}
                         <div className="lg:col-span-2 space-y-6">
                           {/* Board Must-Knows */}
-                          <div className="dark:bg-slate-900 bg-slate-100 dark:text-white text-slate-900 border border-slate-800 p-6 rounded-[2rem] shadow-xl relative overflow-hidden">
+                          <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-800 p-6 rounded-[2rem] shadow-xl relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
                             <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400 mb-4 flex items-center gap-2">
                               <Trophy className="w-5 h-5 dark:text-amber-400 text-amber-700" />
@@ -1337,14 +1337,14 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                                   <span className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xs font-black shrink-0 mt-0.5">
                                     {idx + 1}
                                   </span>
-                                  <p className="text-sm font-semibold dark:text-slate-200 text-slate-800 leading-relaxed">{fact}</p>
+                                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-relaxed">{fact}</p>
                                 </div>
                               ))}
                             </div>
                           </div>
 
                           {/* Key Vocabulary / Terms */}
-                          <div className="bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-700/60 p-6 rounded-[2rem] shadow-sm">
+                          <div className="bg-white bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/60 p-6 rounded-[2rem] shadow-sm">
                             <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                               <BookOpen className="w-5 h-5 text-indigo-500" />
                               Core Key Terms
@@ -1377,7 +1377,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                                   <code className="block bg-slate-950 px-3 py-2 rounded font-mono text-sm text-emerald-450 border border-slate-850/80 text-center w-full">
                                     {eq.formula}
                                   </code>
-                                  <p className="text-[11px] dark:text-slate-400 text-slate-600 leading-normal">{eq.description}</p>
+                                  <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-normal">{eq.description}</p>
                                 </div>
                               ))}
                             </div>
@@ -1427,24 +1427,24 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
           <div className="w-full flex items-center justify-between relative z-10 max-w-4xl border-b border-white/5 pb-6">
             <button
               onClick={() => setIsFullscreen(false)}
-              className="flex items-center gap-2 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 dark:bg-slate-900/80 bg-slate-200/80 border border-slate-800 px-5 py-2.5 rounded-2xl transition-all shadow-lg active:scale-95 text-sm font-bold uppercase tracking-wider"
+              className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-white dark:bg-slate-900/80 bg-slate-200/80 border border-slate-800 px-5 py-2.5 rounded-2xl transition-all shadow-lg active:scale-95 text-sm font-bold uppercase tracking-wider"
             >
               ← Exit Fullscreen <span className="text-[10px] text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded font-mono ml-1">ESC</span>
             </button>
             
             <div className="text-center">
-              <h2 className="text-xl font-bold dark:text-white text-slate-900 tracking-tight leading-none mb-1.5">{activeDeck.title}</h2>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-none mb-1.5">{activeDeck.title}</h2>
               <span className="text-xs dark:text-indigo-400 text-indigo-700 font-extrabold tracking-widest uppercase">
                 {subjectName} Hub • CBSE Class {userClass}
               </span>
             </div>
             
             <div className="w-40 hidden md:block">
-              <div className="flex justify-between text-xs font-bold dark:text-slate-400 text-slate-600 mb-1">
+              <div className="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">
                 <span>Mastered</span>
                 <span>{Math.round((activeDeck.cards.filter((c: any) => c.status === "mastered" || c.status === "complete").length / activeDeck.cards.length) * 100) || 0}%</span>
               </div>
-              <div className="w-full dark:bg-slate-900 bg-slate-100 h-1.5 rounded-full overflow-hidden border border-white/5">
+              <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden border border-slate-300 dark:border-white/5">
                 <div 
                   className="h-full bg-emerald-500 rounded-full transition-all duration-500" 
                   style={{ width: `${(activeDeck.cards.filter((c: any) => c.status === "mastered" || c.status === "complete").length / activeDeck.cards.length) * 100}%` }}
@@ -1496,7 +1496,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                     <span className="text-sm font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-400 px-4 py-1.5 rounded-full border border-emerald-500/20">
                       Answer Revealed
                     </span>
-                    <span className="text-xs font-bold dark:text-slate-400 text-slate-600 uppercase tracking-widest truncate max-w-[200px]" title={activeDeck.title}>
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest truncate max-w-[200px]" title={activeDeck.title}>
                       {activeDeck.title}
                     </span>
                   </div>
@@ -1526,16 +1526,16 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                   setCurrentCardIndex(prev => Math.max(0, prev - 1));
                   setStudySessionFlipped(false);
                 }}
-                className="w-14 h-14 rounded-full border border-slate-800 dark:bg-slate-900 bg-slate-100 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 disabled:opacity-20 hover:border-slate-700 transition-all flex items-center justify-center shadow-lg active:scale-95 hover:shadow-indigo-500/5"
+                className="w-14 h-14 rounded-full border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-20 hover:border-slate-400 dark:hover:border-slate-700 transition-all flex items-center justify-center shadow-lg active:scale-95 hover:shadow-indigo-500/5"
               >
                 <ChevronLeft className="w-8 h-8" />
               </button>
               
               <div className="flex flex-col items-center">
-                <span className="text-xs font-extrabold dark:text-indigo-400 text-indigo-700 tracking-widest uppercase">
+                <span className="text-xs font-extrabold text-indigo-600 dark:text-indigo-400 tracking-widest uppercase">
                   PROGRESS TRACKER
                 </span>
-                <div className="w-48 bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2 border border-white/5">
+                <div className="w-48 bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2 border border-slate-300 dark:border-white/5">
                   <div 
                     className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(168,85,247,0.5)]"
                     style={{ width: `${((currentCardIndex + 1) / activeDeck.cards.length) * 100}%` }}
@@ -1549,7 +1549,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                   setCurrentCardIndex(prev => Math.min(activeDeck.cards.length - 1, prev + 1));
                   setStudySessionFlipped(false);
                 }}
-                className="w-14 h-14 rounded-full border border-slate-800 dark:bg-slate-900 bg-slate-100 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 disabled:opacity-20 hover:border-slate-700 transition-all flex items-center justify-center shadow-lg active:scale-95 hover:shadow-indigo-500/5"
+                className="w-14 h-14 rounded-full border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-20 hover:border-slate-400 dark:hover:border-slate-700 transition-all flex items-center justify-center shadow-lg active:scale-95 hover:shadow-indigo-500/5"
               >
                 <ChevronRight className="w-8 h-8" />
               </button>
@@ -1579,14 +1579,14 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
       {showLineByLineModal && lineByLineData && (
         <div className="fixed inset-0 z-[150] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-8 select-none overflow-y-auto animate-in fade-in duration-300">
           
-          <div className="bg-white dark:bg-slate-900 bg-slate-100 rounded-[2.5rem] shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200 print-view">
+          <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200 print-view">
             
             {/* Modal Header */}
-            <div className="p-6 dark:bg-slate-900 bg-slate-100 dark:text-white text-slate-900 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 relative">
+            <div className="p-6 bg-white dark:bg-slate-900 text-slate-900 dark:text-white shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 relative">
               <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-indigo-600" />
               <div>
-                <span className="text-[10px] font-black uppercase tracking-widest dark:text-indigo-400 text-indigo-700">NCERT Active Annotation Study Guide</span>
-                <h3 className="text-xl font-bold dark:text-white text-slate-900 mt-1 leading-none">{chapterName} — Line-by-Line Breakdown</h3>
+                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">NCERT Active Annotation Study Guide</span>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-1 leading-none">{chapterName} — Line-by-Line Breakdown</h3>
               </div>
               <div className="flex items-center gap-3">
                 <button
@@ -1598,7 +1598,7 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
                 </button>
                 <button
                   onClick={() => setShowLineByLineModal(false)}
-                  className="p-2.5 bg-slate-800 hover:bg-slate-700 dark:text-slate-400 text-slate-600 hover:dark:text-white text-slate-900 rounded-xl transition-all border border-slate-700"
+                  className="p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl transition-all border border-slate-200 dark:border-slate-700"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1616,19 +1616,19 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
 
               <div className="space-y-6">
                 {lineByLineData.lines?.map((line: any, idx: number) => (
-                  <div key={idx} className="bg-white dark:bg-slate-900 bg-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden flex flex-col md:grid md:grid-cols-2">
+                  <div key={idx} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden flex flex-col md:grid md:grid-cols-2">
                     
                     {/* Left Column: Original NCERT Quote */}
-                    <div className="p-6 bg-slate-50 dark:bg-slate-900/30 bg-slate-200/30 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                    <div className="p-6 bg-slate-50 dark:bg-slate-900/30 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                       <div>
                         <span className="inline-block px-2.5 py-0.5 bg-amber-500/10 text-amber-500 text-[9px] font-black tracking-widest uppercase rounded-full mb-3 border border-amber-500/20">
                           NCERT Textbook Line {idx + 1}
                         </span>
-                        <blockquote className="m-0 text-sm font-bold text-slate-800 dark:text-slate-250 italic leading-relaxed border-l-4 border-amber-505 pl-4">
+                        <blockquote className="m-0 text-sm font-bold text-slate-800 dark:text-slate-250 italic leading-relaxed border-l-4 border-amber-500 pl-4">
                           "{line.original}"
                         </blockquote>
                       </div>
-                      <span className="text-[10px] dark:text-slate-400 text-slate-600 font-bold tracking-widest uppercase mt-4 block opacity-50">
+                      <span className="text-[10px] text-slate-600 dark:text-slate-400 font-bold tracking-widest uppercase mt-4 block opacity-50">
                         Official Curriculum Quote
                       </span>
                     </div>

@@ -805,10 +805,10 @@ export default function FormulasPage() {
                 <Brain className="w-5.5 h-5.5 text-white" />
               </div>
               <div>
-                <h3 className="text-sm font-black dark:text-white text-slate-900 uppercase tracking-wide">
+                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wide">
                   Formula Constructor: {gameFormula.title}
                 </h3>
-                <p className="text-[10px] dark:text-slate-400 text-slate-500 font-bold uppercase tracking-wider mt-0.5">
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mt-0.5">
                   Click tiles to assemble the formula in correct order
                 </p>
               </div>
