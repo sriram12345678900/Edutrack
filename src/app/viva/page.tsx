@@ -217,12 +217,19 @@ export default function VivaPage() {
     
     setTimeout(() => {
       if (questions[0]) {
-        speakText(`Hello! Welcome to your oral viva on ${selectedTopic}. Here is your first question: ${questions[0].question}`);
+        const p = PERSONAS[examinerPersona];
+        const greeting = examinerPersona === "examiner"
+          ? `Good day candidate. I am ${p.name}, your CBSE oral examiner for ${selectedTopic}. Listen carefully to Question 1: ${questions[0].question}`
+          : examinerPersona === "mentor"
+          ? `Welcome! I am ${p.name}. We are exploring ${selectedTopic} today. Here is your first question: ${questions[0].question}`
+          : `Hey! I'm ${p.name}. Let's conquer ${selectedTopic} together. Question one: ${questions[0].question}`;
+        speakText(greeting);
       }
     }, 400);
   };
 
   const toggleListening = () => {
+    interruptSpeech();
     if (!recognitionRef.current) {
       alert("Speech recognition is not supported in this browser. Please use Chrome/Edge or type your answer!");
       return;
@@ -410,6 +417,37 @@ export default function VivaPage() {
                   </div>
                 );
               })}
+            </div>
+
+            {/* Persona Selector */}
+            <div className="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+              <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider block">
+                Choose AI Examiner Persona:
+              </span>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {(["examiner", "mentor", "buddy"] as const).map(pKey => {
+                  const p = PERSONAS[pKey];
+                  const isSelected = examinerPersona === pKey;
+                  return (
+                    <div
+                      key={pKey}
+                      onClick={() => setExaminerPersona(pKey)}
+                      className={cn(
+                        "p-3.5 rounded-2xl border cursor-pointer transition-all flex items-center gap-3",
+                        isSelected
+                          ? "bg-purple-50 dark:bg-purple-950/40 border-purple-500 shadow-md shadow-purple-500/10 scale-[1.02]"
+                          : "bg-slate-50 dark:bg-slate-950/60 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+                      )}
+                    >
+                      <img src={p.avatar} alt={p.name} className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30" />
+                      <div>
+                        <h4 className="text-xs font-black text-slate-900 dark:text-white">{p.name}</h4>
+                        <p className="text-[10px] text-purple-600 dark:text-purple-400 font-semibold">{p.role}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-slate-200 dark:border-slate-800">
