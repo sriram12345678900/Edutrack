@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Mic, MicOff, Volume2, VolumeX, Sparkles, Award, Play, RotateCcw, 
   CheckCircle2, AlertCircle, ChevronRight, User, Bot, HelpCircle, 
-  BookOpen, Star, Trophy, ShieldCheck, Flame, FastForward
+  BookOpen, Star, Trophy, ShieldCheck, Flame, FastForward, Zap
 } from "lucide-react";
 import { awardXp } from "@/lib/xp";
 import { cn } from "@/lib/utils";
@@ -544,9 +544,11 @@ export default function VivaPage() {
             <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 md:p-8 space-y-6 shadow-xl relative overflow-hidden">
               <div className="flex items-start gap-4">
                 <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-purple-500/10 dark:bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-600 dark:text-purple-300 shadow-inner">
-                    <Bot className="w-8 h-8" />
-                  </div>
+                  <img
+                    src={PERSONAS[examinerPersona].avatar}
+                    alt={PERSONAS[examinerPersona].name}
+                    className="w-14 h-14 rounded-2xl bg-purple-500/10 dark:bg-purple-500/20 border border-purple-500/40 object-cover shadow-inner"
+                  />
                   {isSpeaking && (
                     <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 ring-4 ring-white dark:ring-slate-900 animate-pulse" />
                   )}
@@ -555,17 +557,28 @@ export default function VivaPage() {
                 <div className="space-y-2 flex-1">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-sm font-black text-slate-900 dark:text-white">Professor Sophia</h3>
-                      <p className="text-[10px] text-purple-600 dark:text-purple-400 font-bold uppercase tracking-wider">Senior Academic Examiner</p>
+                      <h3 className="text-sm font-black text-slate-900 dark:text-white">{PERSONAS[examinerPersona].name}</h3>
+                      <p className="text-[10px] text-purple-600 dark:text-purple-400 font-bold uppercase tracking-wider">{PERSONAS[examinerPersona].role}</p>
                     </div>
 
-                    <button
-                      onClick={() => speakText(currentQuestion.question)}
-                      className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5 transition-colors"
-                    >
-                      <Volume2 className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                      Repeat Question
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {isSpeaking && (
+                        <button
+                          onClick={interruptSpeech}
+                          className="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 text-xs font-bold flex items-center gap-1.5 transition-all animate-pulse"
+                        >
+                          <Zap className="w-3.5 h-3.5" />
+                          Interrupt
+                        </button>
+                      )}
+                      <button
+                        onClick={() => speakText(currentQuestion.question)}
+                        className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                      >
+                        <Volume2 className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        Repeat
+                      </button>
+                    </div>
                   </div>
 
                   <div className="p-4 bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200 dark:border-slate-800/80 text-sm md:text-base font-medium text-slate-900 dark:text-slate-100 leading-relaxed shadow-inner">
