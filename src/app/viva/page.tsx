@@ -85,9 +85,31 @@ const VIVA_QUESTION_BANKS: { [key: string]: VivaQuestion[] } = {
   ]
 };
 
+const PERSONAS = {
+  examiner: {
+    name: "Dr. Sharma",
+    role: "CBSE External Board Examiner",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=ExaminerSharma",
+    tone: "Formal, technical, and adheres to NCERT marking rubrics."
+  },
+  mentor: {
+    name: "Prof. Ananya",
+    role: "Socratic Academic Mentor",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=ProfAnanya",
+    tone: "Encouraging and patient, offers conceptual hints."
+  },
+  buddy: {
+    name: "Aarav",
+    role: "CBSE Topper & Study Buddy",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=AaravTopper",
+    tone: "Energetic study peer using friendly analogies."
+  }
+};
+
 export default function VivaPage() {
   const [selectedTopic, setSelectedTopic] = useState<string>("Physics - Light & Optics");
   const [vivaLanguage, setVivaLanguage] = useState<string>("English");
+  const [examinerPersona, setExaminerPersona] = useState<"examiner" | "mentor" | "buddy">("examiner");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isExamActive, setIsExamActive] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -106,6 +128,13 @@ export default function VivaPage() {
   const [isFinished, setIsFinished] = useState(false);
 
   const recognitionRef = useRef<any>(null);
+
+  const interruptSpeech = () => {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+    setIsSpeaking(false);
+  };
 
   // Load saved language
   useEffect(() => {

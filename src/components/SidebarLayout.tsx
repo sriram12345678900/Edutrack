@@ -73,6 +73,8 @@ const categories = [
   {
     title: "Testing & Examination",
     items: [
+      { href: "/competency", label: "Competency Lab", icon: Target, badge: "NEP" },
+      { href: "/squads", label: "Study Squads", icon: Shield, badge: "Guild" },
       { href: "/shop", label: "Rewards Shop", icon: ShoppingBag, badge: "XP" },
       { href: "/exam-generator", label: "Exam Generator", icon: FileText, badge: "Print" },
       { href: "/generator", label: "Question Generator", icon: Target, badge: "AI" },

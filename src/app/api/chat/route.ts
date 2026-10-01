@@ -7,7 +7,11 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    let { messages, language, bookInfo, image } = body;
+    let { messages, language, bookInfo, image, socratic } = body;
+
+    const socraticInstruction = socratic 
+      ? "\n\nCRITICAL PEDAGOGY RULE (SOCRATIC MODE): The student wants to solve this themselves. DO NOT provide the final numerical answer or complete solution! Instead, act as a Socratic guide: 1) Identify the underlying concept/formula without solving it, 2) Ask them a single leading question to take the very first step, 3) End with an encouraging prompt asking for their attempt."
+      : "";
 
     if (!messages || !Array.isArray(messages)) {
       messages = [];
@@ -52,7 +56,7 @@ export async function POST(req: Request) {
     const localLLMResponse = await queryLocalLLM([
       {
         role: "system",
-        content: `You are EduTrack AI, an expert personal tutor for Indian CBSE Class 6-10 students.${bookInfo ? `\nThe student is currently studying: ${bookInfo}. Base your answers directly on this NCERT curriculum and chapter.` : ""}\n${getLanguagePromptInstruction(language || "English")}\nUse clear step-by-step points, proper mathematical identities or chemical formulas, and key NCERT terms.`
+        content: `You are EduTrack AI, an expert personal tutor for Indian CBSE Class 6-10 students.${bookInfo ? `\nThe student is currently studying: ${bookInfo}. Base your answers directly on this NCERT curriculum and chapter.` : ""}${socraticInstruction}\n${getLanguagePromptInstruction(language || "English")}\nUse clear step-by-step points, proper mathematical identities or chemical formulas, and key NCERT terms.`
       },
       ...messages.map((m: any) => ({
         role: (m.role === "assistant" ? "assistant" : "user") as "assistant" | "user",
@@ -67,7 +71,7 @@ export async function POST(req: Request) {
     // 2. Primary Online Cloud LLM (Gemini 2.5 Flash / Groq) if configured and not in forced local mode
     if (hasOnlineKeys && !forceLocal) {
       try {
-        const reply = await getChatResponse(messages, language || "Hinglish", bookInfo || "");
+        const reply = await getChatResponse(messages, language || "Hinglish", (bookInfo || "") + socraticInstruction);
         if (reply && reply.trim()) {
           return NextResponse.json({ reply });
         }

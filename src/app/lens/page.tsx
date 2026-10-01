@@ -4,13 +4,15 @@ import React, { useState, useEffect, useRef } from "react";
 import { 
   Home, Camera, Upload, Sparkles, MessageSquare, ArrowRight, 
   Zap, Bot, User, Check, Loader2, Mic, Volume2, 
-  VolumeX, FileText, Copy, X, Eye, HelpCircle, BookOpen, Compass, Crosshair, Globe
+  VolumeX, FileText, Copy, X, Eye, HelpCircle, BookOpen, Compass, Crosshair, Globe, Brain
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { SUPPORTED_LANGUAGES, getSpeechLanguageCode } from "@/lib/languages";
+import Confetti from "@/components/Confetti";
+import { awardUserXP } from "@/lib/xp";
 
 interface SampleDoubt {
   id: string;
@@ -59,6 +61,9 @@ export default function LensPage() {
   const [activeSpeakingMsg, setActiveSpeakingMsg] = useState<string | null>(null);
   const [generatingSummary, setGeneratingSummary] = useState(false);
   const [userLanguage, setUserLanguage] = useState<string>("Hinglish");
+  const [socraticMode, setSocraticMode] = useState<boolean>(true);
+  const [socraticBonusClaimed, setSocraticBonusClaimed] = useState<boolean>(false);
+  const [showConfetti, setShowConfetti] = useState<boolean>(false);
 
   useEffect(() => {
     const storedLang = localStorage.getItem("edutrack_language");
@@ -166,7 +171,8 @@ export default function LensPage() {
           image: lensImage || undefined,
           messages: apiMessages,
           language: userLanguage,
-          bookInfo: ""
+          bookInfo: "",
+          socratic: socraticMode
         })
       });
 
@@ -190,6 +196,7 @@ export default function LensPage() {
         setLensChatStarted(false);
         setLensMessages([]);
         setLensConclusion(null);
+        setSocraticBonusClaimed(false);
       } catch (err) {
         console.error("Error reading file:", err);
       }
@@ -206,6 +213,7 @@ export default function LensPage() {
         setLensChatStarted(false);
         setLensMessages([]);
         setLensConclusion(null);
+        setSocraticBonusClaimed(false);
       } catch (err) {
         console.error("Error reading dropped file:", err);
       }
@@ -218,6 +226,7 @@ export default function LensPage() {
     setIsScanning(true);
     setLensChatStarted(true);
     setLensConclusion(null);
+    setSocraticBonusClaimed(false);
     setLensMessages([
       { role: "user", content: "Uploaded a homework image for analysis.", imagePreview: lensImage }
     ]);
@@ -231,7 +240,9 @@ export default function LensPage() {
           messages: [
             {
               role: "user",
-              content: "Please analyze this homework image, extract the text/question, and explain how to solve it step-by-step.",
+              content: socraticMode
+                ? "Please analyze this homework image, extract the text/question, and act as a Socratic tutor: provide progressive hints without revealing the full numerical answer!"
+                : "Please analyze this homework image, extract the text/question, and explain how to solve it step-by-step.",
               attachments: [
                 {
                   type: "image/jpeg",
@@ -242,7 +253,8 @@ export default function LensPage() {
             }
           ],
           language: userLanguage,
-          bookInfo: ""
+          bookInfo: "",
+          socratic: socraticMode
         })
       });
 
@@ -483,6 +495,7 @@ export default function LensPage() {
 
   return (
     <div className="w-full h-full min-h-screen flex flex-col bg-slate-50 dark:bg-[#03050d] text-slate-900 dark:text-slate-100 font-sans relative overflow-hidden selection:bg-emerald-500/30">
+      <Confetti active={showConfetti} />
       <style>{`
         @keyframes scan {
           0% { top: 0%; opacity: 0; }
@@ -597,6 +610,41 @@ export default function LensPage() {
                 </button>
               );
             })}
+          </div>
+
+          {/* Socratic Mode Pedagogical Toggle */}
+          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 backdrop-blur-md">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-400">
+                <Brain className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-200">Socratic Guided Hint Mode</span>
+                  <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">
+                    +50 XP
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-400 leading-tight">
+                  {socraticMode
+                    ? "AI provides progressive nudges so you learn how to solve it yourself."
+                    : "Standard: AI reveals full numerical answer immediately."}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSocraticMode(!socraticMode)}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                socraticMode ? "bg-indigo-600" : "bg-slate-700"
+              }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  socraticMode ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
           </div>
 
           {/* Holographic HUD Viewport */}
@@ -767,6 +815,36 @@ export default function LensPage() {
                   </button>
                 )}
               </div>
+
+              {/* Socratic Guidance Nudge Banner */}
+              {socraticMode && lensMessages.some(m => m.role === "ai") && (
+                <div className="bg-gradient-to-r from-indigo-950/80 via-purple-950/60 to-slate-900 border-b border-indigo-500/30 px-5 py-3 flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <Sparkles className="h-4 w-4 text-amber-400 shrink-0 animate-pulse" />
+                    <span className="text-xs text-indigo-200 font-medium">
+                      Socratic Nudge Mode: Try calculating the next step using this hint!
+                    </span>
+                  </div>
+                  {socraticBonusClaimed ? (
+                    <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-xl">
+                      <Check className="h-3.5 w-3.5" /> +50 XP Mastered!
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        awardUserXP(50);
+                        setSocraticBonusClaimed(true);
+                        setShowConfetti(true);
+                        setTimeout(() => setShowConfetti(false), 3000);
+                      }}
+                      className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/25 transition active:scale-95 flex items-center gap-1.5"
+                    >
+                      <Sparkles className="h-3.5 w-3.5" /> I Cracked It! (+50 XP)
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Chat Messages */}
               <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
