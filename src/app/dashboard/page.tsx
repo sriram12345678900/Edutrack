@@ -18,6 +18,8 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DailyQuestionWidget } from "@/components/dashboard/DailyQuestionWidget";
 import { ClassroomLauncher } from "@/components/dashboard/ClassroomLauncher";
 import FeatureSpotlightTour from "@/components/FeatureSpotlightTour";
+import DailySRSWidget from "@/components/dashboard/DailySRSWidget";
+import BoardExamSprintWidget from "@/components/dashboard/BoardExamSprintWidget";
 import { cn } from "@/lib/utils";
 import { useGamificationStore } from "@/store/useGamificationStore";
 import { useProfileStore } from "@/store/useProfileStore";
@@ -490,6 +492,16 @@ export default function Dashboard() {
                   exit={{ opacity: 0, y: -10 }}
                   className="space-y-6"
                 >
+                  {/* Board Exam Sprint Countdown & Syllabus Velocity */}
+                  <motion.div variants={item}>
+                    <BoardExamSprintWidget />
+                  </motion.div>
+
+                  {/* Daily SuperMemo-2 Spaced Repetition Queue */}
+                  <motion.div variants={item}>
+                    <DailySRSWidget />
+                  </motion.div>
+
                   {/* Top Compact Hero Bar: Level HUD + Quick Actions */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     
