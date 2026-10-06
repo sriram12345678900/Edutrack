@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import { BookOpen, ExternalLink, Search, GraduationCap, X, FileText, ChevronRight, ArrowLeft, Download, Loader2, Home, Brain, Send, Bot, User, Camera, Crop, Image as ImageIcon, ZoomIn, ZoomOut, ChevronLeft, Moon, Sun, Pen, Eraser, Highlighter, Pencil, Trash2, Sparkles, Trophy, Volume2, Play, Pause, Activity, Eye, EyeOff } from "lucide-react";
+import { BookOpen, ExternalLink, Search, GraduationCap, X, FileText, ChevronRight, ArrowLeft, Download, Loader2, Home, Brain, Send, Bot, User, Camera, Crop, Image as ImageIcon, ZoomIn, ZoomOut, ChevronLeft, Moon, Sun, Pen, Eraser, Highlighter, Pencil, Trash2, Sparkles, Trophy, Volume2, Play, Pause, Activity, Eye, EyeOff, WifiOff, Database, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { ncertLibrary, subjects, subjectColors, NcertBook } from "@/lib/ncert-books";
 import html2canvas from 'html2canvas';
 import dynamic from 'next/dynamic';
 import { cn } from "@/lib/utils";
+import { offlineStorage, OfflineStudyPack } from "@/lib/offline-storage";
 const PdfViewer = dynamic(() => import('@/components/PdfViewer'), { ssr: false });
 
 interface MindMapNode {
@@ -542,6 +543,22 @@ export default function NcertViewer() {
   const [showLineByLineModal, setShowLineByLineModal] = useState<boolean>(false);
   const [lineByLineLoading, setLineByLineLoading] = useState<boolean>(false);
 
+  // Offline Study Packs (IndexedDB)
+  const [showOfflineModal, setShowOfflineModal] = useState<boolean>(false);
+  const [offlinePacks, setOfflinePacks] = useState<OfflineStudyPack[]>([]);
+  const [selectedOfflinePack, setSelectedOfflinePack] = useState<OfflineStudyPack | null>(null);
+
+  const handleOpenOffline = async () => {
+    try {
+      const packs = await offlineStorage.getStudyPacks();
+      setOfflinePacks(packs);
+      if (packs.length > 0) setSelectedOfflinePack(packs[0]);
+      setShowOfflineModal(true);
+    } catch (err) {
+      console.error('Failed to load offline packs:', err);
+    }
+  };
+
   const getActiveChapterTitle = () => {
     if (!openBook || !openChapter) return "";
     return chapterNamesMap[openBook.code]?.[openChapter.num - 1] || (openBook.singleFileName || openBook.directUrl ? openBook.title : `${openBook.title} - Chapter ${openChapter.num}`);
@@ -696,16 +713,39 @@ export default function NcertViewer() {
   const interactStartCoords = useRef({ x: 0, y: 0 });
   const startWinState = useRef({ x: 0, y: 0, w: 0, h: 0 });
 
-  // Initialize window position on first open
+  // Initialize window position on first open & clamp to screen
   useEffect(() => {
     if (isAiChatOpen && winState.x === -1) {
-      setWinState(prev => ({
-        ...prev,
-        x: Math.max(20, window.innerWidth - prev.w - 24),
-        y: Math.max(20, window.innerHeight - prev.h - 96)
-      }));
+      setWinState(prev => {
+        const initW = Math.min(prev.w, Math.max(280, window.innerWidth - 32));
+        const initH = Math.min(prev.h, Math.max(360, window.innerHeight - 100));
+        return {
+          x: Math.max(16, window.innerWidth - initW - 24),
+          y: Math.max(16, window.innerHeight - initH - 96),
+          w: initW,
+          h: initH
+        };
+      });
     }
   }, [isAiChatOpen, winState.x]);
+
+  // Keep floating window clamped inside viewport when screen is resized
+  useEffect(() => {
+    const handleScreenResize = () => {
+      if (typeof window === 'undefined') return;
+      setWinState(prev => {
+        if (prev.x === -1) return prev;
+        const maxW = Math.min(prev.w, Math.max(280, window.innerWidth - 32));
+        const maxH = Math.min(prev.h, Math.max(360, window.innerHeight - 80));
+        const clampedX = Math.max(16, Math.min(window.innerWidth - maxW - 16, prev.x));
+        const clampedY = Math.max(16, Math.min(window.innerHeight - maxH - 16, prev.y));
+        return { x: clampedX, y: clampedY, w: maxW, h: maxH };
+      });
+    };
+
+    window.addEventListener('resize', handleScreenResize);
+    return () => window.removeEventListener('resize', handleScreenResize);
+  }, []);
 
   // Screenshot & Crop State
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
@@ -809,15 +849,17 @@ export default function NcertViewer() {
     } else if (isInteracting.current.type === 'resize') {
       const dir = isInteracting.current.dir!;
       let { x, y, w, h } = start;
+      const maxW = Math.min(800, Math.max(280, window.innerWidth - 32));
+      const maxH = Math.min(800, Math.max(360, window.innerHeight - 80));
 
-      if (dir.includes('e')) w = Math.max(300, Math.min(800, start.w + deltaX));
-      if (dir.includes('s')) h = Math.max(400, Math.min(800, start.h + deltaY));
+      if (dir.includes('e')) w = Math.max(280, Math.min(maxW, start.w + deltaX));
+      if (dir.includes('s')) h = Math.max(360, Math.min(maxH, start.h + deltaY));
       if (dir.includes('w')) {
-        const newW = Math.max(300, Math.min(800, start.w - deltaX));
+        const newW = Math.max(280, Math.min(maxW, start.w - deltaX));
         if (newW !== w) { x = start.x + (start.w - newW); w = newW; }
       }
       if (dir.includes('n')) {
-        const newH = Math.max(400, Math.min(800, start.h - deltaY));
+        const newH = Math.max(360, Math.min(maxH, start.h - deltaY));
         if (newH !== h) { y = start.y + (start.h - newH); h = newH; }
       }
       
@@ -1033,13 +1075,23 @@ export default function NcertViewer() {
           </p>
         </div>
         
-        <Link 
-          href="/dashboard" 
-          className="relative z-10 group flex items-center justify-center gap-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-6 py-3.5 rounded-2xl font-bold transition-all duration-300 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:-translate-y-1"
-        >
-          <Home className="w-5 h-5 text-slate-600 dark:text-slate-400 group-hover:text-indigo-500 transition-colors" />
-          Back to Dashboard
-        </Link>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleOpenOffline}
+            className="relative z-10 group flex items-center justify-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 px-4 py-3.5 rounded-2xl font-bold transition-all text-sm shadow-sm hover:-translate-y-1"
+          >
+            <WifiOff className="w-4 h-4 text-emerald-500" />
+            <span>Offline Study Packs</span>
+          </button>
+
+          <Link 
+            href="/dashboard" 
+            className="relative z-10 group flex items-center justify-center gap-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-6 py-3.5 rounded-2xl font-bold transition-all duration-300 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:-translate-y-1"
+          >
+            <Home className="w-5 h-5 text-slate-600 dark:text-slate-400 group-hover:text-indigo-500 transition-colors" />
+            Back to Dashboard
+          </Link>
+        </div>
       </header>
 
       {/* Search */}
@@ -2057,6 +2109,167 @@ export default function NcertViewer() {
             setCropImageSrc(null);
           }}
         />
+      )}
+
+      {/* ── OFFLINE STUDY PACKS (INDEXEDDB) MODAL ── */}
+      {showOfflineModal && (
+        <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 sm:p-6 bg-slate-950/85 backdrop-blur-md animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden border border-slate-200 dark:border-white/10">
+            {/* Modal Header */}
+            <div className="p-5 border-b border-slate-200 dark:border-white/10 flex items-center justify-between bg-slate-50 dark:bg-slate-950">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-2xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                  <Database className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    IndexedDB Offline NCERT Study Packs
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    High-yield chapter summaries, formulas, and questions stored directly in your browser. Works without internet.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Offline Ready
+                </span>
+                <button
+                  onClick={() => setShowOfflineModal(false)}
+                  className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body: Split 2-pane */}
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
+              
+              {/* Left Column: Pack Selector (4 cols) */}
+              <div className="md:col-span-4 border-r border-slate-200 dark:border-white/10 p-4 overflow-y-auto space-y-2 bg-slate-50/50 dark:bg-slate-950/50">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 px-2 block mb-1">
+                  Cached Packs ({offlinePacks.length})
+                </span>
+                {offlinePacks.map((pack) => (
+                  <button
+                    key={pack.id}
+                    onClick={() => setSelectedOfflinePack(pack)}
+                    className={`w-full text-left p-3.5 rounded-2xl transition-all border flex flex-col gap-1 ${
+                      selectedOfflinePack?.id === pack.id
+                        ? 'bg-indigo-600 text-white border-transparent shadow-lg shadow-indigo-600/30'
+                        : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-white/10 hover:border-indigo-400'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider">
+                      <span className={selectedOfflinePack?.id === pack.id ? 'text-indigo-200' : 'text-indigo-500'}>
+                        {pack.subject} • Class {pack.classLevel}
+                      </span>
+                      <span className="opacity-70">{pack.sizeKb} KB</span>
+                    </div>
+                    <span className="font-extrabold text-sm line-clamp-1">
+                      {pack.chapter}
+                    </span>
+                    <span className={`text-[10px] ${selectedOfflinePack?.id === pack.id ? 'text-white/80' : 'text-slate-400'}`}>
+                      {pack.keyFormulas.length} Formulas • {pack.practiceQuestions.length} Questions
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Right Column: Pack Details (8 cols) */}
+              <div className="md:col-span-8 p-6 overflow-y-auto space-y-6 bg-white dark:bg-slate-900">
+                {selectedOfflinePack ? (
+                  <>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
+                          {selectedOfflinePack.subject}
+                        </span>
+                        <span className="text-xs text-slate-400 font-bold">Class {selectedOfflinePack.classLevel}</span>
+                      </div>
+                      <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                        {selectedOfflinePack.chapter}
+                      </h2>
+                    </div>
+
+                    {/* Summary */}
+                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/10 space-y-1.5">
+                      <span className="text-[11px] font-black uppercase tracking-wider text-indigo-500">
+                        High-Yield Chapter Summary
+                      </span>
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+                        {selectedOfflinePack.summary}
+                      </p>
+                    </div>
+
+                    {/* Formulas */}
+                    <div className="space-y-2">
+                      <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+                        Essential Formulas & Reactions
+                      </span>
+                      <div className="space-y-1.5">
+                        {selectedOfflinePack.keyFormulas.map((formula, idx) => (
+                          <div 
+                            key={idx} 
+                            className="p-3 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/60 dark:border-indigo-500/20 font-mono text-xs text-indigo-900 dark:text-indigo-200 font-bold"
+                          >
+                            {formula}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Definitions */}
+                    <div className="space-y-2">
+                      <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+                        Key Definitions
+                      </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {selectedOfflinePack.keyDefinitions.map((def, idx) => (
+                          <div key={idx} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/10 space-y-1">
+                            <span className="text-xs font-black text-slate-900 dark:text-white block">{def.term}</span>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug block">{def.definition}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Practice Questions */}
+                    <div className="space-y-2.5">
+                      <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+                        Practice Board Questions
+                      </span>
+                      <div className="space-y-3">
+                        {selectedOfflinePack.practiceQuestions.map((q, idx) => (
+                          <div key={idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/10 space-y-2">
+                            <div className="flex items-start justify-between gap-3">
+                              <span className="text-xs font-black text-slate-900 dark:text-white">
+                                Q{idx + 1}. {q.question}
+                              </span>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 shrink-0">
+                                {q.marks} Marks
+                              </span>
+                            </div>
+                            <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-800 dark:text-emerald-300 font-medium">
+                              <strong>Ans:</strong> {q.answer}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-20 text-slate-400 text-xs">
+                    Select a study pack from the left column to view offline content.
+                  </div>
+                )}
+              </div>
+
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Loading bar animation */}

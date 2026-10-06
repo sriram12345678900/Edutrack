@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Brain, Flame, Trophy, Moon, Sun, Sparkles, Menu, Compass, Download } from "lucide-react";
+import { Brain, Flame, Trophy, Moon, Sun, Sparkles, Menu, Compass, Download, Maximize, Minimize } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useGamificationStore } from "@/store/useGamificationStore";
 import UserAvatar from "./UserAvatar";
@@ -30,6 +30,7 @@ export default function MobileHeader({
 }: MobileHeaderProps) {
   const [userClass, setUserClass] = useState<string>("10");
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   
   const streakDays = useGamificationStore(state => state.streak);
 
@@ -39,8 +40,23 @@ export default function MobileHeader({
       if (storedClass) setUserClass(storedClass);
 
       setIsDarkMode(document.documentElement.classList.contains("dark"));
+
+      const handleFullscreenChange = () => {
+        setIsFullscreen(!!document.fullscreenElement);
+      };
+      document.addEventListener("fullscreenchange", handleFullscreenChange);
+      return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
     }
   }, []);
+
+  const toggleFullscreen = () => {
+    if (typeof document === "undefined") return;
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
 
   const toggleTheme = () => {
     const isDark = document.documentElement.classList.contains("dark");
@@ -115,6 +131,20 @@ export default function MobileHeader({
           aria-label="Install EduTrack App"
         >
           <Download className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
+        </button>
+
+        {/* Fullscreen Toggle */}
+        <button
+          onClick={toggleFullscreen}
+          className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-slate-600 dark:text-slate-300 active:scale-90 transition-transform"
+          title={isFullscreen ? "Exit Fullscreen" : "Full Screen"}
+          aria-label={isFullscreen ? "Exit Fullscreen" : "Full Screen"}
+        >
+          {isFullscreen ? (
+            <Minimize className="w-4 h-4 text-indigo-500" />
+          ) : (
+            <Maximize className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+          )}
         </button>
 
         {/* Theme Toggle */}

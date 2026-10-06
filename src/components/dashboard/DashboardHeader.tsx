@@ -1,6 +1,7 @@
 "use client";
 
-import { Sparkles, Flame, Globe } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Sparkles, Flame, Globe, Maximize, Minimize } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { getLanguageConfig } from "@/lib/languages";
@@ -26,6 +27,24 @@ export function DashboardHeader({
   onToggleZen
 }: DashboardHeaderProps) {
   const langConfig = getLanguageConfig(userLanguage);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (typeof document === "undefined") return;
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
 
   return (
     <motion.header 
@@ -89,6 +108,21 @@ export function DashboardHeader({
           <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-500" />
           <span>Feature Tour</span>
         </button>
+        <motion.button
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={toggleFullscreen}
+          className="text-xs font-bold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.08] px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-1.5 min-h-[40px]"
+          title={isFullscreen ? "Exit Fullscreen (Esc)" : "Fullscreen Screen Fit"}
+        >
+          {isFullscreen ? (
+            <Minimize className="w-3.5 h-3.5 text-indigo-500" />
+          ) : (
+            <Maximize className="w-3.5 h-3.5 text-slate-500" />
+          )}
+          <span className="hidden sm:inline">{isFullscreen ? "Exit Full" : "Full Screen"}</span>
+        </motion.button>
+
         <Link href="/settings">
           <button className="text-xs font-extrabold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.08] px-3.5 sm:px-4.5 py-2 sm:py-2.5 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95 min-h-[40px]">
             Settings

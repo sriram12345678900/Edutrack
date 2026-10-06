@@ -6,9 +6,9 @@ import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import { 
   Home, BookOpen, MessageSquare, Target, Settings, LogOut, Menu, X, 
   GraduationCap, Moon, Sun, Calendar, Sparkles, Users, Award, Palette, Timer, Brain, Camera, Zap, Trophy, Shield, Compass, Video, Gamepad2, Globe, Mic, Radio, GitFork, Sliders, FileText,
-  CheckSquare, ShoppingBag, AlarmClock, Download
+  CheckSquare, ShoppingBag, AlarmClock, Download, Maximize, Minimize
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { ADMIN_PORTAL_ROUTE } from "@/lib/admin";
@@ -92,6 +92,12 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState<number>(272);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const dragStartXRef = useRef<number>(0);
+  const dragStartWidthRef = useRef<number>(272);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [isNarrowScreen, setIsNarrowScreen] = useState<boolean>(false);
   const [userXp, setUserXp] = useState<number>(0);
   const [userLevel, setUserLevel] = useState<number>(1);
   const [nickname, setNickname] = useState<string>("");
@@ -131,7 +137,28 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     setIsDrawerOpen(false);
   }, [pathname]);
 
-  // Load XP stats and permanent nickname
+  // Auto-adapt for narrow / tablet viewports
+  useEffect(() => {
+    const checkWidth = () => {
+      if (typeof window !== "undefined") {
+        setIsNarrowScreen(window.innerWidth < 1024);
+      }
+    };
+    checkWidth();
+    window.addEventListener("resize", checkWidth);
+    return () => window.removeEventListener("resize", checkWidth);
+  }, []);
+
+  // Sync fullscreen state
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
+  // Load XP stats and permanent nickname & custom sidebar width
   useEffect(() => {
     if (typeof window !== "undefined") {
       const xpVal = localStorage.getItem("edutrack_xp");
@@ -141,6 +168,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       const storedCode = localStorage.getItem("edutrack_friend_code");
       const storedTitle = localStorage.getItem("edutrack_equipped_title");
       const storedFrame = localStorage.getItem("edutrack_equipped_frame");
+      const storedSidebarWidth = localStorage.getItem("edutrack_sidebar_width");
       
       if (xpVal) setUserXp(parseInt(xpVal, 10));
       if (lvlVal) setUserLevel(parseInt(lvlVal, 10));
@@ -149,6 +177,12 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       if (storedCode) setFriendCode(storedCode);
       if (storedTitle) setEquippedTitle(storedTitle);
       if (storedFrame) setEquippedFrame(storedFrame);
+      if (storedSidebarWidth) {
+        const parsed = parseInt(storedSidebarWidth, 10);
+        if (!isNaN(parsed) && parsed >= 200 && parsed <= 380) {
+          setSidebarWidth(parsed);
+        }
+      }
 
       // Listen for profile updates from Tour or Settings
       const handleProfileUpdate = (e: any) => {
@@ -176,6 +210,52 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     }
   }, []);
 
+  const handlePointerMove = useCallback((e: PointerEvent) => {
+    const deltaX = e.clientX - dragStartXRef.current;
+    const newWidth = Math.max(200, Math.min(380, dragStartWidthRef.current + deltaX));
+    setSidebarWidth(newWidth);
+  }, []);
+
+  const handlePointerUp = useCallback(() => {
+    setIsDragging(false);
+    window.removeEventListener("pointermove", handlePointerMove);
+    window.removeEventListener("pointerup", handlePointerUp);
+    setSidebarWidth(current => {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("edutrack_sidebar_width", String(current));
+      }
+      return current;
+    });
+  }, [handlePointerMove]);
+
+  const handleResizeStart = (e: React.PointerEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    dragStartXRef.current = e.clientX;
+    dragStartWidthRef.current = sidebarWidth;
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+  };
+
+  const handleResetWidth = () => {
+    const nextWidth = sidebarWidth === 272 ? 320 : 272;
+    setSidebarWidth(nextWidth);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("edutrack_sidebar_width", String(nextWidth));
+    }
+  };
+
+  const toggleFullscreen = () => {
+    if (typeof document === "undefined") return;
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen().catch(() => {});
+      setIsFullscreen(false);
+    }
+  };
+
   const togglePin = () => {
     const nextState = !isPinned;
     setIsPinned(nextState);
@@ -200,7 +280,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
   const displayName = nickname || effectiveUser.displayName || effectiveUser.email?.split("@")[0] || "Scholar";
   const initials = displayName.charAt(0).toUpperCase();
-  const isExpanded = isPinned || isHovered;
+  const isExpanded = (isPinned || isHovered) && (!isNarrowScreen || isHovered);
 
   const openAppTour = () => {
     if (typeof window !== "undefined") {
@@ -221,6 +301,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     }
   };
 
+  const isCanvasRoute = pathname === "/whiteboard" || pathname.startsWith("/whiteboard/");
   const isFullHeightPage = 
     pathname === "/groups" || pathname.startsWith("/groups/") ||
     pathname === "/whiteboard" || pathname.startsWith("/whiteboard/") ||
@@ -239,7 +320,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="min-h-screen h-screen max-h-screen bg-slate-50 dark:bg-[#06080f] text-slate-900 dark:text-slate-100 flex flex-col md:flex-row overflow-hidden grid-bg-overlay selection:bg-indigo-500/30 selection:text-indigo-200">
+      <div className="min-h-screen min-h-[100dvh] h-[100dvh] max-h-[100dvh] bg-slate-50 dark:bg-[#06080f] text-slate-900 dark:text-slate-100 flex flex-col md:flex-row overflow-hidden grid-bg-overlay selection:bg-indigo-500/30 selection:text-indigo-200">
         {/* Global Interactive App Tour */}
         <AppTour />
         <InteractiveAiGuide />
@@ -247,12 +328,14 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       {/* ── DESKTOP UNVEILING SIDEBAR ── */}
       <motion.aside 
         initial={{ width: 80 }}
-        animate={{ width: isExpanded ? 272 : 80 }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        animate={{ width: isExpanded ? sidebarWidth : 80 }}
+        transition={isDragging ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 30 }}
         onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseLeave={() => {
+          if (!isDragging) setIsHovered(false);
+        }}
         className={cn(
-          "hidden md:flex sticky top-0 h-screen border-r border-slate-200/50 dark:border-white/10 bg-white/95 dark:bg-[#040614] backdrop-blur-3xl flex-col z-50 shadow-2xl shrink-0 overflow-hidden",
+          "hidden md:flex sticky top-0 h-[100dvh] border-r border-slate-200/50 dark:border-white/10 bg-white/95 dark:bg-[#040614] backdrop-blur-3xl flex-col z-50 shadow-2xl shrink-0 relative",
           isExpanded ? "shadow-[0_0_40px_rgba(99,102,241,0.2)]" : "shadow-none"
         )}
       >
@@ -262,6 +345,21 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         {/* Unveil Indicator Edge Light */}
         {!isExpanded && (
           <div className="absolute right-0 top-0 bottom-0 w-[2px] bg-indigo-500/40 animate-pulse pointer-events-none" />
+        )}
+
+        {/* Interactive Drag-to-Resize Handle */}
+        {isExpanded && (
+          <div
+            onPointerDown={handleResizeStart}
+            onDoubleClick={handleResetWidth}
+            title="Drag to resize sidebar • Double-click to reset"
+            className={cn(
+              "sidebar-resizer-handle group/resizer",
+              isDragging && "is-resizing"
+            )}
+          >
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-8 rounded-full bg-indigo-500/40 group-hover/resizer:bg-indigo-500 group-hover/resizer:h-12 transition-all opacity-0 group-hover/resizer:opacity-100" />
+          </div>
         )}
 
         {/* Logo / Header */}
@@ -531,6 +629,33 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
             </select>
           </div>
 
+          {/* Fullscreen Display Toggle */}
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            title={isFullscreen ? "Exit Fullscreen (Esc)" : "Enter Fullscreen"}
+            className="flex items-center justify-between px-3 py-2 rounded-xl font-bold text-xs bg-slate-100/80 dark:bg-white/5 hover:bg-indigo-500/10 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-300 border border-slate-200/50 dark:border-white/10 transition-all w-full text-left group"
+          >
+            <span className="flex items-center gap-3">
+              {isFullscreen ? (
+                <Minimize className="w-4.5 h-4.5 text-indigo-500 shrink-0" />
+              ) : (
+                <Maximize className="w-4.5 h-4.5 text-slate-500 group-hover:text-indigo-500 shrink-0" />
+              )}
+              <span className={cn(
+                "transition-all duration-300 whitespace-nowrap",
+                isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0 hidden"
+              )}>
+                {isFullscreen ? "Exit Fullscreen" : "Full Screen"}
+              </span>
+            </span>
+            {isExpanded && (
+              <span className="text-[8px] font-black uppercase bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded-full">
+                {isFullscreen ? "F11" : "Fit"}
+              </span>
+            )}
+          </button>
+
           <Link 
             href="/settings" 
             prefetch={true}
@@ -580,16 +705,18 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         <main
           className={cn(
             "flex-1 relative flex flex-col min-h-0 transition-colors duration-300",
-            isFullHeightPage 
+            isCanvasRoute 
               ? "overflow-hidden pb-16 md:pb-0" 
               : "overflow-y-auto pb-24 md:pb-0"
           )}
           style={{ backgroundColor: 'var(--background)' }}
         >
           <div className={cn(
-            isFullHeightPage
+            isCanvasRoute
               ? "w-full flex-1 min-h-0 overflow-hidden relative flex flex-col"
-              : "px-4 sm:px-6 md:px-10 pt-6 sm:pt-8 md:pt-10 pb-8 max-w-7xl mx-auto w-full"
+              : isFullHeightPage
+                ? "w-full flex-1 min-h-0 relative flex flex-col"
+                : "px-4 sm:px-6 md:px-10 pt-6 sm:pt-8 md:pt-10 pb-8 max-w-[1600px] mx-auto w-full"
           )}>
             {children}
           </div>

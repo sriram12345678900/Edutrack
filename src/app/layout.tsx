@@ -58,7 +58,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`dark ${outfit.variable} ${plusJakarta.variable} ${jetbrainsMono.variable}`}>
-      <body suppressHydrationWarning className={`${outfit.className} antialiased min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200`}>
+      <body suppressHydrationWarning className={`${outfit.className} antialiased min-h-screen min-h-[100dvh] selection:bg-indigo-500/30 selection:text-indigo-200`}>
         <script
           dangerouslySetInnerHTML={{
             __html: `

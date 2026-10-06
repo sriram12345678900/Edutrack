@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { 
   GraduationCap, Plus, Video, BookOpen, Users, Clock, 
   Sparkles, CheckCircle2, ChevronRight, Copy, CheckCheck, 
-  Send, AlertCircle, Award, Calendar, BarChart3, Layers, FileText, Bell
+  Send, AlertCircle, Award, Calendar, BarChart3, Layers, FileText, Bell, Camera
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
@@ -188,6 +188,20 @@ export default function TeacherDashboard() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/teacher/omr-scanner"
+              className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs transition-all border border-white/15 flex items-center gap-2 shadow-sm"
+            >
+              <Camera className="w-4 h-4 text-pink-300" />
+              OMR Scanner
+            </Link>
+            <Link
+              href="/teacher/analytics"
+              className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs transition-all border border-white/15 flex items-center gap-2 shadow-sm"
+            >
+              <BarChart3 className="w-4 h-4 text-cyan-300" />
+              Diagnostics
+            </Link>
             <Link
               href="/teacher/worksheet-generator"
               className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs transition-all border border-white/15 flex items-center gap-2 shadow-sm"

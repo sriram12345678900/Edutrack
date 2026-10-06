@@ -226,7 +226,7 @@ export default function InteractiveAiGuide() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="mb-4 w-[320px] sm:w-[360px] h-[480px] max-h-[70vh] bg-white dark:bg-[#080b18] border border-indigo-500/20 rounded-2xl shadow-[0_10px_40px_rgba(99,102,241,0.2)] flex flex-col overflow-hidden"
+            className="mb-4 w-[calc(100vw-32px)] sm:w-[360px] max-w-[360px] h-[480px] max-h-[70dvh] bg-white dark:bg-[#080b18] border border-indigo-500/20 rounded-2xl shadow-[0_10px_40px_rgba(99,102,241,0.2)] flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-between text-white shrink-0">

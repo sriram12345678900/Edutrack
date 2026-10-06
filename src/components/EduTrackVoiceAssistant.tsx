@@ -485,7 +485,7 @@ export default function EduTrackVoiceAssistant() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 30 }}
             transition={{ type: "spring", stiffness: 350, damping: 28 }}
-            className="fixed bottom-6 right-4 sm:right-8 z-[140] w-[92vw] sm:w-[420px] bg-white dark:bg-[#070a1e] border-2 border-indigo-500/30 rounded-3xl shadow-[0_20px_60px_rgba(99,102,241,0.25)] overflow-hidden flex flex-col backdrop-blur-xl"
+            className="fixed bottom-6 right-4 sm:right-8 z-[140] w-[calc(100vw-32px)] sm:w-[420px] max-w-[420px] max-h-[85dvh] bg-white dark:bg-[#070a1e] border-2 border-indigo-500/30 rounded-3xl shadow-[0_20px_60px_rgba(99,102,241,0.25)] overflow-hidden flex flex-col backdrop-blur-xl"
           >
             {/* Header */}
             <div className="px-5 py-3.5 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 text-white flex items-center justify-between">

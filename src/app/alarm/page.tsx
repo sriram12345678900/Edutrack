@@ -6,8 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Bell, BellOff, Clock, AlarmClock, Plus, Trash2, CheckCircle2, 
   XCircle, Sparkles, Volume2, VolumeX, ArrowLeft, Zap, Trophy,
-  AlertTriangle, RotateCcw, Brain, ShieldAlert, BookOpen, Coffee
+  AlertTriangle, RotateCcw, Brain, ShieldAlert, BookOpen, Coffee, Smartphone
 } from "lucide-react";
+import { Capacitor } from '@capacitor/core';
 import Confetti from "@/components/Confetti";
 import { awardUserXP } from "@/lib/xp";
 import { AlarmMCQ, getRandomAlarmQuestion } from "@/lib/alarmQuestions";
@@ -282,6 +283,12 @@ export default function AlarmPage() {
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                 Rings loudly until you solve an academic syllabus MCQ. No snooze cheating.
               </p>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border border-indigo-500/20 inline-flex items-center gap-1.5">
+                  <Smartphone className="w-3 h-3" />
+                  {Capacitor.isNativePlatform() ? 'Android AlarmManager Active' : 'PWA / Lockscreen MCQ Bridge Active'}
+                </span>
+              </div>
             </div>
           </div>
 
