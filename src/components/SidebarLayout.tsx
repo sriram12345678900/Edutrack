@@ -23,6 +23,8 @@ import EduTrackVoiceAssistant from "./EduTrackVoiceAssistant";
 import DivyangjanAccessibilitySuite from "./DivyangjanAccessibilitySuite";
 import UserAvatar from "./UserAvatar";
 import { PwaInstallPrompt } from "./PwaInstallPrompt";
+import NightStudyMode from "./NightStudyMode";
+import ScreenTimeTracker from "./ScreenTimeTracker";
 
 // Categorized premium sidebar links for desktop
 const categories = [
@@ -31,6 +33,7 @@ const categories = [
     items: [
       { href: "/community", label: "Global Doubt Forum", icon: Globe, badge: "World" },
       { href: "/arena", label: "Multiplayer Arena", icon: Gamepad2, badge: "Live" },
+      { href: "/peer-teach", label: "Peer Teaching", icon: Users, badge: "2×XP" },
       { href: "/classroom", label: "Student Classroom", icon: GraduationCap, badge: "School" },
       { href: "/teacher", label: "Teacher Command", icon: Video, badge: "Portal" },
       { href: "/parent", label: "Parent AI Digest", icon: Shield, badge: "Parent" },
@@ -752,6 +755,12 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
         {/* In-App PWA Install Banner & Native Prompt Handler */}
         <PwaInstallPrompt />
+
+        {/* Global Circadian Night Study Mode Filter & Bedtime Advisor */}
+        <NightStudyMode />
+
+        {/* Global Screen Time & Parental Limit Guard */}
+        <ScreenTimeTracker />
       </div>
     </div>
     </MotionConfig>

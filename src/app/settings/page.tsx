@@ -5,13 +5,14 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { 
   ArrowLeft, User, Mail, GraduationCap, Globe, Monitor, 
-  Lock, Save, Edit3, Shield, Award, Sparkles 
+  Lock, Save, Edit3, Shield, Award, Sparkles, Moon, Clock
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useProfileStore } from "@/store/useProfileStore";
 import { useGamificationStore } from "@/store/useGamificationStore";
 import { SUPPORTED_LANGUAGES } from "@/lib/languages";
+import { getNightModeConfig, saveNightModeConfig } from "@/lib/night-mode";
 import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
@@ -27,6 +28,8 @@ export default function SettingsPage() {
   const [localClass, setLocalClass] = useState<number>(10);
   const [localLanguage, setLocalLanguage] = useState("English");
   const [localTheme, setLocalTheme] = useState("system");
+  const [nightModeEnabled, setNightModeEnabled] = useState(true);
+  const [dailyScreenLimit, setDailyScreenLimit] = useState(180);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -35,6 +38,10 @@ export default function SettingsPage() {
     setLocalLanguage(userLanguage || "English");
     const storedTheme = localStorage.getItem("edutrack_theme");
     if (storedTheme) setLocalTheme(storedTheme);
+    const nightCfg = getNightModeConfig();
+    setNightModeEnabled(nightCfg.enabled);
+    const storedLimit = localStorage.getItem("edutrack_parent_limit_minutes");
+    if (storedLimit) setDailyScreenLimit(parseInt(storedLimit, 10));
   }, [nickname, userClass, userLanguage, user]);
 
   const initials = (localNickname || user?.displayName || user?.email || "S").charAt(0).toUpperCase();
@@ -51,6 +58,14 @@ export default function SettingsPage() {
       localStorage.setItem("edutrack_class", localClass.toString());
       localStorage.setItem("edutrack_language", localLanguage);
       localStorage.setItem("edutrack_theme", localTheme);
+      saveNightModeConfig({
+        enabled: nightModeEnabled,
+        startHour: 21,
+        endHour: 6,
+        temperature: "warm",
+        bedtimeReminder: true
+      });
+      localStorage.setItem("edutrack_parent_limit_minutes", String(dailyScreenLimit));
       
       if (localTheme === 'dark' || (localTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
@@ -226,6 +241,60 @@ export default function SettingsPage() {
                     <option value="dark" className="bg-slate-900 text-white">Dark Mode</option>
                     <option value="light" className="bg-slate-900 text-white">Light Mode</option>
                   </select>
+                </div>
+              </div>
+
+              {/* 🌙 Night Study Mode & Circadian Comfort */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/10 flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Moon className="w-4 h-4 text-indigo-400" />
+                    <span className="text-sm font-bold text-slate-900 dark:text-white">Circadian Night Study Mode</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Auto-enables warm blue-light filter between 21:00 and 06:00 with gentle bedtime alerts.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setNightModeEnabled(!nightModeEnabled)}
+                  className={cn(
+                    "w-12 h-6 rounded-full transition-colors relative p-1 shrink-0",
+                    nightModeEnabled ? "bg-indigo-600" : "bg-slate-300 dark:bg-slate-700"
+                  )}
+                >
+                  <motion.div
+                    animate={{ x: nightModeEnabled ? 24 : 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    className="w-4 h-4 rounded-full bg-white shadow-md"
+                  />
+                </button>
+              </div>
+
+              {/* 🔒 Screen Time Parental Limit Slider */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/10 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-amber-500" />
+                    <span className="text-sm font-bold text-slate-900 dark:text-white">Daily Screen Time Limit</span>
+                  </div>
+                  <span className="text-xs font-mono font-black text-amber-500">
+                    {Math.floor(dailyScreenLimit / 60)}h {dailyScreenLimit % 60}m
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="60"
+                  max="480"
+                  step="30"
+                  value={dailyScreenLimit}
+                  onChange={(e) => setDailyScreenLimit(Number(e.target.value))}
+                  className="w-full accent-amber-500 cursor-pointer"
+                />
+                <div className="flex justify-between text-[10px] text-slate-400">
+                  <span>1 Hour</span>
+                  <span>4 Hours</span>
+                  <span>8 Hours</span>
                 </div>
               </div>
 

@@ -20,6 +20,9 @@ import { ClassroomLauncher } from "@/components/dashboard/ClassroomLauncher";
 import FeatureSpotlightTour from "@/components/FeatureSpotlightTour";
 import DailySRSWidget from "@/components/dashboard/DailySRSWidget";
 import BoardExamSprintWidget from "@/components/dashboard/BoardExamSprintWidget";
+import { RevisionRouletteWidget } from "@/components/dashboard/RevisionRouletteWidget";
+import { WeeklyChallengeWidget } from "@/components/dashboard/WeeklyChallengeWidget";
+import { computeSurpriseAction } from "@/lib/surprise-engine";
 import { cn } from "@/lib/utils";
 import { useGamificationStore } from "@/store/useGamificationStore";
 import { useProfileStore } from "@/store/useProfileStore";
@@ -479,6 +482,19 @@ export default function Dashboard() {
                 <Users className="w-3.5 h-3.5" />
                 <span>Classroom & Progress</span>
               </button>
+
+              {/* ✨ AI Surprise Me Dynamic Action Button */}
+              <button
+                onClick={() => {
+                  const surprise = computeSurpriseAction();
+                  router.push(surprise.route);
+                }}
+                title="AI analyzes your progress & picks the highest-yield activity right now"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500/15 via-orange-500/15 to-pink-500/15 hover:from-amber-500/25 hover:to-pink-500/25 border border-amber-500/30 text-amber-500 dark:text-amber-300 transition-all shrink-0 snap-center ml-auto group"
+              >
+                <Sparkles className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: "6s" }} />
+                <span>Surprise Me</span>
+              </button>
             </div>
 
             <AnimatePresence mode="wait">
@@ -613,6 +629,11 @@ export default function Dashboard() {
                     <div className="lg:col-span-2 space-y-6">
                       <motion.div variants={item} id="tour-daily-challenge">
                         <DailyQuestionWidget />
+                      </motion.div>
+
+                      {/* Revision Roulette Wheel Widget */}
+                      <motion.div variants={item}>
+                        <RevisionRouletteWidget />
                       </motion.div>
 
                       {/* Interactive AI Whiteboard Bento Card */}
@@ -902,6 +923,11 @@ export default function Dashboard() {
                   {/* Virtual School Launcher */}
                   <motion.div variants={item}>
                     <ClassroomLauncher itemVariants={item} />
+                  </motion.div>
+
+                  {/* Weekly Community Challenge Widget */}
+                  <motion.div variants={item}>
+                    <WeeklyChallengeWidget />
                   </motion.div>
 
                   <div className="grid lg:grid-cols-3 gap-6">

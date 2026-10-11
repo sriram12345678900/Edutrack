@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { completeDailyMission, awardUserXP } from "@/lib/xp";
 import { SUPPORTED_LANGUAGES } from "@/lib/languages";
+import CrossSubjectPanel from "@/components/learn/CrossSubjectPanel";
 
 // Map chapter slug → chapter number for PYQ links
 const chapterNumbers: Record<string, number> = {
@@ -809,6 +810,9 @@ export default function ChapterPage({ params }: { params: { subject: string, cha
           </Link>
         </div>
       </header>
+
+      {/* Multidisciplinary Cross-Subject Curricular Connections */}
+      <CrossSubjectPanel chapterSlug={params.chapter} />
 
       {/* Tabs */}
       <div className="flex space-x-1 bg-slate-100 dark:bg-slate-800/50 p-1 rounded-2xl mb-6 overflow-x-auto">

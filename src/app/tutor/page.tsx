@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { 
   Sparkles, MessageSquare, ArrowRight, Bot, User, Check, Loader2, 
   Mic, Volume2, VolumeX, FileText, Copy, Plus, Trash2, Paperclip, X,
-  Compass, Zap, GraduationCap, ChevronLeft, Menu, Settings2, Lightbulb, ShieldCheck, Globe, Activity
+  Compass, Zap, GraduationCap, ChevronLeft, Menu, Settings2, Lightbulb, ShieldCheck, Globe, Activity,
+  Swords
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -19,7 +20,7 @@ interface ChatSession {
   timestamp: number;
 }
 
-type PersonaMode = "ncert_expert" | "socratic" | "simplifier";
+type PersonaMode = "ncert_expert" | "socratic" | "simplifier" | "debate";
 
 export default function TutorPage() {
   // Conversational Chat States
@@ -260,6 +261,8 @@ export default function TutorPage() {
       personaInstruction = "Act as a Socratic Mentor. Don't give answers directly immediately; guide the student with helpful hints, step by step.";
     } else if (personaMode === "simplifier") {
       personaInstruction = "Act as an ELI5 Simplifier. Use fun real-world analogies, simple terms, and zero jargon.";
+    } else if (personaMode === "debate") {
+      personaInstruction = "CRITICAL PEDAGOGY RULE (DEBATE OPPONENT MODE): Act as a rigorous Oxford debate opponent. Cross-examine the student's arguments, identify cognitive oversights, counter with opposing logic, and prompt them to defend their hypothesis with facts.";
     }
 
     try {
@@ -626,7 +629,8 @@ export default function TutorPage() {
           {[
             { id: "ncert_expert", label: "NCERT Board Expert", icon: ShieldCheck },
             { id: "socratic", label: "Socratic Mentor", icon: Lightbulb },
-            { id: "simplifier", label: "ELI5 Simplifier", icon: Zap }
+            { id: "simplifier", label: "ELI5 Simplifier", icon: Zap },
+            { id: "debate", label: "AI Debate Opponent", icon: Swords }
           ].map((p) => {
             const Icon = p.icon;
             const isActive = personaMode === p.id;

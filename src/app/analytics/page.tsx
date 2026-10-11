@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Home, TrendingUp, Activity, BookOpen, Brain, Zap, Target } from 'lucide-react';
+import { Home, TrendingUp, Activity, BookOpen, Brain, Zap, Target, Download, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { getDecks } from '@/lib/flashcards';
 import { getVaultMistakes } from '@/lib/error-vault';
 import { getGamificationState, getPlans } from '@/lib/plans';
+import { generateStudentPdfReport } from '@/lib/report-generator';
 
 // ── helpers ──────────────────────────────────────────
 const SUBJECT_DEFS = [
@@ -56,6 +57,44 @@ export default function AnalyticsPage() {
   const [insights, setInsights] = useState<{ icon: 'warn' | 'success'; title: string; desc: string }[]>([]);
   const [totalXP, setTotalXP] = useState(0);
   const [streak, setStreak] = useState(0);
+  const [generatingReport, setGeneratingReport] = useState(false);
+
+  const handleDownloadReport = async () => {
+    setGeneratingReport(true);
+    try {
+      const studentName = typeof window !== 'undefined' ? localStorage.getItem('edutrack_nickname') || 'Scholar Student' : 'Scholar Student';
+      const storedLvl = typeof window !== 'undefined' ? parseInt(localStorage.getItem('edutrack_level') || '1', 10) : 1;
+      
+      const res = await fetch("/api/report/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          studentName,
+          className: 10,
+          totalXP,
+          streak,
+          weakSubjects: ["Science", "Mathematics"],
+        }),
+      });
+
+      const reportAi = await res.json();
+
+      generateStudentPdfReport({
+        studentName,
+        className: 10,
+        totalXP,
+        level: storedLvl,
+        streak,
+        executiveSummary: reportAi.executiveSummary,
+        keyStrengths: reportAi.keyStrengths,
+        priorityGrowthAreas: reportAi.priorityGrowthAreas,
+      });
+    } catch (e) {
+      console.error("Report generate error:", e);
+    } finally {
+      setGeneratingReport(false);
+    }
+  };
 
   useEffect(() => {
     const decks = getDecks();
@@ -182,9 +221,28 @@ export default function AnalyticsPage() {
             <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium">AI-driven analytics of your learning journey.</p>
           </div>
         </div>
-        <Link href="/dashboard" className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-colors border border-slate-200 dark:border-slate-700 shadow-sm min-h-[38px] self-end sm:self-auto">
-          <Home className="w-4 h-4" /> Back to Home
-        </Link>
+        <div className="flex items-center gap-2 self-end sm:self-auto">
+          <button
+            onClick={handleDownloadReport}
+            disabled={generatingReport}
+            className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-indigo-600/20 transition-all active:scale-95 disabled:opacity-60"
+          >
+            {generatingReport ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Preparing PDF...</span>
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4" />
+                <span>Download PDF Audit</span>
+              </>
+            )}
+          </button>
+          <Link href="/dashboard" className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-colors border border-slate-200 dark:border-slate-700 shadow-sm min-h-[38px]">
+            <Home className="w-4 h-4" /> Back to Home
+          </Link>
+        </div>
       </header>
 
       {/* Stats Banner */}

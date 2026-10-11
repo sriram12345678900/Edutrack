@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AmbientSoundGenerator from "@/components/pomodoro/AmbientSoundGenerator";
+import BreakSuggestionModal from "@/components/pomodoro/BreakSuggestionModal";
 
 type TimerMode = "study" | "shortBreak" | "longBreak";
 
@@ -36,6 +37,7 @@ export default function PomodoroPage() {
 
   // Quote index
   const [quoteIdx, setQuoteIdx] = useState(0);
+  const [showBreakModal, setShowBreakModal] = useState(false);
 
   const timerRef = useRef<any>(null);
 
@@ -163,9 +165,10 @@ export default function PomodoroPage() {
         mod.useGamificationStore.getState().recordStudySession();
       });
 
-      // Auto transition to short break
+      // Auto transition to short break and show refreshment suggestion
       setMode("shortBreak");
       setTimeLeft(5 * 60);
+      setShowBreakModal(true);
     } else {
       const nextBreaks = breaksCompleted + 1;
       setBreaksCompleted(nextBreaks);
@@ -511,6 +514,16 @@ export default function PomodoroPage() {
            </div>
         )}
       </div>
+
+      <BreakSuggestionModal
+        isOpen={showBreakModal}
+        onClose={() => setShowBreakModal(false)}
+        onStartBreakTimer={(mins) => {
+          setMode("shortBreak");
+          setTimeLeft(mins * 60);
+          setIsRunning(true);
+        }}
+      />
     </div>
   );
 }
