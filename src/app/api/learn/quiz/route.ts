@@ -42,9 +42,36 @@ export async function POST(req: Request) {
     }
 
     const forceLocal = process.env.USE_LOCAL_AI === "true";
+    const hfKey = process.env.HUGGINGFACE_API_KEY || process.env.HF_API_KEY;
     const apiKey = process.env.GEMINI_API_KEY_QUIZ || process.env.GEMINI_API_KEY;
 
-    // 2. Try Cloud LLM (Gemini / Groq) if available and not in pure local mode
+    // 2. Try Hugging Face Inference API if configured
+    if (!forceLocal && hfKey) {
+      try {
+        const { queryHuggingFace, extractJsonFromText } = await import("@/lib/huggingface");
+        const hfResponse = await queryHuggingFace([
+          {
+            role: "system",
+            content: `You are an expert CBSE NCERT test author. Create a 5-question multiple choice quiz with HOTS question for "${chapter}" in ${subject}. Return ONLY a JSON object with keys "questions" and "hots". Each question in "questions" must have "id" (1-5), "question", "options" (array of exactly 4 strings), "answer" (0-3 index), and "explanation". ${prompt}`
+          },
+          {
+            role: "user",
+            content: `Generate 5 CBSE NCERT multiple choice questions for ${subject} chapter: "${chapter}".`
+          }
+        ], { jsonMode: true, max_tokens: 1800 });
+
+        if (hfResponse) {
+          const parsed = extractJsonFromText(hfResponse);
+          if (parsed?.questions && Array.isArray(parsed.questions) && parsed.questions.length > 0) {
+            return NextResponse.json(parsed);
+          }
+        }
+      } catch (hfErr: any) {
+        console.warn("Hugging Face quiz generator failed, trying next provider:", hfErr.message || hfErr);
+      }
+    }
+
+    // 3. Try Cloud LLM (Gemini / Groq) if available and not in pure local mode
     if (!forceLocal && (apiKey || process.env.GROQ_API_KEY)) {
       try {
         if (apiKey) {

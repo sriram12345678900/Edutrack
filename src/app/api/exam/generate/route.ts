@@ -94,7 +94,34 @@ Return the exam paper strictly as a JSON object matching the following structure
       }
     }
 
-    // 2. Try Gemini
+    // 2. Try Hugging Face Inference API
+    const hfKey = process.env.HUGGINGFACE_API_KEY || process.env.HF_API_KEY || "";
+    if (!parsed && hfKey) {
+      try {
+        const { queryHuggingFace, extractJsonFromText } = await import("@/lib/huggingface");
+        const hfRes = await queryHuggingFace([
+          {
+            role: "system",
+            content: "You are an expert CBSE NCERT exam setter. Return strictly valid JSON conforming to the requested schema. No markdown wrapping or conversational filler."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ], { jsonMode: true, max_tokens: 3800 });
+
+        if (hfRes) {
+          const hfParsed = extractJsonFromText(hfRes);
+          if (hfParsed?.questions && Array.isArray(hfParsed.questions) && hfParsed.questions.length > 0) {
+            parsed = hfParsed;
+          }
+        }
+      } catch (hfErr: any) {
+        console.warn("Hugging Face exam generation failed, trying next provider:", hfErr?.message || hfErr);
+      }
+    }
+
+    // 3. Try Gemini
     const geminiKey = process.env.GEMINI_API_KEY || "";
     if (!parsed && geminiKey) {
       try {
@@ -110,7 +137,7 @@ Return the exam paper strictly as a JSON object matching the following structure
       }
     }
 
-    // 3. Fallback to Groq
+    // 4. Fallback to Groq
     const groqKey = process.env.GROQ_API_KEY || "";
     if (!parsed && groqKey) {
       try {

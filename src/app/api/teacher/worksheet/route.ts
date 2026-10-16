@@ -11,16 +11,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Topic is required" }, { status: 400 });
     }
 
+    const hfKey = process.env.HUGGINGFACE_API_KEY || process.env.HF_API_KEY || "";
     const apiKey = process.env.GEMINI_API_KEY || "";
-    if (!apiKey) {
-      return NextResponse.json({ error: "Gemini API key is missing." }, { status: 500 });
-    }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-      generationConfig: { responseMimeType: "application/json" }
-    });
+    let cleanText = "";
 
     const prompt = `You are an expert curriculum designer and teacher for Class ${classLevel} ${subject}.
 Generate a worksheet containing exactly ${questionsCount} questions on the topic: "${topic}".
@@ -41,22 +34,54 @@ Return the output as a strictly formatted JSON object with this exact schema:
   "questions": [
     {
       "id": "q1",
-      "type": "mcq" | "fill_in" | "short_answer",
+      "type": "mcq",
       "question": "The actual question text",
-      "options": ["A", "B", "C", "D"], // ONLY include for 'mcq' type
+      "options": ["A", "B", "C", "D"],
       "answer": "The correct answer or explanation"
     }
   ]
 }
 `;
 
-    const result = await model.generateContent(prompt);
-    const resultText = result.response.text();
-    let cleanText = resultText.trim();
-    if (cleanText.startsWith('```json')) cleanText = cleanText.replace(/^```json\n?/, '').replace(/\n?```$/, '');
-    else if (cleanText.startsWith('```')) cleanText = cleanText.replace(/^```\n?/, '').replace(/\n?```$/, '');
-    
-    const parsed = JSON.parse(cleanText);
+    // 1. Try Hugging Face
+    if (hfKey) {
+      try {
+        const { queryHuggingFace } = await import("@/lib/huggingface");
+        const hfRes = await queryHuggingFace([
+          { role: "system", content: "You are an expert CBSE NCERT worksheet generator. Return strictly valid JSON." },
+          { role: "user", content: prompt }
+        ], { jsonMode: true, max_tokens: 3000 });
+        if (hfRes) cleanText = hfRes;
+      } catch (err: any) {
+        console.warn("HF worksheet generator failed:", err.message);
+      }
+    }
+
+    // 2. Try Gemini
+    if (!cleanText && apiKey) {
+      try {
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({
+          model: "gemini-2.5-flash",
+          generationConfig: { responseMimeType: "application/json" }
+        });
+        const result = await model.generateContent(prompt);
+        cleanText = result.response.text();
+      } catch (geminiErr: any) {
+        console.warn("Gemini worksheet generator failed:", geminiErr.message);
+      }
+    }
+
+    if (!cleanText) {
+      return NextResponse.json({ error: "AI service is currently unavailable. Please check API keys." }, { status: 500 });
+    }
+
+    const { extractJsonFromText } = await import("@/lib/huggingface");
+    const parsed = extractJsonFromText(cleanText);
+
+    if (!parsed) {
+      return NextResponse.json({ error: "Failed to parse worksheet questions." }, { status: 500 });
+    }
 
     return NextResponse.json({ worksheet: parsed });
   } catch (error: any) {

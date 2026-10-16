@@ -96,7 +96,34 @@ Return the evaluation results strictly as a JSON object matching the following s
       }
     }
 
-    // 2. Try Gemini
+    // 2. Try Hugging Face Inference API
+    const hfKey = process.env.HUGGINGFACE_API_KEY || process.env.HF_API_KEY || "";
+    if (!parsed && hfKey) {
+      try {
+        const { queryHuggingFace, extractJsonFromText } = await import("@/lib/huggingface");
+        const hfRes = await queryHuggingFace([
+          {
+            role: "system",
+            content: "You are an expert CBSE NCERT exam evaluator. Return strictly valid JSON conforming to the requested evaluation schema. No conversational preamble."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ], { jsonMode: true, max_tokens: 3800 });
+
+        if (hfRes) {
+          const hfParsed = extractJsonFromText(hfRes);
+          if (hfParsed && typeof hfParsed === "object" && (hfParsed.marksAwarded !== undefined || hfParsed.totalMarks !== undefined)) {
+            parsed = hfParsed;
+          }
+        }
+      } catch (hfErr: any) {
+        console.warn("Hugging Face evaluation failed, trying next provider:", hfErr?.message || hfErr);
+      }
+    }
+
+    // 3. Try Gemini
     const geminiKey = process.env.GEMINI_API_KEY || "";
     if (!parsed && geminiKey) {
       try {
@@ -112,7 +139,7 @@ Return the evaluation results strictly as a JSON object matching the following s
       }
     }
 
-    // 3. Fallback to Groq
+    // 4. Fallback to Groq
     const groqKey = process.env.GROQ_API_KEY || "";
     if (!parsed && groqKey) {
       try {
