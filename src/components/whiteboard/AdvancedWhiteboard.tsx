@@ -12,7 +12,8 @@ import {
   Triangle, ArrowRight, ZoomIn, ZoomOut, RotateCcw, Keyboard,
   Zap, Sun, Moon, Layers, Crosshair, Calculator, Library, Compass,
   Maximize2, Minimize2, Sliders, Image as ImageIcon, Ruler, Mic, Volume2, Plus, ChevronLeft, Menu, Upload, FileUp, Link, Minus,
-  Settings, ChevronUp, MoreHorizontal, MousePointer2, StickyNote, Sigma
+  Settings, ChevronUp, MoreHorizontal, MousePointer2, StickyNote, Sigma,
+  Pin, Atom, Cpu, Activity, BarChart2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import jsPDF from "jspdf";
@@ -621,6 +622,41 @@ export default function AdvancedWhiteboard({ roomId: propRoomId, isEmbedded = fa
   const [textInputPos, setTextInputPos] = useState<{ x: number; y: number } | null>(null);
   const [textValue, setTextValue] = useState("");
   const [isEditingLatex, setIsEditingLatex] = useState(false);
+  const [showMathDock, setShowMathDock] = useState(false);
+  const [presetCategory, setPresetCategory] = useState<"all" | "science" | "math">("all");
+
+  const pinSolutionToCanvas = () => {
+    if (!aiSolution) return;
+    const newNote: StickyNote = {
+      id: `sticky_ai_${Date.now()}`,
+      x: Math.max(200, (containerRef.current?.scrollLeft || 0) + 200),
+      y: Math.max(200, (containerRef.current?.scrollTop || 0) + 160),
+      text: aiSolution.length > 550 ? aiSolution.slice(0, 550) + "\n\n[...cont on panel]" : aiSolution,
+      color: "yellow"
+    };
+    setStickyNotes(prev => [...prev, newNote]);
+    showToast("Pinned Solution as Sticky Note onto Canvas! 📌");
+  };
+
+  const insertMathSymbol = (symbolCode: string) => {
+    if (textInputPos) {
+      setTextValue(prev => prev + symbolCode);
+      showToast(`Added ${symbolCode}`);
+    } else {
+      const cx = Math.max(300, (containerRef.current?.scrollLeft || 0) + 400);
+      const cy = Math.max(300, (containerRef.current?.scrollTop || 0) + 300);
+      const newLatexStroke: Stroke = {
+        id: `latex_${Date.now()}`,
+        tool: "latex",
+        color: color || "#6366f1",
+        brushSize: 4,
+        points: [{ x: cx, y: cy }],
+        text: symbolCode
+      };
+      setStrokes(prev => [...prev, newLatexStroke]);
+      showToast(`Inserted ${symbolCode} on canvas`);
+    }
+  };
 
   // History Stack
   const [history, setHistory] = useState<string[]>([]);
@@ -1197,6 +1233,100 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
         { id: `${Date.now()}_lc`, tool: "text", color: colorToUse, brushSize: 4, points: [{ x: cx - 50, y: cy - 20 }], text: "c" },
         { id: `${Date.now()}_90`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx + 110, y: cy + 100 }], text: "90°" },
         { id: `${Date.now()}_formula`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx - 80, y: cy + 200 }], text: "a² + b² = c²" }
+      ];
+    } else if (type === "optics_lens") {
+      newStrokes = [
+        { id: `${Date.now()}_axis`, tool: "line", color: colorToUse, brushSize: 2, points: [{ x: cx - 350, y: cy }, { x: cx + 350, y: cy }] },
+        { id: `${Date.now()}_lens_vert`, tool: "line", color: "#6366f1", brushSize: 2, points: [{ x: cx, y: cy - 160 }, { x: cx, y: cy + 160 }] },
+        { id: `${Date.now()}_lens_l`, tool: "line", color: "#6366f1", brushSize: 3, points: [{ x: cx, y: cy - 160 }, { x: cx - 25, y: cy }] },
+        { id: `${Date.now()}_lens_l2`, tool: "line", color: "#6366f1", brushSize: 3, points: [{ x: cx - 25, y: cy }, { x: cx, y: cy + 160 }] },
+        { id: `${Date.now()}_lens_r`, tool: "line", color: "#6366f1", brushSize: 3, points: [{ x: cx, y: cy - 160 }, { x: cx + 25, y: cy }] },
+        { id: `${Date.now()}_lens_r2`, tool: "line", color: "#6366f1", brushSize: 3, points: [{ x: cx + 25, y: cy }, { x: cx, y: cy + 160 }] },
+        { id: `${Date.now()}_2f1`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx - 240, y: cy + 25 }], text: "2F₁" },
+        { id: `${Date.now()}_f1`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx - 120, y: cy + 25 }], text: "F₁" },
+        { id: `${Date.now()}_o`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx - 10, y: cy + 25 }], text: "O" },
+        { id: `${Date.now()}_f2`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx + 110, y: cy + 25 }], text: "F₂" },
+        { id: `${Date.now()}_2f2`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx + 230, y: cy + 25 }], text: "2F₂" },
+        { id: `${Date.now()}_obj`, tool: "line", color: "#ef4444", brushSize: 3, points: [{ x: cx - 240, y: cy }, { x: cx - 240, y: cy - 90 }] },
+        { id: `${Date.now()}_obj_arr`, tool: "triangle", color: "#ef4444", brushSize: 2, points: [{ x: cx - 248, y: cy - 90 }, { x: cx - 232, y: cy - 75 }] },
+        { id: `${Date.now()}_obj_txt`, tool: "text", color: "#ef4444", brushSize: 3, points: [{ x: cx - 250, y: cy - 100 }], text: "AB (Object)" },
+        { id: `${Date.now()}_ray1a`, tool: "line", color: "#f59e0b", brushSize: 2, points: [{ x: cx - 240, y: cy - 90 }, { x: cx, y: cy - 90 }] },
+        { id: `${Date.now()}_ray1b`, tool: "line", color: "#f59e0b", brushSize: 2, points: [{ x: cx, y: cy - 90 }, { x: cx + 240, y: cy + 90 }] },
+        { id: `${Date.now()}_ray2`, tool: "line", color: "#10b981", brushSize: 2, points: [{ x: cx - 240, y: cy - 90 }, { x: cx + 240, y: cy + 90 }] }
+      ];
+    } else if (type === "electric_circuit") {
+      newStrokes = [
+        { id: `${Date.now()}_w1`, tool: "line", color: colorToUse, brushSize: 3, points: [{ x: cx - 220, y: cy - 120 }, { x: cx + 220, y: cy - 120 }] },
+        { id: `${Date.now()}_w2`, tool: "line", color: colorToUse, brushSize: 3, points: [{ x: cx + 220, y: cy - 120 }, { x: cx + 220, y: cy + 120 }] },
+        { id: `${Date.now()}_w3`, tool: "line", color: colorToUse, brushSize: 3, points: [{ x: cx + 220, y: cy + 120 }, { x: cx - 220, y: cy + 120 }] },
+        { id: `${Date.now()}_w4`, tool: "line", color: colorToUse, brushSize: 3, points: [{ x: cx - 220, y: cy + 120 }, { x: cx - 220, y: cy - 120 }] },
+        { id: `${Date.now()}_b_pos`, tool: "line", color: "#ef4444", brushSize: 4, points: [{ x: cx - 40, y: cy - 145 }, { x: cx - 40, y: cy - 95 }] },
+        { id: `${Date.now()}_b_neg`, tool: "line", color: "#3b82f6", brushSize: 4, points: [{ x: cx - 15, y: cy - 135 }, { x: cx - 15, y: cy - 105 }] },
+        { id: `${Date.now()}_b_lbl`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx - 65, y: cy - 155 }], text: "Battery (+/-)" },
+        { id: `${Date.now()}_sw_lbl`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx + 235, y: cy }], text: "Key (K) (•)" },
+        { id: `${Date.now()}_r_lbl`, tool: "text", color: "#f59e0b", brushSize: 4, points: [{ x: cx - 40, y: cy + 155 }], text: "Resistor R [Ω]" },
+        { id: `${Date.now()}_amm_c`, tool: "circle", color: "#10b981", brushSize: 2, points: [{ x: cx - 220, y: cy }, { x: cx - 195, y: cy }] },
+        { id: `${Date.now()}_amm_t`, tool: "text", color: "#10b981", brushSize: 4, points: [{ x: cx - 228, y: cy + 8 }], text: "A" }
+      ];
+    } else if (type === "bohr_atom") {
+      newStrokes = [
+        { id: `${Date.now()}_nuc`, tool: "circle", color: "#ef4444", brushSize: 4, fill: true, points: [{ x: cx, y: cy }, { x: cx + 22, y: cy }] },
+        { id: `${Date.now()}_nuc_t`, tool: "text", color: "#ffffff", brushSize: 3, points: [{ x: cx - 14, y: cy + 5 }], text: "+6" },
+        { id: `${Date.now()}_k_shell`, tool: "circle", color: "#6366f1", brushSize: 2, points: [{ x: cx, y: cy }, { x: cx + 80, y: cy }] },
+        { id: `${Date.now()}_e1`, tool: "circle", color: "#38bdf8", brushSize: 3, fill: true, points: [{ x: cx, y: cy - 80 }, { x: cx + 6, y: cy - 80 }] },
+        { id: `${Date.now()}_e2`, tool: "circle", color: "#38bdf8", brushSize: 3, fill: true, points: [{ x: cx, y: cy + 80 }, { x: cx + 6, y: cy + 80 }] },
+        { id: `${Date.now()}_l_shell`, tool: "circle", color: "#a855f7", brushSize: 2, points: [{ x: cx, y: cy }, { x: cx + 150, y: cy }] },
+        { id: `${Date.now()}_e3`, tool: "circle", color: "#38bdf8", brushSize: 3, fill: true, points: [{ x: cx - 150, y: cy }, { x: cx - 144, y: cy }] },
+        { id: `${Date.now()}_e4`, tool: "circle", color: "#38bdf8", brushSize: 3, fill: true, points: [{ x: cx + 150, y: cy }, { x: cx + 156, y: cy }] },
+        { id: `${Date.now()}_e5`, tool: "circle", color: "#38bdf8", brushSize: 3, fill: true, points: [{ x: cx, y: cy - 150 }, { x: cx + 6, y: cy - 150 }] },
+        { id: `${Date.now()}_e6`, tool: "circle", color: "#38bdf8", brushSize: 3, fill: true, points: [{ x: cx, y: cy + 150 }, { x: cx + 6, y: cy + 150 }] },
+        { id: `${Date.now()}_lbl_atom`, tool: "text", color: colorToUse, brushSize: 4, points: [{ x: cx - 120, y: cy - 180 }], text: "Bohr Model: Carbon (C-12)" },
+        { id: `${Date.now()}_lbl_k`, tool: "text", color: "#6366f1", brushSize: 3, points: [{ x: cx + 85, y: cy - 70 }], text: "K-shell (n=1, 2e⁻)" },
+        { id: `${Date.now()}_lbl_l`, tool: "text", color: "#a855f7", brushSize: 3, points: [{ x: cx + 155, y: cy - 130 }], text: "L-shell (n=2, 4e⁻)" }
+      ];
+    } else if (type === "neuron_diagram") {
+      newStrokes = [
+        { id: `${Date.now()}_cyton`, tool: "circle", color: "#ec4899", brushSize: 3, fill: true, points: [{ x: cx - 150, y: cy }, { x: cx - 90, y: cy }] },
+        { id: `${Date.now()}_nuc_bio`, tool: "circle", color: "#ffffff", brushSize: 3, fill: true, points: [{ x: cx - 150, y: cy }, { x: cx - 135, y: cy }] },
+        { id: `${Date.now()}_d1`, tool: "line", color: "#ec4899", brushSize: 2, points: [{ x: cx - 210, y: cy - 30 }, { x: cx - 260, y: cy - 60 }] },
+        { id: `${Date.now()}_d2`, tool: "line", color: "#ec4899", brushSize: 2, points: [{ x: cx - 200, y: cy + 30 }, { x: cx - 250, y: cy + 70 }] },
+        { id: `${Date.now()}_d3`, tool: "line", color: "#ec4899", brushSize: 2, points: [{ x: cx - 150, y: cy - 60 }, { x: cx - 160, y: cy - 110 }] },
+        { id: `${Date.now()}_axon`, tool: "line", color: "#f59e0b", brushSize: 5, points: [{ x: cx - 90, y: cy }, { x: cx + 140, y: cy }] },
+        { id: `${Date.now()}_m1`, tool: "rect", color: "#fbbf24", brushSize: 2, points: [{ x: cx - 70, y: cy - 15 }, { x: cx - 10, y: cy + 15 }] },
+        { id: `${Date.now()}_m2`, tool: "rect", color: "#fbbf24", brushSize: 2, points: [{ x: cx + 10, y: cy - 15 }, { x: cx + 70, y: cy + 15 }] },
+        { id: `${Date.now()}_m3`, tool: "rect", color: "#fbbf24", brushSize: 2, points: [{ x: cx + 90, y: cy - 15 }, { x: cx + 130, y: cy + 15 }] },
+        { id: `${Date.now()}_ne1`, tool: "line", color: "#ec4899", brushSize: 2, points: [{ x: cx + 140, y: cy }, { x: cx + 190, y: cy - 40 }] },
+        { id: `${Date.now()}_ne2`, tool: "line", color: "#ec4899", brushSize: 2, points: [{ x: cx + 140, y: cy }, { x: cx + 200, y: cy + 30 }] },
+        { id: `${Date.now()}_lbl_den`, tool: "text", color: "#ec4899", brushSize: 3, points: [{ x: cx - 280, y: cy - 75 }], text: "Dendrites" },
+        { id: `${Date.now()}_lbl_soma`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx - 180, y: cy + 85 }], text: "Cyton / Cell Body" },
+        { id: `${Date.now()}_lbl_ax`, tool: "text", color: "#f59e0b", brushSize: 3, points: [{ x: cx + 20, y: cy - 30 }], text: "Axon (Myelin Sheath)" },
+        { id: `${Date.now()}_lbl_ne`, tool: "text", color: "#ec4899", brushSize: 3, points: [{ x: cx + 195, y: cy - 50 }], text: "Nerve Endings" }
+      ];
+    } else if (type === "cylinder_cone") {
+      newStrokes = [
+        { id: `${Date.now()}_cyl_top`, tool: "circle", color: "#38bdf8", brushSize: 2, points: [{ x: cx - 160, y: cy - 80 }, { x: cx - 100, y: cy - 80 }] },
+        { id: `${Date.now()}_cyl_l`, tool: "line", color: "#38bdf8", brushSize: 3, points: [{ x: cx - 220, y: cy - 80 }, { x: cx - 220, y: cy + 100 }] },
+        { id: `${Date.now()}_cyl_r`, tool: "line", color: "#38bdf8", brushSize: 3, points: [{ x: cx - 100, y: cy - 80 }, { x: cx - 100, y: cy + 100 }] },
+        { id: `${Date.now()}_cyl_bot`, tool: "circle", color: "#38bdf8", brushSize: 2, points: [{ x: cx - 160, y: cy + 100 }, { x: cx - 100, y: cy + 100 }] },
+        { id: `${Date.now()}_cyl_lbl`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx - 210, y: cy + 140 }], text: "Cylinder: V = πr²h" },
+        { id: `${Date.now()}_cone_top`, tool: "line", color: "#a855f7", brushSize: 3, points: [{ x: cx + 140, y: cy - 90 }, { x: cx + 70, y: cy + 100 }] },
+        { id: `${Date.now()}_cone_top2`, tool: "line", color: "#a855f7", brushSize: 3, points: [{ x: cx + 140, y: cy - 90 }, { x: cx + 210, y: cy + 100 }] },
+        { id: `${Date.now()}_cone_base`, tool: "circle", color: "#a855f7", brushSize: 2, points: [{ x: cx + 140, y: cy + 100 }, { x: cx + 210, y: cy + 100 }] },
+        { id: `${Date.now()}_cone_lbl`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx + 90, y: cy + 140 }], text: "Cone: V = ⅓πr²h" }
+      ];
+    } else if (type === "bar_chart") {
+      newStrokes = [
+        { id: `${Date.now()}_bc_y`, tool: "line", color: colorToUse, brushSize: 3, points: [{ x: cx - 200, y: cy + 120 }, { x: cx - 200, y: cy - 140 }] },
+        { id: `${Date.now()}_bc_x`, tool: "line", color: colorToUse, brushSize: 3, points: [{ x: cx - 200, y: cy + 120 }, { x: cx + 220, y: cy + 120 }] },
+        { id: `${Date.now()}_bar1`, tool: "rect", color: "#38bdf8", brushSize: 2, fill: true, points: [{ x: cx - 170, y: cy + 120 }, { x: cx - 120, y: cy - 30 }] },
+        { id: `${Date.now()}_bar2`, tool: "rect", color: "#818cf8", brushSize: 2, fill: true, points: [{ x: cx - 90, y: cy + 120 }, { x: cx - 40, y: cy - 100 }] },
+        { id: `${Date.now()}_bar3`, tool: "rect", color: "#ec4899", brushSize: 2, fill: true, points: [{ x: cx - 10, y: cy + 120 }, { x: cx + 40, y: cy + 20 }] },
+        { id: `${Date.now()}_bar4`, tool: "rect", color: "#10b981", brushSize: 2, fill: true, points: [{ x: cx + 70, y: cy + 120 }, { x: cx + 120, y: cy - 60 }] },
+        { id: `${Date.now()}_bc_title`, tool: "text", color: colorToUse, brushSize: 4, points: [{ x: cx - 100, y: cy - 165 }], text: "Statistics: Bar Graph" },
+        { id: `${Date.now()}_lbl_b1`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx - 155, y: cy + 145 }], text: "Q1" },
+        { id: `${Date.now()}_lbl_b2`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx - 75, y: cy + 145 }], text: "Q2" },
+        { id: `${Date.now()}_lbl_b3`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx + 5, y: cy + 145 }], text: "Q3" },
+        { id: `${Date.now()}_lbl_b4`, tool: "text", color: colorToUse, brushSize: 3, points: [{ x: cx + 85, y: cy + 145 }], text: "Q4" }
       ];
     }
 
@@ -2345,6 +2475,61 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
           DESKTOP — Grouped Bottom Toolbar (hidden on mobile)
       ════════════════════════════════════════════════════════════════ */}
       <div className="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex-col items-center gap-2">
+        {/* Floating Math Symbols Palette */}
+        <AnimatePresence>
+          {(showMathDock || tool === "latex") && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-3xl border border-indigo-500/40 px-3 py-2 rounded-2xl shadow-2xl flex items-center gap-1.5 pointer-events-auto max-w-[92vw] overflow-x-auto custom-scrollbar"
+            >
+              <div className="flex items-center gap-1 shrink-0 pr-2 border-r border-slate-200 dark:border-slate-800">
+                <Sigma className="w-4 h-4 text-indigo-500" />
+                <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400">Math Palette</span>
+              </div>
+              {[
+                { label: "½", code: "\\frac{a}{b}" },
+                { label: "x²", code: "x^{2}" },
+                { label: "xⁿ", code: "x^{n}" },
+                { label: "√x", code: "\\sqrt{x}" },
+                { label: "π", code: "\\pi" },
+                { label: "θ", code: "\\theta" },
+                { label: "α", code: "\\alpha" },
+                { label: "β", code: "\\beta" },
+                { label: "Δ", code: "\\Delta" },
+                { label: "±", code: "\\pm" },
+                { label: "≤", code: "\\le" },
+                { label: "≥", code: "\\ge" },
+                { label: "≠", code: "\\neq" },
+                { label: "≈", code: "\\approx" },
+                { label: "×", code: "\\times" },
+                { label: "÷", code: "\\div" },
+                { label: "∑", code: "\\sum" },
+                { label: "∫", code: "\\int" },
+                { label: "∞", code: "\\infty" },
+                { label: "°", code: "^\\circ" }
+              ].map(sym => (
+                <button
+                  key={sym.label}
+                  onClick={() => insertMathSymbol(sym.code)}
+                  className="px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-500 hover:text-white dark:hover:bg-indigo-600 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-mono font-bold transition-all shrink-0 active:scale-95"
+                  title={`Insert ${sym.code}`}
+                >
+                  {sym.label}
+                </button>
+              ))}
+              <button
+                onClick={() => setShowMathDock(false)}
+                className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-400 ml-1 shrink-0"
+                title="Close Palette"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Lasso count badge */}
         <AnimatePresence>
           {tool === 'lasso' && isDrawing && liveSelectionCount > 0 && (
@@ -2394,6 +2579,7 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
             <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600">Insert</span>
             <div className="flex items-center gap-0.5">
               {toolGroups.insert.map(t => <ToolButton key={t.id} active={tool === t.id} onClick={() => { if (t.id === 'image') { imageUploadInputRef.current?.click(); } else { setTool(t.id); } }} icon={t.icon} label={`${t.label}${t.shortcut ? ` (${t.shortcut})` : ''}`} />)}
+              <ToolButton active={showMathDock} onClick={() => setShowMathDock(v => !v)} icon={Sigma} label="Math Palette" extraClass={showMathDock ? "bg-indigo-600 text-white" : ""} />
             </div>
           </div>
 
@@ -2744,15 +2930,25 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
             </div>
             {/* Footer */}
             <div className="px-4 py-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
-              <button
-                onClick={solveWhiteboardWithAI}
-                disabled={solvingAI}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all"
-              >
-                {solvingAI ? <Sparkles className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-                {solvingAI ? 'Re-solving...' : 'Re-solve'}
-              </button>
-              <span className="text-[10px] dark:text-slate-500 text-slate-400">Draw more & re-solve to update</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={solveWhiteboardWithAI}
+                  disabled={solvingAI}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all"
+                >
+                  {solvingAI ? <Sparkles className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                  {solvingAI ? 'Re-solving...' : 'Re-solve'}
+                </button>
+                <button
+                  onClick={pinSolutionToCanvas}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-semibold transition-all shadow-sm"
+                  title="Pin as Sticky Note"
+                >
+                  <Pin className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Pin to Board</span>
+                </button>
+              </div>
+              <span className="text-[10px] dark:text-slate-500 text-slate-400">Sticky Note</span>
             </div>
           </motion.div>
         )}
@@ -2766,66 +2962,154 @@ Be thorough but easy to understand for a student. Use plain text, no markdown sy
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-3xl p-6 shadow-2xl"
+              className="w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-3xl p-6 shadow-2xl max-h-[85vh] flex flex-col"
             >
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-3 shrink-0">
                 <div className="flex items-center gap-2">
                   <Library className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                  <h3 className="text-base font-bold">Educational Diagram Presets</h3>
+                  <h3 className="text-base font-bold">CBSE NCERT Diagram Presets</h3>
                 </div>
                 <button onClick={() => setShowPresetBank(false)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => insertPresetDiagram("axes")}
-                  className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
-                >
-                  <Compass className="w-5 h-5 dark:text-indigo-400 text-indigo-700 mb-2 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">X-Y Coordinate Axes</h4>
-                  <p className="text-[10px] text-slate-600 dark:text-slate-400 mt-1">2D Graph plane with origin & axes</p>
-                </button>
-                <button
-                  onClick={() => insertPresetDiagram("triangle")}
-                  className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
-                >
-                  <Triangle className="w-5 h-5 dark:text-cyan-400 text-cyan-700 mb-2 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Labeled Triangle</h4>
-                  <p className="text-[10px] text-slate-600 dark:text-slate-400 mt-1">Geometric triangle with vertices A, B, C</p>
-                </button>
-                <button
-                  onClick={() => insertPresetDiagram("unit_circle")}
-                  className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
-                >
-                  <Circle className="w-5 h-5 dark:text-amber-400 text-amber-700 mb-2 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Trig Unit Circle</h4>
-                  <p className="text-[10px] text-slate-600 dark:text-slate-400 mt-1">Unit circle marked with 0° & 90° angles</p>
-                </button>
-                <button
-                  onClick={() => insertPresetDiagram("venn")}
-                  className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
-                >
-                  <Layers className="w-5 h-5 dark:text-pink-400 text-pink-700 mb-2 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Venn Diagram</h4>
-                  <p className="text-[10px] text-slate-600 dark:text-slate-400 mt-1">Two overlapping set circles</p>
-                </button>
-                <button
-                  onClick={() => insertPresetDiagram("number_line")}
-                  className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
-                >
-                  <Minus className="w-5 h-5 dark:text-green-400 text-green-700 mb-2 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Number Line</h4>
-                  <p className="text-[10px] text-slate-600 dark:text-slate-400 mt-1">Labeled number line -3 to +3</p>
-                </button>
-                <button
-                  onClick={() => insertPresetDiagram("right_triangle")}
-                  className="p-4 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
-                >
-                  <Triangle className="w-5 h-5 dark:text-yellow-400 text-yellow-600 mb-2 group-hover:scale-110 transition-transform" />
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Pythagoras Triangle</h4>
-                  <p className="text-[10px] text-slate-600 dark:text-slate-400 mt-1">Right-angle triangle with a² + b² = c²</p>
-                </button>
+
+              {/* Category Filter Tabs */}
+              <div className="flex items-center gap-2 pb-3 mb-3 border-b border-slate-200 dark:border-slate-800 shrink-0">
+                {(["all", "science", "math"] as const).map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setPresetCategory(cat)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-all ${
+                      presetCategory === cat
+                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    }`}
+                  >
+                    {cat === "all" ? "All Presets" : cat === "science" ? "Science (Physics/Chem/Bio)" : "Mathematics"}
+                  </button>
+                ))}
+              </div>
+
+              {/* Grid of Presets */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 overflow-y-auto p-1 custom-scrollbar">
+                {/* Science Presets */}
+                {(presetCategory === "all" || presetCategory === "science") && (
+                  <>
+                    <button
+                      onClick={() => insertPresetDiagram("optics_lens")}
+                      className="p-3.5 bg-slate-50 dark:bg-slate-950/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
+                    >
+                      <Crosshair className="w-4 h-4 text-indigo-500 mb-1.5 group-hover:scale-110 transition-transform" />
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Convex Lens Ray Trace</h4>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Principal axis, 2F₁, F₁, object & refracted rays</p>
+                    </button>
+
+                    <button
+                      onClick={() => insertPresetDiagram("electric_circuit")}
+                      className="p-3.5 bg-slate-50 dark:bg-slate-950/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
+                    >
+                      <Cpu className="w-4 h-4 text-emerald-500 mb-1.5 group-hover:scale-110 transition-transform" />
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Electric Circuit</h4>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Battery (+/-), resistor, key switch & ammeter</p>
+                    </button>
+
+                    <button
+                      onClick={() => insertPresetDiagram("bohr_atom")}
+                      className="p-3.5 bg-slate-50 dark:bg-slate-950/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
+                    >
+                      <Atom className="w-4 h-4 text-cyan-500 mb-1.5 group-hover:scale-110 transition-transform" />
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Bohr Atom Model</h4>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Nucleus, K-shell (n=1) & L-shell with electrons</p>
+                    </button>
+
+                    <button
+                      onClick={() => insertPresetDiagram("neuron_diagram")}
+                      className="p-3.5 bg-slate-50 dark:bg-slate-950/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
+                    >
+                      <Activity className="w-4 h-4 text-pink-500 mb-1.5 group-hover:scale-110 transition-transform" />
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Neuron (Nerve Cell)</h4>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Cyton cell body, dendrites, axon & nerve endings</p>
+                    </button>
+                  </>
+                )}
+
+                {/* Math Presets */}
+                {(presetCategory === "all" || presetCategory === "math") && (
+                  <>
+                    <button
+                      onClick={() => insertPresetDiagram("axes")}
+                      className="p-3.5 bg-slate-50 dark:bg-slate-950/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
+                    >
+                      <Compass className="w-4 h-4 text-indigo-500 mb-1.5 group-hover:scale-110 transition-transform" />
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">X-Y Coordinate Axes</h4>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">2D Graph plane with origin & axes</p>
+                    </button>
+
+                    <button
+                      onClick={() => insertPresetDiagram("cylinder_cone")}
+                      className="p-3.5 bg-slate-50 dark:bg-slate-950/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
+                    >
+                      <Layers className="w-4 h-4 text-purple-500 mb-1.5 group-hover:scale-110 transition-transform" />
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">3D Cylinder & Cone</h4>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Mensuration shapes with radius, height & formula</p>
+                    </button>
+
+                    <button
+                      onClick={() => insertPresetDiagram("bar_chart")}
+                      className="p-3.5 bg-slate-50 dark:bg-slate-950/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
+                    >
+                      <BarChart2 className="w-4 h-4 text-amber-500 mb-1.5 group-hover:scale-110 transition-transform" />
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Statistics Bar Graph</h4>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Frequency bars with labeled categorical axes</p>
+                    </button>
+
+                    <button
+                      onClick={() => insertPresetDiagram("right_triangle")}
+                      className="p-3.5 bg-slate-50 dark:bg-slate-950/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
+                    >
+                      <Triangle className="w-4 h-4 text-yellow-500 mb-1.5 group-hover:scale-110 transition-transform" />
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Pythagoras Triangle</h4>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Right-angle triangle with a² + b² = c²</p>
+                    </button>
+
+                    <button
+                      onClick={() => insertPresetDiagram("unit_circle")}
+                      className="p-3.5 bg-slate-50 dark:bg-slate-950/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
+                    >
+                      <Circle className="w-4 h-4 text-cyan-500 mb-1.5 group-hover:scale-110 transition-transform" />
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Trig Unit Circle</h4>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Unit circle marked with 0° & 90° angles</p>
+                    </button>
+
+                    <button
+                      onClick={() => insertPresetDiagram("number_line")}
+                      className="p-3.5 bg-slate-50 dark:bg-slate-950/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
+                    >
+                      <Minus className="w-4 h-4 text-green-500 mb-1.5 group-hover:scale-110 transition-transform" />
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Number Line</h4>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Labeled number line -3 to +3</p>
+                    </button>
+
+                    <button
+                      onClick={() => insertPresetDiagram("triangle")}
+                      className="p-3.5 bg-slate-50 dark:bg-slate-950/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
+                    >
+                      <Triangle className="w-4 h-4 text-rose-500 mb-1.5 group-hover:scale-110 transition-transform" />
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Labeled Triangle</h4>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Geometric triangle with vertices A, B, C</p>
+                    </button>
+
+                    <button
+                      onClick={() => insertPresetDiagram("venn")}
+                      className="p-3.5 bg-slate-50 dark:bg-slate-950/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 rounded-2xl text-left transition-all group"
+                    >
+                      <Layers className="w-4 h-4 text-pink-500 mb-1.5 group-hover:scale-110 transition-transform" />
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Venn Diagram</h4>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Two overlapping set circles</p>
+                    </button>
+                  </>
+                )}
               </div>
             </motion.div>
           </div>

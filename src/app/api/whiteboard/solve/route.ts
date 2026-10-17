@@ -145,11 +145,35 @@ Keep all equations, formulas, variables ($x, y$), and units preserved in standar
           return NextResponse.json({ solution: text, engine: "Gemini Vision AI" });
         }
       } catch (geminiErr) {
-        console.warn("Gemini vision solve failed, falling back to Groq / Offline Engine.");
+        console.warn("Gemini vision solve failed, falling back to Hugging Face / Groq / Offline Engine.");
       }
     }
 
-    // 3. Fallback to Groq for text/query solving
+    // 3. Try Hugging Face for text/query problem solving
+    const hfKey = process.env.HUGGINGFACE_API_KEY || process.env.HF_API_KEY;
+    if (hfKey && queryText) {
+      try {
+        const { queryHuggingFace } = await import("@/lib/huggingface");
+        const hfSolution = await queryHuggingFace([
+          {
+            role: "system",
+            content: `You are an expert CBSE NCERT math and science problem solver. Provide a complete step-by-step textbook solution with: 1. Given/Identified Problem, 2. Step-by-Step Breakdown, 3. Final Answer with proper units. ${langInstruction}`
+          },
+          {
+            role: "user",
+            content: `Solve this student whiteboard problem step-by-step:\n"${queryText}"`
+          }
+        ], { max_tokens: 1800 });
+
+        if (hfSolution) {
+          return NextResponse.json({ solution: hfSolution, engine: "Hugging Face AI Engine" });
+        }
+      } catch (hfErr: any) {
+        console.warn("Hugging Face whiteboard solve failed:", hfErr.message);
+      }
+    }
+
+    // 4. Fallback to Groq for text/query solving
     const groqKey = process.env.GROQ_API_KEY;
     if (groqKey && queryText) {
       try {
