@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { 
   ArrowLeft, User, Mail, GraduationCap, Globe, Monitor, 
-  Lock, Save, Edit3, Shield, Award, Sparkles, Moon, Clock
+  Lock, Save, Edit3, Shield, Award, Sparkles, Moon, Clock, Camera, Check, Palette
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -31,6 +31,8 @@ export default function SettingsPage() {
   const [nightModeEnabled, setNightModeEnabled] = useState(true);
   const [dailyScreenLimit, setDailyScreenLimit] = useState(180);
   const [isSaving, setIsSaving] = useState(false);
+  const [avatarPhoto, setAvatarPhoto] = useState<string | null>(null);
+  const [equippedTheme, setEquippedTheme] = useState<string | null>(null);
 
   useEffect(() => {
     setLocalNickname(nickname || user?.displayName?.split(" ")[0] || "");
@@ -42,9 +44,51 @@ export default function SettingsPage() {
     setNightModeEnabled(nightCfg.enabled);
     const storedLimit = localStorage.getItem("edutrack_parent_limit_minutes");
     if (storedLimit) setDailyScreenLimit(parseInt(storedLimit, 10));
+    const storedPhoto = localStorage.getItem("edutrack_avatar_photo");
+    if (storedPhoto) setAvatarPhoto(storedPhoto);
+    const storedShopTheme = localStorage.getItem("edutrack_equipped_theme");
+    if (storedShopTheme) setEquippedTheme(storedShopTheme);
   }, [nickname, userClass, userLanguage, user]);
 
   const initials = (localNickname || user?.displayName || user?.email || "S").charAt(0).toUpperCase();
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Please choose an image under 2MB.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      setAvatarPhoto(base64);
+      localStorage.setItem("edutrack_avatar_photo", base64);
+      window.dispatchEvent(new CustomEvent("edutrack_avatar_photo_updated", { detail: { photoUrl: base64 } }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemovePhoto = () => {
+    setAvatarPhoto(null);
+    localStorage.removeItem("edutrack_avatar_photo");
+    window.dispatchEvent(new CustomEvent("edutrack_avatar_photo_updated", { detail: { photoUrl: null } }));
+  };
+
+  const handleEquipTheme = (themeId: string | null) => {
+    setEquippedTheme(themeId);
+    if (themeId) {
+      localStorage.setItem("edutrack_equipped_theme", themeId);
+      const themeName = themeId.replace("theme-", "");
+      document.documentElement.setAttribute("data-theme", themeName);
+    } else {
+      localStorage.removeItem("edutrack_equipped_theme");
+      document.documentElement.removeAttribute("data-theme");
+    }
+    window.dispatchEvent(new CustomEvent("edutrack_shop_updated", {
+      detail: { equippedTheme: themeId }
+    }));
+  };
 
   const handleSave = () => {
     setIsSaving(true);
@@ -115,11 +159,40 @@ export default function SettingsPage() {
               animate={{ opacity: 1, y: 0 }}
               className="p-6 rounded-3xl bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 shadow-xl text-center"
             >
-              <div className="w-24 h-24 mx-auto bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-4xl font-black text-white shadow-lg mb-4 relative group">
-                {initials}
-                <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                  <Edit3 className="w-6 h-6 text-white" />
-                </div>
+              <div className="relative mx-auto w-24 h-24 mb-4 group">
+                <input
+                  type="file"
+                  id="avatar-photo-input"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handlePhotoUpload}
+                />
+                <label
+                  htmlFor="avatar-photo-input"
+                  className="w-24 h-24 rounded-full overflow-hidden block relative cursor-pointer shadow-lg border-2 border-indigo-500/40 group-hover:border-indigo-400 transition-all"
+                >
+                  {avatarPhoto ? (
+                    <img src={avatarPhoto} alt="User Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-4xl font-black text-white">
+                      {initials}
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[10px] font-bold gap-1">
+                    <Camera className="w-5 h-5 text-white" />
+                    <span>Change</span>
+                  </div>
+                </label>
+                {avatarPhoto && (
+                  <button
+                    type="button"
+                    onClick={handleRemovePhoto}
+                    className="absolute -top-1 -right-1 bg-rose-600 hover:bg-rose-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shadow-md"
+                    title="Remove Photo"
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
               <h2 className="text-xl font-black text-slate-900 dark:text-white mb-1">{localNickname || "Scholar"}</h2>
               <p className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5 truncate">
@@ -241,6 +314,51 @@ export default function SettingsPage() {
                     <option value="dark" className="bg-slate-900 text-white">Dark Mode</option>
                     <option value="light" className="bg-slate-900 text-white">Light Mode</option>
                   </select>
+                </div>
+              </div>
+
+              {/* 🎨 Custom Accent Theme Swatches */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/10 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Palette className="w-4 h-4 text-indigo-400" />
+                    <span className="text-sm font-bold text-slate-900 dark:text-white">Active Accent Theme</span>
+                  </div>
+                  <Link href="/shop" className="text-xs font-bold text-indigo-500 hover:text-indigo-400 flex items-center gap-1">
+                    <span>Explore Armory</span> →
+                  </Link>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                  {[
+                    { id: null, name: "Default Violet", gradient: "from-indigo-500 to-purple-600" },
+                    { id: "theme-cyberpunk", name: "Cyberpunk", gradient: "from-cyan-400 via-fuchsia-500 to-purple-600" },
+                    { id: "theme-emerald", name: "Emerald Matrix", gradient: "from-emerald-400 to-teal-600" },
+                    { id: "theme-sunset", name: "Sunset Gold", gradient: "from-amber-400 via-orange-500 to-rose-500" },
+                    { id: "theme-cosmic", name: "Cosmic Nebula", gradient: "from-violet-400 via-purple-500 to-indigo-600" }
+                  ].map((t) => {
+                    const isSelected = equippedTheme === t.id;
+                    return (
+                      <button
+                        key={t.name}
+                        type="button"
+                        onClick={() => handleEquipTheme(t.id)}
+                        className={cn(
+                          "p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group flex flex-col justify-between h-20",
+                          isSelected
+                            ? "border-indigo-500 ring-2 ring-indigo-500/40 bg-indigo-500/10"
+                            : "border-slate-200 dark:border-white/10 bg-white/40 dark:bg-black/20 hover:border-indigo-500/30"
+                        )}
+                      >
+                        <div className={cn("w-full h-3 rounded-md bg-gradient-to-r shadow-sm", t.gradient)} />
+                        <div className="flex items-center justify-between mt-1">
+                          <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 leading-tight">
+                            {t.name}
+                          </span>
+                          {isSelected && <Check className="w-3.5 h-3.5 text-indigo-500 shrink-0" />}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

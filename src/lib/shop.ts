@@ -92,6 +92,42 @@ export const SHOP_ITEMS: ShopItem[] = [
     previewClass: "avatar-frame-emerald",
     accentColor: "from-emerald-400 to-teal-600"
   },
+  {
+    id: "frame-holographic",
+    name: "Prismatic Hologram Matrix",
+    category: "frame",
+    cost: 600,
+    icon: "✨",
+    desc: "Mythic iridescent hyper-dimensional border cycling through full spectrum starlight.",
+    rarity: "mythic",
+    perk: "Dynamic rainbow cycling aura with hyper-shimmer",
+    previewClass: "avatar-frame-holographic",
+    accentColor: "from-pink-500 via-cyan-400 to-amber-400"
+  },
+  {
+    id: "frame-sakura",
+    name: "Sakura Blossom Halo",
+    category: "frame",
+    cost: 280,
+    icon: "🌸",
+    desc: "Gentle floating cherry blossom petals and delicate radiant pink luminescence.",
+    rarity: "rare",
+    perk: "Soft pastel cherry blossom glow and petal accent",
+    previewClass: "avatar-frame-sakura",
+    accentColor: "from-pink-400 to-rose-400"
+  },
+  {
+    id: "frame-thunder",
+    name: "Thunderstorm Arc Reactor",
+    category: "frame",
+    cost: 450,
+    icon: "⚡",
+    desc: "Supercharged high-voltage electric discharge arcing continuously around your avatar.",
+    rarity: "epic",
+    perk: "High-frequency electric arc flashing animation",
+    previewClass: "avatar-frame-thunder",
+    accentColor: "from-yellow-400 via-amber-300 to-blue-500"
+  },
 
   // ── 2. ACADEMIC TITLES & BADGES ──
   {

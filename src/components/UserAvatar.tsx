@@ -55,6 +55,21 @@ const FRAME_DECORATIONS: Record<string, { badge: string; borderClass: string; gl
     badge: "🧪",
     borderClass: "avatar-frame-emerald",
     glowColor: "shadow-emerald-500/40"
+  },
+  "frame-holographic": {
+    badge: "✨",
+    borderClass: "avatar-frame-holographic",
+    glowColor: "shadow-pink-500/40"
+  },
+  "frame-sakura": {
+    badge: "🌸",
+    borderClass: "avatar-frame-sakura",
+    glowColor: "shadow-pink-400/40"
+  },
+  "frame-thunder": {
+    badge: "⚡",
+    borderClass: "avatar-frame-thunder",
+    glowColor: "shadow-yellow-400/40"
   }
 };
 
@@ -72,6 +87,7 @@ export default function UserAvatar({
 }: UserAvatarProps) {
   const [activeFrame, setActiveFrame] = useState<string | null>(frameId !== undefined ? frameId : null);
   const [activeCompanion, setActiveCompanion] = useState<string | null>(companionIcon || null);
+  const [avatarPhoto, setAvatarPhoto] = useState<string | null>(src || null);
   const [robloxAvatar, setRobloxAvatar] = useState<any>({
     bodyColor: "#f1f3f6",
     face: "classic",
@@ -87,6 +103,10 @@ export default function UserAvatar({
     }
 
     if (typeof window !== "undefined") {
+      if (!src) {
+        const storedPhoto = localStorage.getItem("edutrack_avatar_photo");
+        if (storedPhoto) setAvatarPhoto(storedPhoto);
+      }
       const storedFrame = localStorage.getItem("edutrack_equipped_frame");
       setActiveFrame(storedFrame || "frame-gold");
 
@@ -128,8 +148,17 @@ export default function UserAvatar({
         }
       };
 
+      const handlePhotoUpdate = (e: any) => {
+        if (e.detail?.photoUrl !== undefined) {
+          setAvatarPhoto(e.detail.photoUrl);
+        }
+      };
+      window.addEventListener("edutrack_avatar_photo_updated", handlePhotoUpdate);
       window.addEventListener("edutrack_shop_updated", handleShopUpdate);
-      return () => window.removeEventListener("edutrack_shop_updated", handleShopUpdate);
+      return () => {
+        window.removeEventListener("edutrack_shop_updated", handleShopUpdate);
+        window.removeEventListener("edutrack_avatar_photo_updated", handlePhotoUpdate);
+      };
     }
   }, [frameId, companionIcon]);
 
@@ -161,9 +190,9 @@ export default function UserAvatar({
           frameConfig && frameConfig.glowColor
         )}
       >
-        {src ? (
+        {(src || avatarPhoto) ? (
           <img
-            src={src}
+            src={(src || avatarPhoto)!}
             alt={name}
             className="w-full h-full object-cover rounded-full"
             onError={(e) => {
